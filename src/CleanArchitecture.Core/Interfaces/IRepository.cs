@@ -10,6 +10,6 @@ namespace CleanArchitecture.Core.Interfaces
         T Add(T entity);
         void Update(T entity);
         void Delete(T entity);
-        void AddProduct(T entity); // for testing
+        T AddProduct(T entity); // for testing
     }
 }

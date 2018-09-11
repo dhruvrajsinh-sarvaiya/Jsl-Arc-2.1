@@ -45,9 +45,12 @@ namespace CleanArchitecture.Infrastructure.Data
             _dbContext.SaveChanges();
         }
 
-        public void AddProduct(T entity)
+        public T AddProduct(T entity)
         {
-            throw new System.NotImplementedException();
+            _dbContext.Set<T>().Add(entity);
+            _dbContext.SaveChanges();
+
+            return entity;
         }
     }
 }
