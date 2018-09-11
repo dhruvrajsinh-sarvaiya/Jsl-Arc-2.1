@@ -44,5 +44,10 @@ namespace CleanArchitecture.Infrastructure.Data
             _dbContext.Entry(entity).State = EntityState.Modified;
             _dbContext.SaveChanges();
         }
+
+        public void AddProduct(T entity)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
