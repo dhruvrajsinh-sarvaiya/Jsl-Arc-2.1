@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace CleanArchitecture.Core.Entities
@@ -8,6 +9,7 @@ namespace CleanArchitecture.Core.Entities
     public class ReplyEmailQueue
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long EmailID { get; set; }
 
         public long RefNo { get; set; }
