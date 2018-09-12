@@ -21,5 +21,7 @@ namespace CleanArchitecture.Core.SharedKernel
         long? UpdatedBy { get; set; }
 
         int Status { get; set; }
+
+        public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
     }
 }
