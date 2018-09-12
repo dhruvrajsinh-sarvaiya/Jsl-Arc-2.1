@@ -6,7 +6,8 @@ namespace CleanArchitecture.Core.Enums
 {
     public enum ServiceStatus
     {
-        InActive = 9,
-        Active = 1        
+        Disable = 9,
+        Active = 1,
+        InActive = 0
     }
 }
