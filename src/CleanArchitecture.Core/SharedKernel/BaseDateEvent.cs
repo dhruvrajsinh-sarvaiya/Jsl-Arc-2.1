@@ -2,9 +2,9 @@
 
 namespace CleanArchitecture.Core.SharedKernel
 {
-    public abstract class BaseDomainEvent
+    public abstract class BaseDateEvent
     {
-        // public DateTime DateOccurred { get; protected set; } = DateTime.UtcNow;
+        public DateTime CreatedDate { get; protected set; } = DateTime.UtcNow;
         public DateTime UpdatedDate { get; protected set; } = DateTime.UtcNow;
     }
 }
