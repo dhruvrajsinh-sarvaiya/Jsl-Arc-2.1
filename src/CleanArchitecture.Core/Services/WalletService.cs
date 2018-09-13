@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.Services
 
     public class WalletService<T> : IWalletService<T> where T : BizBase
 { 
-        private readonly IRepository<WalletMaster> _todoRepository;
+        private readonly IWalletService<T> _todoRepository;
 
         bool IWalletService<T>.GetUserBalance(int walletId)
         {
