@@ -21,5 +21,6 @@ namespace CleanArchitecture.Core.SharedKernel
         public short Status { get; set; }
 
         public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
+
     }
 }
