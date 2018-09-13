@@ -14,7 +14,7 @@ namespace CleanArchitecture.Core.SharedKernel
 
         DateTime CreatedDate { get; set; }
 
-        DateTime? UpdatedDate { get; set; }
+        //DateTime? UpdatedDate { get; set; } already there in basedomainevent
 
         long CreatedBy { get; set; }
 
