@@ -6,21 +6,19 @@ using System.Text;
 
 namespace CleanArchitecture.Core.SharedKernel
 {
-    public class BizBase
+    public abstract class BizBase
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        int Id { get; set; }
+        public long Id { get; set; }
 
-        DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
 
-        DateTime? UpdatedDate { get; set; }
+        public long CreatedBy { get; set; }
 
-        long CreatedBy { get; set; }
+        public long? UpdatedBy { get; set; }
 
-        long? UpdatedBy { get; set; }
-
-        int Status { get; set; }
+        public short Status { get; set; }
 
         public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
     }

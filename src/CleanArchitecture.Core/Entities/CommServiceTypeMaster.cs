@@ -5,12 +5,10 @@ using System;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public  class CommServiceTypeMaster : BaseEntity
+    public  class CommServiceTypeMaster : BizBase
     {
         public long CommServiceID { get; set; }
         public string CommServiceTypeName { get; set; }
-        public short Status { get; set; }
-        public DateTime CreatedDate { get; set; }
 
         public void DisableService()
         {
