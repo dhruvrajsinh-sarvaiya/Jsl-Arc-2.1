@@ -17,15 +17,15 @@ namespace CleanArchitecture.Core.Entities
         public decimal MinimumAmount { get; set; }
         public decimal MaximumAmount { get; set; }
 
-        public void SetActiveService()
+        public void SetActiveProvider()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);
-            Events.Add(new ServiceActiveInactiveEvent(this));
+            Events.Add(new ServiceStatusEvent<ProviderConfiguration>(this));
         }
-        public void SetInActiveService()
+        public void SetInActiveProvider()
         {
             Status = Convert.ToInt16(ServiceStatus.InActive);
-            Events.Add(new ServiceActiveInactiveEvent(this));
+            Events.Add(new ServiceStatusEvent<ProviderConfiguration>(this));
         }
     }
 }

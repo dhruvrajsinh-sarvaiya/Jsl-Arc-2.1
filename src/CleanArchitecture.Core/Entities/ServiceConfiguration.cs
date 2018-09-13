@@ -20,12 +20,12 @@ namespace CleanArchitecture.Core.Entities
         public void SetActiveService()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);
-            Events.Add(new ServiceActiveInactiveEvent(this));
+            Events.Add(new ServiceStatusEvent<ServiceConfiguration>(this));
         }
         public void SetInActiveService()
         {
             Status = Convert.ToInt16(ServiceStatus.InActive);
-            Events.Add(new ServiceActiveInactiveEvent(this));
+            Events.Add(new ServiceStatusEvent<ServiceConfiguration>(this));
         }
     }
 }
