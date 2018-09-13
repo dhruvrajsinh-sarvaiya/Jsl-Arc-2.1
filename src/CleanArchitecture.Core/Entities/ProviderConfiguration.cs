@@ -7,11 +7,11 @@ using System;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ServiceConfiguration : BizBase
+    public class ProviderConfiguration : BizBase
     {
         [Key]       
-        public long ServiceID { get; set; }
-        public string ServiceName { get; set; }
+        public long SerProID { get; set; }
+        public string SerProName { get; set; }
         public short Status { get; set; }
         public short ServiceType { get; set; }
         public decimal MinimumAmount { get; set; }
