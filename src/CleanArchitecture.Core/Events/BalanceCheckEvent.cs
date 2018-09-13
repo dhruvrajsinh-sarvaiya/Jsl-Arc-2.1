@@ -10,10 +10,10 @@ namespace CleanArchitecture.Core.Events
     {
         public WalletMaster WalletObj { get; set; }
 
-        public WalletMaster CheckUserBalance(long WalletID)
-        {
+        //public WalletMaster CheckUserBalance(long WalletID)
+        //{
             
-        }
+        //}
 
     }
 }
