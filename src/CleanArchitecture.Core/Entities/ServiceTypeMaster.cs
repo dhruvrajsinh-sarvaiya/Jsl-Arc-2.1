@@ -7,12 +7,10 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ServiceTypeMaster : BaseEntity
+    public class ServiceTypeMaster : BizBase
     {
         public long ServiceTypeID { get; set; }
         public string ServiceTypeName { get; set; }
-        public short Status { get; set; }
-        public DateTime CreatedDate { get; set; }
 
         public void DisableService()
         {

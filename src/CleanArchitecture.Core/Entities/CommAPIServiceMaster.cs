@@ -5,7 +5,7 @@ using System;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public  class CommAPIServiceMaster : BaseEntity
+    public  class CommAPIServiceMaster : BizBase
     {
         public long APID { get; set; }
         public long CommServiceID { get; set; }
@@ -15,6 +15,5 @@ namespace CleanArchitecture.Core.Entities
         public string UserID { get; set; }
         public string Password { get; set; }
         public string Balance { get; set; }
-        public DateTime CreatedDate { get; set; }
     }
 }

@@ -7,25 +7,25 @@ using System;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ServiceConfiguration : BizBase
+    public class ProviderConfiguration : BizBase
     {
         [Key]       
-        public long ServiceID { get; set; }
-        public string ServiceName { get; set; }
+        public long SerProID { get; set; }
+        public string SerProName { get; set; }
         public short Status { get; set; }
         public short ServiceType { get; set; }
         public decimal MinimumAmount { get; set; }
         public decimal MaximumAmount { get; set; }
 
-        public void SetActiveService()
+        public void SetActiveProvider()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);
-            Events.Add(new ServiceStatusEvent<ServiceConfiguration>(this));
+            Events.Add(new ServiceStatusEvent<ProviderConfiguration>(this));
         }
-        public void SetInActiveService()
+        public void SetInActiveProvider()
         {
             Status = Convert.ToInt16(ServiceStatus.InActive);
-            Events.Add(new ServiceStatusEvent<ServiceConfiguration>(this));
+            Events.Add(new ServiceStatusEvent<ProviderConfiguration>(this));
         }
     }
 }

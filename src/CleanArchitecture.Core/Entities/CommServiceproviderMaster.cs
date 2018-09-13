@@ -5,13 +5,11 @@ using System;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public  class CommServiceproviderMaster : BaseEntity
+    public  class CommServiceproviderMaster : BizBase
     {
         public long CommSerproID { get; set; }
         public long CommServiceID { get; set; }
         public string SerproName { get; set; }
-        public short Status { get; set; }
-        public DateTime CreatedDate { get; set; }
 
         public void DisableService()
         {
