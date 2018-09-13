@@ -7,16 +7,15 @@ namespace CleanArchitecture.Core.ViewModels
 {
     public class SMSServiceRequest
     {
-
         [Key]
-        public int Id { get; set; }
+        public int TemplateID { get; set; }
 
         [Required]
         [Phone]
         public long MobileNo { get; set; }
 
         [Required]
-        [StringLength(1024, MinimumLength = 5)]
+        [StringLength(300, MinimumLength = 5)]
         public string Message { get; set; }
     }
 }

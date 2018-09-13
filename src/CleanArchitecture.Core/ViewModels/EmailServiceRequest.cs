@@ -7,11 +7,12 @@ namespace CleanArchitecture.Core.ViewModels
 {
     public class EmailServiceRequest
     {
-        [Key]
-        public int Id { get; set; }
+        [Required]
+        public int TemplateID { get; set; }
+
         [Required]
         [StringLength(255, MinimumLength = 5)]
-        public string Name { get; set; }
+        public string Subject { get; set; }
 
         [Required]
         [EmailAddress]
