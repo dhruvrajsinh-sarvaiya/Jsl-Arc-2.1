@@ -7,7 +7,7 @@ namespace CleanArchitecture.Core.ViewModels
 {
     public class SMSServiceRequest
     {
-        [Key]
+        [Required]
         public int TemplateID { get; set; }
 
         [Required]
