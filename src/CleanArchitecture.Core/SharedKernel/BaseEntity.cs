@@ -7,7 +7,7 @@ namespace CleanArchitecture.Core.SharedKernel
     public abstract class BaseEntity
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int AutoNo { get; set; }
+        public int Id { get; set; }
 
         public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
     }
