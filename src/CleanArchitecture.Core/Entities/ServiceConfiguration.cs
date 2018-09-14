@@ -22,10 +22,12 @@ namespace CleanArchitecture.Core.Entities
         public string SMSCode { get; set; }
         public short ServiceType { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal MinimumAmount { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal MaximumAmount { get; set; }
 
         public void SetActiveService()

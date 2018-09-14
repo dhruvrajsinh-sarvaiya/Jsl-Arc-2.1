@@ -34,10 +34,12 @@ namespace CleanArchitecture.Core.Entities
         public string ValidationUrl { get; set; }
         public string TransactionUrl { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal MinimumAmount { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal MaximumAmount { get; set; }
 
         [StringLength(50)]

@@ -37,7 +37,9 @@ namespace CleanArchitecture.Core.Entities
         public string CustomerMobile { get; set; }
 
         [Required]
-        [Range(0, 9999999999.99999999)]
+        //[Range(0, 9999999999.99999999)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
         [Required]
@@ -99,10 +101,12 @@ namespace CleanArchitecture.Core.Entities
         public string AdditionalInfo { get; set; }
 
         //public long? CouponNo { get; set; }
-        [Range(0, 9999999999.99999999)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal? ChargePer { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal? ChargeRs { get; set; }
 
         public short? ChargeType { get; set; }
