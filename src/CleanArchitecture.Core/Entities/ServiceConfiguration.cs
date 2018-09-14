@@ -4,17 +4,28 @@ using CleanArchitecture.Core.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Core.Entities
 {
     public class ServiceConfiguration : BizBase
     {
-        [Key]       
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ServiceID { get; set; }
+
+        [StringLength(30)]
         public string ServiceName { get; set; }
-        public short Status { get; set; }
+        //public short Status { get; set; }
+
+        [StringLength(10)]
+        public string SMSCode { get; set; }
         public short ServiceType { get; set; }
+
+        [Range(0, 9999999999.99999999)]
         public decimal MinimumAmount { get; set; }
+
+        [Range(0, 9999999999.99999999)]
         public decimal MaximumAmount { get; set; }
 
         public void SetActiveService()

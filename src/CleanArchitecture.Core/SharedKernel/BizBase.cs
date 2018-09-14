@@ -12,10 +12,12 @@ namespace CleanArchitecture.Core.SharedKernel
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [DataType(DataType.Date)]
         public DateTime CreatedDate { get; set; }
 
         public long CreatedBy { get; set; }
 
+        [DataType(DataType.DateTime)]
         public long? UpdatedBy { get; set; }
 
         public short Status { get; set; }
