@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Events;
+using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {   
@@ -38,7 +41,7 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         //[Range(0, 9999999999.99999999)]
-        [DataType(DataType.Currency)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
@@ -110,6 +113,28 @@ namespace CleanArchitecture.Core.Entities
         public decimal? ChargeRs { get; set; }
 
         public short? ChargeType { get; set; }
+
+        public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
+
+        public void MakeTransactionSuccess()
+        {
+            Status = Convert.ToInt16(TransactionStatus.Success);
+            AddValueChangeEvent();
+        }
+        public void SetTransactionCode(short statuscode)
+        {
+            StatusCode = statuscode;
+            AddValueChangeEvent();
+        }
+        public void SetTransactionStatusMsg(string statusMsg)
+        {
+            StatusMsg = statusMsg;
+            AddValueChangeEvent();
+        }
+        public void AddValueChangeEvent()
+        {
+            Events.Add(new ServiceStatusEvent<TransactionQueue>(this));
+        }
 
     }
 }
