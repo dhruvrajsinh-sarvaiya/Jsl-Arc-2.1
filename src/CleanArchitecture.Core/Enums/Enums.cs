@@ -29,4 +29,22 @@ namespace CleanArchitecture.Core.Enums
         Deposit = 8,
         Generate_Address = 9
     }
+    public enum EnOrderStatus
+    {
+        Rejected = 9,
+        Success = 1,
+        Pending = 0
+    }
+
+    public enum EnOrderType
+    {
+        BuyOrder = 1,
+        SellOrder = 2,
+        CancelOrder = 3,
+        DepositOrder = 4,
+        WithdrawalOrder = 5,
+        CashOnBank = 6,
+        Cheque = 7,
+        Transfer = 8
+    }
 }

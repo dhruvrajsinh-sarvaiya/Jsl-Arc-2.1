@@ -40,7 +40,7 @@ namespace CleanArchitecture.Core.Entities
         public void SetAsSettled()
         {
             IsSettled = 1;
-            Events.Add(new CommonCompletedEvent<TransactionAccount>(this));
+            Events.Add(new ServiceStatusEvent<TransactionAccount>(this));
         }
     }
 
