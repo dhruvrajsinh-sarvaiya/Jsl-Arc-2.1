@@ -2,12 +2,17 @@
 using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.Entities
 {
     public  class CommServiceTypeMaster : BizBase
     {
+        [Required]
         public long CommServiceID { get; set; }
+
+        [Required]
+        [StringLength(60)]
         public string CommServiceTypeName { get; set; }
 
         public void DisableService()
