@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
@@ -16,7 +17,7 @@ namespace CleanArchitecture.Core.Entities
         public DateTime TrnDate { get; set; }
 
         [Required]
-        public byte ServiceTypeID { get; set; } // fk of ServiceTypeMaster table
+        public EnServiceType ServiceTypeID { get; set; } // fk of ServiceTypeMaster table
 
         [Required]
         public long TrnNo { get; set; }

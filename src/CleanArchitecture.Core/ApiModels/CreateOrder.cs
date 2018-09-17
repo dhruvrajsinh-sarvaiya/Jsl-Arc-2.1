@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels
 {
-    public class CreateOrderRequest : CommonRequestClass
+    public class CreateOrderRequest : BizRequestClass
     {
         [Required]
         public decimal OrderAmt { get; set; }
@@ -18,7 +18,7 @@ namespace CleanArchitecture.Core.ViewModels
         public long OWalletMasterID { get; set; }
     }
 
-    public class CreateOrderResponse : CommonResponseClass
+    public class CreateOrderResponse : BizResponseClass
     {
         public decimal OrderID { get; set; }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels
 {
-    public class CommonRequestClass
+    public class BizRequestClass
     {
         public string AccessToken { get; set; }
     }

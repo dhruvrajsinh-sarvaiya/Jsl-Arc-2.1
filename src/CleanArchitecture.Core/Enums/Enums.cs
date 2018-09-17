@@ -47,4 +47,17 @@ namespace CleanArchitecture.Core.Enums
         Cheque = 7,
         Transfer = 8
     }
+
+    public enum EnServiceType
+    {
+        Recharge = 1,
+        BillPayment = 2,
+        DTH = 3,
+        Buy_Trade = 4,
+        Sell_Trade = 5,
+        Withdraw = 6,
+        Shoping_Cart = 7,
+        Deposit = 8,
+        Generate_Address = 9
+    }
 }

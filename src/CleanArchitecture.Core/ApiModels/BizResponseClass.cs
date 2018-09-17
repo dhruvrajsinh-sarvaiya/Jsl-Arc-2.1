@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels
 {
-    public class CommonResponseClass
+    public class BizResponseClass
     {
         public byte ReturnCode { get; set; }
 
