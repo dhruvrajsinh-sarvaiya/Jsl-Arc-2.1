@@ -87,12 +87,12 @@ namespace CleanArchitecture.Core.Entities
         public void SetAsSuccess()
         {
             Status = EnOrderStatus.Success;
-            Events.Add(new CommonCompletedEvent<WalletOrder>(this));
+            Events.Add(new ServiceStatusEvent<WalletOrder>(this));
         }
         public void SetAsRejected()
         {
             Status = EnOrderStatus.Rejected;
-            Events.Add(new CommonCompletedEvent<WalletOrder>(this));
+            Events.Add(new ServiceStatusEvent<WalletOrder>(this));
         }
 
     }
