@@ -2,18 +2,42 @@
 using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Core.Entities
 {
     public  class CommAPIServiceMaster : BizBase
     {
+        [Required]
         public long APID { get; set; }
+
+        [Required]
         public long CommServiceID { get; set; }
-        public long SenderID { get; set; }
+
+        [Required]
+        [StringLength(60)]
+        public string SenderID { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string SMSSendURL { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string SMSBalURL { get; set; }
+
+        [Required]
+        [StringLength(20)]
         public string UserID { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string Password { get; set; }
-        public string Balance { get; set; }
+
+        [Range(1, 100)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Balance { get; set; }
     }
 }
