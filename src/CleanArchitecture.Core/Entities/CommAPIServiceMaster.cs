@@ -39,5 +39,8 @@ namespace CleanArchitecture.Core.Entities
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Balance { get; set; }
+
+        [Required]
+        public int Priority { get; set; }
     }
 }

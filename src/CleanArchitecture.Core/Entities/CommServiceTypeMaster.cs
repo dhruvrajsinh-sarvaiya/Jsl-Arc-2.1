@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.Entities
     public  class CommServiceTypeMaster : BizBase
     {
         [Required]
-        public long CommServiceID { get; set; }
+        public long CommServiceTypeID { get; set; }
 
         [Required]
         [StringLength(60)]

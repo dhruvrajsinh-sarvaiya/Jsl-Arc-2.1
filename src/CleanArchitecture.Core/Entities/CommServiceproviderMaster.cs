@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.Entities
         public long CommSerproID { get; set; }
 
         [Required]
-        public long CommServiceID { get; set; }
+        public long CommServiceTypeID { get; set; }
 
         [Required]
         [StringLength(60)]

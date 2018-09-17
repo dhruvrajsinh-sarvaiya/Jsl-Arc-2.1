@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.SharedKernel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,11 +7,11 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ReplyEmailQueue
+    public class EmailQueue : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long EmailID { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long EmailID { get; set; }
 
         public long RefNo { get; set; }
 
@@ -34,18 +35,10 @@ namespace CleanArchitecture.Core.Entities
         [StringLength(500)]
         public string Attachment { get; set; }
 
-        [Required]
-        public DateTime CreateDate { get; set; }
-
-        [Required]
-        public short Status { get; set; }
-
         public short SendBy { get; set; }
 
         public short EmailType { get; set; }
 
         public short ChannelID { get; set; }
-
-        public DateTime SendDate { get; set; }
     }
 }

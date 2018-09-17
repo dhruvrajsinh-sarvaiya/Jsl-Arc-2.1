@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ReplySMSQueue
+    public class MessagingQueue : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long SMSID { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long SMSID { get; set; }
 
         [Required]
         public long RefNo { get; set; }
@@ -27,13 +28,7 @@ namespace CleanArchitecture.Core.Entities
         public string RespText { get; set; }
 
         [Required]
-        public DateTime TrnDate { get; set; }
-
-        [Required]
         public short SMSServiceID { get; set; }
-
-        [Required]
-        public short Status { get; set; }
 
         [Required]
         public short SMSSendBy { get; set; }
@@ -46,7 +41,5 @@ namespace CleanArchitecture.Core.Entities
         public string GTalkID { get; set; }
 
         public string RegisterID { get; set; }
-
-        public DateTime SendDate { get; set; }
     }
 }
