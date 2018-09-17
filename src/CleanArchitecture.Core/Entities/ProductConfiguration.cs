@@ -8,29 +8,31 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ProviderConfiguration : BizBase
+    public class ProductConfiguration : BizBase
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long SerProID { get; set; }
+        public long ProductID { get; set; }
 
+        [Required]
         [StringLength(30)]
-        public string SerProName { get; set; }
+        public string ProductName { get; set; }
         //public short Status { get; set; }
         [Required]
-        public short AppType { get; set; }
+        public long ServceID { get; set; }
 
-        public long  ThirdPartyAPIServiceId { get; set; }
+        [Required]
+        public long StateID { get; set; }        
 
-        public void SetActiveProvider()
+        public void SetActiveProduct()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);
-            Events.Add(new ServiceStatusEvent<ProviderConfiguration>(this));
+            Events.Add(new ServiceStatusEvent<ProductConfiguration>(this));
         }
-        public void SetInActiveProvider()
+        public void SetInActiveProduct()
         {
             Status = Convert.ToInt16(ServiceStatus.InActive);
-            Events.Add(new ServiceStatusEvent<ProviderConfiguration>(this));
+            Events.Add(new ServiceStatusEvent<ProductConfiguration>(this));
         }
     }
 }

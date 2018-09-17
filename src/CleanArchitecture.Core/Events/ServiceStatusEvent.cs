@@ -5,11 +5,11 @@ namespace CleanArchitecture.Core.Events
 {
     public class ServiceStatusEvent<T> : BaseDomainEvent
     {
-        public T ChanegdServiceStatus { get; set; }
+        public T ChangedServiceStatus { get; set; }
 
         public ServiceStatusEvent(T ChangedStatus)
         {
-            ChanegdServiceStatus = ChangedStatus;
+            ChangedServiceStatus = ChangedStatus;
         }
     }
 }
