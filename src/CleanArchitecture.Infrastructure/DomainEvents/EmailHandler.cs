@@ -19,9 +19,23 @@ namespace CleanArchitecture.Infrastructure.Services
             _MessageRepository = MessageRepository;
         }
 
-        public Task<SendEmailResponse> Handle(SendEmailRequest request, CancellationToken cancellationToken)
+        public Task<SendEmailResponse> Handle(SendEmailRequest Request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new SendEmailResponse { });
+            var Email = new EmailQueue()
+            {
+                EmailType = Request.EmailType,
+                Recepient = Request.Recepient,
+                Attachment = Request.Attachment,
+                BCC = Request.BCC,
+                CC = Request.CC,
+                Body = Request.Body,
+                Status = 0,
+                Subject  = Request.Subject,
+                SendBy =  1,
+                CreatedDate = DateTime.UtcNow
+            };
+            _MessageRepository.Add(Email);
+            return Task.FromResult(new SendEmailResponse { ResponseCode = 101, ResponseMessage = "Message sent." });
         }
 
 
