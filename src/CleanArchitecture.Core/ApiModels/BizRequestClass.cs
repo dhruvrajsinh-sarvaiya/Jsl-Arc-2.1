@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CleanArchitecture.Core.ViewModels
+namespace CleanArchitecture.Core.ApiModels
 {
     public class BizRequestClass
     {
-        public string AccessToken { get; set; }
+        //public string AccessToken { get; set; }
     }
 }
