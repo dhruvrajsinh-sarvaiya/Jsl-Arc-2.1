@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Web
 {
@@ -12,6 +13,11 @@ namespace CleanArchitecture.Web
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+            .ConfigureLogging((hostingContext, logging) =>
+            {
+                logging.AddConsole(options => options.IncludeScopes = true);
+                logging.AddDebug();
+            })
                 .UseStartup<Startup>();
     }
 }
