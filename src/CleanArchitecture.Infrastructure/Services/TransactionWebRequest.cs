@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    class MakeAPIRequest : IWebApiConfiguration<TransactionApiConfigurationResponse>
+    class TransactionWebRequest : IWebApiConfiguration<TransactionApiConfigurationResponse>
     {
         public Task SendAPIRequestAsync(string Url, string Request, string MethodType = "POST")
         {
