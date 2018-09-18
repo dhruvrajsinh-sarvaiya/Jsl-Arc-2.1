@@ -250,5 +250,4 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
-src/CleanArchitecture.Web/CleanArchitecture.Web.csproj
 *.csproj

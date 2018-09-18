@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Core.Interfaces
 {
-    public interface ITransaction<T>
+    public interface IWebApiConfiguration<T>
     {
          Task SendAPIRequestAsync(string Url, string Request, string MethodType="POST");
          Task<T> TransactionParseResponse(string TransactionResponse);
