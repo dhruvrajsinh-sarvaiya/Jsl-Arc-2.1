@@ -5,7 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Events;
+using CleanArchitecture.Core.Services;
 using CleanArchitecture.Core.SharedKernel;
+using Microsoft.Extensions.Logging;
 
 
 namespace CleanArchitecture.Core.Entities
@@ -84,10 +86,25 @@ namespace CleanArchitecture.Core.Entities
 
         //public bool? IsDebited { get; set; }
 
+        readonly ILogger<ExceptionLog> _log;
+
+        public WalletOrder(ILogger<ExceptionLog> log)
+        {
+            _log = log;
+        }
+
         public void SetAsSuccess()
         {
-            Status = EnOrderStatus.Success;
-            Events.Add(new ServiceStatusEvent<WalletOrder>(this));
+            try
+            {
+                Status = EnOrderStatus.Success;
+                Events.Add(new ServiceStatusEvent<WalletOrder>(this));
+            }
+            catch(Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name,LogLevel.Error);
+            }
+
         }
         public void SetAsRejected()
         {
