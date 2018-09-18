@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace CleanArchitecture.Core.ViewModels
+namespace CleanArchitecture.Core.ApiModels
 {
-    class TransactionApiConfigurationRequest
+    public class TransactionApiConfigurationRequest
     {
         [Required]
         public long TrnNo { get; set; }       
     }
-    class TransactionApiConfigurationResponse
+    public class TransactionApiConfigurationResponse
     {
         public long ServiceID { get; set; }
         public string ServiceName { get; set; }
