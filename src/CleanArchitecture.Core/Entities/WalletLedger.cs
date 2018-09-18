@@ -8,7 +8,7 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class MemberLedger : BizBase
+    public class WalletLedger : BizBase
     {
         [Required]
         public long WalletMasterId { get; set;} // fk of walletmaster table

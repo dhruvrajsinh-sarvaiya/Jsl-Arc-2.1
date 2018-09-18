@@ -6,7 +6,7 @@ using System.Text;
 namespace CleanArchitecture.Core.Interfaces
 {
     
-    public interface IWalletService<T> where T : BizBase
+    public interface IWalletService
     {
         bool GetUserBalance(int walletId);
 
