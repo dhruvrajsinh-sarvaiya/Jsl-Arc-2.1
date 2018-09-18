@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace CleanArchitecture.Core.ViewModels
+namespace CleanArchitecture.Core.ApiModels
 {
     public class SMSServiceRequest
     {

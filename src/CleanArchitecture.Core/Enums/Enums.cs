@@ -60,4 +60,12 @@ namespace CleanArchitecture.Core.Enums
         Deposit = 8,
         Generate_Address = 9
     }
+
+    public enum MessageStatusType
+    {
+        Pending = 6,
+        Success = 1,
+        Initialize = 0,
+        Fail = 9
+    }
 }

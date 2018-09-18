@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Web.ApiModels;
 using CleanArchitecture.Web.Filters;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Web.Api
@@ -15,10 +17,12 @@ namespace CleanArchitecture.Web.Api
     public class ToDoItemsController : Controller
     {
         private readonly IRepository<ToDoItem> _todoRepository;
+        private readonly IMediator _mediator;
 
-        public ToDoItemsController(IRepository<ToDoItem> todoRepository)
+        public ToDoItemsController(IRepository<ToDoItem> todoRepository, IMediator mediator)
         {
             _todoRepository = todoRepository;
+            _mediator = mediator;
         }
 
         // GET: api/ToDoItems
@@ -59,6 +63,13 @@ namespace CleanArchitecture.Web.Api
             _todoRepository.Update(toDoItem);
 
             return Ok(ToDoItemDTO.FromToDoItem(toDoItem));
+        }
+
+        [HttpPost("SendMessage")]
+        public async Task<IActionResult> SendMessage(SendSMSRequest Request)
+        {
+            SendSMSResponse Response = await _mediator.Send(Request);
+            return Ok(Response);
         }
     }
 }

@@ -7,5 +7,7 @@ namespace CleanArchitecture.Core.ViewModels
 {
     public class SendEmailResponse : IRequest
     {
+        public int ResponseCode { get; set; }
+        public string ResponseMessage { get; set; }
     }
 }

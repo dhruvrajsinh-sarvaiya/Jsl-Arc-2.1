@@ -19,10 +19,20 @@ namespace CleanArchitecture.Infrastructure.Services
             _MessageRepository = MessageRepository;
         }
 
-        public Task<SendNotificationResponse> Handle(SendNotificationRequest request, CancellationToken cancellationToken)
+        public Task<SendNotificationResponse> Handle(SendNotificationRequest Request, CancellationToken cancellationToken)
         {
-            
-            return Task.FromResult(new SendNotificationResponse { });
+
+            var Notification = new NotificationQueue()
+            {
+                MobileNo = Request.MobileNo,
+                Message = Request.Message,
+                DeviceID = Request.DeviceID,
+                Status = 0,
+                CreatedBy = 1,
+                CreatedDate = DateTime.UtcNow
+            };
+            _MessageRepository.Add(Notification);
+            return Task.FromResult(new SendNotificationResponse { ResponseCode = 101, ResponseMessage = "Message sent." });
         }
 
         //public Task<ToDoItemResponse> Handle(ToDoItemRequest request, CancellationToken cancellationToken)

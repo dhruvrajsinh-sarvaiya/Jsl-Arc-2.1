@@ -4,6 +4,8 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using CleanArchitecture.Core.SharedKernel;
+using CleanArchitecture.Core.Events;
+using CleanArchitecture.Core.Enums;
 
 namespace CleanArchitecture.Core.Entities
 {
@@ -13,8 +15,8 @@ namespace CleanArchitecture.Core.Entities
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         //public long SMSID { get; set; }
 
-        [Required]
-        public long RefNo { get; set; }
+        //[Required]
+        //public long RefNo { get; set; }
 
         [Required]
         [Phone]
@@ -26,20 +28,37 @@ namespace CleanArchitecture.Core.Entities
 
         [StringLength(1000)]
         public string RespText { get; set; }
-
-        [Required]
+        
         public short SMSServiceID { get; set; }
-
-        [Required]
+        
         public short SMSSendBy { get; set; }
 
-        [Required]
-        public short Gateway { get; set; }
+        //[Required]
+        //public short Gateway { get; set; }
 
-        public short ChannelID { get; set; }
+        //public short ChannelID { get; set; }
 
-        public string GTalkID { get; set; }
+        //public string GTalkID { get; set; }
 
-        public string RegisterID { get; set; }
+        //public string RegisterID { get; set; }
+
+
+        public void FailMessage()
+        {
+            Status = Convert.ToInt16(MessageStatusType.Fail);
+            Events.Add(new ServiceStatusEvent<MessagingQueue>(this));
+        }
+
+        public void InQueueMessage()
+        {
+            Status = Convert.ToInt16(MessageStatusType.Pending);
+            Events.Add(new ServiceStatusEvent<MessagingQueue>(this));
+        }
+
+        public void SentMessage()
+        {
+            Status = Convert.ToInt16(MessageStatusType.Success);
+            Events.Add(new ServiceStatusEvent<MessagingQueue>(this));
+        }
     }
 }
