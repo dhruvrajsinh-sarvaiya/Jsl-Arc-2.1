@@ -86,9 +86,9 @@ namespace CleanArchitecture.Core.Entities
 
         //public bool? IsDebited { get; set; }
 
-        readonly ILogger<ExceptionLog> _log;
+        readonly ILogger<WalletOrder> _log;
 
-        public WalletOrder(ILogger<ExceptionLog> log)
+        public WalletOrder(ILogger<WalletOrder> log)
         {
             _log = log;
         }
