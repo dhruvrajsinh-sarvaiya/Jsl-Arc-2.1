@@ -12,6 +12,9 @@ namespace CleanArchitecture.Core.Entities
         public long CommServiceTypeID { get; set; }
 
         [Required]
+        public long ServiceTypeID { get; set; }
+
+        [Required]
         [StringLength(60)]
         public string CommServiceTypeName { get; set; }
 
