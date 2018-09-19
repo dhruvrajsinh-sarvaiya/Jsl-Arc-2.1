@@ -10,6 +10,6 @@ namespace CleanArchitecture.Core.Interfaces
         Task SendAPIRequestAsync(string Url, string Request, string MethodType="POST");
         Task<TResponse> TransactionParseResponse(string TransactionResponse);
         Task<TResponse> GetAPIConfigurationAsync(TRequest Request);
-        Task<TResponse> GetTemplateConfigurationAsync(TRequest Request);
+        //Task<TResponse> GetTemplateConfigurationAsync(TRequest Request);
     }
 }

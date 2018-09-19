@@ -3,6 +3,7 @@ using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Core.Entities
 {
@@ -17,6 +18,19 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         [StringLength(60)]
         public string SerproName { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        public string UserID { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string Password { get; set; }
+
+        [Range(1, 100)]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Balance { get; set; }
 
         public void DisableService()
         {
