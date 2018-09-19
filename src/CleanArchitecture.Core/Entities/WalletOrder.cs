@@ -51,12 +51,12 @@ namespace CleanArchitecture.Core.Entities
 
       
 
-        readonly ILogger<WalletOrder> _log;
+        //readonly ILogger<WalletOrder> _log;
 
-        public WalletOrder(ILogger<WalletOrder> log)
-        {
-            _log = log;
-        }
+        //public WalletOrder(ILogger<WalletOrder> log)
+        //{
+        //    _log = log;
+        //}
 
         public void SetAsSuccess()
         {
@@ -67,7 +67,8 @@ namespace CleanArchitecture.Core.Entities
             }
             catch(Exception ex)
             {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name,LogLevel.Error);
+                // _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name,LogLevel.Error);
+                throw ex;
             }
 
         }
@@ -81,7 +82,8 @@ namespace CleanArchitecture.Core.Entities
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
             }
         }
 
