@@ -6,11 +6,13 @@ using System.Text;
 namespace CleanArchitecture.Core.Interfaces
 {
     
-    public interface IWalletService<T> where T : BizBase
+    public interface IWalletService
     {
-        bool GetUserBalance(int walletId);
+        decimal GetUserBalance(int walletId);
 
         bool CreditWallet(int walletId, ref decimal PostBal);
+
+        bool WalletBalanceCheck(decimal amount,long walletId);
 
         bool DebitWallet(int walletId,ref decimal PostBal);
 

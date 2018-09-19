@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Infrastructure.Data;
+using CleanArchitecture.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -68,6 +69,7 @@ namespace CleanArchitecture.Web
 
                 // TODO: Move to Infrastucture Registry
                 config.For(typeof(IRepository<>)).Add(typeof(EfRepository<>));
+                config.For(typeof(IWalletRepository<>)).Add(typeof(WalletRepository<>));
                 config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
                 config.For<IMediator>().Use<Mediator>();
 
@@ -80,9 +82,9 @@ namespace CleanArchitecture.Web
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            //loggerFactory.AddFile("Logs/myapp-{Date}.txt");
-            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            //loggerFactory.AddDebug();
+            loggerFactory.AddFile("Logs/myapp-{Date}.txt");
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
 
             if (env.IsDevelopment())
             {

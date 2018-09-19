@@ -33,28 +33,7 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public new EnOrderStatus Status { get; set; }
-
-        //public double DiscPer { get; set; }
-
-        //public decimal DiscRs { get; set; }
-
-        //public long? OBankID { get; set; }
-
-        //public string OBranchName { get; set; }
-
-        //public string OAccountNo { get; set; }
-
-        //public string OChequeNo { get; set; }
-
-        //public DateTime? OChequeDate { get; set; }
-
-        //public long DMemberID { get; set; }
-
-        //public long DBankID { get; set; }
-
-        //public string DAccountNo { get; set; }
-
-        //public byte Status { get; set; }
+             
         [Required]
         [StringLength(100)]
         public string ORemarks { get; set; }
@@ -70,21 +49,7 @@ namespace CleanArchitecture.Core.Entities
 
         public DateTime? DeliveryGivenDate { get; set; }
 
-        //public byte AlertRec { get; set; }
-
-        //public double CashChargePer { get; set; }
-
-        //public decimal CashChargeRs { get; set; }
-
-        //public decimal WalletAmt { get; set; }
-
-        //public int? PGId { get; set; }
-
-        //public long? CouponNo { get; set; }
-
-        //public bool? IsChargeAccepted { get; set; }
-
-        //public bool? IsDebited { get; set; }
+      
 
         readonly ILogger<WalletOrder> _log;
 
@@ -108,8 +73,16 @@ namespace CleanArchitecture.Core.Entities
         }
         public void SetAsRejected()
         {
-            Status = EnOrderStatus.Rejected;
-            Events.Add(new ServiceStatusEvent<WalletOrder>(this));
+            try
+            {
+
+                Status = EnOrderStatus.Rejected;
+                Events.Add(new ServiceStatusEvent<WalletOrder>(this));
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+            }
         }
 
     }
