@@ -17,7 +17,13 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         public DbSet<ToDoItem> ToDoItems { get; set; }
-        public DbSet<MessagingQueue> MessagingQueue { get; set; }
+        public DbSet<MessagingQueue> MessagingQueue { get; set; }        
+        public DbSet<WalletTypeMaster> WalletTypeMasters { get; set; }
+        public DbSet<WalletMaster> WalletMasters { get; set; }
+        public DbSet<WalletOrder> WalletOrders { get; set; }
+        public DbSet<TransactionAccount> TransactionAccounts { get; set; }
+        public DbSet<WalletLedger> WalletLedgers { get; set; }
+
 
         public override int SaveChanges()
         {
