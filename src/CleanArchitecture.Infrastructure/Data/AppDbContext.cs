@@ -10,6 +10,10 @@ namespace CleanArchitecture.Infrastructure.Data
     {
         private readonly IDomainEventDispatcher _dispatcher;
 
+        public AppDbContext()
+        {
+        }
+
         public AppDbContext(DbContextOptions<AppDbContext> options, IDomainEventDispatcher dispatcher)
             : base(options)
         {
@@ -18,6 +22,15 @@ namespace CleanArchitecture.Infrastructure.Data
 
         public DbSet<ToDoItem> ToDoItems { get; set; }
         public DbSet<MessagingQueue> MessagingQueue { get; set; }
+        public DbSet<EmailQueue> EmailQueue { get; set; }
+        public DbSet<NotificationQueue> NotificationQueue { get; set; }
+        public DbSet<CommAPIServiceMaster> CommAPIServiceMaster { get; set; }
+        public DbSet<CommServiceMaster> CommServiceMaster { get; set; }
+        public DbSet<CommServiceproviderMaster> CommServiceproviderMaster { get; set; }
+        public DbSet<CommServiceTypeMaster> CommServiceTypeMaster { get; set; }
+        public DbSet<RequestFormatMaster> RequestFormatMaster { get; set; }
+        public DbSet<ServiceTypeMaster> ServiceTypeMaster { get; set; }
+        public DbSet<TemplateMaster> TemplateMaster { get; set; }
 
         public override int SaveChanges()
         {
