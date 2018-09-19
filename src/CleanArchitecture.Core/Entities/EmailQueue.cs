@@ -1,4 +1,6 @@
-﻿using CleanArchitecture.Core.SharedKernel;
+﻿using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Events;
+using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,7 +15,7 @@ namespace CleanArchitecture.Core.Entities
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         //public long EmailID { get; set; }
 
-        public long RefNo { get; set; }
+        //public long RefNo { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -39,6 +41,25 @@ namespace CleanArchitecture.Core.Entities
 
         public short EmailType { get; set; }
 
-        public short ChannelID { get; set; }
+        //public short ChannelID { get; set; }
+
+
+        public void FailMessage()
+        {
+            Status = Convert.ToInt16(MessageStatusType.Fail);
+            Events.Add(new ServiceStatusEvent<EmailQueue>(this));
+        }
+
+        public void InQueueMessage()
+        {
+            Status = Convert.ToInt16(MessageStatusType.Pending);
+            Events.Add(new ServiceStatusEvent<EmailQueue>(this));
+        }
+
+        public void SentMessage()
+        {
+            Status = Convert.ToInt16(MessageStatusType.Success);
+            Events.Add(new ServiceStatusEvent<EmailQueue>(this));
+        }
     }
 }

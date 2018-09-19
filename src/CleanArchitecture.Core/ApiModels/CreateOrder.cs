@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -16,11 +17,18 @@ namespace CleanArchitecture.Core.ViewModels
 
         [Required]
         public long OWalletMasterID { get; set; }
+
+        [Required]
+        public long DWalletMasterID { get; set; }
+
+        [Required]
+        public EnOrderType OrderType { get; set; }
+
     }
 
     public class CreateOrderResponse : BizResponseClass
     {
-        public decimal OrderID { get; set; }
+        public long OrderID { get; set; }
 
         public string ORemarks { get; set; }        
     }

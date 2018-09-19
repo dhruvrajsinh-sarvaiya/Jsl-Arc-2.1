@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Infrastructure.Data;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -47,6 +48,8 @@ namespace CleanArchitecture.Web
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
             });
 
+            services.AddMediatR(typeof(Startup));
+
             var container = new Container();
 
             container.Configure(config =>
@@ -58,12 +61,15 @@ namespace CleanArchitecture.Web
                     _.Assembly("CleanArchitecture.Infrastructure"); // Infrastructure
                     _.WithDefaultConventions();
                     _.ConnectImplementationsToTypesClosing(typeof(IHandle<>));
+                    _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>));
                 });
 
                 // TODO: Add Registry Classes to eliminate reference to Infrastructure
 
                 // TODO: Move to Infrastucture Registry
                 config.For(typeof(IRepository<>)).Add(typeof(EfRepository<>));
+                config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
+                config.For<IMediator>().Use<Mediator>();
 
                 //Populate the container using the service collection
                 config.Populate(services);
@@ -74,8 +80,9 @@ namespace CleanArchitecture.Web
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            //loggerFactory.AddFile("Logs/myapp-{Date}.txt");
+            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            //loggerFactory.AddDebug();
 
             if (env.IsDevelopment())
             {
