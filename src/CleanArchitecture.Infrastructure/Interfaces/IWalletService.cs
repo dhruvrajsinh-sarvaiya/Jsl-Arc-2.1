@@ -8,13 +8,16 @@ namespace CleanArchitecture.Infrastructure.Interfaces
     
     public interface IWalletService
     {
-        decimal GetUserBalance(int walletId);
+        decimal GetUserBalance(long walletId);
 
-        bool CreditWallet(int walletId, ref decimal PostBal);
+        bool CreditWallet(long walletId, ref decimal PostBal);
 
-        bool WalletBalanceCheck(decimal amount,long walletId);
+        bool WalletBalanceCheck(decimal amount, long walletId);
 
-        bool DebitWallet(int walletId,ref decimal PostBal);
+        bool DebitWallet(long walletId, ref decimal PostBal);
 
+        bool IsValidWallet(long walletId);
+
+        
     }
 }

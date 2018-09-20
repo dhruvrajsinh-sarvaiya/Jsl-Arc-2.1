@@ -16,7 +16,7 @@ namespace CleanArchitecture.Core.Entities
         
         public long WalletTypeID { get; set; }
 
-        public long IsValid { get; set; }
+        public bool IsValid { get; set; }
 
         public void CreditBalance(decimal amount)
         {
