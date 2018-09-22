@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public short AppType { get; set; }
 
-        public long  ThirdPartyAPIServiceId { get; set; }
+        public long APIServiceID { get; set; }
 
         public void SetActiveProvider()
         {
