@@ -14,7 +14,8 @@ namespace CleanArchitecture.Core.Interfaces
         //APIid  
         //priority wise ,
         //Request format config type id (internally use)
-        Task GetAPIConfigurationAsync(long ServiceTypeID, long CommServiceTypeID,long CommSerproID, long CommServiceID, long APIId, int priority);
+        //Task GetAPIConfigurationAsync(long ServiceTypeID, long CommServiceTypeID,long CommSerproID, long CommServiceID, long APIId, int Priority);
+        Task GetAPIConfigurationAsync(long ServiceTypeID, long CommServiceTypeID,long CommSerproID, int Priority);
 
         // service type id - ex commmunication , 
         //communication service type id ex SMS ,

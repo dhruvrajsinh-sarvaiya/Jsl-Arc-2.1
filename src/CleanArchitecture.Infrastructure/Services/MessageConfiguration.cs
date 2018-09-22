@@ -17,7 +17,7 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             _dbContext = dbContext;
         }
-        public Task GetAPIConfigurationAsync()
+        public Task GetAPIConfigurationAsync(long ServiceTypeID, long CommServiceTypeID, long CommSerproID, int Priority)
         {
             using (AppDbContext ctx = new AppDbContext())
             {
@@ -27,6 +27,8 @@ namespace CleanArchitecture.Infrastructure.Services
                              join CSM in ctx.CommServiceMaster on CSMP.CommSerproID equals CSM.CommSerproID
                              join CASM in ctx.CommAPIServiceMaster on CSM.CommServiceID equals CASM.CommServiceID
                              join RM in ctx.RequestFormatMaster on CSM.RequestID equals RM.RequestID
+                             where SM.ServiceTypeID == ServiceTypeID  && CSTM.CommServiceTypeID == CommServiceTypeID 
+                             && CSMP.CommSerproID == CommSerproID && CASM.Priority == priority
                              select new 
                              {
                                  CASM.SenderID,
