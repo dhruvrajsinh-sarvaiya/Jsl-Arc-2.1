@@ -28,7 +28,7 @@ namespace CleanArchitecture.Infrastructure.Services
                              join CASM in ctx.CommAPIServiceMaster on CSM.CommServiceID equals CASM.CommServiceID
                              join RM in ctx.RequestFormatMaster on CSM.RequestID equals RM.RequestID
                              where SM.ServiceTypeID == ServiceTypeID  && CSTM.CommServiceTypeID == CommServiceTypeID 
-                             && CSMP.CommSerproID == CommSerproID && CASM.Priority == priority
+                             && CSMP.CommSerproID == CommSerproID && CASM.Priority == Priority
                              select new 
                              {
                                  CASM.SenderID,
