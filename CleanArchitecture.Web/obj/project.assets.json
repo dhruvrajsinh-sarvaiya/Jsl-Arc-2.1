@@ -15268,11 +15268,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.Web\\CleanArchitecture.Web.csproj",
+      "projectUniqueName": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.Web\\CleanArchitecture.Web.csproj",
       "projectName": "CleanArchitecture.Web",
-      "projectPath": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.Web\\CleanArchitecture.Web.csproj",
+      "projectPath": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.Web\\CleanArchitecture.Web.csproj",
       "packagesPath": "C:\\Users\\JBSPL-0058\\.nuget\\packages\\",
-      "outputPath": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.Web\\obj\\",
+      "outputPath": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.Web\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -15291,11 +15291,11 @@
       "frameworks": {
         "netcoreapp2.1": {
           "projectReferences": {
-            "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj": {
-              "projectPath": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj"
+            "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj": {
+              "projectPath": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj"
             },
-            "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj": {
-              "projectPath": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj"
+            "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj": {
+              "projectPath": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj"
             }
           }
         }

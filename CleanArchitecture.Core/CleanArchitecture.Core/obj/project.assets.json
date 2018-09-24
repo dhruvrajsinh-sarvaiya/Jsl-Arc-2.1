@@ -4843,11 +4843,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj",
+      "projectUniqueName": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj",
       "projectName": "CleanArchitecture.Core",
-      "projectPath": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj",
+      "projectPath": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj",
       "packagesPath": "C:\\Users\\JBSPL-0058\\.nuget\\packages\\",
-      "outputPath": "D:\\Birju\\WorkingProject\\Project\\DemoClearArchicture\\CleanArchitecture\\CleanArchitecture.core\\CleanArchitecture.core\\obj\\",
+      "outputPath": "D:\\Birju\\WorkingProject\\Project\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

@@ -54,3 +54,17 @@ D:\Nirav\Project\17-09-2018\CleanArchitecture\CleanArchitecture.Infrastructure\o
 D:\Nirav\Project\17-09-2018\CleanArchitecture\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.csproj.CopyComplete
 D:\Nirav\Project\17-09-2018\CleanArchitecture\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.dll
 D:\Nirav\Project\17-09-2018\CleanArchitecture\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.pdb
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.deps.json
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.runtimeconfig.json
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.runtimeconfig.dev.json
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.dll
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.pdb
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.dll
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.pdb
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.csprojAssemblyReference.cache
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.csproj.CoreCompileInputs.cache
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.AssemblyInfoInputs.cache
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.AssemblyInfo.cs
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.csproj.CopyComplete
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.dll
+D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.Infrastructure\obj\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.pdb
