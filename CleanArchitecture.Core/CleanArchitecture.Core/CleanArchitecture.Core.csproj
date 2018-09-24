@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Entities\OpenIddictApplications.cs" />
+    <Compile Remove="Entities\OpenIddictAuthorizations.cs" />
+    <Compile Remove="Entities\OpenIddictScopes.cs" />
+    <Compile Remove="Entities\OpenIddictTokens.cs" />
+    <Compile Remove="Entities\RoleClaims.cs" />
+    <Compile Remove="Entities\UserClaims.cs" />
+    <Compile Remove="Entities\UserLogins.cs" />
+    <Compile Remove="Entities\UserRoles.cs" />
+    <Compile Remove="Entities\UserTokens.cs" />
+    <Compile Remove="Services\WalletService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Ardalis.GuardClauses" Version="1.2.3" />
+	  <PackageReference Include="AutoMapper" Version="7.0.1" />
+	  <PackageReference Include="MediatR" Version="5.1.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.2" />
+	  <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.1.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.Identity.Stores">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.identity.stores\2.1.1\lib\netstandard2.0\Microsoft.Extensions.Identity.Stores.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
