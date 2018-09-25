@@ -22,3 +22,9 @@ CleanArchitecture.Web/obj/Debug/netcoreapp2.1/CleanArchitecture.Web.assets.cache
 CleanArchitecture.Core/CleanArchitecture.Core/obj/CleanArchitecture.Core.csproj.nuget.cache
 *.sln
 CleanArchitecture.sln
+CleanArchitecture.Core/CleanArchitecture.Core/obj/CleanArchitecture.Core.csproj.nuget.cache
+CleanArchitecture.Core/CleanArchitecture.Core/obj/CleanArchitecture.Core.csproj.nuget.g.props
+CleanArchitecture.Core/CleanArchitecture.Core/obj/CleanArchitecture.Core.csproj.nuget.cache
+*.cache
+CleanArchitecture.Core/CleanArchitecture.Core/obj/project.assets.json
+CleanArchitecture.sln
