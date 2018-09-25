@@ -9,11 +9,11 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ThirPartyAPIResponseConfiguration
+    public class ThirPartyAPIResponseConfiguration : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long ParsingDataID { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long ParsingDataID { get; set; }
 
         public string BalanceRegex { get; set; }
 

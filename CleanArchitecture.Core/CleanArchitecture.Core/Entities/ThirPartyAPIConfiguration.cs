@@ -7,9 +7,9 @@ namespace CleanArchitecture.Core.Entities
 {
     public class ThirPartyAPIConfiguration : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long ThirPartyAPIID { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long ThirPartyAPIID { get; set; }
 
         [Required]
         [StringLength(30)]
