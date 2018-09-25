@@ -109,7 +109,7 @@ namespace CleanArchitecture.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddFile(Configuration["LogPath"].ToString());//Take from Setting file
+            loggerFactory.AddFile("D:/Nirav/Project/17-09-2018/CleanArchitecture/CleanArchitecture.Web/bin/Debug/netcoreapp2.1/log.txt");
             if (env.IsDevelopment())
             {
                // app.UseDeveloperExceptionPage();
