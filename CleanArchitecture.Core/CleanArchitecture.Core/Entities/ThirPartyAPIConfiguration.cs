@@ -5,11 +5,11 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class APIServiceConfiguration : BizBase
+    public class ThirPartyAPIConfiguration : BizBase
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long APIServiceID { get; set; }
+        public long ThirPartyAPIID { get; set; }
 
         [Required]
         [StringLength(30)]

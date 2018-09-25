@@ -9,7 +9,7 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class APIServiceResponseConfiguration
+    public class ThirPartyAPIResponseConfiguration
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -42,6 +42,14 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletOrder> WalletOrders { get; set; }
         public DbSet<TransactionAccount> TransactionAccounts { get; set; }
         public DbSet<WalletLedger> WalletLedgers { get; set; }
+        //========Transaction Tables
+        public DbSet<TransactionQueue> TransactionQueue { get; set; }
+        public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }       
+        public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
+        public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
+        public DbSet<RouteConfiguration> RouteConfiguration { get; set; }
+        public DbSet<ThirPartyAPIConfiguration> ThirPartyAPIConfiguration { get; set; }
+        public DbSet<ThirPartyAPIResponseConfiguration> ThirPartyAPIResponseConfiguration { get; set; }
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
