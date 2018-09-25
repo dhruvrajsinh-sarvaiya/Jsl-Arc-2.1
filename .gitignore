@@ -28,3 +28,6 @@ CleanArchitecture.Core/CleanArchitecture.Core/obj/CleanArchitecture.Core.csproj.
 *.cache
 CleanArchitecture.Core/CleanArchitecture.Core/obj/project.assets.json
 CleanArchitecture.sln
+*.cache
+CleanArchitecture.Core/CleanArchitecture.Core/obj/project.assets.json
+CleanArchitecture.sln
