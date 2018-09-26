@@ -60,7 +60,11 @@ using CleanArchitecture.Web;
             WriteLiteral("\r\n<div class=\"row\">\r\n    <div class=\"col-md-6\">\r\n        <h2>To Do Items (MVC)</h2>\r\n        <ul>\r\n            <li>");
             EndContext();
             BeginContext(180, 86, false);
+<<<<<<< HEAD
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "5afe19f18a004f92a5dd06dd877ea239", async() => {
+=======
             __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "ac36efbf193a4d77b86d1a8357676cdd", async() => {
+>>>>>>> b47013064aa141324f919f06d8b4ea77e38f23d9
                 BeginContext(239, 23, true);
                 WriteLiteral("Load Sample To Do Items");
                 EndContext();
@@ -86,7 +90,11 @@ using CleanArchitecture.Web;
             WriteLiteral("</li>\r\n            <li>");
             EndContext();
             BeginContext(289, 76, false);
+<<<<<<< HEAD
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "5a736196ea5d43d99bd16b012dbb38cf", async() => {
+=======
             __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "29f707c2090e4f3a9db0bcf12ca1100a", async() => {
+>>>>>>> b47013064aa141324f919f06d8b4ea77e38f23d9
                 BeginContext(345, 16, true);
                 WriteLiteral("List To Do Items");
                 EndContext();
@@ -112,7 +120,11 @@ using CleanArchitecture.Web;
             WriteLiteral("</li>\r\n            <li><a href=\"/swagger\">API Documentation (Swagger)</a></li>\r\n        </ul>\r\n        <h2>To Do Items (Razor Pages)</h2>\r\n        <ul>\r\n            <li>");
             EndContext();
             BeginContext(534, 65, false);
+<<<<<<< HEAD
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "b2cbbbcd24714892a9d3443366821755", async() => {
+=======
             __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "8c10438a027f45259a039a8228997859", async() => {
+>>>>>>> b47013064aa141324f919f06d8b4ea77e38f23d9
                 BeginContext(572, 23, true);
                 WriteLiteral("Load Sample To Do Items");
                 EndContext();
@@ -134,7 +146,11 @@ using CleanArchitecture.Web;
             WriteLiteral("</li>\r\n            <li>");
             EndContext();
             BeginContext(622, 55, false);
+<<<<<<< HEAD
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "298ee063ce254696aee2e4276bd85c27", async() => {
+=======
             __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "a556e2e5e5e845d6b4defd5fcb08696d", async() => {
+>>>>>>> b47013064aa141324f919f06d8b4ea77e38f23d9
                 BeginContext(657, 16, true);
                 WriteLiteral("List To Do Items");
                 EndContext();
