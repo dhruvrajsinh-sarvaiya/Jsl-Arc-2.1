@@ -81,3 +81,11 @@ CleanArchitecture.Web/Migrations/CleanArchitectureContextModelSnapshot.cs
 CleanArchitecture.Web/Migrations/20180925113032_TransactionalServices.Designer.cs
 .vs/CleanArchitecture/v15/.suo
 .vs/CleanArchitecture/DesignTimeBuild/.dtbcache
+*.ide-shm
+*.ide
+*.ide-wal
+.vs/CleanArchitecture/DesignTimeBuild/.dtbcache
+.vs/CleanArchitecture/v15/.suo
+.vs/config/applicationhost.config
+CleanArchitecture.Core/CleanArchitecture.Core/bin/Debug/netcoreapp2.1/CleanArchitecture.Core.deps.json
+.vs
