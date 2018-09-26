@@ -37,12 +37,18 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<RequestFormatMaster> RequestFormatMaster { get; set; }
         public DbSet<ServiceTypeMaster> ServiceTypeMaster { get; set; }
         public DbSet<TemplateMaster> TemplateMaster { get; set; }
+        // wallet tables
         public DbSet<WalletTypeMaster> WalletTypeMasters { get; set; }
         public DbSet<WalletMaster> WalletMasters { get; set; }
         public DbSet<WalletOrder> WalletOrders { get; set; }
         public DbSet<TransactionAccount> TransactionAccounts { get; set; }
         public DbSet<WalletLedger> WalletLedgers { get; set; }
+        public DbSet<DepositHistory> DepositHistorys { get; set; }
+        public DbSet<TradeBitGoDelayAddresses> TradeBitGoDelayAddressess { get; set; }
+        public DbSet<AddressMaster> AddressMasters { get; set; }
+
         //========Transaction Tables
+
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
         public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }       
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
