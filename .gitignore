@@ -88,4 +88,15 @@ CleanArchitecture.Web/Migrations/20180925113032_TransactionalServices.Designer.c
 .vs/CleanArchitecture/v15/.suo
 .vs/config/applicationhost.config
 CleanArchitecture.Core/CleanArchitecture.Core/bin/Debug/netcoreapp2.1/CleanArchitecture.Core.deps.json
-.vs
+.vs/
+.bundle
+.DS_Store
+db/*.sqlite3
+log/*.log
+tmp/
+CleanArchitecture.Web/bin/
+CleanArchitecture.Web/obj/
+CleanArchitecture.Core/CleanArchitecture.Core/bin/
+CleanArchitecture.Core/CleanArchitecture.Core/obj/
+CleanArchitecture.Infrastructure/obj/
+CleanArchitecture.Infrastructure/bin/
