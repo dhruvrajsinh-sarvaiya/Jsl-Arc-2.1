@@ -10,9 +10,9 @@ namespace CleanArchitecture.Core.Entities
 {
     public class ProviderConfiguration : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long SerProID { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long SerProID { get; set; }
 
         [StringLength(30)]
         public string SerProName { get; set; }

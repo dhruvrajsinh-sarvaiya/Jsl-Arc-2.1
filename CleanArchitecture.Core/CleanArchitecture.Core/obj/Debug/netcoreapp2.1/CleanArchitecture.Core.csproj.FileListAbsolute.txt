@@ -58,3 +58,15 @@ D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitec
 D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.csproj.CopyComplete
 D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.dll
 D:\Birju\WorkingProject\Project\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.pdb
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.deps.json
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.dll
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.pdb
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\bin\Debug\netcoreapp2.1\Microsoft.Extensions.Identity.Stores.dll
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\bin\Debug\netcoreapp2.1\Microsoft.Extensions.Identity.Stores.xml
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.csprojAssemblyReference.cache
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.csproj.CoreCompileInputs.cache
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.AssemblyInfoInputs.cache
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.AssemblyInfo.cs
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.csproj.CopyComplete
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.dll
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.core\CleanArchitecture.core\obj\Debug\netcoreapp2.1\CleanArchitecture.Core.pdb
