@@ -79,3 +79,5 @@ CleanArchitecture.Web/obj/CleanArchitecture.Web.csproj.nuget.g.props
 CleanArchitecture.Web/obj/CleanArchitecture.Web.csproj.nuget.cache
 CleanArchitecture.Web/Migrations/CleanArchitectureContextModelSnapshot.cs
 CleanArchitecture.Web/Migrations/20180925113032_TransactionalServices.Designer.cs
+.vs/CleanArchitecture/v15/.suo
+.vs/CleanArchitecture/DesignTimeBuild/.dtbcache
