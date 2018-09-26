@@ -11,18 +11,15 @@ namespace CleanArchitecture.Core.Entities
 {
     public class NotificationQueue : BizBase
     {
-        //[Required]
-        //public long RefNo { get; set; }
-
-        [Required]
-        [Phone]
-        public long MobileNo { get; set; }
+        [StringLength(50)]
+        public string Subject { get; set; }
 
         [Required]
         [StringLength(200)]
         public string Message { get; set; }
 
         [Required]
+        [StringLength(500)]
         public string DeviceID { get; set; }
 
 

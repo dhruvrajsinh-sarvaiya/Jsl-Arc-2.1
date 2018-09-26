@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    [Migration("20180926080241_Communicationservice")]
-    partial class Communicationservice
+    [Migration("20180926131301_CommunicationService_26_09")]
+    partial class CommunicationService_26_09
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -415,15 +415,17 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<DateTime>("CreatedDate");
 
                     b.Property<string>("DeviceID")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(500);
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(200);
 
-                    b.Property<long>("MobileNo");
-
                     b.Property<short>("Status");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(50);
 
                     b.Property<long?>("UpdatedBy");
 

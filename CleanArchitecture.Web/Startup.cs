@@ -112,7 +112,7 @@ namespace CleanArchitecture.Web
 
             services.AddMediatR(typeof(Startup));
 
-            var container = new Container();
+            Container container = new Container();
 
             container.Configure(config =>
             {

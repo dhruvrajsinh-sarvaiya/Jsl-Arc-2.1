@@ -68,8 +68,43 @@ namespace CleanArchitecture.Web.Api
         [HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage(SendSMSRequest Request)
         {
-            SendSMSResponse Response = await _mediator.Send(Request);
-            return Ok(Response);
+            try
+            {
+                CommunicationResponse Response = await _mediator.Send(Request);
+                return Ok(Response);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(Response);
+            }
+        }
+
+        [HttpPost("SendEmail")]
+        public async Task<IActionResult> SendEmail(SendEmailRequest Request)
+        {
+            try
+            {
+                CommunicationResponse Response = await _mediator.Send(Request);
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(Response);
+            }
+        }
+
+        [HttpPost("SendNotification")]
+        public async Task<IActionResult> SendNotification(SendNotificationRequest Request)
+        {
+            try
+            {
+                CommunicationResponse Response = await _mediator.Send(Request);
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(Response);
+            }
         }
     }
 }

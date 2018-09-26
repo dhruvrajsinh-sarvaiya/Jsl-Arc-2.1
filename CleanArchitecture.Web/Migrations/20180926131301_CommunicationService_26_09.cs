@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CleanArchitecture.Web.Migrations
 {
-    public partial class Communicationservice : Migration
+    public partial class CommunicationService_26_09 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -146,9 +146,9 @@ namespace CleanArchitecture.Web.Migrations
                     CreatedBy = table.Column<long>(nullable: false),
                     UpdatedBy = table.Column<long>(nullable: true),
                     Status = table.Column<short>(nullable: false),
-                    MobileNo = table.Column<long>(nullable: false),
+                    Subject = table.Column<string>(maxLength: 50, nullable: true),
                     Message = table.Column<string>(maxLength: 200, nullable: false),
-                    DeviceID = table.Column<string>(nullable: false)
+                    DeviceID = table.Column<string>(maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {

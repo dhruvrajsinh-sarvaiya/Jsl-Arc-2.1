@@ -413,15 +413,17 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<DateTime>("CreatedDate");
 
                     b.Property<string>("DeviceID")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(500);
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(200);
 
-                    b.Property<long>("MobileNo");
-
                     b.Property<short>("Status");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(50);
 
                     b.Property<long?>("UpdatedBy");
 

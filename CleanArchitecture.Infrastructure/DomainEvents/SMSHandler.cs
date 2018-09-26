@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class SMSHandler : IRequestHandler<SendSMSRequest, SendSMSResponse>
+    public class SMSHandler : IRequestHandler<SendSMSRequest, CommunicationResponse>
     {
         private readonly IMessageRepository<MessagingQueue> _MessageRepository;
 
@@ -19,19 +19,26 @@ namespace CleanArchitecture.Infrastructure.Services
             _MessageRepository = MessageRepository;
         }
 
-        public Task<SendSMSResponse> Handle(SendSMSRequest Request, CancellationToken cancellationToken)
+        public Task<CommunicationResponse> Handle(SendSMSRequest Request, CancellationToken cancellationToken)
         {
-            var Message = new MessagingQueue()
+            try
             {
-                MobileNo = Request.MobileNo,
-                SMSText = Request.Message,
-                SMSSendBy= 0,
-                Status = 0 ,
-                CreatedBy = 1,                
-                CreatedDate = DateTime.UtcNow
-            };
-            _MessageRepository.Add(Message);
-            return Task.FromResult(new SendSMSResponse {ResponseCode = 101 , ResponseMessage  = "Message sent."});
+                var Message = new MessagingQueue()
+                {
+                    MobileNo = Request.MobileNo,
+                    SMSText = Request.Message,
+                    SMSSendBy = 0,
+                    Status = 0,
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow
+                };
+                _MessageRepository.Add(Message);
+                return Task.FromResult(new CommunicationResponse { ErrorCode = 101, ReturnMsg = "Message sent."});
+            }
+            catch(Exception ex)
+            {
+                return Task.FromResult(new CommunicationResponse { ErrorCode = 99, ReturnMsg = "Message not sent."});
+            }            
         }
 
         //public Task<ToDoItemResponse> Handle(ToDoItemRequest request, CancellationToken cancellationToken)

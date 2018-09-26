@@ -7,7 +7,7 @@ using MediatR;
 
 namespace CleanArchitecture.Core.ViewModels
 {
-    public class SendEmailRequest : IRequest<SendEmailResponse>
+    public class SendEmailRequest : IRequest<CommunicationResponse>
     {
         [Required]
         [StringLength(50)]
@@ -28,8 +28,6 @@ namespace CleanArchitecture.Core.ViewModels
 
         [StringLength(500)]
         public string Attachment { get; set; }
-
-        public short SendBy { get; set; }
 
         public short EmailType { get; set; }
     }
