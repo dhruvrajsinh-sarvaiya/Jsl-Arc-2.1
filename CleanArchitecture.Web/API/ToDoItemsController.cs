@@ -52,6 +52,7 @@ namespace CleanArchitecture.Web.Api
         {
             var toDoItem = _todoRepository.GetById(id);
             toDoItem.MarkComplete();
+
             _todoRepository.Update(toDoItem);
             return Ok(ToDoItemDTO.FromToDoItem(toDoItem));
         }
