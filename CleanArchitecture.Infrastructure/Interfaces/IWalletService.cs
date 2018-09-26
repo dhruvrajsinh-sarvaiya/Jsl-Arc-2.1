@@ -16,8 +16,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         bool DebitWallet(long walletId, ref decimal PostBal);
 
-        bool IsValidWallet(long walletId);
-
+        bool IsValidWallet(long walletId);      
         
     }
 }
