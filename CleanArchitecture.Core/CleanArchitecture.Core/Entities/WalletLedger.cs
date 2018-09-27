@@ -17,7 +17,7 @@ namespace CleanArchitecture.Core.Entities
         public DateTime TrnDate { get; set; }
 
         [Required]
-        public EnServiceType ServiceTypeID { get; set; } // fk of ServiceTypeMaster table
+        public enServiceType ServiceTypeID { get; set; } // fk of ServiceTypeMaster table
 
         [Required]
         public EnTrnType TrnType { get; set; } // type of txn

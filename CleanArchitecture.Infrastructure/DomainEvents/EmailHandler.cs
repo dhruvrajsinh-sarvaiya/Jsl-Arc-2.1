@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels;
 using MediatR;
@@ -31,7 +32,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     BCC = Request.BCC,
                     CC = Request.CC,
                     Body = Request.Body,
-                    Status = 0,
+                    Status = Convert.ToInt16(MessageStatusType.Initialize),
                     Subject = Request.Subject,
                     CreatedDate = DateTime.UtcNow
                 };

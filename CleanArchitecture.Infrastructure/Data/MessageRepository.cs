@@ -29,7 +29,6 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             _dbContext.Set<T>().Add(entity);
             _dbContext.SaveChanges();
-
             return entity;
         }
 

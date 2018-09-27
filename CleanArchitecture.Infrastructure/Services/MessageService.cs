@@ -13,7 +13,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return Task.FromResult(0);
         }
 
-        public Task SendSMSAsync(string Mobile, string Message, string Url, string SerderID, string UserID, string Password)
+        public Task SendSMSAsync(long Mobile, string Message, string Url, string SerderID, string UserID, string Password)
         {
             return Task.FromResult(0);
         }
