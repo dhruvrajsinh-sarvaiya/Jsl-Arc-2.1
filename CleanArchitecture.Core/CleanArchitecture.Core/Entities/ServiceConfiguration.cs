@@ -10,9 +10,9 @@ namespace CleanArchitecture.Core.Entities
 {
     public class ServiceConfiguration : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long ServiceID { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long ServiceID { get; set; }
 
         [StringLength(30)]
         public string ServiceName { get; set; }

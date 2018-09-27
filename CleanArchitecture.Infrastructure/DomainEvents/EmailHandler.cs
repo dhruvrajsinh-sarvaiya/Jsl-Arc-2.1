@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class EmailHandler : IRequestHandler<SendEmailRequest, SendEmailResponse>
+    public class EmailHandler : IRequestHandler<SendEmailRequest, CommunicationResponse>
     {
         private readonly IMessageRepository<EmailQueue> _MessageRepository;
 
@@ -19,23 +19,29 @@ namespace CleanArchitecture.Infrastructure.Services
             _MessageRepository = MessageRepository;
         }
 
-        public Task<SendEmailResponse> Handle(SendEmailRequest Request, CancellationToken cancellationToken)
+        public Task<CommunicationResponse> Handle(SendEmailRequest Request, CancellationToken cancellationToken)
         {
-            var Email = new EmailQueue()
+            try
             {
-                EmailType = Request.EmailType,
-                Recepient = Request.Recepient,
-                Attachment = Request.Attachment,
-                BCC = Request.BCC,
-                CC = Request.CC,
-                Body = Request.Body,
-                Status = 0,
-                Subject  = Request.Subject,
-                SendBy =  1,
-                CreatedDate = DateTime.UtcNow
-            };
-            _MessageRepository.Add(Email);
-            return Task.FromResult(new SendEmailResponse { ResponseCode = 101, ResponseMessage = "Message sent." });
+                var Email = new EmailQueue()
+                {
+                    EmailType = Request.EmailType,
+                    Recepient = Request.Recepient,
+                    Attachment = Request.Attachment,
+                    BCC = Request.BCC,
+                    CC = Request.CC,
+                    Body = Request.Body,
+                    Status = 0,
+                    Subject = Request.Subject,
+                    CreatedDate = DateTime.UtcNow
+                };
+                _MessageRepository.Add(Email);
+                return Task.FromResult(new CommunicationResponse { ErrorCode = 101, ReturnMsg = "Message sent."});
+            }
+            catch(Exception ex)
+            {
+                return Task.FromResult(new CommunicationResponse { ErrorCode = 99, ReturnMsg = "Message not sent."});
+            }
         }
 
 

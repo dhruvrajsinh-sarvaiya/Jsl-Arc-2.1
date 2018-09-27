@@ -10,9 +10,9 @@ namespace CleanArchitecture.Core.Entities
 {
     public class ProductConfiguration : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long ProductID { get; set; }
+       // [Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long ProductID { get; set; }
 
         [Required]
         [StringLength(30)]

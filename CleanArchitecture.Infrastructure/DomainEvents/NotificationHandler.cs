@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class NotificationHandler : IRequestHandler<SendNotificationRequest, SendNotificationResponse>
+    public class NotificationHandler : IRequestHandler<SendNotificationRequest, CommunicationResponse>
     {
         private readonly IMessageRepository<NotificationQueue> _MessageRepository;
 
@@ -19,20 +19,26 @@ namespace CleanArchitecture.Infrastructure.Services
             _MessageRepository = MessageRepository;
         }
 
-        public Task<SendNotificationResponse> Handle(SendNotificationRequest Request, CancellationToken cancellationToken)
+        public Task<CommunicationResponse> Handle(SendNotificationRequest Request, CancellationToken cancellationToken)
         {
-
-            var Notification = new NotificationQueue()
+            try
             {
-                MobileNo = Request.MobileNo,
-                Message = Request.Message,
-                DeviceID = Request.DeviceID,
-                Status = 0,
-                CreatedBy = 1,
-                CreatedDate = DateTime.UtcNow
-            };
-            _MessageRepository.Add(Notification);
-            return Task.FromResult(new SendNotificationResponse { ResponseCode = 101, ResponseMessage = "Message sent." });
+                var Notification = new NotificationQueue()
+                {
+                    Message = Request.Message,
+                    Subject = Request.Subject,
+                    DeviceID = Request.DeviceID,
+                    Status = 0,
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow
+                };
+                _MessageRepository.Add(Notification);
+                return Task.FromResult(new CommunicationResponse { ErrorCode = 101, ReturnMsg = "Message sent."});
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(new CommunicationResponse { ErrorCode = 99, ReturnMsg = "Message not sent."});
+            }            
         }
 
         //public Task<ToDoItemResponse> Handle(ToDoItemRequest request, CancellationToken cancellationToken)

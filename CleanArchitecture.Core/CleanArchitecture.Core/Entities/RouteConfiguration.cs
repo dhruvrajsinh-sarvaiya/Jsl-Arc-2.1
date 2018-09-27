@@ -10,9 +10,9 @@ namespace CleanArchitecture.Core.Entities
 {
     public class RouteConfiguration : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long RouteID { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long RouteID { get; set; }
 
         [Required]
         [StringLength(30)]

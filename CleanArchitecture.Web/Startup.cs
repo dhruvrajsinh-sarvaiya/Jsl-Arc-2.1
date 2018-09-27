@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels.Configuration;
+using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Web.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
+using StructureMap;
+using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Web
 {
@@ -30,7 +36,7 @@ namespace CleanArchitecture.Web
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -104,12 +110,42 @@ namespace CleanArchitecture.Web
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
             services.Configure<SMSSetting>(Configuration.GetSection("SMS"));
 
+            services.AddMediatR(typeof(Startup));
+
+            Container container = new Container();
+
+            container.Configure(config =>
+            {
+                config.Scan(_ =>
+                {
+                    _.AssemblyContainingType(typeof(Startup)); // Web
+                    _.AssemblyContainingType(typeof(BaseEntity)); // Core
+                    _.Assembly("CleanArchitecture.Infrastructure"); // Infrastructure
+                    _.WithDefaultConventions();
+                    _.ConnectImplementationsToTypesClosing(typeof(IHandle<>));
+                    _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>));
+                });
+
+                // TODO: Add Registry Classes to eliminate reference to Infrastructure
+
+                // TODO: Move to Infrastucture Registry
+                config.For(typeof(IRepository<>)).Add(typeof(EfRepository<>));
+                config.For(typeof(IWalletRepository<>)).Add(typeof(WalletRepository<>));
+                config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
+                config.For<IMediator>().Use<Mediator>();
+
+                //Populate the container using the service collection
+                config.Populate(services);
+
+            });
+
+            return container.GetInstance<IServiceProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddFile("D:/Nirav/Project/17-09-2018/CleanArchitecture/CleanArchitecture.Web/bin/Debug/netcoreapp2.1/log.txt");
+            loggerFactory.AddFile(Configuration["LogPath"].ToString());//Take from Setting file
             if (env.IsDevelopment())
             {
                // app.UseDeveloperExceptionPage();

@@ -6,10 +6,10 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels
 {
-    public class SendSMSRequest : IRequest<SendSMSResponse>
+    public class SendSMSRequest : IRequest<CommunicationResponse>
     {
-        [Required]
-        public int TemplateTypeID { get; set; }
+        //[Required]
+        //public int TemplateTypeID { get; set; }
 
         [Required]
         public long MobileNo { get; set; }
@@ -18,6 +18,6 @@ namespace CleanArchitecture.Core.ViewModels
         [StringLength(300, MinimumLength = 5)]
         public string Message { get; set; }
         
-        public long CommServiceTypeID { get; set; }
+        //public long CommServiceTypeID { get; set; }
     }
 }
