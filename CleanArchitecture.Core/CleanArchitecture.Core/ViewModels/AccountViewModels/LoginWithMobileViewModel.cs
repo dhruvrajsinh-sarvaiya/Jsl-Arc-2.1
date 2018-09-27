@@ -6,26 +6,21 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 {
-    public class BlockChainViewModel : TrackerViewModel
+    public class LoginWithMobileViewModel : TrackerViewModel
     {
+        [Required]
+        [Phone]
+        public string Mobile { get; set; }
+
         [Required]
         [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
-        public string KeyPassword { get; set; }
+        public string Password { get; set; }
     }
 
-    public class BlockChainResponse : BizResponseClass
+    public class LoginWithMobileResponse : BizResponseClass
     {
-        public string PasswordNotes { get; set; }
-
-        public string KeystoreNotes { get; set; }
-
-        public string EncryptedPrivateKey { get; set; }
-
-        public string  PaperWalletLink { get; set; }
-
-        public string KeyStoreFileLink { get; set; }
 
     }
 }

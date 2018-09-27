@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 
         //public string ProviderKey { get; set; }
 
-        public string ProviderName { get; set; }
+        //public string ProviderName { get; set; }
 
         //public int UserID { get; set; }
 
