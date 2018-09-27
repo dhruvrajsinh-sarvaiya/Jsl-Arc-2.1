@@ -20,6 +20,9 @@ namespace CleanArchitecture.Core.Entities
         public EnServiceType ServiceTypeID { get; set; } // fk of ServiceTypeMaster table
 
         [Required]
+        public EnTrnType TrnType { get; set; } // type of txn
+
+        [Required]
         public long TrnNo { get; set; }
 
         [Required]        

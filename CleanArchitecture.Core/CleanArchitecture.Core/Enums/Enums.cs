@@ -12,7 +12,6 @@ namespace CleanArchitecture.Core.Enums
         TwoFactor = 3,
         Lockout = 4,
         CreateAccount = 5
-
     }
 
     public enum ModeStatus
@@ -44,7 +43,10 @@ namespace CleanArchitecture.Core.Enums
         Withdraw = 6,
         Shoping_Cart = 7,
         Deposit = 8,
-        Generate_Address = 9
+        Generate_Address = 9,
+        Topup = 10,
+        Charge = 11,
+        Commission=12        
     }
     public enum EnOrderStatus
     {
@@ -65,17 +67,26 @@ namespace CleanArchitecture.Core.Enums
         Transfer = 8
     }
 
-    public enum EnServiceType
+    public enum enServiceType
     {
-        Recharge = 1,
-        BillPayment = 2,
-        DTH = 3,
-        Buy_Trade = 4,
-        Sell_Trade = 5,
-        Withdraw = 6,
-        Shoping_Cart = 7,
-        Deposit = 8,
-        Generate_Address = 9
+        Recharge = 1,        
+        DTH = 2,
+        BillPayment = 3,
+        FlightBooking = 4,
+        RailwayBooking = 5,
+        BusBooking = 6,
+        HotelBooking = 7,
+        DataCard = 8,
+        DMRSERVICE = 13,
+        CAB = 14,
+        WalletService = 15,
+        LoanAPI = 16
+        //Buy_Trade = 4,
+        //Sell_Trade = 5,
+        //Withdraw = 6,
+        //Shoping_Cart = 7,
+        //Deposit = 8,
+        //Generate_Address = 9
     }
 
     public enum MessageStatusType
@@ -84,5 +95,28 @@ namespace CleanArchitecture.Core.Enums
         Success = 1,
         Initialize = 0,
         Fail = 9
+    }
+    public enum enWebAPIRouteType
+    {
+        TransactionAPI = 1,
+        SMSAPI = 2
+    }
+
+    public enum enProviderAppType
+    {
+        DemoCard = 1,
+        WebService = 2,
+        SocketBase = 3,
+        AutoFill = 4,
+        ThirdPartyAPI = 5,
+        CyberPlate = 6,
+        GTalkAPI = 7,
+        DMRJBSPL = 8,
+        DirectTrn = 9,
+        HermesMobileAPI = 10,
+        HermesFlightAPI = 11,
+        HermesBusAPI = 12,
+        LoanAPI = 24,
+        AEPSTopUpCall = 26,
     }
 }
