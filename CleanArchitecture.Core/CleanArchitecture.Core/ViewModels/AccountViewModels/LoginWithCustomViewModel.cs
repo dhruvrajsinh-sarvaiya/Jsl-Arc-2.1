@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CleanArchitecture.Core.ApiModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 {
-    public class LoginWithCustomViewModel
+    public class LoginWithCustomViewModel : TrackerViewModel
     {
         [Required]
         [StringLength(50)]
@@ -14,5 +15,10 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }       
+    }
+
+    public class LoginWithCustomResponse : BizResponseClass
+    {
+
     }
 }

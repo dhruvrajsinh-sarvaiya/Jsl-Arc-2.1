@@ -12,6 +12,10 @@ namespace CleanArchitecture.Core.ApiModels
 
         public int ErrorCode { get; set; }
 
+        public byte StatusCode { get; set; }
+
+        public string StatusMessage { get; set; }
+
         //public string RefreshToken { get; set; }
 
         //public string AccessToken { get; set; }

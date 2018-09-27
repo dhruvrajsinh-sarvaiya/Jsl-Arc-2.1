@@ -80,16 +80,81 @@ namespace CleanArchitecture.Web.API
         }
 
         /// <summary>
+        /// Thid method are used standard login 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("StandardLogin")]
+        [AllowAnonymous]
+        public async Task<IActionResult> StandardLogin([FromBody]StandardLoginViewModel model)
+        {
+            StandardLoginResponse response = new StandardLoginResponse();
+            response.ReturnCode = 200;
+            response.ReturnMsg = "Success";
+            response.StatusCode = 200;
+            response.StatusMessage = "Success";
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// This method are used login with notify to your email. 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("LoginWithEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithEmail([FromBody]LoginWithEmailViewModel model)
+        {
+            LoginWithEmailResponse response = new LoginWithEmailResponse();
+            response.ReturnCode = 200;
+            response.ReturnMsg = "Success";
+            response.StatusCode = 200;
+            response.StatusMessage = "Success";
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// This method are used login with otp base verify 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("LoginWithMobile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithMobile([FromBody]LoginWithMobileViewModel model)
+        {
+            LoginWithMobileResponse response = new LoginWithMobileResponse();
+            response.ReturnCode = 200;
+            response.ReturnMsg = "Success";
+            response.StatusCode = 200;
+            response.StatusMessage = "Success";
+            return Ok(response);
+        }
+
+        ///// <summary>
+        /////  This method are used social media using to login.
+        ///// </summary>  
+        //[HttpPost("SocialLogin")]
+        //[AllowAnonymous]
+        ////[ValidateAntiForgeryToken]
+        //public IActionResult Sociallogin([FromBody] SocialLoginWithEmailViewModel model, string returnUrl = null)
+        //{
+        //    var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+        //    var properties = _signInManager.ConfigureExternalAuthenticationProperties(model.ProviderName, redirectUrl);
+        //    return new ChallengeResult(model.ProviderName, properties);
+        //}
+
+        /// <summary>
         ///  This method are used social media using to login.
         /// </summary>  
         [HttpPost("SocialLogin")]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
-        public IActionResult Sociallogin([FromBody] SocialLoginWithEmailViewModel model, string returnUrl = null)
+        public IActionResult Sociallogin(string ProviderName, string returnUrl = null)
         {
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(model.ProviderName, redirectUrl);
-            return new ChallengeResult(model.ProviderName, properties);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(ProviderName, redirectUrl);
+            return new ChallengeResult(ProviderName, properties);
         }
 
         [HttpGet("ExternalLoginCallback")]
@@ -176,11 +241,11 @@ namespace CleanArchitecture.Web.API
         }
 
         /// <summary>
-        ///  this method are register with email using verified link
+        ///  This method are Direct signUp with email using verified link
         /// </summary>        
-        [HttpPost("RegisterWithEmail")]
+        [HttpPost("DirectSignUpWithEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterWithEmail([FromBody]SignUpEmailWithOTPViewModel model)
+        public async Task<IActionResult> DirectSignUpWithEmail([FromBody]SignUpWithEmailViewModel model)
         {
             var checkemail = await _userManager.FindByEmailAsync(model.Email);
             if (string.IsNullOrEmpty(checkemail?.Email))
@@ -209,7 +274,13 @@ namespace CleanArchitecture.Web.API
                         var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
                         _logger.LogInformation(3, "User created a new account with password.");
                         await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-                        return Ok("Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.");
+
+                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                        response.ReturnCode = 200;
+                        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+                        response.StatusCode = 200;
+                        response.StatusMessage = "Success";
+                        return Ok(response);
                     }
                 }
                 AddErrors(result);
@@ -224,11 +295,11 @@ namespace CleanArchitecture.Web.API
         }
 
         /// <summary>
-        ///  this method are register with mobile sms using verified opt.
+        ///  This method are Direct signUp with mobile sms using verified opt.
         /// </summary>        
-        [HttpPost("RegisterWithMobile")]
+        [HttpPost("DirectSignUpWithMobile")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterWithMobile([FromBody]SignUpMobileWithOTPViewModel model)
+        public async Task<IActionResult> DirectSignUpWithMobile([FromBody]SignUpMobileWithOTPViewModel model)
         {
             bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
             if (IsSignMobile)
@@ -251,7 +322,12 @@ namespace CleanArchitecture.Web.API
                     if (roleAddResult.Succeeded)
                     {
                         //await _messageSender.SendSMSAsync(model.Mobile, "");
-                        return Ok();
+                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                        response.ReturnCode = 200;
+                        response.ReturnMsg = "Success";
+                        response.StatusCode = 200;
+                        response.StatusMessage = "Done";
+                        return Ok(response);
                     }
                 }
                 AddErrors(result);
@@ -263,6 +339,19 @@ namespace CleanArchitecture.Web.API
             }
             // If we got this far, something failed, redisplay form
             return BadRequest(new ApiError(ModelState));
+        }
+
+        [HttpPost("BlockChainSignUp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BlockChainSignUp([FromBody] BlockChainViewModel model)
+        {
+            BlockChainResponse response = new BlockChainResponse();
+            response.ReturnCode = 200;
+            response.ReturnMsg = "Success";
+            response.StatusCode = 200;
+            response.StatusMessage = "Done";
+            
+            return Ok(response);
         }
 
         [HttpGet("ConfirmEmail")]

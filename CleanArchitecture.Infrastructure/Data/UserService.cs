@@ -26,23 +26,32 @@ namespace CleanArchitecture.Infrastructure.Data
             else
                 return true;
         }
-
+        /// <summary>
+        /// added by nirav savariya for random generate otp on 9/26/2018
+        /// </summary>
+        /// <returns></returns>
         public long GenerateRandomOTP()
         {
             try
             {
-                string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
-                string sOTP = String.Empty;
-                long sTempChars ;
-                Random rand = new Random();
-                int iOTPLength = 6;
-                for (int i = 0; i < iOTPLength; i++)
-                {
-                    int p = rand.Next(0, saAllowedCharacters.Length);
-                    sTempChars = Convert.ToInt64(saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)]);
-                    sOTP += sTempChars;
-                }
+                //string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+                //string sOTP = String.Empty;
+                //long sTempChars ;
+                //Random rand = new Random();
+                //int iOTPLength = 6;
+                //for (int i = 0; i < iOTPLength; i++)
+                //{
+                //    int p = rand.Next(0, saAllowedCharacters.Length);
+                //    sTempChars = Convert.ToInt64(saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)]);
+                //    sOTP += sTempChars;
+                //}
+                //return Convert.ToInt64(sOTP);
+
+
+                Random generator = new Random();
+                String sOTP = generator.Next(000000, 999999).ToString("D6");
                 return Convert.ToInt64(sOTP);
+
             }
             catch (Exception ex)
             {
@@ -50,7 +59,5 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
-
-
     }
 }
