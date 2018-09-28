@@ -12,13 +12,13 @@ using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Infrastructure.Data
 {
-    public class WalletRepository<T> : IWalletRepository<T> where T : BizBase
+    public class WalletRepository : IWalletRepository
     {
         private readonly CleanArchitectureContext _dbContext;
 
-        readonly ILogger<WalletRepository<T>> _log;
+        readonly ILogger<WalletRepository> _log;
 
-        public WalletRepository(ILogger<WalletRepository<T>> log)
+        public WalletRepository(ILogger<WalletRepository> log)
         {
             _log = log;
         }

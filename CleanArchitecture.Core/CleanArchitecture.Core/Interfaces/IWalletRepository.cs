@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Interfaces
 {
-    public interface IWalletRepository<T> where T : BizBase
+    public interface IWalletRepository
     {
         //T GetById(long id); moved to icommonrepository
         //List<T> List();
