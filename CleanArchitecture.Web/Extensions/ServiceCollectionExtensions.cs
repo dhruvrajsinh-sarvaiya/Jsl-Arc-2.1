@@ -90,6 +90,7 @@ namespace CleanArchitecture.Web.Extensions
                 // options.Password.RequiredLength = 4;
                 // options.Password.RequireNonAlphanumeric = false;
 
+                /*
                 // Start Pawword Related Setting
                 //.AddTokenProvider<ConfirmEmailDataProtectorTokenProvider<ApplicationUser>>(EmailConfirmationTokenProviderName);
 
@@ -112,6 +113,7 @@ namespace CleanArchitecture.Web.Extensions
                 options.User.RequireUniqueEmail = false;
 
                 // End Pawword Related Setting
+                */
             })
             .AddEntityFrameworkStores<CleanArchitectureContext>()
             .AddDefaultTokenProviders();
