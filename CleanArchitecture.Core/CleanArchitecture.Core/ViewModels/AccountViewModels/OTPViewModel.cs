@@ -8,9 +8,8 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels
     public class OTPViewModel : TrackerViewModel
     {
         [Required]
-        
         [StringLength(6, MinimumLength = 6)]
         [Range(6, Int64.MaxValue)]
-        public int OTP { get; set; }
+        public string OTP { get; set; }
     }
 }
