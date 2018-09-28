@@ -17,7 +17,7 @@ namespace CleanArchitecture.Core.Interfaces
 
     public interface IWebApiSendRequest
     {
-        Task<String> SendAPIRequestAsync(string Url, string Request, string MethodType = "POST");
+        Task<String> SendAPIRequestAsync(string Url, string Request, string ContentType, int Timeout, string MethodType = "POST");
         //Task<TResponse> GetTemplateConfigurationAsync(TRequest Request);
     }
 
