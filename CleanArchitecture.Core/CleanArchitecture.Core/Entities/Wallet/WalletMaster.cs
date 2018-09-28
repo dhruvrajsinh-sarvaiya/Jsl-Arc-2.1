@@ -12,10 +12,18 @@ namespace CleanArchitecture.Core.Entities
     public class WalletMaster : BizBase
     {      
 
+        [Required]
+        [StringLength(50)]
+        public string Walletname { get; set; }
+
+        [Required]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Balance { get; set; }
-        
+
+        [Required]
         public long WalletTypeID { get; set; }
 
+        [Required]
         public bool IsValid { get; set; }
 
         public void CreditBalance(decimal amount)

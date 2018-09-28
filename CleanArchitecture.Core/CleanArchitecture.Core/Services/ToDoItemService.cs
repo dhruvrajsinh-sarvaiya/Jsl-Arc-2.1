@@ -9,6 +9,7 @@ namespace CleanArchitecture.Core.Services
         public void Handle(ToDoItemCompletedEvent domainEvent)
         {
             Guard.Against.Null(domainEvent, nameof(domainEvent));
+            
 
             // Do Nothing
         }

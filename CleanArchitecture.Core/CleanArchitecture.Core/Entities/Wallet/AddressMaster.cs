@@ -20,7 +20,9 @@ namespace CleanArchitecture.Core.Entities
         public byte IsDefaultAddress { get; set; }
 
         [Required]
-        public long SerProID { get; set; }        
+        public long SerProID { get; set; }             
+
+
     }
 
 }
