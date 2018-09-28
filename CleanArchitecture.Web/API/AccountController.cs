@@ -14,6 +14,7 @@ using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using System.Web;
+using PhoneNumbers;
 
 namespace CleanArchitecture.Web.API
 {
@@ -48,6 +49,7 @@ namespace CleanArchitecture.Web.API
         }
 
 
+        #region Login
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
@@ -79,6 +81,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
+        #region Standerd Login
         /// <summary>
         /// Thid method are used standard login 
         /// </summary>
@@ -95,8 +98,9 @@ namespace CleanArchitecture.Web.API
             response.StatusMessage = "Success";
             return Ok(response);
         }
-
-
+        #endregion
+        
+        #region Login With Email
         /// <summary>
         /// This method are used login with notify to your email. 
         /// </summary>
@@ -113,7 +117,9 @@ namespace CleanArchitecture.Web.API
             response.StatusMessage = "Success";
             return Ok(response);
         }
+        #endregion
 
+        #region Login With Mobile
         /// <summary>
         /// This method are used login with otp base verify 
         /// </summary>
@@ -130,6 +136,9 @@ namespace CleanArchitecture.Web.API
             response.StatusMessage = "Success";
             return Ok(response);
         }
+        #endregion
+        
+        #region Social Login
 
         ///// <summary>
         /////  This method are used social media using to login.
@@ -190,6 +199,16 @@ namespace CleanArchitecture.Web.API
                 return View("ExternalLoginConfirmation", new SocialLoginWithEmailViewModel { Email = email });
             }
         }
+        #endregion
+
+
+        #endregion
+
+
+
+        #region SignUp
+
+        #region Default register
 
         [HttpPost("register")]
         [AllowAnonymous]
@@ -240,6 +259,10 @@ namespace CleanArchitecture.Web.API
             return BadRequest(new ApiError(ModelState));
         }
 
+        #endregion
+
+        #region DirectSignUpWithEmail
+        
         /// <summary>
         ///  This method are Direct signUp with email using verified link
         /// </summary>        
@@ -256,6 +279,7 @@ namespace CleanArchitecture.Web.API
                     UserName = model.Email
                 };
 
+                /*
                 var result = await _userManager.CreateAsync(currentUser);
                 if (result.Succeeded)
                 {
@@ -277,13 +301,23 @@ namespace CleanArchitecture.Web.API
 
                         SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
                         response.ReturnCode = 200;
-                        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
-                        response.StatusCode = 200;
                         response.StatusMessage = "Success";
+                        response.StatusCode = 200;
+                        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+                                             
                         return Ok(response);
                     }
                 }
                 AddErrors(result);
+                */
+
+                SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                response.ReturnCode = 200;
+                response.StatusMessage = "Success";
+                response.StatusCode = 200;
+                response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+
+                return Ok(response);
             }
             else
             {
@@ -294,16 +328,43 @@ namespace CleanArchitecture.Web.API
             return BadRequest(new ApiError(ModelState));
         }
 
+        #endregion
+
+        #region DirectSignUpWithMobile
+
         /// <summary>
         ///  This method are Direct signUp with mobile sms using verified opt.
         /// </summary>        
         [HttpPost("DirectSignUpWithMobile")]
         [AllowAnonymous]
-        public async Task<IActionResult> DirectSignUpWithMobile([FromBody]SignUpMobileWithOTPViewModel model)
+        public async Task<IActionResult> DirectSignUpWithMobile([FromBody]SignUpWithMobileViewModel model)
         {
+            SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
+
+            string countryCode = "IN";
+            PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
+
+
+            bool isValidNumber = phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
+            if (!isValidNumber)
+            {
+                response.ReturnCode = 200;
+                response.ReturnMsg = "This mobile number is not Valid";
+                response.ErrorCode = 401;
+                response.StatusCode = 200;
+                response.StatusMessage = "error";
+                return Ok(response);
+                //   return Ok("This mobile number is  Valid");
+            }
+
+
+
             bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
             if (IsSignMobile)
             {
+                /*
                 var currentUser = new ApplicationUser
                 {
                     Mobile = model.Mobile,
@@ -331,6 +392,12 @@ namespace CleanArchitecture.Web.API
                     }
                 }
                 AddErrors(result);
+                */
+                response.ReturnCode = 200;
+                response.ReturnMsg = "Success";
+                response.StatusCode = 200;
+                response.StatusMessage = "Done";
+                return Ok(response);
             }
             else
             {
@@ -341,6 +408,10 @@ namespace CleanArchitecture.Web.API
             return BadRequest(new ApiError(ModelState));
         }
 
+        #endregion
+        
+        #region BlockChainSignUp
+
         [HttpPost("BlockChainSignUp")]
         [AllowAnonymous]
         public async Task<IActionResult> BlockChainSignUp([FromBody] BlockChainViewModel model)
@@ -350,9 +421,44 @@ namespace CleanArchitecture.Web.API
             response.ReturnMsg = "Success";
             response.StatusCode = 200;
             response.StatusMessage = "Done";
-            
+
             return Ok(response);
         }
+
+        #endregion
+
+        #endregion
+
+        #region SignUpOtpVerification
+
+        /// <summary>
+        ///  This method are Direct signUp with mobile sms using verified opt.
+        /// </summary>        
+        [HttpPost("DirectSignUpOtpVerification")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DirectSignUpOtpVerification([FromBody]OTPViewModel model)
+        {
+
+            if (model!= null)
+            {
+                SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                response.ReturnCode = 200;
+                response.ReturnMsg = "Success";
+                response.StatusCode = 200;
+                response.StatusMessage = "Done";
+                return Ok(response);
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                return BadRequest(new ApiError(ModelState));
+            }
+
+        }
+
+        #endregion
+
+
 
         [HttpGet("ConfirmEmail")]
         [AllowAnonymous]
