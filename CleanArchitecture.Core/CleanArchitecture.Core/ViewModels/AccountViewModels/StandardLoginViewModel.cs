@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,6 +25,23 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 
     public class StandardLoginResponse : BizResponseClass
     {
-
+        public string MemberDetails { get; set; }
+        public bool IsOTP { get; set; }
+        public bool Is2FA { get; set; }
+        public bool IsEmailVerified { get; set; }
+        public bool IsListedIP { get; set; }
+        public bool IsTrustedHost { get; set; }
+        public bool IsSecurityMessage { get; set; }
+        public bool IsSecurityImage { get; set; }
+        public string SecurityMessage { get; set; }
+        public int SecurityImageId { get; set; }
+        public int LoginAttemptCount { get; set; }
+        public decimal Balance { get; set; }
+        public string TwoFAQRKey { get; set; }
+        public string TwoFAAuthCode { get; set; }
+        public bool IsDefaultSetup { get; set; }
+        public int SelectedDefaultPageID { get; set; }
+        public int MaxImagePostCount { get; set; }
+        public int ProfileID { get; set; }
     }
 }

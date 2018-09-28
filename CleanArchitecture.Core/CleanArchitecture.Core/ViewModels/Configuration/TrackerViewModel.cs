@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace CleanArchitecture.Core.ViewModels.AccountViewModels
+namespace CleanArchitecture.Core.ViewModels.Configuration
 {
     public class TrackerViewModel
     {
