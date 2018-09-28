@@ -16,6 +16,7 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels.ManageViewModels;
 using CleanArchitecture.Web.Filters;
 using CleanArchitecture.Web.Extensions;
+using CleanArchitecture.Core.ViewModels.AccountViewModels;
 
 namespace CleanArchitecture.Web.API
 {
@@ -170,7 +171,6 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-
         [HttpGet("getlogins")]
         public async Task<IActionResult> GetLogins()
         {
@@ -245,6 +245,37 @@ namespace CleanArchitecture.Web.API
             };
 
             return Ok(model);
+        }
+
+        [HttpPost("Authentication2FA")]
+        public async Task<IActionResult> Authentication2FA(TwoFactorAuthViewModel model)
+        {
+
+            if (model != null)
+            {
+                SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                response.ReturnCode = 200;
+                response.ReturnMsg = "Success";
+                response.StatusCode = 200;
+                response.StatusMessage = "Done";
+                return Ok(response);
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid");
+                return BadRequest(new ApiError(ModelState));
+            }
+
+            //var user = await GetCurrentUserAsync();
+
+            //var model = new TwoFactorAuthenticationViewModel
+            //{
+            //    HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
+            //    Is2faEnabled = user.TwoFactorEnabled,
+            //    RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
+            //};
+
+            //return Ok(model);
         }
 
         [HttpPost("disable2fa")]
