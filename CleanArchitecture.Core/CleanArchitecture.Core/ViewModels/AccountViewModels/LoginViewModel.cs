@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 {
-    public class LoginViewModel : TrackerViewModel
+    public class LoginViewModel
     {
         [Required]
         [EmailAddress]
