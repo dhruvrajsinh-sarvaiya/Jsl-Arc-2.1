@@ -26,7 +26,7 @@ namespace CleanArchitecture.Core.Enums
         Active = 1,
         InActive = 0
     }
-    public enum TransactionStatus
+    public enum enTransactionStatus
     {
         Success = 1,
         OperatorFail = 2,
@@ -35,7 +35,7 @@ namespace CleanArchitecture.Core.Enums
         Refunded = 5,
         Pending = 6
     }
-    public enum EnTrnType
+    public enum enTrnType
     {
         Transaction = 1,
         Buy_Trade = 4,
@@ -48,14 +48,14 @@ namespace CleanArchitecture.Core.Enums
         Charge = 11,
         Commission=12        
     }
-    public enum EnOrderStatus
+    public enum enOrderStatus
     {
         Rejected = 9,
         Success = 1,
         Pending = 0
     }
 
-    public enum EnOrderType
+    public enum enOrderType
     {
         BuyOrder = 1,
         SellOrder = 2,
@@ -96,13 +96,13 @@ namespace CleanArchitecture.Core.Enums
         Initialize = 0,
         Fail = 9
     }
-    public enum enWebAPIRouteType
+    public enum enWebAPIRouteType //ThirdParty Apptype-Types of API
     {
         TransactionAPI = 1,
         SMSAPI = 2
     }
 
-    public enum enProviderAppType
+    public enum enProviderAppType //Provider Apptype-Types of Transaction
     {
         DemoCard = 1,
         WebService = 2,

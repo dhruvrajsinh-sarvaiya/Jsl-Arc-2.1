@@ -68,6 +68,9 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public string StatusMsg { get; set; }
+        public short VerifyDone { get; set; }
+
+        public string TrnRefNo { get; set; }
         //[Required]
         //public double DiscPer { get; set; }
         //[Required]
@@ -92,18 +95,11 @@ namespace CleanArchitecture.Core.Entities
         //public double RTDiscPer { get; set; }
         //[Required]
         //public decimal RTDiscRs { get; set; }
-       
-        public short VerifyDone { get; set; }
-
-        public string TrnRefNo { get; set; }
-
         //public decimal? OfferedFare { get; set; }
-
         //public decimal? MarkupValue { get; set; }
-
+        //public long? CouponNo { get; set; }
         public string AdditionalInfo { get; set; }
 
-        //public long? CouponNo { get; set; }
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal? ChargePer { get; set; }
@@ -118,7 +114,7 @@ namespace CleanArchitecture.Core.Entities
 
         public void MakeTransactionSuccess()
         {
-            Status = Convert.ToInt16(TransactionStatus.Success);
+            Status = Convert.ToInt16(enTransactionStatus.Success);
             AddValueChangeEvent();
         }
         public void SetTransactionCode(short statuscode)

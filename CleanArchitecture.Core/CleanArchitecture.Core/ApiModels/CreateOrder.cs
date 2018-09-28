@@ -25,7 +25,7 @@ namespace CleanArchitecture.Core.ApiModels
         public long DWalletMasterID { get; set; }
 
         [Required]
-        public EnOrderType OrderType { get; set; }
+        public enOrderType OrderType { get; set; }
 
     }
 

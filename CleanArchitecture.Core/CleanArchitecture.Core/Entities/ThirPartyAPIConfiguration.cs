@@ -27,7 +27,9 @@ namespace CleanArchitecture.Core.Entities
 
         [Url]
         public string APIStatusCheckURL { get; set; }
-       
+
+        public string APIRequestBody { get; set; }
+
         public string TransactionIdPrefix { get; set; }
 
         public string MerchantCode { get; set; }

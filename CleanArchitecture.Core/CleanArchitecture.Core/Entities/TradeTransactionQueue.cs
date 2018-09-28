@@ -21,8 +21,8 @@ namespace CleanArchitecture.Core.Entities
 
         public string TrnTypeName { get; set; }
 
-        [Required]
-        public short TrnMode { get; set; }
+        //[Required]
+        //public short TrnMode { get; set; }
 
         [Required]
         public long PairID { get; set; }
@@ -62,7 +62,7 @@ namespace CleanArchitecture.Core.Entities
 
         public long SerProID { get; set; }
 
-        public long ItemID { get; set; }
+        public int RoutID { get; set; }//change column as new structure
 
         public long? TrnRefNo { get; set; }
 

@@ -100,3 +100,7 @@ CleanArchitecture.Core/CleanArchitecture.Core/bin/
 CleanArchitecture.Core/CleanArchitecture.Core/obj/
 CleanArchitecture.Infrastructure/obj/
 CleanArchitecture.Infrastructure/bin/
+*.cache
+*.pdb
+*.txt
+*.csproj

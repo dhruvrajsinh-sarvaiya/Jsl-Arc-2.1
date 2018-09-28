@@ -18,7 +18,7 @@ namespace CleanArchitecture.Core.Entities
         public DateTime OrderDate { get; set; }
 
         [Required]
-        public EnOrderType OrderType { get; set; }
+        public enOrderType OrderType { get; set; }
 
         [Required]
         public long OWalletMasterID { get; set; }
@@ -32,7 +32,7 @@ namespace CleanArchitecture.Core.Entities
         public decimal OrderAmt { get; set; }
 
         [Required]
-        public new EnOrderStatus Status { get; set; }
+        public new enOrderStatus Status { get; set; }
              
         [Required]
         [StringLength(100)]
@@ -62,7 +62,7 @@ namespace CleanArchitecture.Core.Entities
         {
             try
             {
-                Status = EnOrderStatus.Success;
+                Status = enOrderStatus.Success;
                 Events.Add(new ServiceStatusEvent<WalletOrder>(this));
             }
             catch(Exception ex)
@@ -77,7 +77,7 @@ namespace CleanArchitecture.Core.Entities
             try
             {
 
-                Status = EnOrderStatus.Rejected;
+                Status = enOrderStatus.Rejected;
                 Events.Add(new ServiceStatusEvent<WalletOrder>(this));
             }
             catch (Exception ex)

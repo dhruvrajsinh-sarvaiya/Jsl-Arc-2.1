@@ -5,9 +5,14 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Core.Interfaces
 {
-    public interface IWebApiRouteData<in TRequest, TResponse>
+    public interface IProviderDataList<in TRequest, TResponse>
     {
-        Task<TResponse> GetAPIConfigurationAsync(TRequest Request);
+        IEnumerable<TResponse> GetProviderDataList(TRequest Request);
+    }
+
+    public interface IWebApiData<TResponse>
+    {
+        TResponse GetAPIConfiguration(long ThirPartyAPIID);
     }
 
     public interface IWebApiSendRequest
@@ -18,7 +23,7 @@ namespace CleanArchitecture.Core.Interfaces
 
     public interface IWebApiParseResponse<TResponse>
     {        
-        Task<TResponse> TransactionParseResponse(string TransactionResponse,long ThirPartyAPIID);       
+        TResponse TransactionParseResponse(string TransactionResponse,long ThirPartyAPIID);       
       
     }
    
