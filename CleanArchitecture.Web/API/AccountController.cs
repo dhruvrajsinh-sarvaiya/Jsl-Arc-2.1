@@ -450,7 +450,7 @@ namespace CleanArchitecture.Web.API
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                ModelState.AddModelError(string.Empty, "Invalid OTP.");
                 return BadRequest(new ApiError(ModelState));
             }
 
