@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,7 +13,7 @@ namespace CleanArchitecture.Core.ApiModels
         public string SMSCode { get; set; }
         enWebAPIRouteType APIType { get; set; }
     }
-    public class TransactionApiConfigurationResponse
+    public class TransactionProviderResponse
     {
         public long ServiceID { get; set; }
         public string ServiceName { get; set; }
@@ -22,11 +23,18 @@ namespace CleanArchitecture.Core.ApiModels
         public string RouteName { get; set; }
         //public string SMSCode { get; set; }
         public short ServiceType { get; set; }
+        public long ThirPartyAPIID { get; set; }      
+        public short AppType { get; set; }
+    }
+
+    public class WebApiConfigurationResponse
+    { 
         public long ThirPartyAPIID { get; set; }
         public string APISendURL { get; set; }
         public string APIValidateURL { get; set; }
         public string APIBalURL { get; set; }
         public string APIStatusCheckURL { get; set; }
+        public string APIRequestBody { get; set; }
         public string TransactionIdPrefix { get; set; }
         public string MerchantCode { get; set; }
         public string UserID { get; set; }
