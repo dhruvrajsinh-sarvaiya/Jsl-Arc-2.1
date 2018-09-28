@@ -71,12 +71,12 @@ namespace CleanArchitecture.Core.Entities
 
         public void SetAsSuccess()
         {
-            Status = Convert.ToInt16(EnOrderStatus.Success);
+            Status = Convert.ToInt16(enOrderStatus.Success);
             Events.Add(new ServiceStatusEvent<WalletOrderSub>(this));
         }
         public void SetAsRejected()
         {
-            Status = Convert.ToInt16(EnOrderStatus.Rejected);
+            Status = Convert.ToInt16(enOrderStatus.Rejected);
             Events.Add(new ServiceStatusEvent<WalletOrderSub>(this));
         }
     }
