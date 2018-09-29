@@ -2,6 +2,7 @@
 using System.Linq;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Repository;
 
 namespace CleanArchitecture.Core
 {
