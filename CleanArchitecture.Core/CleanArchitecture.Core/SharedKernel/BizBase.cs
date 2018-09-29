@@ -19,6 +19,9 @@ namespace CleanArchitecture.Core.SharedKernel
                
         public long? UpdatedBy { get; set; }
 
+        [DataType(DataType.DateTime)]
+        public DateTime UpdatedDate { get; set; }
+
         public short Status { get; set; }
 
         public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
