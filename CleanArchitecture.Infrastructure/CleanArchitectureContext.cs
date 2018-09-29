@@ -8,7 +8,11 @@ using System.Linq;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Services;
 using Microsoft.AspNetCore.Identity;
-
+using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Entities.Culture;
+using CleanArchitecture.Core.Entities.Resource;
+using CleanArchitecture.Core.Entities.Modes;
+using CleanArchitecture.Core.Entities.Log;
 
 namespace CleanArchitecture.Infrastructure
 {
