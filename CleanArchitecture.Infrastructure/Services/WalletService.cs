@@ -13,17 +13,26 @@ namespace CleanArchitecture.Infrastructure.Services
     class WalletService : BasePage, IWalletService 
     {
         readonly ILogger<WalletService> _log;
-        readonly IWalletRepository<WalletMaster> _walletRepository;
-        readonly IWalletRepository<WalletOrder> _walletOrderRepository;
-        readonly IWalletRepository<WalletOrder> _walletOrder;
+        readonly ICommonRepository<WalletMaster> _walletRepository;
+        readonly ICommonRepository<WalletOrder> _walletOrderRepository;  
+        readonly ICommonRepository<TrnAcBatch> _trnBatch;
+        readonly ICommonRepository<TransactionAccount> _trnxAccount;
+        readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
+       
+
+
         //readonly IBasePage _BaseObj;
 
-        public WalletService(ILogger<WalletService> log, IWalletRepository<WalletMaster> repository, IWalletRepository<WalletOrder> walletOrderRepository,ILogger<BasePage> logger) : base(logger)
+        public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> repository, ICommonRepository<WalletOrder> walletOrderRepository,
+            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletLedger> walletledgerrepo,ILogger<BasePage> logger) : base(logger)
         {
             _log = log;
             _walletRepository = repository;
             _walletOrderRepository = walletOrderRepository;
             //_BaseObj = basePage;
+            _trnBatch = BatchLogger;
+            _walletLedgerRepository = walletledgerrepo;
+
         }
 
         public bool CreditWallet(long walletId, ref decimal PostBal)
@@ -125,6 +134,121 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-      
+
+
+        public void ProcessOrder(long OrderID)
+        {
+            try
+            {
+                TransactionAccount tansAccObj = new TransactionAccount();
+                decimal balance;                
+                var orderObj = _walletOrderRepository.GetById(OrderID);
+                if(orderObj != null)
+                {
+                    balance = GetUserBalance(orderObj.DWalletMasterID);
+                    if (balance < orderObj.DeliveryAmt)
+                    {
+                        // return false;
+                    }
+                    var dWalletobj = _walletRepository.GetById(orderObj.DWalletMasterID);
+                    if (dWalletobj == null || dWalletobj.Status != 1)
+                    {
+                        // return false;
+                    }
+                    var oWalletobj = _walletRepository.GetById(orderObj.OWalletMasterID);
+                    if (oWalletobj == null || oWalletobj.Status != 1)
+                    {
+                        // return false;
+                    }
+
+                    //using (var context = new  CleanArchitecture.Infrastructure.CleanArchitectureContext())
+                    //{
+                    //    context.Database.BeginTransaction();
+
+                    //    context.Database.CommitTransaction(); // RollbackTransaction()
+                    //}
+                    TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
+                    tansAccObj.BatchNo = batchObj.Id;
+                    tansAccObj.CrAmt = orderObj.OrderAmt;
+                    tansAccObj.CreatedBy = orderObj.DWalletMasterID;
+                    tansAccObj.CreatedDate = UTC_To_IST();
+                    tansAccObj.DrAmt = 0;
+                    tansAccObj.IsSettled = 1;
+                    tansAccObj.RefNo = OrderID;
+                    tansAccObj.Remarks = "Order Success:" + OrderID ;
+                    tansAccObj.Status = 1;
+                    tansAccObj.TrnDate = UTC_To_IST();
+                    tansAccObj.UpdatedBy = orderObj.DWalletMasterID;
+                    tansAccObj.WalletID = orderObj.OWalletMasterID;
+                    //tansAccObj = _trnxAccount.Add(tansAccObj);
+
+                    tansAccObj = new TransactionAccount();
+                    tansAccObj.BatchNo = batchObj.Id;
+                    tansAccObj.CrAmt = 0;
+                    tansAccObj.CreatedBy = orderObj.DWalletMasterID;
+                    tansAccObj.CreatedDate = UTC_To_IST();
+                    tansAccObj.DrAmt = orderObj.OrderAmt;
+                    tansAccObj.IsSettled = 1;
+                    tansAccObj.RefNo = OrderID;
+                    tansAccObj.Remarks = "Order Success:" + OrderID;
+                    tansAccObj.Status = 1;
+                    tansAccObj.TrnDate = UTC_To_IST();
+                    tansAccObj.UpdatedBy = orderObj.DWalletMasterID;
+                    tansAccObj.WalletID = orderObj.DWalletMasterID;
+                    //tansAccObj = _trnxAccount.Add(tansAccObj);
+
+                    dWalletobj.DebitBalance(orderObj.OrderAmt);
+                    oWalletobj.CreditBalance(orderObj.OrderAmt);
+
+                    //_walletRepository.Update(dWalletobj);
+                    //_walletRepository.Update(oWalletobj);
+
+                    var walletLedger = new WalletLedger();
+                    walletLedger.ServiceTypeID = Core.Enums.enServiceType.WalletService;
+                    walletLedger.TrnType = Core.Enums.enTrnType.Deposit;
+                    walletLedger.CrAmt = 0;
+                    walletLedger.CreatedBy = orderObj.DWalletMasterID;
+                    walletLedger.CreatedDate = UTC_To_IST();
+                    walletLedger.DrAmt = orderObj.OrderAmt;                   
+                    walletLedger.TrnNo = OrderID;
+                    walletLedger.Remarks = "Order Success:" + OrderID;
+                    walletLedger.Status = 1;
+                    walletLedger.TrnDate = UTC_To_IST();
+                    walletLedger.UpdatedBy = orderObj.DWalletMasterID;
+                    walletLedger.WalletMasterId = orderObj.DWalletMasterID;
+                    walletLedger.PreBal = dWalletobj.Balance;
+                    walletLedger.PostBal = dWalletobj.Balance - orderObj.OrderAmt;
+                    //walletLedger = _walletLedgerRepository.Add(walletLedger);
+
+                    walletLedger = new WalletLedger();
+                    walletLedger.ServiceTypeID = Core.Enums.enServiceType.WalletService;
+                    walletLedger.TrnType = Core.Enums.enTrnType.Deposit;
+                    walletLedger.CrAmt = orderObj.OrderAmt;
+                    walletLedger.CreatedBy = orderObj.DWalletMasterID;
+                    walletLedger.CreatedDate = UTC_To_IST();
+                    walletLedger.DrAmt = 0;
+                    walletLedger.TrnNo = OrderID;
+                    walletLedger.Remarks = "Order Success:" + OrderID;
+                    walletLedger.Status = 1;
+                    walletLedger.TrnDate = UTC_To_IST();
+                    walletLedger.UpdatedBy = orderObj.DWalletMasterID;
+                    walletLedger.WalletMasterId = orderObj.OWalletMasterID;
+                    walletLedger.PreBal = oWalletobj.Balance;
+                    walletLedger.PostBal = oWalletobj.Balance - orderObj.OrderAmt;
+                    //walletLedger = _walletLedgerRepository.Add(walletLedger);
+                    //_walletLedgerRepository.WalletOperation();
+                }
+                else
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
     }
 }

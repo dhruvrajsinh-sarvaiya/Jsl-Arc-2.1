@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-	  
-	  <BuildServerSideRenderer>false</BuildServerSideRenderer>
-	  <UserSecretsId>aspnetcorespa-c23d27a4-eb88-4b18-9b77-2a93f3b15119</UserSecretsId>
+
+    <BuildServerSideRenderer>false</BuildServerSideRenderer>
+    <UserSecretsId>aspnetcorespa-c23d27a4-eb88-4b18-9b77-2a93f3b15119</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,20 +12,23 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="AspNet.Security.OAuth.Validation" Version="2.0.0-rc2-final" />
-	  <PackageReference Include="AutoMapper" Version="7.0.1" />
-	  <!--<PackageReference Include="Microsoft.AspNetCore.All" />-->
+    <PackageReference Include="AspNet.Security.OAuth.Validation" Version="2.0.0-rc2-final" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.9.14" />
+    <!--<PackageReference Include="Microsoft.AspNetCore.All" />-->
     <PackageReference Include="Microsoft.AspNetCore.App" />
-	  <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" />
-	  <PackageReference Include="OpenIddict" Version="2.0.0-rc2-final" />
-	  <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="2.0.0-rc2-final" />
-	  <PackageReference Include="OpenIddict.Mvc" Version="2.0.0-rc2-final" />
-	  <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="3.0.0" />
+    <PackageReference Include="OpenIddict" Version="2.0.0-rc2-final" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="2.0.0-rc2-final" />
+    <PackageReference Include="OpenIddict.Mvc" Version="2.0.0-rc2-final" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="3.0.0" />
-	  <PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders" Version="0.7.0" />
-	  <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders" Version="0.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="5.1.0" />
+    <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="1.4.0" />
   </ItemGroup>
 
   <ItemGroup>

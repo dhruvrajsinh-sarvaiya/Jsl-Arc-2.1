@@ -131,7 +131,8 @@ namespace CleanArchitecture.Web
 
                 // TODO: Move to Infrastucture Registry
                 config.For(typeof(IRepository<>)).Add(typeof(EfRepository<>));
-                config.For(typeof(IWalletRepository<>)).Add(typeof(WalletRepository<>));
+                config.For(typeof(ICommonRepository<>)).Add(typeof(EFCommonRepository<>));
+                config.For(typeof(IWalletRepository)).Add(typeof(WalletRepository));
                 config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
                 config.For<IMediator>().Use<Mediator>();
 
