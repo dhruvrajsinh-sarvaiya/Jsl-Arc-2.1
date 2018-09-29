@@ -17,6 +17,8 @@ using CleanArchitecture.Core.ViewModels.ManageViewModels;
 using CleanArchitecture.Web.Filters;
 using CleanArchitecture.Web.Extensions;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
+using CleanArchitecture.Core.Entities.User;
 
 namespace CleanArchitecture.Web.API
 {

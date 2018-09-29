@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Web.API

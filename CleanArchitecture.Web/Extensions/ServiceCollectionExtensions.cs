@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Primitives;
 
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Session;
+using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.Services;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data;

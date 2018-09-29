@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 

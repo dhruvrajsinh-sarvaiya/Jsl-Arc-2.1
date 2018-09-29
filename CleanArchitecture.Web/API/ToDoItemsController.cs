@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities;
-using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Web.ApiModels;
-using CleanArchitecture.Web.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

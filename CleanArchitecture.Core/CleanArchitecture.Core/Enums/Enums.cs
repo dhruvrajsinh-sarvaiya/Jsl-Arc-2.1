@@ -12,13 +12,7 @@ namespace CleanArchitecture.Core.Enums
         TwoFactor = 3,
         Lockout = 4,
         CreateAccount = 5
-    }
-
-    public enum ModeStatus
-    {
-        False =0,
-        True=1
-    }
+    }  
 
     public enum ServiceStatus
     {

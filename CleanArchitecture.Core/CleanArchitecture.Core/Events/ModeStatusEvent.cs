@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.Entities;
+﻿
+using CleanArchitecture.Core.Entities.Modes;
 using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;

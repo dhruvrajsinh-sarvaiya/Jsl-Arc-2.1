@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace CleanArchitecture.Core.Entities
+namespace CleanArchitecture.Core.Entities.User
 {
     public partial class ApplicationRole : IdentityRole<int>
     {    

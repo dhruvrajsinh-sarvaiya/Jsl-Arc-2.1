@@ -8,13 +8,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using AspNet.Security.OpenIdConnect.Primitives;
-
 using CleanArchitecture.Web.Filters;
-using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
-using System.Web;
 using PhoneNumbers;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.Login;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
+using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.ForgotPassword;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.ResetPassword;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.OTP;
+using CleanArchitecture.Core.Interfaces.User;
 
 namespace CleanArchitecture.Web.API
 {

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using StructureMap;
 using CleanArchitecture.Core.SharedKernel;
+using CleanArchitecture.Core.Interfaces.Repository;
 
 namespace CleanArchitecture.Web
 {
