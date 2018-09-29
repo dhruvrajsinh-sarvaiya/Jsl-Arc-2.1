@@ -11,7 +11,7 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         public WebAPIParseResponse TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
         {
-            string test = "test conflictpo";
+            string test = "test conflict1";
             throw new NotImplementedException();
         }
     }
