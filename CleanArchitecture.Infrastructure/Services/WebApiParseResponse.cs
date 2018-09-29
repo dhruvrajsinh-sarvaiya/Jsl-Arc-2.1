@@ -11,6 +11,7 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         public WebAPIParseResponse TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
         {
+            string test = "";
             throw new NotImplementedException();
         }
     }
