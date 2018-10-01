@@ -26,6 +26,7 @@ namespace CleanArchitecture.Web.API
     [Route("api/[controller]")]
     public class AccountController : BaseController
     {
+        /*
         private readonly IOptions<IdentityOptions> _identityOptions;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -51,7 +52,7 @@ namespace CleanArchitecture.Web.API
             _userdata = userdata;
             _messageSender = messageSender;
         }
-
+        */
 
         #region Login
 
@@ -617,6 +618,7 @@ namespace CleanArchitecture.Web.API
         }
         */
 
+            /*
         [HttpPost("logout")]
         public async Task<IActionResult> LogOff()
         {
@@ -624,9 +626,9 @@ namespace CleanArchitecture.Web.API
             _logger.LogInformation(4, "User logged out.");
             return NoContent();
         }
-
+        */
         #region Helpers
-
+            /*
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -639,7 +641,7 @@ namespace CleanArchitecture.Web.API
         {
             return _userManager.GetUserAsync(HttpContext.User);
         }
-
+        */
         #endregion
     }
 }

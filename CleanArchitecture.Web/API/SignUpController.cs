@@ -51,6 +51,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         // Email Link to direct call this method
         [HttpGet("ConfirmEmail")]
         [AllowAnonymous]

@@ -342,6 +342,17 @@ namespace CleanArchitecture.Web.API
             AddErrors(result);
             return BadRequest(new ApiError(ModelState));
         }
+
+        #region Logout        
+        [HttpPost("logout")]
+        public async Task<IActionResult> LogOff()
+        {
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation(4, "User logged out.");
+            return NoContent();
+        }
+        #endregion
+
         #endregion
     }
 
