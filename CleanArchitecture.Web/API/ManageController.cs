@@ -54,7 +54,7 @@ namespace CleanArchitecture.Web.API
         }
         #endregion
 
-        #region My Account Profile 
+        #region Method
 
         [HttpGet("userinfo")]
         public async Task<IActionResult> UserInfo()

@@ -26,6 +26,7 @@ namespace CleanArchitecture.Web.API
     [Route("api/[controller]")]
     public class AccountController : BaseController
     {
+        /*
         private readonly IOptions<IdentityOptions> _identityOptions;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -51,11 +52,14 @@ namespace CleanArchitecture.Web.API
             _userdata = userdata;
             _messageSender = messageSender;
         }
-
+        */
 
         #region Login
+
+        /*
         [HttpPost("login")]
         [AllowAnonymous]
+        [ApiExplorerSettings()]
         public async Task<IActionResult> Login([FromBody]LoginViewModel model)
         {
             // This doesn't count login failures towards account lockout
@@ -84,7 +88,7 @@ namespace CleanArchitecture.Web.API
             }
 
         }
-
+        
         #region Standerd Login
         /// <summary>
         /// Thid method are used standard login 
@@ -204,16 +208,14 @@ namespace CleanArchitecture.Web.API
             }
         }
         #endregion
-
+        */
 
         #endregion
-
-
-
+                       
         #region SignUp
-
+           /*
         #region Default register
-
+            
         [HttpPost("register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody]RegisterViewModel model, string returnUrl = null)
@@ -262,7 +264,7 @@ namespace CleanArchitecture.Web.API
             // If we got this far, something failed, redisplay form
             return BadRequest(new ApiError(ModelState));
         }
-
+        
         #endregion
 
         #region DirectSignUpWithEmail
@@ -283,38 +285,38 @@ namespace CleanArchitecture.Web.API
                     UserName = model.Email
                 };
 
-                /*
-                var result = await _userManager.CreateAsync(currentUser);
-                if (result.Succeeded)
-                {
-                    // Add to roles
-                    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                
+                //var result = await _userManager.CreateAsync(currentUser);
+                //if (result.Succeeded)
+                //{
+                //    // Add to roles
+                //    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
 
-                    if (roleAddResult.Succeeded)
-                    {
-                        string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
-                        string ctokenlink = Url.Action("ConfirmEmail", "Account", new
-                        {
-                            userId = currentUser.Id,
-                            emailConfirmCode = ctoken
-                        }, protocol: HttpContext.Request.Scheme);
+                //    if (roleAddResult.Succeeded)
+                //    {
+                //        string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
+                //        string ctokenlink = Url.Action("ConfirmEmail", "Account", new
+                //        {
+                //            userId = currentUser.Id,
+                //            emailConfirmCode = ctoken
+                //        }, protocol: HttpContext.Request.Scheme);
 
-                        var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
-                        _logger.LogInformation(3, "User created a new account with password.");
-                        await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+                //        var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
+                //        _logger.LogInformation(3, "User created a new account with password.");
+                //        await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
 
-                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-                        response.ReturnCode = 200;
-                        response.StatusMessage = "Success";
-                        response.StatusCode = 200;
-                        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+                //        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                //        response.ReturnCode = 200;
+                //        response.StatusMessage = "Success";
+                //        response.StatusCode = 200;
+                //        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
                                              
-                        return Ok(response);
-                    }
-                }
-                AddErrors(result);
-                */
-
+                //        return Ok(response);
+                //    }
+                //}
+                //AddErrors(result);
+                
+               
                 SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
                 response.ReturnCode = 200;
                 response.StatusMessage = "Success";
@@ -368,35 +370,35 @@ namespace CleanArchitecture.Web.API
             bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
             if (IsSignMobile)
             {
-                /*
-                var currentUser = new ApplicationUser
-                {
-                    Mobile = model.Mobile,
-                    UserName = model.Mobile,
-                    OTP = _userdata.GenerateRandomOTP()
-                };
+                
+                //var currentUser = new ApplicationUser
+                //{
+                //    Mobile = model.Mobile,
+                //    UserName = model.Mobile,
+                //    OTP = _userdata.GenerateRandomOTP()
+                //};
 
-                var result = await _userManager.CreateAsync(currentUser);
-                if (result.Succeeded)
-                {
-                    var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile, ClaimValueTypes.Integer);
-                    await _userManager.AddClaimAsync(currentUser, officeClaim);
-                    // Add to roles
-                    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                //var result = await _userManager.CreateAsync(currentUser);
+                //if (result.Succeeded)
+                //{
+                //    var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile, ClaimValueTypes.Integer);
+                //    await _userManager.AddClaimAsync(currentUser, officeClaim);
+                //    // Add to roles
+                //    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
 
-                    if (roleAddResult.Succeeded)
-                    {
-                        //await _messageSender.SendSMSAsync(model.Mobile, "");
-                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-                        response.ReturnCode = 200;
-                        response.ReturnMsg = "Success";
-                        response.StatusCode = 200;
-                        response.StatusMessage = "Done";
-                        return Ok(response);
-                    }
-                }
-                AddErrors(result);
-                */
+                //    if (roleAddResult.Succeeded)
+                //    {
+                //        //await _messageSender.SendSMSAsync(model.Mobile, "");
+                //        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                //        response.ReturnCode = 200;
+                //        response.ReturnMsg = "Success";
+                //        response.StatusCode = 200;
+                //        response.StatusMessage = "Done";
+                //        return Ok(response);
+                //    }
+                //}
+                //AddErrors(result);
+                
                 response.ReturnCode = 200;
                 response.ReturnMsg = "Success";
                 response.StatusCode = 200;
@@ -430,11 +432,11 @@ namespace CleanArchitecture.Web.API
         }
 
         #endregion
-
+        */
         #endregion
 
         #region SignUpOtpVerification
-
+        /*
         /// <summary>
         ///  This method are Direct signUp with mobile sms using verified opt.
         /// </summary>        
@@ -459,11 +461,11 @@ namespace CleanArchitecture.Web.API
             }
 
         }
-
+        */
         #endregion
 
 
-
+        /*
         [HttpGet("ConfirmEmail")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string emailConfirmCode)
@@ -480,8 +482,8 @@ namespace CleanArchitecture.Web.API
 
             var result = await _userManager.ConfirmEmailAsync(user, emailConfirmCode);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
-        }
-
+        }*/
+        /*
         [HttpPost("ForgotPassword")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody]ForgotPasswordViewModel model)
@@ -531,7 +533,8 @@ namespace CleanArchitecture.Web.API
             AddErrors(result);
             return BadRequest(new ApiError(ModelState));
         }
-
+        */
+        /*
         [HttpGet("SendCode")]
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl = null, bool rememberMe = false)
@@ -574,8 +577,9 @@ namespace CleanArchitecture.Web.API
             // }
 
             return RedirectToAction(nameof(VerifyCode), new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
-        }
+        }*/
 
+            /*
         [HttpGet("VerifyCode")]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyCode(string provider, bool rememberMe, string returnUrl = null)
@@ -612,7 +616,9 @@ namespace CleanArchitecture.Web.API
                 return View(model);
             }
         }
+        */
 
+            /*
         [HttpPost("logout")]
         public async Task<IActionResult> LogOff()
         {
@@ -620,9 +626,9 @@ namespace CleanArchitecture.Web.API
             _logger.LogInformation(4, "User logged out.");
             return NoContent();
         }
-
+        */
         #region Helpers
-
+            /*
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -635,7 +641,7 @@ namespace CleanArchitecture.Web.API
         {
             return _userManager.GetUserAsync(HttpContext.User);
         }
-
+        */
         #endregion
     }
 }

@@ -40,7 +40,7 @@ namespace CleanArchitecture.Web.API
         }
         #endregion
 
-        #region TwoFA
+        #region Method
 
         [HttpPost("twofactorauthentication")]
         public async Task<IActionResult> TwoFactorAuthentication()
