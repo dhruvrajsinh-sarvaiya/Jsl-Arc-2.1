@@ -8,7 +8,13 @@ using CleanArchitecture.Core.SharedKernel;
 namespace CleanArchitecture.Core.Entities
 {
     public class WalletTypeMaster : BizBase
-    {        
+    {
+        [Required]
+        [StringLength(50)]
         public string WalletTypeName { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Discription { get; set; }
     }
 }

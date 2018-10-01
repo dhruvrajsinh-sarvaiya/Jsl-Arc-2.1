@@ -14,6 +14,9 @@ namespace CleanArchitecture.Core.Entities
         public long WalletMasterId { get; set;} // fk of walletmaster table
 
         [Required]
+        public long ToWalletMasterId { get; set; }
+
+        [Required]
         public DateTime TrnDate { get; set; }
 
         [Required]
@@ -44,6 +47,8 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         [StringLength(100)]
         public string Remarks { get; set; }
+
        
+
     }
 }

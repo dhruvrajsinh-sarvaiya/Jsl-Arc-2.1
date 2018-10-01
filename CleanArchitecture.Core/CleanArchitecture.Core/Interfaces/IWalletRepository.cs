@@ -15,6 +15,6 @@ namespace CleanArchitecture.Core.Interfaces
         //void Delete(T entity);
         //T AddProduct(T entity);
         TradeBitGoDelayAddresses GetUnassignedETH();
-        bool WalletOperation(WalletLedger wl1, WalletMaster wm1, TransactionAccount ta1, WalletLedger wl2, WalletMaster wm2, TransactionAccount ta2);
+        bool WalletOperation(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1);
     }
 }

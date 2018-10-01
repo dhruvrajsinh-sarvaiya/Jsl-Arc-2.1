@@ -113,8 +113,7 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             try
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
-                return _dbContext.Set<TradeBitGoDelayAddresses>().Where(e => e.GenerateBit == 1 && e.WalletmasterID == 0).OrderBy(e => e.Id).FirstOrDefault(); 
-               
+                return _dbContext.Set<TradeBitGoDelayAddresses>().Where(e => e.GenerateBit == 1 && e.WalletmasterID == 0).OrderBy(e => e.Id).FirstOrDefault();                
             }
             catch (Exception ex)
             {
@@ -122,11 +121,10 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
-        public bool WalletOperation(WalletLedger wl1, WalletMaster wm1, TransactionAccount ta1, WalletLedger wl2, WalletMaster wm2, TransactionAccount ta2)
+        public bool WalletOperation(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1)
         {
             try
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
-
 
                 _dbContext.Database.BeginTransaction();
                 _dbContext.Set<WalletLedger>().Add(wl1);
@@ -146,5 +144,6 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
+            
     }
 }

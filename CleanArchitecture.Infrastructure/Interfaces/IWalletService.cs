@@ -10,11 +10,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
     {
         decimal GetUserBalance(long walletId);
 
-        bool CreditWallet(long walletId, ref decimal PostBal);
-
         bool WalletBalanceCheck(decimal amount, long walletId);
-
-        bool DebitWallet(long walletId, ref decimal PostBal);
 
         bool IsValidWallet(long walletId);      
         

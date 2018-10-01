@@ -25,7 +25,7 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public bool IsValid { get; set; }
-
+               
         public void CreditBalance(decimal amount)
         {
             Balance = Balance + amount;

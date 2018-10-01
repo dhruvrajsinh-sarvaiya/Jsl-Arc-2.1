@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Events;
@@ -9,7 +10,11 @@ using CleanArchitecture.Core.SharedKernel;
 namespace CleanArchitecture.Core.Entities
 {
     public class DepositHistory : BizBase
-    {     
+    {
+                
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
+
         [Key]
         [StringLength(100)]
         public string TrnID { get; set; }
