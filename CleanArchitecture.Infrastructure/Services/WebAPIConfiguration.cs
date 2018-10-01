@@ -5,15 +5,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Infrastructure.Data.Transaction;
 
 namespace CleanArchitecture.Infrastructure.Services
 {   
     //Take Transaction Route Data
     class TransactionWebAPIConfiguration : IWebApiData<WebApiConfigurationResponse>
-    {       
+    {
+        private readonly WebApiDataRepository _webapiDataRepository;
+        public TransactionWebAPIConfiguration(WebApiDataRepository webapiDataRepository)
+        {
+            _webapiDataRepository = webapiDataRepository;
+        }
+
         public WebApiConfigurationResponse GetAPIConfiguration(long ThirPartyAPIID)
         {
-            throw new NotImplementedException();
+            return _webapiDataRepository.GetThirdPartyAPIData(ThirPartyAPIID);            
         }            
     }
 

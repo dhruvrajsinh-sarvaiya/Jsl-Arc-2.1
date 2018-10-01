@@ -143,6 +143,8 @@ namespace CleanArchitecture.Web.Extensions
             app.UseSwaggerUI(c =>
             {                
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Clean Architecture Api V1");
+                // add search options in swagger ui by nirav savariya 9-29-2018  
+                c.EnableFilter("");
             });
 
             return app;

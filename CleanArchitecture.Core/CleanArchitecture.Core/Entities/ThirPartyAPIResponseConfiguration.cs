@@ -21,6 +21,10 @@ namespace CleanArchitecture.Core.Entities
 
         public string StatusMsgRegex { get; set; }
 
+        public string ResponseCodeRegex { get; set; }
+
+        public string ErrorCodeRegex { get; set; }
+
         public string TrnRefNoRegex { get; set; }
 
         public string OprTrnRefNoRegex { get; set; }

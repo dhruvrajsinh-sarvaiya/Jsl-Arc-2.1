@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces.Repository;
 
-namespace CleanArchitecture.Infrastructure.Services
+namespace CleanArchitecture.Infrastructure.Data.Transaction
 {
     public class MakeTransaction
     {
