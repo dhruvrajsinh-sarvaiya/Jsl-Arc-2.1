@@ -297,6 +297,15 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody]ForgotPasswordViewModel model)
         {
+
+            ForgotPasswordResponse response = new ForgotPasswordResponse();
+            response.ReturnCode = 200;
+            response.ReturnMsg = "Success";
+            response.StatusCode = 200;
+            response.StatusMessage = "Success";
+            return Ok(response);
+
+            /*
             var currentUser = await _userManager.FindByNameAsync(model.Email);
             if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
             {
@@ -321,6 +330,7 @@ namespace CleanArchitecture.Web.API
             //var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Reset your password</a>";
             await _emailSender.SendEmailAsync(model.Email, "Forgotten password email", confirmationLink);
             return NoContent(); // sends 204
+            */
         }
 
         [HttpPost("resetpassword")]

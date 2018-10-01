@@ -51,7 +51,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         // Email Link to direct call this method
         [HttpGet("ConfirmEmail")]
         [AllowAnonymous]
@@ -126,7 +126,7 @@ namespace CleanArchitecture.Web.API
         }
 
         #endregion
-        
+
         #region DirectSignUpWithEmail
 
         /// <summary>
@@ -318,6 +318,21 @@ namespace CleanArchitecture.Web.API
                 return BadRequest(new ApiError(ModelState));
             }
 
+        }
+
+        /// <summary>
+        ///  This method are Auto generate resend otp
+        /// </summary>        
+        [HttpPost("ReSendOtp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtp()
+        {
+            SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+            response.ReturnCode = 200;
+            response.ReturnMsg = "Success";
+            response.StatusCode = 200;
+            response.StatusMessage = "Done";
+            return Ok(response);
         }
 
         #endregion
