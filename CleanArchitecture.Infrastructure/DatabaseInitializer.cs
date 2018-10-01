@@ -54,6 +54,7 @@ namespace CleanArchitecture.Infrastructure
             CreateUsers();
             AddLocalisedData();
             await AddOpenIdConnectOptions(configuration);
+            AddWalletType(); // ntrivedi 01-10-2018 added default wallettype master entry
         }
 
         private void CreateRoles()
@@ -155,5 +156,41 @@ namespace CleanArchitecture.Infrastructure
             }
 
         }
+
+
+        private void AddWalletType()
+        {
+            if (!_context.WalletTypeMasters.Any())
+            {
+                _context.WalletTypeMasters.AddRange(
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "BTC", Status = 1, WalletTypeName = "BTC" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "INR", Status = 1, WalletTypeName = "INR" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "LTC", Status = 1, WalletTypeName = "LTC" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "ETH", Status = 1, WalletTypeName = "ETH" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "XRP", Status = 1, WalletTypeName = "XRP" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "ATCC", Status = 1, WalletTypeName = "ATCC" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "ARISTO", Status = 1, WalletTypeName = "ARISTO" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "BCI", Status = 1, WalletTypeName = "BCI" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "BCH", Status = 1, WalletTypeName = "BCH" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "BTG", Status = 1, WalletTypeName = "BTG" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "CVC", Status = 1, WalletTypeName = "CVC" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "REP", Status = 1, WalletTypeName = "REP" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "OMG", Status = 1, WalletTypeName = "OMG" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "PAY", Status = 1, WalletTypeName = "PAY" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "GNT", Status = 1, WalletTypeName = "GNT" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "BAT", Status = 1, WalletTypeName = "BAT" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "KNC", Status = 1, WalletTypeName = "KNC" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "ZRX", Status = 1, WalletTypeName = "ZRX" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "FUN", Status = 1, WalletTypeName = "FUN" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "EOS", Status = 1, WalletTypeName = "EOS" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "QRL", Status = 1, WalletTypeName = "QRL" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "NMR", Status = 1, WalletTypeName = "NMR" },
+                  new WalletTypeMaster { CreatedBy = 900, CreatedDate = DateTime.UtcNow, Discription = "LMX", Status = 1, WalletTypeName = "LMX" }
+               );
+                _context.SaveChanges();
+            }
+        }
+
+
     }
 }
