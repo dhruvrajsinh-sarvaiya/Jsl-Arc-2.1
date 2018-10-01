@@ -45,14 +45,23 @@ namespace CleanArchitecture.Infrastructure.Services
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1,1);
                 foreach (CommunicationProviderList g in Result)
                 {
-                    await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SMSSendURL, g.SenderID, g.UserID, g.Password);
+                    string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SMSSendURL, g.SenderID, g.UserID, g.Password);
+
+                    if (Resposne != "Fail")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
                 return await Task.FromResult(new CommunicationResponse { ErrorCode = 101, ReturnMsg = "Message sent." });
             }
             catch(Exception ex)
             {
                 return await Task.FromResult(new CommunicationResponse { ErrorCode = 99, ReturnMsg = "Message not sent." });
-            }            
+            }
         }
 
         //public Task<ToDoItemResponse> Handle(ToDoItemRequest request, CancellationToken cancellationToken)

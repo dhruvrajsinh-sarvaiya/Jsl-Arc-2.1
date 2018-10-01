@@ -20,8 +20,7 @@ namespace CleanArchitecture.Web.Api
         {
             _todoRepository = todoRepository;
             _mediator = mediator;
-        }
- 
+        } 
         
         // GET: api/ToDoItems
         [HttpGet]
@@ -64,7 +63,7 @@ namespace CleanArchitecture.Web.Api
         }
 
         [HttpPost("SendMessage")]
-        public async Task<IActionResult> SendMessage(SendSMSRequest Request)
+        public async Task<IActionResult> SendMessage([FromBody] SendSMSRequest Request)
         {
             try
             {
@@ -78,7 +77,7 @@ namespace CleanArchitecture.Web.Api
         }
 
         [HttpPost("SendEmail")]
-        public async Task<IActionResult> SendEmail(SendEmailRequest Request)
+        public async Task<IActionResult> SendEmail([FromBody] SendEmailRequest Request)
         {
             try
             {
@@ -92,7 +91,7 @@ namespace CleanArchitecture.Web.Api
         }
 
         [HttpPost("SendNotification")]
-        public async Task<IActionResult> SendNotification(SendNotificationRequest Request)
+        public async Task<IActionResult> SendNotification([FromBody] SendNotificationRequest Request)
         {
             try
             {

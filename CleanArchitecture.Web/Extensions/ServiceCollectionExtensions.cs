@@ -300,7 +300,7 @@ namespace CleanArchitecture.Web.Extensions
         {
             // New instance every time, only configuration class needs so its ok
             services.AddSingleton<IStringLocalizerFactory, EFStringLocalizerFactory>();
-            services.AddTransient<IEmailSender, MessageService>();
+            //services.AddTransient<IEmailSender, MessageService>();
             services.AddTransient<IApplicationDataService, ApplicationDataService>();
             services.AddScoped<IUnitOfWork, HttpUnitOfWork>();
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
@@ -313,7 +313,7 @@ namespace CleanArchitecture.Web.Extensions
 
             services.AddTransient<IUserSessionService, UserSessionService>();
             // added by nirav savariya for getting message otp in mobile on 9-22-2018
-            services.AddTransient<IMessageSender, MessageService>();
+            //services.AddTransient<IMessageSender, MessageService>();
             return services;
         }
     }

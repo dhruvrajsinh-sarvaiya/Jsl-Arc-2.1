@@ -20,11 +20,11 @@ namespace CleanArchitecture.Core.Entities
         public string SenderID { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(200)]
         public string SMSSendURL { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(200)]
         public string SMSBalURL { get; set; }        
 
         [Required]
