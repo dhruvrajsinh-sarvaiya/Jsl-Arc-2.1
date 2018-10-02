@@ -30,7 +30,7 @@ namespace CleanArchitecture.Web.API
         private readonly CleanArchitectureContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IEmailSender _emailSender;
+        //private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
 
@@ -41,14 +41,14 @@ namespace CleanArchitecture.Web.API
         CleanArchitectureContext context,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IEmailSender emailSender,
+        //IEmailSender emailSender,
         ILoggerFactory loggerFactory,
         UrlEncoder urlEncoder)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
-            _emailSender = emailSender;
+            //_emailSender = emailSender;
             _logger = loggerFactory.CreateLogger<ManageController>();
             _urlEncoder = urlEncoder;
         }
