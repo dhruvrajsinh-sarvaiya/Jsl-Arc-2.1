@@ -26,7 +26,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _MessageService = MessageService;
         }
 
-        public async Task<CommunicationResponse> HandleAsync(SendSMSRequest Request, CancellationToken cancellationToken)
+        public async Task<CommunicationResponse> Handle(SendSMSRequest Request, CancellationToken cancellationToken)
         {
             try
             {
