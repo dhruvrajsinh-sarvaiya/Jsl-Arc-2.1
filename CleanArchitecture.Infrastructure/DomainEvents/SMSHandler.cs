@@ -35,7 +35,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     MobileNo = Request.MobileNo,
                     SMSText = Request.Message,
                     SMSSendBy = 0,
-                    Status = Convert.ToInt16(MessageStatusType.Initialize),
+                    Status = Convert.ToInt16(enMessageService.Init),
                     CreatedBy = 1,
                     CreatedDate = DateTime.UtcNow
                 };
@@ -48,11 +48,19 @@ namespace CleanArchitecture.Infrastructure.Services
                     string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SMSSendURL, g.SenderID, g.UserID, g.Password);
 
                     if (Resposne != "Fail")
-                    {
+                    {                       
+                        Message.Status = Convert.ToInt16(enMessageService.Success);
+                        Message.SentMessage();
+                        Message.RespText = Resposne;
+                        _MessageRepository.Update(Message);
                         break;
                     }
                     else
                     {
+                        Message.Status = Convert.ToInt16(enMessageService.Fail);
+                        Message.SentMessage();
+                        Message.RespText = Resposne;
+                        _MessageRepository.Update(Message);
                         continue;
                     }
                 }
