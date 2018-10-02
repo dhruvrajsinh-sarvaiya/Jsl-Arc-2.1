@@ -8,6 +8,7 @@ using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Infrastructure.DTOClasses;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -125,33 +126,50 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
 
-        public void ProcessOrder(long RefNo,long DWalletID,long OWalletID,decimal amount,string remarks, enTrnType enTrnType,enServiceType serviceType)
+        public BizResponse ProcessOrder(long RefNo,long DWalletID,long OWalletID,decimal amount,string remarks, enTrnType enTrnType,enServiceType serviceType)
         {
             try
             {
                 TransactionAccount tansAccObj = new TransactionAccount();
                 TransactionAccount tansAccObj1 = new TransactionAccount();
+                BizResponse bizResponse = new BizResponse();
+
 
                 decimal balance;                
                
                     balance = GetUserBalance(DWalletID);
-                    if(amount <  0)
-                    {
+               if(amount <  0)
+               {
                     //return false;
-                    }
-                    if (balance < amount)
+                    bizResponse.ErrorCode = enErrorCode.InvalidAmount;
+                    bizResponse.ReturnMsg = "Invalid Amount";
+                    bizResponse.StatusCode = 1;
+                    return bizResponse;
+                }
+                if (balance < amount)
                     {
-                        // return false;
-                    }
+                    // return false;
+                    bizResponse.ErrorCode = enErrorCode.InsufficientBalance;
+                    bizResponse.ReturnMsg = "Insufficient Balance";
+                    bizResponse.StatusCode = 1;
+                    return bizResponse;
+                }
                     var dWalletobj = _commonRepository.GetById(DWalletID);
                     if (dWalletobj == null || dWalletobj.Status != 1)
                     {
-                        // return false;
-                    }
+                    // return false;
+                    bizResponse.ErrorCode = enErrorCode.InvalidWallet;
+                    bizResponse.ReturnMsg = "Invalid Wallet";
+                    bizResponse.StatusCode = 1;
+                    return bizResponse;
+                }
                     var oWalletobj = _commonRepository.GetById(OWalletID);
                     if (oWalletobj == null || oWalletobj.Status != 1)
                     {
-                        // return false;
+                    bizResponse.ErrorCode = enErrorCode.InvalidWallet;
+                    bizResponse.ReturnMsg = "Invalid Wallet";
+                    bizResponse.StatusCode = 1;
+                    return bizResponse;
                     }
                     
                     TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
@@ -225,8 +243,11 @@ namespace CleanArchitecture.Infrastructure.Services
                     walletLedger2.PreBal = oWalletobj.Balance;                 
                     walletLedger2.PostBal = oWalletobj.Balance - amount;
 
-                    _walletRepository1.WalletOperation(walletLedger,walletLedger2,tansAccObj,tansAccObj1, dWalletobj, oWalletobj);                   
-               
+                    _walletRepository1.WalletOperation(walletLedger,walletLedger2,tansAccObj,tansAccObj1, dWalletobj, oWalletobj);
+                bizResponse.ErrorCode = enErrorCode.Success;
+                bizResponse.ReturnMsg = "Success";
+                bizResponse.StatusCode = 0;
+                return bizResponse;
             }
             catch (Exception ex)
             {
