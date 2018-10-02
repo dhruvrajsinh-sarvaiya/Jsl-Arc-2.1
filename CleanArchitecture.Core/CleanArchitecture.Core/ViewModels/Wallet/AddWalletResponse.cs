@@ -6,6 +6,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
 {
     public class AddWalletResponse
     {
+
         public class User
         {
             public string user { get; set; }
