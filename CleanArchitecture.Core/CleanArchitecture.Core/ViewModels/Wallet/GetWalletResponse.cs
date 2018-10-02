@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -71,7 +72,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
             public Policy policy { get; set; }
         }
 
-        public class GetWalletRootObject
+        public class GetWalletRootObject : BizResponseClass
         {
             public string id { get; set; }
             public List<User> users { get; set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -68,7 +69,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
             public Wallet2 _wallet { get; set; }
         }
 
-        public class CreateWalletRootObject
+        public class CreateWalletRootObject : BizResponseClass
         {
             public Wallet wallet { get; set; }
         }

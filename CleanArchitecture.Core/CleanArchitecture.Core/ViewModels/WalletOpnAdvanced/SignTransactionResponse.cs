@@ -5,11 +5,8 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 {
-   public  class ChangeFeeonTransactionResponse
+    public class SignTransactionResponse: BizResponseClass
     {
-        public class ChangeFeeonTransactionRootObject : BizResponseClass
-        {
-            public string txid { get; set; }
-        }
+        public string txHex { get; set; }
     }
 }
