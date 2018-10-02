@@ -7,16 +7,21 @@ using AspNet.Security.OpenIdConnect.Primitives;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.User;
+using CleanArchitecture.Core.Services;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.Login;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.OTP;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
+using CleanArchitecture.Infrastructure.Services;
 using CleanArchitecture.Web.Filters;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using PhoneNumbers;
 
 namespace CleanArchitecture.Web.API
@@ -28,15 +33,32 @@ namespace CleanArchitecture.Web.API
         #region Field
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
+<<<<<<< HEAD
+        //private readonly IEmailSender _emailSender;
+=======
+>>>>>>> cc88a1d71b30ee62a7c5ad98e74f1830c52e8d40
         private readonly IUserService _userdata;
+        private readonly IMediator _mediator;
+        private readonly EncyptedDecrypted _encdecAEC;
+        private readonly string _AESSalt = "rz8LuOtFBXphj9WQfvFh";
         #endregion
 
         #region Ctore
+<<<<<<< HEAD
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, IMediator mediator, EncyptedDecrypted encdecAEC)
+        {
+            _userManager = userManager;
+            _logger = loggerFactory.CreateLogger<SignUpController>();
+            //_emailSender = emailSender;
+=======
         public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
+>>>>>>> cc88a1d71b30ee62a7c5ad98e74f1830c52e8d40
             _userdata = userdata;
+            _mediator = mediator;
+            _encdecAEC = encdecAEC;
         }
         #endregion
 
@@ -53,20 +75,53 @@ namespace CleanArchitecture.Web.API
         // Email Link to direct call this method
         [HttpGet("ConfirmEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string emailConfirmCode)
+        public async Task<IActionResult> ConfirmEmail(string emailConfirmCode)
         {
-            if (userId == null || emailConfirmCode == null)
-            {
-                return View("Error");
-            }
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return View("Error");
-            }
 
-            var result = await _userManager.ConfirmEmailAsync(user, emailConfirmCode);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            if (string.IsNullOrEmpty(emailConfirmCode))
+            {
+                byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+
+                string DecryptToken = EncyptedDecrypted.Decrypt(emailConfirmCode, DecpasswordBytes);
+
+                LinkTokenViewModel dmodel = JsonConvert.DeserializeObject<LinkTokenViewModel>(DecryptToken);
+                if (dmodel?.Expirytime >= DateTime.UtcNow)
+                {
+                    if (string.IsNullOrEmpty(dmodel?.Id))
+                    {
+                        //return View("Error");
+                        ModelState.AddModelError(string.Empty, "Error.");
+                        return BadRequest(new ApiError(ModelState));
+                    }
+                    var user = await _userManager.FindByIdAsync(dmodel.Id);
+                    if (user == null)
+                    {
+                        //return View("Error");
+                        ModelState.AddModelError(string.Empty, "Error");
+                        return BadRequest(new ApiError(ModelState));
+                    }
+                    else if (!user.EmailConfirmed)
+                    {
+                        var result = await _userManager.ConfirmEmailAsync(user, emailConfirmCode);
+                        return View(result.Succeeded ? "ConfirmEmail" : "Error");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "This email is already registered.");
+                        return BadRequest(new ApiError(ModelState));
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
+                    return BadRequest(new ApiError(ModelState));
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
+                return BadRequest(new ApiError(ModelState));
+            }
         }
         #endregion
 
@@ -85,7 +140,6 @@ namespace CleanArchitecture.Web.API
                 FirstName = model.Firstname,
                 LastName = model.Lastname,
                 Mobile = model.Mobile
-                //Balance = model.Balance
             };
 
             var result = await _userManager.CreateAsync(currentUser, model.Password);
@@ -101,11 +155,29 @@ namespace CleanArchitecture.Web.API
                 var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
                 if (roleAddResult.Succeeded)
                 {
-                    string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
-                    string ctokenlink = Url.Action("ConfirmEmail", "Account", new
+                    LinkTokenViewModel linkToken = new LinkTokenViewModel();
+
+                    linkToken.Id = currentUser.Id.ToString();
+                    linkToken.Username = model.Email;
+                    linkToken.Email = model.Email;
+                    linkToken.Firstname = model.Firstname;
+                    linkToken.Lastname = model.Lastname;
+                    linkToken.Mobile = model.Mobile;
+                    linkToken.CurrentTime = DateTime.UtcNow;
+                    linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
+
+
+                    byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+
+                    string UserDetails = JsonConvert.SerializeObject(linkToken);
+
+                    string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
+
+                    //string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
+                    string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
                     {
-                        userId = currentUser.Id,
-                        emailConfirmCode = ctoken
+                        //userId = currentUser.Id,
+                        emailConfirmCode = SubScriptionKey
                     }, protocol: HttpContext.Request.Scheme);
 
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(currentUser);
@@ -113,9 +185,30 @@ namespace CleanArchitecture.Web.API
                     //var host = Request.Scheme + "://" + Request.Host;
                     //var callbackUrl = host+ "/api/Account/ConfirmEmail" + "?userId=" + currentUser.Id + "&emailConfirmCode=" + code;
                     var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
+
+                    SendEmailRequest request = new SendEmailRequest();
+                    request.Recepient = model.Email;
+                    request.Subject = "Registration confirmation email";
+                    request.Body = confirmationLink;
+
+                    CommunicationResponse CommResponse = await _mediator.Send(request);
                     _logger.LogInformation(3, "User created a new account with password.");
+<<<<<<< HEAD
+                    //await _mediator.Publish(new EmailHandler())
+                    //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+
+
+
+                    RegisterResponse response = new RegisterResponse();
+                    response.ReturnCode = 200;
+                    response.StatusMessage = "Success";
+                    response.StatusCode = 200;
+                    response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+                    return Ok(response);
+=======
                     //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
                     return Ok("User created a new account with password.");
+>>>>>>> cc88a1d71b30ee62a7c5ad98e74f1830c52e8d40
                 }
             }
             AddErrors(result);
@@ -141,9 +234,10 @@ namespace CleanArchitecture.Web.API
                 {
                     Email = model.Email,
                     UserName = model.Email
+                    //PasswordHash = model.Password
                 };
 
-                /*
+
                 var result = await _userManager.CreateAsync(currentUser);
                 if (result.Succeeded)
                 {
@@ -152,36 +246,50 @@ namespace CleanArchitecture.Web.API
 
                     if (roleAddResult.Succeeded)
                     {
-                        string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
-                        string ctokenlink = Url.Action("ConfirmEmail", "Account", new
+                        LinkTokenViewModel linkToken = new LinkTokenViewModel();
+
+                        linkToken.Id = currentUser.Id.ToString();
+                        linkToken.Username = model.Email;
+                        linkToken.Email = model.Email;
+                        linkToken.CurrentTime = DateTime.UtcNow;
+                        linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
+
+
+                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+
+                        string UserDetails = JsonConvert.SerializeObject(linkToken);
+
+                        string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
+
+                        //string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
+                        string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
                         {
-                            userId = currentUser.Id,
-                            emailConfirmCode = ctoken
+                            //userId = currentUser.Id,
+                            emailConfirmCode = SubScriptionKey
                         }, protocol: HttpContext.Request.Scheme);
 
                         var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
                         _logger.LogInformation(3, "User created a new account with password.");
-                        await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
 
-                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                        SendEmailRequest request = new SendEmailRequest();
+                        request.Recepient = model.Email;
+                        request.Subject = "Registration confirmation email";
+                        request.Body = confirmationLink;
+
+                        CommunicationResponse CommResponse = await _mediator.Send(request);
+
+                        //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+
+                        SignUpWithEmailResponse response = new SignUpWithEmailResponse();
                         response.ReturnCode = 200;
                         response.StatusMessage = "Success";
                         response.StatusCode = 200;
                         response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
-                                             
+
                         return Ok(response);
                     }
                 }
                 AddErrors(result);
-                */
-
-                SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-                response.ReturnCode = 200;
-                response.StatusMessage = "Success";
-                response.StatusCode = 200;
-                response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
-
-                return Ok(response);
             }
             else
             {
@@ -303,7 +411,7 @@ namespace CleanArchitecture.Web.API
 
             if (model != null)
             {
-                SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                OTPResponse response = new OTPResponse();
                 response.ReturnCode = 200;
                 response.ReturnMsg = "Success";
                 response.StatusCode = 200;
