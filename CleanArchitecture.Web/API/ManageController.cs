@@ -19,6 +19,7 @@ using CleanArchitecture.Web.Extensions;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using CleanArchitecture.Core.Entities.User;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace CleanArchitecture.Web.API
 {
@@ -41,7 +42,6 @@ namespace CleanArchitecture.Web.API
         CleanArchitectureContext context,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        //IEmailSender emailSender,
         ILoggerFactory loggerFactory,
         UrlEncoder urlEncoder)
         {
