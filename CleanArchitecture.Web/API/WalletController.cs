@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static CleanArchitecture.Core.ViewModels.Wallet.AddWalletResponse;
@@ -17,7 +18,7 @@ using static CleanArchitecture.Core.ViewModels.Wallet.UpdateWalletResponse;
 
 namespace CleanArchitecture.Web.API
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class WalletController : ControllerBase
     {
         #region"Methods"
@@ -26,26 +27,28 @@ namespace CleanArchitecture.Web.API
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        [HttpPost("CreateWallet")]
-        public ActionResult CreateWallet([FromBody]CreateWalletRequest Request)
-        {
-            string requeststring = "{'wallet':{'_wallet':{'id':'591a40dd9fdde805252f0d8aefed79b3','users':[{'user':'55cce42633dc60ca06db38e643622a86','permissions':['admin','view','spend']}],'coin':'tltc','label':'My Test Wallet','m':2,'n':3,'keys':['591a40dc422326ff248919e62a02b2be','591a40dd422326ff248919e91caa8b6a','591a40dc9fdde805252f0d87f76577f8'],'tags':['591a40dd9fdde805252f0d8a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'isCold':false,'coinSpecific':{},'balance':0,'confirmedBalance':0,'spendableBalance':0,'balanceString':'0','confirmedBalanceString':'0','spendableBalanceString':'0','receiveAddress':{'address':'QRWXF9VxJnbSx5uYbX99kuw55pUW4DrmTx','chain':0,'index':0,'coin':'tltc','wallet':'591a40dd9fdde805252f0d8aefed79b3','coinSpecific':{'redeemScript':'522103e8bc…c7ac0e53ae'}},'pendingApprovals':[]}}}";
-            CreateWalletRootObject Response = new CreateWalletRootObject();
-            Response = JsonConvert.DeserializeObject<CreateWalletRootObject>(requeststring);
-            Response.StatusCode = 200;
-            var respObj = JsonConvert.SerializeObject(Response);
-            dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
-        }
+        //[HttpPost("{coin:string}")]
+        //[ActionName("CreateWallet")]
+        //public ActionResult CreateWallet([FromQuery]CreateWalletRequest Request)
+        //{
+        //    string requeststring = "{'wallet':{'_wallet':{'id':'591a40dd9fdde805252f0d8aefed79b3','users':[{'user':'55cce42633dc60ca06db38e643622a86','permissions':['admin','view','spend']}],'coin':'tltc','label':'My Test Wallet','m':2,'n':3,'keys':['591a40dc422326ff248919e62a02b2be','591a40dd422326ff248919e91caa8b6a','591a40dc9fdde805252f0d87f76577f8'],'tags':['591a40dd9fdde805252f0d8a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'isCold':false,'coinSpecific':{},'balance':0,'confirmedBalance':0,'spendableBalance':0,'balanceString':'0','confirmedBalanceString':'0','spendableBalanceString':'0','receiveAddress':{'address':'QRWXF9VxJnbSx5uYbX99kuw55pUW4DrmTx','chain':0,'index':0,'coin':'tltc','wallet':'591a40dd9fdde805252f0d8aefed79b3','coinSpecific':{'redeemScript':'522103e8bc…c7ac0e53ae'}},'pendingApprovals':[]}}}";
+        //    CreateWalletRootObject Response = new CreateWalletRootObject();
+        //    Response = JsonConvert.DeserializeObject<CreateWalletRootObject>(requeststring);
+        //    Response.StatusCode = 200;
+        //    var respObj = JsonConvert.SerializeObject(Response);
+        //    dynamic respObjJson = JObject.Parse(respObj);
+        //    return Ok(respObjJson);
+        //}
 
         /// <summary>
         /// vsolanki 1-10-2018 Create Wallet
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        [HttpPost("ListWallet")]
-        public ActionResult ListWallet([FromBody]ListWalletRequest Request)
-        {
+        [HttpGet("{coin}")]
+       // [Route("{coin}")]
+        public ActionResult ListWallet(string coin, int limit=25,string prevId=null,bool allTokens=false)
+        { 
             string requeststring = "{'wallets':[{'id':'585951a5df8380e0e3063e9f','users':[{'user':'55e8a1a5df8380e0e30e20c6','permissions':['admin','view','spend']}],'coin':'tbtc','label':'Alexs first wallet','m':2,'n':3,'keys':['585951a5df8380e0e304a553','585951a5df8380e0e30d645c','585951a5df8380e0e30b6147'],'tags':['585951a5df8380e0e30a198a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'coinSpecific':{}}]}";
             ListWalletRootObject Response = new ListWalletRootObject();
             Response = JsonConvert.DeserializeObject<ListWalletRootObject>(requeststring);
