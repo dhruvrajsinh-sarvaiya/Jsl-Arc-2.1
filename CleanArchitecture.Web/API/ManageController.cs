@@ -19,6 +19,7 @@ using CleanArchitecture.Web.Extensions;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using CleanArchitecture.Core.Entities.User;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace CleanArchitecture.Web.API
 {
