@@ -314,6 +314,8 @@ namespace CleanArchitecture.Web.Extensions
             services.AddTransient<IUserSessionService, UserSessionService>();
             // added by nirav savariya for getting message otp in mobile on 9-22-2018
             //services.AddTransient<IMessageSender, MessageService>();
+            // added by nirav savariya for Encypted Decrypted on 10-02-2018
+            services.AddScoped<EncyptedDecrypted>();
             return services;
         }
     }
