@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -22,7 +23,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
             public CoinSpecific coinSpecific { get; set; }
         }
 
-        public class ListWalletAddressRootObject
+        public class ListWalletAddressRootObject : BizResponseClass
         {
             public int limit { get; set; }
             public string coin { get; set; }

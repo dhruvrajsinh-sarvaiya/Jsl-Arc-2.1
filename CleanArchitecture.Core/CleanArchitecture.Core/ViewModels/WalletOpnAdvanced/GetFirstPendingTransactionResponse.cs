@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,7 +7,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 {
     public class GetFirstPendingTransactionResponse
     {
-        public class GetFirstPendingTransactionRootObject
+        public class GetFirstPendingTransactionRootObject : BizResponseClass
         {
             public string walletId { get; set; }
             public string txid { get; set; }

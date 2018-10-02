@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -50,7 +51,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
             public List<Entry> entries { get; set; }
         }
 
-        public class ListWalletTransactionRootObject
+        public class ListWalletTransactionRootObject : BizResponseClass
         {
             public List<Transaction> transactions { get; set; }
             public string coin { get; set; }

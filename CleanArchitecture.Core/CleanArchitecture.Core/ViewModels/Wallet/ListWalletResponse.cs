@@ -37,7 +37,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
             public CoinSpecific coinSpecific { get; set; }
         }
 
-        public class ListWalletRootObject
+        public class ListWalletRootObject : ApiModels.BizResponseClass
         {
             public List<Wallet> wallets { get; set; }
         }
