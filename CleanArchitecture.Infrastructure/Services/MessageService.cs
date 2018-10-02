@@ -23,14 +23,14 @@ namespace CleanArchitecture.Infrastructure.Services
             _WebAPISendRequest = WebAPISendRequest;
         }
 
-        public async Task<string> SendEmailAsync(string Email, string Recepient, string Subject, string BCC, string CC, string Body, string Url, string UserID, string Password, int Port)
+        public async Task<string> SendEmailAsync(string Recepient, string Subject, string BCC, string CC, string Body, string Url, string UserID, string Password, int Port)
         {
             try
             {
-                string toEmail = Email;
+                string toEmail = Recepient;
                 MailMessage mail = new MailMessage()
                 {
-                    From = new MailAddress(Recepient)
+                    From = new MailAddress(UserID)
                 };
                 mail.To.Add(new MailAddress(toEmail));
                 //mail.CC.Add(new MailAddress(_emailSettings.CcEmail));
@@ -42,7 +42,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 using (SmtpClient smtp = new SmtpClient(Url,Port))
                 {
-                    smtp.Credentials = new NetworkCredential(Recepient, Password);
+                    smtp.Credentials = new NetworkCredential(UserID, Password);
                     smtp.EnableSsl = true;
                     await smtp.SendMailAsync(mail);
                 }
@@ -75,9 +75,9 @@ namespace CleanArchitecture.Infrastructure.Services
             
         }
 
-        public Task SendNotificationAsync(string DeviceID, string Message, string Url)
+        public Task<string> SendNotificationAsync(string DeviceID, string Message, string Url)
         {
-            return Task.FromResult(0);
+            return Task.FromResult("");
         }
 
         //public async Task SendEmail(string email, string subject, string message)
