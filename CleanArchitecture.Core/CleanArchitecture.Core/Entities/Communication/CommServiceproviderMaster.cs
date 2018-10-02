@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.Entities
         public string SerproName { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [StringLength(50)]
         public string UserID { get; set; }
 
         [Required]

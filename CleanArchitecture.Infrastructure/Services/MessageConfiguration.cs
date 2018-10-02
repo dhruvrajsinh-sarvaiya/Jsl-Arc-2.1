@@ -48,7 +48,7 @@ namespace CleanArchitecture.Infrastructure.Services
             // return Task.FromResult(result);
 
             IQueryable Result = _dbContext.CommunicationProviderList.FromSql(
-                    @"select CASM.SenderID,CASM.SMSSendURL,CASM.Priority,CASM.SMSBalURL,CSM.RequestID, RM.RequestFormat,
+                    @"select CASM.SenderID,CASM.SMSSendURL As SendURL,CASM.Priority,CASM.SMSBalURL,CSM.RequestID, RM.RequestFormat,
              RM.contentType,RM.MethodType, CSM.ServiceName,CSMP.UserID, CSMP.Password,CSMP.Balance ,CSM.CommServiceID
               from ServiceTypeMaster SM
              inner join CommServiceTypeMaster CSTM on SM.ServiceTypeID = CSTM.ServiceTypeID
