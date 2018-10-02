@@ -28,16 +28,14 @@ namespace CleanArchitecture.Web.API
         #region Field
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
-        private readonly IEmailSender _emailSender;
         private readonly IUserService _userdata;
         #endregion
 
         #region Ctore
-        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IEmailSender emailSender, IUserService userdata)
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
-            _emailSender = emailSender;
             _userdata = userdata;
         }
         #endregion
@@ -116,7 +114,7 @@ namespace CleanArchitecture.Web.API
                     //var callbackUrl = host+ "/api/Account/ConfirmEmail" + "?userId=" + currentUser.Id + "&emailConfirmCode=" + code;
                     var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
                     _logger.LogInformation(3, "User created a new account with password.");
-                    await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+                    //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
                     return Ok("User created a new account with password.");
                 }
             }
