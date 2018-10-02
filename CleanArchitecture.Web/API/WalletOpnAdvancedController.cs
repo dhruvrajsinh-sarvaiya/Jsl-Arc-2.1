@@ -91,7 +91,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace CleanArchitecture.Web.API
             Response.StatusCode = 200;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
-            return Ok(respObjJson);
+            return returnDynamicResult(respObjJson);
         }
 
         ///// <summary>
