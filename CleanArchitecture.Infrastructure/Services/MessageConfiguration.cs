@@ -49,7 +49,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
             IQueryable Result = _dbContext.CommunicationProviderList.FromSql(
                     @"select CASM.SenderID,CASM.SMSSendURL,CASM.Priority,CASM.SMSBalURL,CSM.RequestID, RM.RequestFormat,
-             RM.contentType,RM.MethodType, CSM.ServiceName,CSMP.UserID, CSMP.Password,CSMP.Balance 
+             RM.contentType,RM.MethodType, CSM.ServiceName,CSMP.UserID, CSMP.Password,CSMP.Balance ,CSM.CommServiceID
               from ServiceTypeMaster SM
              inner join CommServiceTypeMaster CSTM on SM.ServiceTypeID = CSTM.ServiceTypeID
              inner join CommServiceproviderMaster CSMP on CSTM.CommServiceTypeID = CSMP.CommServiceTypeID

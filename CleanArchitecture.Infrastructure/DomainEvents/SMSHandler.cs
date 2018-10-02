@@ -26,7 +26,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _MessageService = MessageService;
         }
 
-        public async Task<CommunicationResponse> Handle(SendSMSRequest Request, CancellationToken cancellationToken)
+        public async Task<CommunicationResponse> HandleAsync(SendSMSRequest Request, CancellationToken cancellationToken)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1,1);
                 foreach (CommunicationProviderList g in Result)
                 {
-                    string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SMSSendURL, g.SenderID, g.UserID, g.Password);
+                    string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SendURL, g.SenderID, g.UserID, g.Password);
 
                     if (Resposne != "Fail")
                     {                       

@@ -7,7 +7,7 @@ namespace CleanArchitecture.Core.ApiModels
     public class CommunicationProviderList
     {
         public string  SenderID { get; set; }
-        public string  SMSSendURL { get; set; }
+        public string  SendURL { get; set; }
         public int  Priority { get; set; }
         public string  SMSBalURL { get; set; }
         public long  RequestID { get; set; }
