@@ -12,14 +12,14 @@ namespace CleanArchitecture.Infrastructure.Services
 {
     public class MessageService : IMessageService
     {
-        public EmailSettings _emailSettings { get; }
-        public SMSSetting _smsSettings { get; set; }
+        //public EmailSettings _emailSettings { get; }
+        //public SMSSetting _smsSettings { get; set; }
         public WebAPISendRequest<MessageService> _WebAPISendRequest { get; set; }
 
-        public MessageService(IOptions<EmailSettings> emailSettings, IOptions<SMSSetting> SmsSetting, WebAPISendRequest<MessageService> WebAPISendRequest)
+        public MessageService(WebAPISendRequest<MessageService> WebAPISendRequest)
         {
-            _emailSettings = emailSettings.Value;
-            _smsSettings = SmsSetting.Value;
+            //_emailSettings = emailSettings.Value;
+            //_smsSettings = SmsSetting.Value;
             _WebAPISendRequest = WebAPISendRequest;
         }
 

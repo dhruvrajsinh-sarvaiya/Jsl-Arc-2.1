@@ -108,8 +108,8 @@ namespace CleanArchitecture.Web
             //services.AddDistributedMemoryCache();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.Configure<EmailSettings>(Configuration.GetSection("Email"));
-            services.Configure<SMSSetting>(Configuration.GetSection("SMS"));
+            //services.Configure<EmailSettings>(Configuration.GetSection("Email"));
+            //services.Configure<SMSSetting>(Configuration.GetSection("SMS"));
 
             services.AddMediatR(typeof(Startup));
 
