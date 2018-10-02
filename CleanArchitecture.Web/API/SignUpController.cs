@@ -29,7 +29,7 @@ namespace CleanArchitecture.Web.API
         #region Field
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly Core.Interfaces.IEmailSender _emailSender;
         private readonly IUserService _userdata;
         #endregion
 

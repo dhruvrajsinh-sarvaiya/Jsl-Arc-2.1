@@ -28,7 +28,7 @@ namespace CleanArchitecture.Web.API
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly Core.Interfaces.IEmailSender _emailSender;
         #endregion
 
         #region Ctore
