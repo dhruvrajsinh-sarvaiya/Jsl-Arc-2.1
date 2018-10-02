@@ -121,4 +121,13 @@ namespace CleanArchitecture.Core.Enums
         Fail = 2,
         Pending = 6        
     }
+
+    public enum enErrorCode
+    {
+        InvalidAmount = 2251,
+        InsufficientBalance = 2252,
+        InvalidWallet = 2253,
+        Success = 2253
+
+    }
 }

@@ -200,7 +200,7 @@ namespace CleanArchitecture.Web
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/CleanArchitecture/swagger/v1/swagger.json", "Clean Architecture Api V1");
+                c.SwaggerEndpoint(Configuration["SwaggerPath"].ToString(), "Clean Architecture Api V1");
                 c.DocExpansion(DocExpansion.None);
             });
 
