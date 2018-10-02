@@ -33,7 +33,10 @@ namespace CleanArchitecture.Web.API
         #region Field
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
+<<<<<<< HEAD
         //private readonly IEmailSender _emailSender;
+=======
+>>>>>>> cc88a1d71b30ee62a7c5ad98e74f1830c52e8d40
         private readonly IUserService _userdata;
         private readonly IMediator _mediator;
         private readonly EncyptedDecrypted _encdecAEC;
@@ -41,11 +44,18 @@ namespace CleanArchitecture.Web.API
         #endregion
 
         #region Ctore
+<<<<<<< HEAD
         public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, IMediator mediator, EncyptedDecrypted encdecAEC)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
             //_emailSender = emailSender;
+=======
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata)
+        {
+            _userManager = userManager;
+            _logger = loggerFactory.CreateLogger<SignUpController>();
+>>>>>>> cc88a1d71b30ee62a7c5ad98e74f1830c52e8d40
             _userdata = userdata;
             _mediator = mediator;
             _encdecAEC = encdecAEC;
@@ -183,6 +193,7 @@ namespace CleanArchitecture.Web.API
 
                     CommunicationResponse CommResponse = await _mediator.Send(request);
                     _logger.LogInformation(3, "User created a new account with password.");
+<<<<<<< HEAD
                     //await _mediator.Publish(new EmailHandler())
                     //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
 
@@ -194,6 +205,10 @@ namespace CleanArchitecture.Web.API
                     response.StatusCode = 200;
                     response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
                     return Ok(response);
+=======
+                    //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+                    return Ok("User created a new account with password.");
+>>>>>>> cc88a1d71b30ee62a7c5ad98e74f1830c52e8d40
                 }
             }
             AddErrors(result);
