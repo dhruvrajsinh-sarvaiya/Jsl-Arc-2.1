@@ -6,6 +6,8 @@ using CleanArchitecture.Core.ViewModels.WalletOpnAdvanced;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static CleanArchitecture.Core.ViewModels.WalletOpnAdvanced.ChangeFeeonTransactionResponse;
+using static CleanArchitecture.Core.ViewModels.WalletOpnAdvanced.GetFirstPendingTransactionResponse;
 using static CleanArchitecture.Core.ViewModels.WalletOpnAdvanced.GetWalletTransactionResponse;
 using static CleanArchitecture.Core.ViewModels.WalletOpnAdvanced.ListWalletAddressResponse;
 using static CleanArchitecture.Core.ViewModels.WalletOpnAdvanced.ListWalletTransactionResponse;
@@ -65,6 +67,39 @@ namespace CleanArchitecture.Web.API
             dynamic respObjJson = JObject.Parse(respObj);
             return Ok(respObjJson);
         }
+
+        /// <summary>
+        /// vsolanki 2-10-2018 Get First Pending Transaction
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        [HttpPost("Get First Pending Transaction")]
+        public ActionResult GetFirstPendingTransaction([FromBody]GetFirstPendingTransactionRequest Request)
+        {
+            string requeststring = "{ 'walletId':'585c51a5df8380e0e3082e46','txid':'0x023d55519e14d6243e614273ca779d2e45c6bccea30cfb32cd859b8f93291c69','tx':'f901ec81c38504a817c8008307a120949e342e458e910017e538ca5868318d06a7fac0d240b90a8439425215000000000000000000000000406243ba15759c5b73bf8ed97bb037037619c5df00000000000000000000000000000000000000000000000000038d7ea4c6800000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000005a7e5ad1000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000414eec57fea039bdcf8d9346a36f77d799878aa3c9c97ec02d34678c8eca038e015c646ed7a8bb7501fe0c1422dc395f7434311daa1a21f9cbe912b46fe5606bf41c000000000000000000000000000000000000000000000000000000000000001ba09c427a0852c3cc06e5b7a67e51ba9d41c9efa66acf6cea28f814e3048a6e92efa03a1ba9ef435a21d473cf7cc4c2e55eb860481c36c1310e9076d02b4b88226f51','coin':'teth','gasPrice':1000000000000000000}";
+            GetFirstPendingTransactionRootObject Response = new GetFirstPendingTransactionRootObject();
+            Response = JsonConvert.DeserializeObject<GetFirstPendingTransactionRootObject>(requeststring);
+            var respObj = JsonConvert.SerializeObject(Response);
+            dynamic respObjJson = JObject.Parse(respObj);
+            return Ok(respObjJson);
+        }
+
+        /// <summary>
+        /// vsolanki 2-10-2018 Change Fee on Transaction
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        [HttpPost("Change Fee on Transaction")]
+        public ActionResult ChangeFeeonTransaction([FromBody]ChangeFeeonTransactionRequest Request)
+        {
+            string requeststring = "{'txid':'dd21875eb303e5efda9056585d68c79b10345585213a62c9c1a7bc331dfd5d93'}";
+            ChangeFeeonTransactionRootObject Response = new ChangeFeeonTransactionRootObject();
+            Response = JsonConvert.DeserializeObject<ChangeFeeonTransactionRootObject>(requeststring);
+            var respObj = JsonConvert.SerializeObject(Response);
+            dynamic respObjJson = JObject.Parse(respObj);
+            return Ok(respObjJson);
+        }
+
 
         #endregion
     }
