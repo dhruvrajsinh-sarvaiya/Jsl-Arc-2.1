@@ -32,7 +32,7 @@ namespace CleanArchitecture.Web.API
         #endregion
 
         #region Ctore
-        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IEmailSender emailSender)
+        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, Core.Interfaces.IEmailSender emailSender)
         {
             _signInManager = signInManager;
             _userManager = userManager;

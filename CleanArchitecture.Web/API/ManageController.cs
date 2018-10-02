@@ -42,7 +42,7 @@ namespace CleanArchitecture.Web.API
         CleanArchitectureContext context,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IEmailSender emailSender,
+        Core.Interfaces.IEmailSender emailSender,
         ILoggerFactory loggerFactory,
         UrlEncoder urlEncoder)
         {

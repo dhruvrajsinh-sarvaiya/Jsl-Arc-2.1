@@ -34,7 +34,7 @@ namespace CleanArchitecture.Web.API
         #endregion
 
         #region Ctore
-        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IEmailSender emailSender, IUserService userdata)
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, Core.Interfaces.IEmailSender emailSender, IUserService userdata)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
