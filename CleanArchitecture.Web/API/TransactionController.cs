@@ -201,7 +201,7 @@ namespace CleanArchitecture.Web.API
 
         #region "uday method"
 
-        [HttpPost("GetAssetInformationg")]
+        [HttpPost("GetAssetInformation")]
         public ActionResult GetAssetInformation([FromBody]GetAssetInfoRequest Request)
         {
             //For Testing Purpose
@@ -279,7 +279,7 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("CancelMultipleOrder")]
-        public ActionResult CancelMultipleOrder([FromBody]CancelOrderRequest Request)
+        public ActionResult CancelMultipleOrder([FromBody]List<CancelOrderRequest> Request)
         {
             //For Testing Purpose
             List<CancelOrderResponse> Response = new List<CancelOrderResponse>()

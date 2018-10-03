@@ -8,9 +8,11 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     public class CreateMarginTradingRequest
     {
         [Required]
+        [Range(0, 9999999999.99999999)]
         public string currency { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999)]
         public decimal amount { get; set; }
 
         [Required]
