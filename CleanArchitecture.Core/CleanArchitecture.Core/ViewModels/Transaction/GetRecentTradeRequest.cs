@@ -8,8 +8,9 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     public  class GetRecentTradeRequest
     {
         [Required]
+        [StringLength(7,MinimumLength =6)]
         public string Pair { get; set; }
 
-        public int Limit { get; set; }
+        public long Limit { get; set; }
     }
 }

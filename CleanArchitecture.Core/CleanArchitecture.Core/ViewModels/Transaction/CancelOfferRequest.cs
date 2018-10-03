@@ -10,6 +10,6 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     public class CancelOfferRequest 
     {
         [Required]
-        public string offer_id { get; set; }
+        public long offer_id { get; set; }
     }
 }

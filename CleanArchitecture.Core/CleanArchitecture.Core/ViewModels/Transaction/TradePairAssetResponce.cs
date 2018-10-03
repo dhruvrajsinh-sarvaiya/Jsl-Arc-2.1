@@ -11,22 +11,7 @@ namespace CleanArchitecture.Core.ViewModels
         public List<RateLimit> rateLimits { get; set; }
         public List<object> exchangeFilters { get; set; }
         public List<Symbol> symbols { get; set; }
-        //public string altname { get; set; }
-        //public string aclass_base { get; set; }
-        //public string @base { get; set; }
-        //public string aclass_quote { get; set; }
-        //public string quote { get; set; }
-        //public string lot { get; set; }
-        //public int pair_decimals { get; set; }
-        //public int lot_decimals { get; set; }
-        //public int lot_multiplier { get; set; }
-        //public List<object> leverage_buy { get; set; }
-        //public List<object> leverage_sell { get; set; }
-        //public List<List<double>> fees { get; set; }
-        //public List<List<double>> fees_maker { get; set; }
-        //public string fee_volume_currency { get; set; }
-        //public int margin_call { get; set; }
-        //public int margin_stop { get; set; }
+        
     }
     
 
@@ -40,8 +25,8 @@ namespace CleanArchitecture.Core.ViewModels
         public class Filter
         {
             public string filterType { get; set; }
-            public string minPrice { get; set; }
-            public string maxPrice { get; set; }
+            public decimal minPrice { get; set; }
+            public decimal maxPrice { get; set; }
             public string tickSize { get; set; }
             public string minQty { get; set; }
             public string maxQty { get; set; }
@@ -62,8 +47,4 @@ namespace CleanArchitecture.Core.ViewModels
             public List<Filter> filters { get; set; }
         }
 
-        public class RootObject
-        {
-           
-        }
 }

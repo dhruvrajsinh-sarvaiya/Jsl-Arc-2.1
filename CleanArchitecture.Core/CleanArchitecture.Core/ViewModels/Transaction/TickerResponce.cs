@@ -8,10 +8,10 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     {
         //Binance
         public string symbol { get; set; }
-        public string bidPrice { get; set; }
-        public string bidQty { get; set; }
-        public string askPrice { get; set; }
-        public string askQty { get; set; }
+        public decimal bidPrice { get; set; }
+        public decimal  bidQty { get; set; }
+        public decimal askPrice { get; set; }
+        public decimal  askQty { get; set; }
     }
 
     

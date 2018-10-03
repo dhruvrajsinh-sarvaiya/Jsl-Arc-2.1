@@ -6,12 +6,12 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 {
     public class MyTradesFundingResponce
     {
-        public string rate { get; set; }
-        public int period { get; set; }
-        public string amount { get; set; }
-        public string timestamp { get; set; }
+        public decimal  rate { get; set; }
+        public long  period { get; set; }
+        public decimal  amount { get; set; }
+        public string   timestamp { get; set; }
         public string type { get; set; }
-        public int tid { get; set; }
-        public int offer_id { get; set; }
+        public long  tid { get; set; }
+        public long  offer_id { get; set; }
     }
 }

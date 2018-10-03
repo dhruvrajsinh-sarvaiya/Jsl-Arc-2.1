@@ -8,6 +8,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     public class TradeLedgerRequest
     {
         [Required]
+        [StringLength (7,MinimumLength =6)]
         public string Pair { get; set; }
 
         [Required]
