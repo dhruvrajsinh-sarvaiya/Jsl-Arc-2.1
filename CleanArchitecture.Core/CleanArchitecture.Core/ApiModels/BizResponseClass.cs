@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using CleanArchitecture.Core.Enums;
 namespace CleanArchitecture.Core.ApiModels
 {
     public class BizResponseClass
     {
-        public short ReturnCode { get; set; }
+        public enResponseCode ReturnCode { get; set; }
 
         public string ReturnMsg { get; set; }
 
-        public short ErrorCode { get; set; }
+        public EnErrorCode ErrorCode { get; set; }
 
-        public short StatusCode { get; set; }
+        //public short StatusCode { get; set; }
 
-        public string StatusMessage { get; set; }
+        //public string StatusMessage { get; set; }
 
         //public string RefreshToken { get; set; }
 

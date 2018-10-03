@@ -136,4 +136,11 @@ namespace CleanArchitecture.Core.Enums
         Fail = 0,
         InternalError = 9
     }
+
+    public enum enResponseCode
+    {
+        Success = 1,
+        Fail = 0,
+        InternalError = 9
+    }
 }
