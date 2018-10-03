@@ -6,16 +6,20 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 {
     public class CancelOfferReasponce
     {
-        public int id { get; set; }
-        public string currency { get; set; }
-        public string rate { get; set; }
-        public int period { get; set; }
-        public string direction { get; set; }
+        public long id { get; set; }
+        public string symbol { get; set; }
+        public object exchange { get; set; }
+        public decimal  price { get; set; }
+        public decimal  avg_execution_price { get; set; }
+        public string side { get; set; }
+        public string type { get; set; }
         public string timestamp { get; set; }
         public bool is_live { get; set; }
         public bool is_cancelled { get; set; }
-        public string original_amount { get; set; }
-        public string remaining_amount { get; set; }
-        public string executed_amount { get; set; }
+        public bool is_hidden { get; set; }
+        public bool was_forced { get; set; }
+        public decimal  original_amount { get; set; }
+        public decimal  remaining_amount { get; set; }
+        public decimal  executed_amount { get; set; }
     }
 }
