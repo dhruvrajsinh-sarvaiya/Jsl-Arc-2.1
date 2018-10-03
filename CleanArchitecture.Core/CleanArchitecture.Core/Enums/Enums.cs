@@ -130,4 +130,10 @@ namespace CleanArchitecture.Core.Enums
         Success = 2253
 
     }
+    public enum enResponseCodeService
+    {
+        Success = 1,
+        Fail = 0,
+        InternalError = 9
+    }
 }

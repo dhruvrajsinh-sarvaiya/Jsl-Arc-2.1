@@ -13,12 +13,12 @@ namespace CleanArchitecture.Infrastructure.Services
     //Common Parsing method Implement Here
     class WebApiParseResponse : IWebApiParseResponse<WebAPIParseResponse>
     {
-        readonly ILogger<WalletService> _log;
+        readonly ILogger _log;
         readonly TransactionWebAPIConfiguration _txnWebAPIConf;
         GetDataForParsingAPI _txnWebAPIParsingData;
         WebAPIParseResponse _webapiParseResponse;
         private readonly WebApiDataRepository _webapiDataRepository;
-        public WebApiParseResponse(ILogger<WalletService> log, TransactionWebAPIConfiguration txnWebAPIConf, WebApiDataRepository webapiDataRepository)
+        public WebApiParseResponse(ILogger log, TransactionWebAPIConfiguration txnWebAPIConf, WebApiDataRepository webapiDataRepository)
         {
             _log = log;
             _txnWebAPIConf = txnWebAPIConf;
