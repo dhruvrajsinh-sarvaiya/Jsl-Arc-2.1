@@ -263,7 +263,45 @@ namespace CleanArchitecture.Web.API
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
             return returnDynamicResult(respObjJson);
-        }    
+        }
+
+        //Rushabh 03-10-2018
+
+        [HttpPost("{coin}/{id}")]
+        public ActionResult SignTransaction(string coin, string id, [FromBody]SignTransactionRequest Request)
+        {
+            string requeststring = "{'txHex': '010000000179b0b5ad6641de8fed13270395e52515236c922d1dd5bee3a9dae68c3cbbf57d0100000000ffffffff0240420f000000000017a914f600974688ccdf5e72ce3f2b187afabbf4f1d3ec878e7835000000000017a9140c0a513cb9d8e46113c57aa46ae42d1bad29063d8700000000'}";
+            SignTransactionResRootObject Response = new SignTransactionResRootObject();
+            Response = JsonConvert.DeserializeObject<SignTransactionResRootObject>(requeststring);
+            Response.ReturnCode = enResponseCode.Success;
+            var respObj = JsonConvert.SerializeObject(Response);
+            dynamic respObjJson = JObject.Parse(respObj);
+            return returnDynamicResult(respObjJson);
+        }
+
+        [HttpPost("{coin}/{id}")]
+        public ActionResult SendTransaction(string coin, string id, [FromBody]SendTransaction Request)
+        {
+            string requeststring = "{'txid':'415993bf16c856feb92ab15245a7d6b18757a276c2ac8f58fdbf6fad926857d6','txHex':'010000000179b0b5ad6641de8fed13270395e52515236c922d1dd5bee3a9dae68c3cbbf57d0100000000ffffffff0240420f000000000017a914f600974688ccdf5e72ce3f2b187afabbf4f1d3ec878e7835000000000017a9140c0a513cb9d8e46113c57aa46ae42d1bad29063d8700000000','status':'signed'}";
+            SendTransactionResponse Response = new SendTransactionResponse();
+            Response = JsonConvert.DeserializeObject<SendTransactionResponse>(requeststring);
+            Response.ReturnCode = enResponseCode.Success;
+            var respObj = JsonConvert.SerializeObject(Response);
+            dynamic respObjJson = JObject.Parse(respObj);
+            return returnDynamicResult(respObjJson);
+        }
+
+        [HttpPost("{id}")]
+        public ActionResult FreezeWallet(string id, [FromBody]FreezeWalletRequest Request)
+        {
+            string requeststring = "{'time':'2016-04-01T03:51:39.779Z','expires':'2016-04-01T04:58:19.779Z'}";
+            FreezeWalletResponse Response = new FreezeWalletResponse();
+            Response = JsonConvert.DeserializeObject<FreezeWalletResponse>(requeststring);
+            Response.ReturnCode = enResponseCode.Success;
+            var respObj = JsonConvert.SerializeObject(Response);
+            dynamic respObjJson = JObject.Parse(respObj);
+            return returnDynamicResult(respObjJson);
+        }
         #endregion
     }
 }
