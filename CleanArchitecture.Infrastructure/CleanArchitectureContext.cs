@@ -30,9 +30,11 @@ namespace CleanArchitecture.Infrastructure
         public virtual DbSet<Resources> Resources { get; set; }     
         public virtual DbSet<Mode> Mode { get; set; }       
         public virtual DbSet<LoginLog> LoginLog { get; set; }
+
         public virtual DbSet<RegisterType> RegisterType { get; set; }
         public virtual DbSet<TempUserRegister> TempUserRegister { get; set; }
         public virtual DbSet<TempOtpMaster> TempOtpMaster { get; set; }
+
 
 
 
