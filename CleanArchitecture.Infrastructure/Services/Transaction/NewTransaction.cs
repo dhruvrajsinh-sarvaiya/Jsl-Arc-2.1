@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using Microsoft.Extensions.Logging;
 using System;
@@ -45,14 +46,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             string TrnTypeName = "";
             try
             {
-
+                return (new BizResponse { ReturnMsg = "", ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                _Resp.ReturnCode = Convert.ToInt16(enResponseCodeService.InternalError);
-                _Resp.ReturnMsg = ex.Message;
-                return (new BizResponse { ReturnMsg = "", StatusCode = 0 });
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);                
+                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError });
             }
 
         }
