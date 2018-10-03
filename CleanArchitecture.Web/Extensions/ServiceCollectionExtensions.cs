@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using Microsoft.VisualStudio.Web.CodeGeneration.Utils.Messaging;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -313,8 +314,8 @@ namespace CleanArchitecture.Web.Extensions
             services.AddScoped<IUserService, UserService>();
 
             services.AddTransient<IUserSessionService, UserSessionService>();
-            // added by nirav savariya for getting message otp in mobile on 9-22-2018
-            services.AddTransient<IMessageSender, MessageService>();
+            //// added by nirav savariya for getting message otp in mobile on 9-22-2018
+            //services.AddTransient<IMessageSender, MessageService>();
 
             // added by birju for TempRegister Table on 02-10-2018
             services.AddScoped<IRegisterTypeService, RegisterTypeService>();
