@@ -30,15 +30,19 @@ namespace CleanArchitecture.Web.API
         private readonly ILogger _logger;
         private readonly IEmailSender _emailSender;
         private readonly IUserService _userdata;
+        private readonly ITempUserRegisterService _tempUserRegisterService;
+
+
         #endregion
 
         #region Ctore
-        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IEmailSender emailSender, IUserService userdata)
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IEmailSender emailSender, IUserService userdata, ITempUserRegisterService tempUserRegisterService)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
             _emailSender = emailSender;
             _userdata = userdata;
+            _tempUserRegisterService = tempUserRegisterService;
         }
         #endregion
 
@@ -117,7 +121,14 @@ namespace CleanArchitecture.Web.API
                     var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
                     _logger.LogInformation(3, "User created a new account with password.");
                     await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-                    return Ok("User created a new account with password.");
+                    //return Ok("User created a new account with password.");
+
+                    RegisterResponse response = new RegisterResponse();
+                    response.ReturnCode = 200;
+                    response.StatusMessage = "Success";
+                    response.StatusCode = 200;
+                    response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+                    return Ok(response);
                 }
             }
             AddErrors(result);
@@ -126,7 +137,7 @@ namespace CleanArchitecture.Web.API
         }
 
         #endregion
-        
+
         #region DirectSignUpWithEmail
 
         /// <summary>
@@ -230,40 +241,56 @@ namespace CleanArchitecture.Web.API
             bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
             if (IsSignMobile)
             {
-                /*
-                var currentUser = new ApplicationUser
+                bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
+                if (IsSignTempMobile)
                 {
-                    Mobile = model.Mobile,
-                    UserName = model.Mobile,
-                    OTP = _userdata.GenerateRandomOTP()
-                };
+                   var result = await _tempUserRegisterService.AddTempRegister(model);
 
-                var result = await _userManager.CreateAsync(currentUser);
-                if (result.Succeeded)
-                {
-                    var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile, ClaimValueTypes.Integer);
-                    await _userManager.AddClaimAsync(currentUser, officeClaim);
-                    // Add to roles
-                    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-
-                    if (roleAddResult.Succeeded)
+                    if(result != null )
                     {
-                        //await _messageSender.SendSMSAsync(model.Mobile, "");
-                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
                         response.ReturnCode = 200;
                         response.ReturnMsg = "Success";
                         response.StatusCode = 200;
                         response.StatusMessage = "Done";
                         return Ok(response);
                     }
+                    //var currentUser = new TempUserRegister
+                    //{
+                    //    Mobile = model.Mobile,
+                    //    UserName = model.Mobile,
+                     //  TempOtpMaster. OTP = _userdata.GenerateRandomOTP()
+                    //};
+
+                    /*
+
+                    //var result = await _userManager.CreateAsync(currentUser);
+                    if (result.Succeeded)
+                    {
+                        var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile, ClaimValueTypes.Integer);
+                        await _userManager.AddClaimAsync(currentUser, officeClaim);
+                        ////// Add to roles
+                        ////var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+
+                        //if (roleAddResult.Succeeded)
+                        //{
+                        //await _messageSender.SendSMSAsync(model.Mobile, "");
+                        // SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                        response.ReturnCode = 200;
+                        response.ReturnMsg = "Success";
+                        response.StatusCode = 200;
+                        response.StatusMessage = "Done";
+                        return Ok(response);
+                        //}
+                    }
+                    */
                 }
-                AddErrors(result);
-                */
-                response.ReturnCode = 200;
-                response.ReturnMsg = "Success";
-                response.StatusCode = 200;
-                response.StatusMessage = "Done";
-                return Ok(response);
+                //AddErrors(result);
+
+                //response.ReturnCode = 200;
+                //response.ReturnMsg = "Success";
+                //response.StatusCode = 200;
+                //response.StatusMessage = "Done";
+                //return Ok(response);
             }
             else
             {
