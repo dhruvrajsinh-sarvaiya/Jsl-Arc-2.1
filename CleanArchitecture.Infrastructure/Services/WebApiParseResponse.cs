@@ -11,12 +11,12 @@ using System.Text.RegularExpressions;
 namespace CleanArchitecture.Infrastructure.Services
 {
     //Common Parsing method Implement Here
-    class WebApiParseResponse : IWebApiParseResponse<WebAPIParseResponse>
+    class WebApiParseResponse : IWebApiParseResponse<WebAPIParseResponseCls>
     {
         readonly ILogger _log;
         readonly TransactionWebAPIConfiguration _txnWebAPIConf;
         GetDataForParsingAPI _txnWebAPIParsingData;
-        WebAPIParseResponse _webapiParseResponse;
+        WebAPIParseResponseCls _webapiParseResponse;
         private readonly WebApiDataRepository _webapiDataRepository;
         public WebApiParseResponse(ILogger log, TransactionWebAPIConfiguration txnWebAPIConf, WebApiDataRepository webapiDataRepository)
         {
@@ -24,7 +24,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _txnWebAPIConf = txnWebAPIConf;
             _webapiDataRepository = webapiDataRepository;
         }
-        public WebAPIParseResponse TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
+        public WebAPIParseResponseCls TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
         {
             try
             {
