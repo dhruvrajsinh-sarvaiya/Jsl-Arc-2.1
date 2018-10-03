@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static CleanArchitecture.Core.ViewModels.Wallet.AddWalletResponse;
@@ -21,6 +22,12 @@ namespace CleanArchitecture.Web.API
     [Route("api/[controller]/[action]")]
     public class WalletController : ControllerBase
     {
+        private readonly ILogger<WalletController> _logger;
+
+        public WalletController(ILogger<WalletController> logger)
+        {
+            _logger = logger;
+        }
         static int i = 1;
         private ActionResult returnDynamicResult(dynamic respObjJson)
         {
@@ -61,14 +68,25 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{coin}")]
        // [Route("{coin}")]
         public ActionResult ListWallet(string coin, int limit=25,string prevId=null,bool allTokens=false)
-        { 
-            string requeststring = "{'wallets':[{'id':'585951a5df8380e0e3063e9f','users':[{'user':'55e8a1a5df8380e0e30e20c6','permissions':['admin','view','spend']}],'coin':'tbtc','label':'Alexs first wallet','m':2,'n':3,'keys':['585951a5df8380e0e304a553','585951a5df8380e0e30d645c','585951a5df8380e0e30b6147'],'tags':['585951a5df8380e0e30a198a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'coinSpecific':{}}]}";
-            ListWalletRootObject Response = new ListWalletRootObject();
-            Response = JsonConvert.DeserializeObject<ListWalletRootObject>(requeststring);
-            Response.StatusCode = 200;
-            var respObj = JsonConvert.SerializeObject(Response);
-            dynamic respObjJson = JObject.Parse(respObj);
-            return returnDynamicResult(respObjJson);
+        {
+            try
+            {
+                //_logger.Log(LogLevel.Information, 1, "Test", null, (s, e) => DateTime.Now + " " + s.ToString());
+
+                _logger.LogError(1,  DateTime.Now + "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+                
+            }
+            catch(Exception ex)
+            {
+                string requeststring = "{'wallets':[{'id':'585951a5df8380e0e3063e9f','users':[{'user':'55e8a1a5df8380e0e30e20c6','permissions':['admin','view','spend']}],'coin':'tbtc','label':'Alexs first wallet','m':2,'n':3,'keys':['585951a5df8380e0e304a553','585951a5df8380e0e30d645c','585951a5df8380e0e30b6147'],'tags':['585951a5df8380e0e30a198a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'coinSpecific':{}}]}";
+                ListWalletRootObject Response = new ListWalletRootObject();
+                Response = JsonConvert.DeserializeObject<ListWalletRootObject>(requeststring);
+                Response.StatusCode = 200;
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return returnDynamicResult(respObjJson);
+            }    
         }
 
         /// <summary>
