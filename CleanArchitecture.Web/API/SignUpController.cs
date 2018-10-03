@@ -91,7 +91,9 @@ namespace CleanArchitecture.Web.API
                     }
                     else if (!user.EmailConfirmed)
                     {
-                        var result = await _userManager.ConfirmEmailAsync(user, emailConfirmCode);
+                        user.EmailConfirmed = true;
+                        var result = await _userManager.UpdateAsync(user); 
+                        //var result = await _userManager.ConfirmEmailAsync(user, emailConfirmCode);
                         return View(result.Succeeded ? "ConfirmEmail" : "Error");
                     }
                     else
@@ -153,7 +155,7 @@ namespace CleanArchitecture.Web.API
                     linkToken.Lastname = model.Lastname;
                     linkToken.Mobile = model.Mobile;
                     linkToken.CurrentTime = DateTime.UtcNow;
-                    linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+                    linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
 
 
                     byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
@@ -243,11 +245,8 @@ namespace CleanArchitecture.Web.API
                         linkToken.CurrentTime = DateTime.UtcNow;
                         linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
 
-
                         byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
-
                         string UserDetails = JsonConvert.SerializeObject(linkToken);
-
                         string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
 
                         //string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
