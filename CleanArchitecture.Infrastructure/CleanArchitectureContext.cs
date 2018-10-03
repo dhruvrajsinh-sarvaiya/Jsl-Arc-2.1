@@ -20,6 +20,7 @@ namespace CleanArchitecture.Infrastructure
     {
         private readonly UserResolveService _userService;
                          
+        // Account Management
         public string CurrentUserId { get; internal set; }
         public virtual DbSet<ApplicationUser> Users { get; set; }
         public virtual DbSet<ApplicationUserPhotos> ApplicationUserPhotos { get; set; }
@@ -28,6 +29,10 @@ namespace CleanArchitecture.Infrastructure
         public virtual DbSet<Resources> Resources { get; set; }     
         public virtual DbSet<Mode> Mode { get; set; }       
         public virtual DbSet<LoginLog> LoginLog { get; set; }
+        public virtual DbSet<RegisterType> RegisterType { get; set; }
+        public virtual DbSet<TempUserRegister> TempUserRegister { get; set; }
+        public virtual DbSet<TempOtpMaster> TempOtpMaster { get; set; }
+
 
 
         public DbSet<ToDoItem> ToDoItems { get; set; }
@@ -60,6 +65,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<RouteConfiguration> RouteConfiguration { get; set; }
         public DbSet<ThirPartyAPIConfiguration> ThirPartyAPIConfiguration { get; set; }
         public DbSet<ThirPartyAPIResponseConfiguration> ThirPartyAPIResponseConfiguration { get; set; }
+
+     
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {

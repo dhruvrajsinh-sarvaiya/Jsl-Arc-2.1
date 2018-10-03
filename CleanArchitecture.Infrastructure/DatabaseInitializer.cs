@@ -9,6 +9,7 @@ using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Culture;
 using CleanArchitecture.Core.Entities.Resource;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Interfaces.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ namespace CleanArchitecture.Infrastructure
         private readonly CleanArchitectureContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IRegisterTypeService _registerTypeService;
         private readonly OpenIddictApplicationManager<OpenIddictApplication> _openIddictApplicationManager;
         private readonly ILogger _logger;
 
@@ -36,7 +38,8 @@ namespace CleanArchitecture.Infrastructure
             ILogger<DatabaseInitializer> logger,
             OpenIddictApplicationManager<OpenIddictApplication> openIddictApplicationManager,
             RoleManager<ApplicationRole> roleManager,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IRegisterTypeService registerTypeService
             )
         {
             _context = context;
@@ -44,6 +47,7 @@ namespace CleanArchitecture.Infrastructure
             _openIddictApplicationManager = openIddictApplicationManager;
             _roleManager = roleManager;
             _userManager = userManager;
+            _registerTypeService = registerTypeService;
         }
 
         public async Task SeedAsync(IConfiguration configuration)
@@ -55,6 +59,23 @@ namespace CleanArchitecture.Infrastructure
             AddLocalisedData();
             await AddOpenIdConnectOptions(configuration);
             AddWalletType(); // ntrivedi 01-10-2018 added default wallettype master entry
+            CreateRegisterType(); // Birju 02-10-2018  added by default Register type add;
+        }
+
+        private void CreateRegisterType()
+        {
+            var TypeToAdd = new List<RegisterType>(){
+                new RegisterType { CreatedDate = DateTime.Now, CreatedBy= 1,Type="Mobile",ActiveStatus=true,IsDeleted = false},
+                new RegisterType { CreatedDate = DateTime.Now, CreatedBy= 1,Type="Email",ActiveStatus=true,IsDeleted = false},
+                new RegisterType { CreatedDate = DateTime.Now, CreatedBy= 1,Type="Standerd",ActiveStatus=true,IsDeleted = false},
+            };
+            foreach (var Type in TypeToAdd)
+            {
+                if (!_registerTypeService.GetRegisterType(Type.Type).Result)
+                {
+                    _registerTypeService.AddRegisterType(Type);
+                }
+            }
         }
 
         private void CreateRoles()
