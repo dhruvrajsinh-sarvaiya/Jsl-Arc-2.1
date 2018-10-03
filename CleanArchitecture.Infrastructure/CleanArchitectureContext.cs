@@ -14,6 +14,7 @@ using CleanArchitecture.Core.Entities.Resource;
 using CleanArchitecture.Core.Entities.Modes;
 using CleanArchitecture.Core.Entities.Log;
 using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Infrastructure.DTOClasses;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -70,6 +71,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ThirPartyAPIResponseConfiguration> ThirPartyAPIResponseConfiguration { get; set; }
 
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
+        public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {

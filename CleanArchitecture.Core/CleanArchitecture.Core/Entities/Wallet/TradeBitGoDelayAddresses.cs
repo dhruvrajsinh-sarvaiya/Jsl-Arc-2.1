@@ -10,7 +10,10 @@ namespace CleanArchitecture.Core.Entities
     public class TradeBitGoDelayAddresses : BizBase
     {
         [Required]
-        public long WalletmasterID { get; set; }
+        public long WalletId { get; set; }
+
+        [Required]
+        public long WalletTypeId { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -25,7 +28,7 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         [StringLength(5)]
-        public string SMSCode { get; set; }
+        public string CoinName { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -35,13 +38,12 @@ namespace CleanArchitecture.Core.Entities
         [StringLength(250)]
         public string CoinSpecific { get; set; }
                
-
         public void GetAddressInStatusCheck(byte generateBit,string address,string coinSpecific,long WalletID)
         {
             GenerateBit = generateBit;
             Address = address;
             CoinSpecific = coinSpecific;
-            WalletmasterID = WalletID;
+            WalletId = WalletID;
             Events.Add(new ServiceStatusEvent<TradeBitGoDelayAddresses>(this));
         }
     }

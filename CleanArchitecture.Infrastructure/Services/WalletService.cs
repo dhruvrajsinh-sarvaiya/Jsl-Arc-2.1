@@ -21,6 +21,7 @@ namespace CleanArchitecture.Infrastructure.Services
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         readonly IWalletRepository _walletRepository1;
 
+        
         //readonly IBasePage _BaseObj;
 
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
@@ -252,6 +253,109 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
+        public void GenerateAddress(long walletID)
+        {
+            try
+            {
+                WalletMaster walletMaster = _commonRepository.GetById(walletID);
+                if(walletMaster == null)
+                {
+                    //return false
+                }
+                else if(walletMaster.Status != 1)
+                {
+                    //return false
+                }
+                
+
+                
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public AddressMaster GetAddressObj(long walletID,long serproID, string address,string coinName,string addressName,long createdBy, byte isDefaultAdd,short status)
+        {
+            try
+            {
+                AddressMaster addressMaster = new AddressMaster();
+                addressMaster.Address = address;
+                addressMaster.CoinName = coinName;
+                addressMaster.CreatedBy = createdBy;
+                addressMaster.CreatedDate = UTC_To_IST();
+                addressMaster.IsDefaultAddress = isDefaultAdd;
+                addressMaster.SerProID = serproID;
+                addressMaster.Status = status;
+                addressMaster.WalletId = walletID;
+                return addressMaster;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "MethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
+        public TradeBitGoDelayAddresses GetTradeBitGoDelayAddresses(long walletID, long WalletTypeId, string TrnID,string address, string coinName, string BitgoWalletId, long createdBy, string CoinSpecific, short status,byte generatebit)
+        {
+            try
+            {
+                TradeBitGoDelayAddresses addressMaster = new TradeBitGoDelayAddresses
+                {
+                    CoinSpecific = CoinSpecific,
+                    Address = address,
+                    BitgoWalletId = BitgoWalletId,
+                    CoinName = coinName,
+                    CreatedBy = createdBy,
+                    CreatedDate = UTC_To_IST(),
+                    GenerateBit = generatebit,
+                    Status = status,
+                    TrnID = TrnID,
+                    WalletId = walletID,
+                    WalletTypeId = WalletTypeId
+                };
+                 
+                return addressMaster;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "MethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
+        public WalletMaster GetWalletMaster(long WalletTypeId, string walletName, bool isValid, short status , long createdBy,string coinname)
+        {
+            try
+            {
+                WalletMaster addressMaster = new WalletMaster
+                {
+                   
+                    CoinName = coinname,
+                    CreatedBy = createdBy,
+                    CreatedDate = UTC_To_IST(),                   
+                    Status = status,
+                    Balance = 0,
+                    IsValid = isValid,
+                    Walletname = walletName,
+                    WalletTypeID = WalletTypeId                   
+                };
+
+                return addressMaster;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "MethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
         }
