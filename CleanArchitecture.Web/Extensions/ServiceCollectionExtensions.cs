@@ -15,6 +15,7 @@ using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.EFLocalizer;
 using CleanArchitecture.Infrastructure.Services;
+using CleanArchitecture.Infrastructure.Services.User;
 using CleanArchitecture.Web.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -314,6 +315,11 @@ namespace CleanArchitecture.Web.Extensions
             services.AddTransient<IUserSessionService, UserSessionService>();
             // added by nirav savariya for getting message otp in mobile on 9-22-2018
             services.AddTransient<IMessageSender, MessageService>();
+
+            // added by birju for TempRegister Table on 02-10-2018
+            services.AddScoped<IRegisterTypeService, RegisterTypeService>();
+            services.AddScoped<ITempUserRegisterService, TempUserRegisterService>();
+            services.AddScoped<ITempOtpService, TempOtpService>(); 
             return services;
         }
     }
