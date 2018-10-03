@@ -7,8 +7,8 @@ namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 {
     public class ChangeFeeonTransactionRequest
     {
-        [Required]
-        public string walletId { get; set; }
+        //[Required]
+        //public string walletId { get; set; }
 
         [Required]
         public string txid { get; set; }

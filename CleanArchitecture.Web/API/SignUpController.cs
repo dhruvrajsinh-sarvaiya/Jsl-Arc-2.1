@@ -227,12 +227,11 @@ namespace CleanArchitecture.Web.API
                 var currentUser = new ApplicationUser
                 {
                     Email = model.Email,
-                    UserName = model.Email
-                    //PasswordHash = model.Password
+                    UserName = model.Email,
+                    PasswordHash = model.Password
                 };
 
-
-                var result = await _userManager.CreateAsync(currentUser);
+                var result = await _userManager.CreateAsync(currentUser,model.Password);
                 if (result.Succeeded)
                 {
                     // Add to roles
