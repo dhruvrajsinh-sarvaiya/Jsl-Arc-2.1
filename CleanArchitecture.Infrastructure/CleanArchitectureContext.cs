@@ -13,6 +13,7 @@ using CleanArchitecture.Core.Entities.Culture;
 using CleanArchitecture.Core.Entities.Resource;
 using CleanArchitecture.Core.Entities.Modes;
 using CleanArchitecture.Core.Entities.Log;
+using CleanArchitecture.Core.ApiModels;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -66,7 +67,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ThirPartyAPIConfiguration> ThirPartyAPIConfiguration { get; set; }
         public DbSet<ThirPartyAPIResponseConfiguration> ThirPartyAPIResponseConfiguration { get; set; }
 
-     
+        public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {

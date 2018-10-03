@@ -35,7 +35,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     MobileNo = Request.MobileNo,
                     SMSText = Request.Message,
                     SMSSendBy = 0,
-                    Status = Convert.ToInt16(MessageStatusType.Initialize),
+                    Status = Convert.ToInt16(enMessageService.Init),
                     CreatedBy = 1,
                     CreatedDate = DateTime.UtcNow
                 };
@@ -45,14 +45,31 @@ namespace CleanArchitecture.Infrastructure.Services
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1,1);
                 foreach (CommunicationProviderList g in Result)
                 {
-                    await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SMSSendURL, g.SenderID, g.UserID, g.Password);
+                    string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SendURL, g.SenderID, g.UserID, g.Password);
+
+                    if (Resposne != "Fail")
+                    {                       
+                        Message.Status = Convert.ToInt16(enMessageService.Success);
+                        Message.SentMessage();
+                        Message.RespText = Resposne;
+                        _MessageRepository.Update(Message);
+                        break;
+                    }
+                    else
+                    {
+                        Message.Status = Convert.ToInt16(enMessageService.Fail);
+                        Message.SentMessage();
+                        Message.RespText = Resposne;
+                        _MessageRepository.Update(Message);
+                        continue;
+                    }
                 }
                 return await Task.FromResult(new CommunicationResponse { ErrorCode = 101, ReturnMsg = "Message sent." });
             }
             catch(Exception ex)
             {
                 return await Task.FromResult(new CommunicationResponse { ErrorCode = 99, ReturnMsg = "Message not sent." });
-            }            
+            }
         }
 
         //public Task<ToDoItemResponse> Handle(ToDoItemRequest request, CancellationToken cancellationToken)

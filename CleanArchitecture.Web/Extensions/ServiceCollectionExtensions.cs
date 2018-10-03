@@ -301,7 +301,7 @@ namespace CleanArchitecture.Web.Extensions
         {
             // New instance every time, only configuration class needs so its ok
             services.AddSingleton<IStringLocalizerFactory, EFStringLocalizerFactory>();
-            services.AddTransient<IEmailSender, MessageService>();
+            //services.AddTransient<IEmailSender, MessageService>();
             services.AddTransient<IApplicationDataService, ApplicationDataService>();
             services.AddScoped<IUnitOfWork, HttpUnitOfWork>();
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
@@ -320,6 +320,9 @@ namespace CleanArchitecture.Web.Extensions
             services.AddScoped<IRegisterTypeService, RegisterTypeService>();
             services.AddScoped<ITempUserRegisterService, TempUserRegisterService>();
             services.AddScoped<ITempOtpService, TempOtpService>(); 
+            //services.AddTransient<IMessageSender, MessageService>();
+            // added by nirav savariya for Encypted Decrypted on 10-02-2018
+            services.AddScoped<EncyptedDecrypted>();
             return services;
         }
     }

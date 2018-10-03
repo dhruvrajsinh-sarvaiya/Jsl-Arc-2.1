@@ -5,14 +5,17 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.ForgotPassword;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.Login;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.ResetPassword;
 using CleanArchitecture.Web.Filters;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -27,15 +30,16 @@ namespace CleanArchitecture.Web.API
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly IMediator _mediator;
         #endregion
 
         #region Ctore
-        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IEmailSender emailSender)
+        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SigninController>();
+            _mediator = mediator;
         }
         #endregion
 
@@ -86,7 +90,13 @@ namespace CleanArchitecture.Web.API
             var message = "Your security code is: " + code;
             if (model.SelectedProvider == "Email")
             {
-                await _emailSender.SendEmailAsync(user.Email, "Security Code", message);
+                SendEmailRequest request = new SendEmailRequest();
+                request.Recepient = user.Email;
+                request.Subject = "Security Code";
+                request.Body = message;
+
+                CommunicationResponse Response = await _mediator.Send(request);
+                //await _emailSender.SendEmailAsync(user.Email, "Security Code", message);
             }
             // else if (model.SelectedProvider == "Phone")
             // {
@@ -176,7 +186,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("login")]
         [AllowAnonymous]        
-        public async Task<IActionResult> Login([FromBody]LoginViewModel model)
+        public async Task<IActionResult> Login([FromBody]Core.ViewModels.AccountViewModels.LoginViewModel model)
         {
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, set lockoutOnFailure: true
@@ -297,6 +307,15 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody]ForgotPasswordViewModel model)
         {
+
+            ForgotPasswordResponse response = new ForgotPasswordResponse();
+            response.ReturnCode = 200;
+            response.ReturnMsg = "Success";
+            response.StatusCode = 200;
+            response.StatusMessage = "Success";
+            return Ok(response);
+
+            /*
             var currentUser = await _userManager.FindByNameAsync(model.Email);
             if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
             {
@@ -321,6 +340,7 @@ namespace CleanArchitecture.Web.API
             //var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Reset your password</a>";
             await _emailSender.SendEmailAsync(model.Email, "Forgotten password email", confirmationLink);
             return NoContent(); // sends 204
+            */
         }
 
         [HttpPost("resetpassword")]

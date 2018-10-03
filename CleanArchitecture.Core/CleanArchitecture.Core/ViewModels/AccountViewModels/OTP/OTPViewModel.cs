@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.ViewModels.Configuration;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,5 +13,10 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
         [StringLength(6, MinimumLength = 6)]
         [Range(6, Int64.MaxValue)]
         public string OTP { get; set; }
+    }
+
+    public class OTPResponse : BizResponseClass
+    {
+
     }
 }
