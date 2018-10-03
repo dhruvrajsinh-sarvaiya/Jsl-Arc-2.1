@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ApiModels
 {
-    public class WebAPIParseResponse
+    public class WebAPIParseResponseCls
     {        
         public decimal Balance { get; set; }
         public int Status { get; set; }
