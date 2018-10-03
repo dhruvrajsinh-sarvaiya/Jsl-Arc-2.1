@@ -18,12 +18,12 @@ namespace CleanArchitecture.Core.Entities.User
         [Phone]
         public string Mobile { get; set; }
 
-        [DataType("decimal(18,2)")]
-        public decimal Balance { get; set; }
+        //[DataType("decimal(18,2)")]
+        //public decimal Balance { get; set; }
 
-        [Required]
-        [Range(6, Int64.MaxValue)]
-        public long OTP { get; set; }
+        //[Required]
+        //[Range(6, Int64.MaxValue)]
+        //public long OTP { get; set; }
 
         public ApplicationUserPhotos ProfilePhoto { get; set; }
 
