@@ -253,7 +253,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpPost("{coin}/{id}")]
-        public ActionResult BuildTransaction(string coin, string id/*,[FromBody]BuildTransactionRequest Request*/)
+        public ActionResult BuildTransaction(string coin, string id,[FromBody]BuildTransactionRequest Request)
         {
             string requeststring = "{'txHex':'010000000179b0b5ad6641de8fed13270395e52515236c922d1dd5bee3a9dae68c3cbbf57d0100000000ffffffff0240420f000000000017a914f600974688ccdf5e72ce3f2b187afabbf4f1d3ec878e7835000000000017a9140c0a513cb9d8e46113c57aa46ae42d1bad29063d8700000000','txInfo':{'nP2SHInputs':1,'nSegwitInputs':0,'nOutputs':2,'unspents':[{'chain':1,'index':10,'redeemScript':'52210208906f13de98b88bc9f83886c39a1555ada816b12de6f029626af2ef9413708b2102bca01320026604530fc47068ce015b39b91bd72d8964b0c5023697645b1441ab210336d8e968990c8a5b2bad83a237c37957ce70586ed507b155941ea28ec953860153ae','id':'7df5bb3c8ce6daa9e3bed51d2d926c231525e595032713ed8fde4166adb5b079:1','address':'2MvevrYxML8NkRng4avXz7oMCgs5qxR7Mef','value':4508000}],'changeAddresses':['2MtLtTSsC98dF4zriFGvCfmce3A17Zz1McK']},'feeInfo':{'size':373,'fee':3730,'feeRate':10000,'payGoFee':0,'payGoFeeString':'0'}}";
             BuildTransactionRootObject Response = new BuildTransactionRootObject();
@@ -262,23 +262,7 @@ namespace CleanArchitecture.Web.API
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);
             return returnDynamicResult(respObjJson);
-        }
-
-        ///// <summary>
-        ///// vsolanki 2-10-2018 Sign  Transaction
-        ///// </summary>
-        ///// <param name="Request"></param>
-        ///// <returns></returns>
-        //[HttpPost("Sign  Transaction")]
-        //public ActionResult SignTransaction([FromBody]SignTransactionRootObject Request)
-        //{
-        //    string requeststring = "{'txHex':'010000000179b0b5ad6641de8fed13270395e52515236c922d1dd5bee3a9dae68c3cbbf57d0100000000ffffffff0240420f000000000017a914f600974688ccdf5e72ce3f2b187afabbf4f1d3ec878e7835000000000017a9140c0a513cb9d8e46113c57aa46ae42d1bad29063d8700000000'}";
-        //    SignTransactionResponse Response = new SignTransactionResponse();
-        //    Response = JsonConvert.DeserializeObject<SignTransactionResponse>(requeststring);
-        //    var respObj = JsonConvert.SerializeObject(Response);
-        //    dynamic respObjJson = JObject.Parse(respObj);
-        //    return Ok(respObjJson);
-        //}
+        }    
         #endregion
     }
 }
