@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.ApiModels
 
         public string ReturnMsg { get; set; }
 
-        public EnErrorCode ErrorCode { get; set; }
+        public enErrorCode ErrorCode { get; set; }
 
         //public short StatusCode { get; set; }
 
