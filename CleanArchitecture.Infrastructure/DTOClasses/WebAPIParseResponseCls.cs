@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CleanArchitecture.Core.ApiModels
+namespace CleanArchitecture.Infrastructure.DTOClasses
 {
     public class WebAPIParseResponseCls
     {        

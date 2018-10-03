@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CleanArchitecture.Infrastructure.DTOClasses
 {
-    public class NewTransactionRequest
+    public class NewTransactionRequestCls
     {
         [Required]
         public short TrnMode { get; set; }

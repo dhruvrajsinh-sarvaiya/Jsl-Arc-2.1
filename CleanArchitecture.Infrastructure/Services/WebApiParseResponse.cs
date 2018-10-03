@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Data.Transaction;
+using CleanArchitecture.Infrastructure.DTOClasses;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
