@@ -125,8 +125,8 @@ namespace CleanArchitecture.Web.Extensions
                     // Apply logic here for deciding which headers to add
                     context.Response.Headers.Add("Body", content);
 
-                    
-                    
+
+
                     await memory.CopyToAsync(originalStream);
                     context.Response.Body = originalStream;
                 }
@@ -156,14 +156,15 @@ namespace CleanArchitecture.Web.Extensions
 
             loggerFactory.AddConsole(Startup.Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            
             app.UseDeveloperExceptionPage();
-            app.UseDatabaseErrorPage();            
+            app.UseDatabaseErrorPage();
+            // NOTE: For SPA swagger needs adding before MVC
+            app.UseCustomSwaggerApi();
 
             app.UseSession();
 
             ////// app.ApiTokenRespons();
-            
+
             //// Call Method only this url.
             //app.UseWhen(context => context.Request.Path.StartsWithSegments("/connect/token"), appBuilder =>
             //{

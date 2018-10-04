@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +8,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
     public class WebAPIParseResponseCls
     {        
         public decimal Balance { get; set; }
-        public int Status { get; set; }
+        public enTransactionStatus Status { get; set; }
         public string StatusMsg { get; set; }
         public string ResponseCode { get; set; }
         public string ResponseMsg { get; set; }
