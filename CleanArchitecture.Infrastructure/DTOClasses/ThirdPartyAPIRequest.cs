@@ -12,6 +12,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public string RequestBody { get; set; }
         public WebHeaderCollection keyValuePairsHeader { get; set; }
         public byte DelayAddress { get; set; }
+        public string walletID { get; set; }
 
     }
 }

@@ -129,7 +129,8 @@ namespace CleanArchitecture.Core.Enums
         InvalidWallet = 2253,
         Success = 2253,
         ItemNotFoundForGenerateAddress = 2254,
-        InvalidThirdpartyID = 2255
+        InvalidThirdpartyID = 2255,
+        AddressGenerationFailed = 2256
 
     }
     public enum enResponseCodeService
