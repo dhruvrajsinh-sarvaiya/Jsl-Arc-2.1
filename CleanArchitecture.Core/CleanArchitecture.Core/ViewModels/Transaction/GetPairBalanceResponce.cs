@@ -1,12 +1,17 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Transaction
 {
-    public class GetPairBalanceResponce
+    public class GetPairBalanceResponce : BizResponseClass
     {
-        public string  Currency { get; set; }
+       public GetPairBalanceInfo response { get; set; }
+    }
+    public class GetPairBalanceInfo
+    {
+        public string Currency { get; set; }
         public decimal Balance { get; set; }
         public decimal Available { get; set; }
         public long Pending { get; set; }

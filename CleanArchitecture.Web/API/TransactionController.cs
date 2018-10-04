@@ -100,78 +100,130 @@ namespace CleanArchitecture.Web.API
         [HttpPost("GetWalletBalance")]
         public IActionResult GetWalletBalance([FromHeader, BindRequired] string ApiKey)
         {
+            WalletBalanceResponce response = new WalletBalanceResponce();
+
             if (string.IsNullOrEmpty(ApiKey))
-                return BadRequest(Json("Unauthorize ApiKey"));
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
             if (ApiKey != "123456")
-                return BadRequest(Json("Unauthorize ApiKey"));
-            dummyResponce = "[{ 'type':'deposit', 'currency':'btc', 'amount':'0.0', 'available':'0.0' },{ 'type':'deposit', 'currency':'usd', 'amount':'1.0', 'available':'1.0' },{ 'type':'exchange', 'currency':'btc', 'amount':'1', 'available':'1' },{ 'type':'exchange', 'currency':'usd', 'amount':'1', 'available':'1' },{ 'type':'trading', 'currency':'btc', 'amount':'1', 'available':'1' },{ 'type':'trading', 'currency':'usd', 'amount':'1', 'available':'1' }]";
-            List<WalletBalanceResponce> responce = new List<WalletBalanceResponce>();
-            responce = JsonConvert.DeserializeObject<List<WalletBalanceResponce>>(dummyResponce);
-            return Ok(responce);
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
+            dummyResponce = "{response : [{ 'type':'deposit', 'currency':'btc', 'amount':'0.0', 'available':'0.0' },{ 'type':'deposit', 'currency':'usd', 'amount':'1.0', 'available':'1.0' },{ 'type':'exchange', 'currency':'btc', 'amount':'1', 'available':'1' },{ 'type':'exchange', 'currency':'usd', 'amount':'1', 'available':'1' },{ 'type':'trading', 'currency':'btc', 'amount':'1', 'available':'1' },{ 'type':'trading', 'currency':'usd', 'amount':'1', 'available':'1' }]}";
+          
+            response = JsonConvert.DeserializeObject<WalletBalanceResponce>(dummyResponce);
+            return Ok(response);
         }
 
         [HttpPost("GetTradeBalance")]
         public IActionResult GetTradeBalance([FromHeader, BindRequired] string ApiKey)
         {
-            if (string.IsNullOrEmpty(ApiKey))
-                return Json("Unauthorize ApiKey");
-            if (ApiKey != "123456")
-                return Json("Unauthorize ApiKey");
+            GetPairBalanceResponce response = new GetPairBalanceResponce();
 
-            dummyResponce = "{'Currency':'BTC','Balance':4.21549076,'Available':4.21549076,'Pending':0,'CryptoAddress':'1MacMr6715hjds342dXuLqXcju6fgwHA31','Requested':false,'Uuid':null}";
-            GetPairBalanceResponce responce = new GetPairBalanceResponce();
-            responce = JsonConvert.DeserializeObject<GetPairBalanceResponce>(dummyResponce);
-            return Ok(responce);
+            if (string.IsNullOrEmpty(ApiKey))
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
+            if (ApiKey != "123456")
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
+
+            dummyResponce = "{response : {'Currency':'BTC','Balance':4.21549076,'Available':4.21549076,'Pending':0,'CryptoAddress':'1MacMr6715hjds342dXuLqXcju6fgwHA31','Requested':false,'Uuid':null}}";
+
+            response = JsonConvert.DeserializeObject<GetPairBalanceResponce>(dummyResponce);
+            response.ReturnCode = enResponseCode.Success;
+            return Ok(response);
         }
 
         [HttpPost("GetTradeLedger")]
         public IActionResult GetTradeLedger([FromHeader, BindRequired] string ApiKey, TradeLedgerRequest request)
         {
-            if (string.IsNullOrEmpty(ApiKey))
-                return Json("Unauthorize ApiKey");
-            if (ApiKey != "123456")
-                return Json("Unauthorize ApiKey");
+            TradeLedgerResponce response = new TradeLedgerResponce();
 
+            if (string.IsNullOrEmpty(ApiKey))
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
+            if (ApiKey != "123456")
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            dummyResponce = "{'symbol':'BNBBTC','id':28457,'orderId':100234,'price':'4.00000100','qty':'12.00000000','commission':'10.10000000','commissionAsset':'BNB','time':1499865549590,'isBuyer':true,'isMaker':false,'isBestMatch':true}";
-            TradeLedgerResponce responce = new TradeLedgerResponce();
-            responce = JsonConvert.DeserializeObject<TradeLedgerResponce>(dummyResponce);
-            return Ok(responce);
+            dummyResponce = "{response : {'symbol':'BNBBTC','id':28457,'orderId':100234,'price':'4.00000100','qty':'12.00000000','commission':'10.10000000','commissionAsset':'BNB','time':1499865549590,'isBuyer':true,'isMaker':false,'isBestMatch':true}}";
+
+            response = JsonConvert.DeserializeObject<TradeLedgerResponce>(dummyResponce);
+            response.ReturnCode = enResponseCode.Success;
+            return Ok(response);
         }
 
         [HttpPost("CancelOffer")] //bitfinex https://api.bitfinex.com/v1/offer/cancel
         public IActionResult CancelOffer([FromHeader, BindRequired] string ApiKey, CancelOfferRequest request)
         {
+            CancelOfferReasponce response = new CancelOfferReasponce();
+
             if (string.IsNullOrEmpty(ApiKey))
-                return Json("Unauthorize ApiKey");
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
             if (ApiKey != "123456")
-                return Json("Unauthorize ApiKey");
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            dummyResponce = "{'id':446915287,'symbol':'btcusd','exchange':null,'price':'239.0','avg_execution_price':'0.0','side':'sell','type':'trailing stop','timestamp':'1444141982.0','is_live':true,'is_cancelled':false,'is_hidden':false,'was_forced':false,'original_amount':'1.0','remaining_amount':'1.0','executed_amount':'0.0'}";
-            CancelOfferReasponce reasponce = new CancelOfferReasponce();
-            reasponce = JsonConvert.DeserializeObject<CancelOfferReasponce>(dummyResponce);
-            return Ok(reasponce);
-        }
+            dummyResponce = "{response : {'id':446915287,'symbol':'btcusd','exchange':null,'price':'239.0','avg_execution_price':'0.0','side':'sell','type':'trailing stop','timestamp':'1444141982.0','is_live':true,'is_cancelled':false,'is_hidden':false,'was_forced':false,'original_amount':'1.0','remaining_amount':'1.0','executed_amount':'0.0'}}";
 
+            response = JsonConvert.DeserializeObject<CancelOfferReasponce>(dummyResponce);
+            response.ReturnCode = enResponseCode.Success;
+            return Ok(response);
+        }
 
         [HttpPost("ActiveCredits")] //bitfinex https://api.bitfinex.com/v1/credits or Active Offer https://api.bitfinex.com/v1/offers
         public IActionResult ActiveCredits([FromHeader, BindRequired] string ApiKey)
         {
+            ActiveCreditsResponce response = new ActiveCreditsResponce();
+
             if (string.IsNullOrEmpty(ApiKey))
-                return Json("Unauthorize ApiKey");
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
             if (ApiKey != "123456")
-                return Json("Unauthorize ApiKey");
+            {
+                response.ReturnCode = enResponseCode.Fail;
+                response.ReturnMsg = "Unauthorize ApiKey";
+                return Ok(response);
+            }
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            dummyResponce = "{ 'id':13800719, 'currency':'USD', 'rate':'31.39', 'period':2, 'direction':'lend', 'timestamp':'1444280237.0', 'is_live':true, 'is_cancelled':false, 'original_amount':'50.0', 'remaining_amount':'50.0', 'executed_amount':'0.0' }";
-            ActiveCreditsResponce reasponce = new ActiveCreditsResponce();
-            reasponce = JsonConvert.DeserializeObject<ActiveCreditsResponce>(dummyResponce);
-            return Ok(reasponce);
+            dummyResponce = "{response : { 'id':13800719, 'currency':'USD', 'rate':'31.39', 'period':2, 'direction':'lend', 'timestamp':'1444280237.0', 'is_live':true, 'is_cancelled':false, 'original_amount':'50.0', 'remaining_amount':'50.0', 'executed_amount':'0.0' }}";
+            
+            response = JsonConvert.DeserializeObject<ActiveCreditsResponce>(dummyResponce);
+            response.ReturnCode = enResponseCode.Success;
+            return Ok(response);
         }
 
         [HttpPost("MyTradesFunding")] //bitfinex https://api.bitfinex.com/v1/mytrades_funding
@@ -218,7 +270,7 @@ namespace CleanArchitecture.Web.API
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            dummyResponce = "[{'id':11576737,'position_id':944309,'currency':'USD','rate':'9.8874','period':2,'amount':'34.24603414','timestamp':'1444280948.0','auto_close':false}]";
+            dummyResponce = "{response : {[{'id':11576737,'position_id':944309,'currency':'USD','rate':'9.8874','period':2,'amount':'34.24603414','timestamp':'1444280948.0','auto_close':false}]}";
             List<MarginFundingResponce> reasponce = new List<MarginFundingResponce>();
             reasponce = JsonConvert.DeserializeObject<List<MarginFundingResponce>>(dummyResponce);
             return Ok(reasponce);
@@ -226,20 +278,7 @@ namespace CleanArchitecture.Web.API
 
         //Close Margin Funding 
         [HttpPost("CloseMarginFunding")]//bitfinex https://api.bitfinex.com/v1/funding/close?swap_id=11576737
-        public IActionResult CloseMarginFunding([FromHeader, BindRequired] string ApiKey, CloseMarginFundingRequest request)
-        {
-            if (string.IsNullOrEmpty(ApiKey))
-                return Json("Unauthorize ApiKey");
-            if (ApiKey != "123456")
-                return Json("Unauthorize ApiKey");
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            dummyResponce = "{'id':11576737,'position_id':944309,'currency':'USD','rate':'9.8874','period':2,'amount':'34.24603414','timestamp':'1444280948.0','auto_close':false}";
-            MarginFundingResponce reasponce = new MarginFundingResponce();
-            reasponce = JsonConvert.DeserializeObject<MarginFundingResponce>(dummyResponce);
-            return Ok(reasponce);
-        }
+        public IActionResult CloseMarginFunding([FromHeader, BindRequired] string ApiKey, CloseMarginFundingRequest request)        {            if (string.IsNullOrEmpty(ApiKey))                return Json("Unauthorize ApiKey");            if (ApiKey != "123456")                return Json("Unauthorize ApiKey");            if (!ModelState.IsValid)                return BadRequest(ModelState);            dummyResponce = "{'id':11576737,'position_id':944309,'currency':'USD','rate':'9.8874','period':2,'amount':'34.24603414','timestamp':'1444280948.0','auto_close':false}";            MarginFundingResponce reasponce = new MarginFundingResponce();            reasponce = JsonConvert.DeserializeObject<MarginFundingResponce>(dummyResponce);            return Ok(reasponce);        }
         #endregion
 
         #region "uday method"
