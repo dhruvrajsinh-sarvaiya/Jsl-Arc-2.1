@@ -36,7 +36,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 CreatedBy = UserId
 
             };
-            await _dbContext.Add(currentTempotp);
+            _dbContext.Add(currentTempotp);
             _dbContext.SaveChanges();
 
             return currentTempotp;
