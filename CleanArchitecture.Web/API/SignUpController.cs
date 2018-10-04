@@ -190,7 +190,7 @@ namespace CleanArchitecture.Web.API
                         linkToken.Mobile = model.Mobile;
                         linkToken.CurrentTime = DateTime.UtcNow;
                         linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        //linkToken.Password = tempcurrentUser.PasswordHash;
+                        linkToken.Password = EncyptedDecrypted.Encrypt(tempcurrentUser.PasswordHash, passwordBytes);
 
                         string UserDetails = JsonConvert.SerializeObject(linkToken);
                         string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
@@ -414,9 +414,9 @@ namespace CleanArchitecture.Web.API
                                     {
                                         UserName = tempdata.Mobile,
                                         Mobile = tempdata.Mobile,
-                                        PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
+                                        //PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
                                     };
-                                    var result = await _userManager.CreateAsync(currentUser, currentUser.PasswordHash);
+                                    var result = await _userManager.CreateAsync(currentUser);
                                     if (result.Succeeded)
                                     {
                                         if (currentUser.Mobile != null)
@@ -430,6 +430,7 @@ namespace CleanArchitecture.Web.API
                                         {
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
+                                            currentUser.PhoneNumberConfirmed = true;
                                             var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
                                             return Ok("Your account has been activated, you can now login.");
                                             //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
@@ -694,7 +695,8 @@ namespace CleanArchitecture.Web.API
                         linkToken.Email = model.Email;
                         linkToken.CurrentTime = DateTime.UtcNow;
                         linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        linkToken.Password = tempdata.PasswordHash;
+                        //linkToken.Password = tempdata.PasswordHash;
+                        //linkToken.Password = EncyptedDecrypted.Encrypt(tempcurrentUser.PasswordHash, passwordBytes);
 
                         string UserDetails = JsonConvert.SerializeObject(linkToken);
                         string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
