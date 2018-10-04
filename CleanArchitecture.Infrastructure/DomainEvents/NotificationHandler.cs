@@ -62,11 +62,11 @@ namespace CleanArchitecture.Infrastructure.Services
                         continue;
                     }
                 }
-                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = "Message sent." });
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.NotificationSuccessMessage });
             }
             catch (Exception ex)
             {
-                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = "Message not sent."});
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.NotificationExceptionMessage});
             }            
         }
 

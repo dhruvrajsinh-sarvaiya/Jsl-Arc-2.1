@@ -43,10 +43,10 @@ namespace CleanArchitecture.Infrastructure.Services
                 Message.InQueueMessage();
                 _MessageRepository.Update(Message);
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1,1);
-                foreach (CommunicationProviderList g in Result)
+                foreach (CommunicationProviderList Provider in Result)
                 {
-                    string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, g.SendURL, g.SenderID, g.UserID, g.Password);
-
+                    string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, Provider.SendURL, Provider.SenderID, Provider.UserID, Provider.Password);
+                    
                     if (Resposne != "Fail")
                     {                       
                         Message.Status = Convert.ToInt16(enMessageService.Success);
@@ -64,11 +64,11 @@ namespace CleanArchitecture.Infrastructure.Services
                         continue;
                     }
                 }
-                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = "Message sent." });
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SMSExceptionMessage });
             }
             catch(Exception ex)
             {
-                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = "Message not sent." });
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.SMSExceptionMessage });
             }
         }
 
