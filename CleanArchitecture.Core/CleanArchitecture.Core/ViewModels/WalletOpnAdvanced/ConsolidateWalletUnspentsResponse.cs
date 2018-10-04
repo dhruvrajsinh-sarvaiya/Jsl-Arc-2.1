@@ -5,13 +5,13 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 {
-    public class ConsolidateWalletUnspentsResponse
+    public class ConsolidateWalletUnspentsResponse : BizResponseClass
     {
-        public class ConsolidateWalletUnspentsRootObject : BizResponseClass
-        {
+        //public class ConsolidateWalletUnspentsRootObject : BizResponseClass
+        //{
             public string txid { get; set; }
             public string tx { get; set; }
             public string status { get; set; }
-        }
+       // }
     }
 }

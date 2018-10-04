@@ -5,12 +5,12 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 {
-    public  class GetMaximumSpendableResponse
+    public  class GetMaximumSpendableResponse : BizResponseClass
     {
-        public class GetMaximumSpendableRootObject : BizResponseClass
-        {
+        //public class GetMaximumSpendableRootObject : BizResponseClass
+        //{
             public int maximumSpendable { get; set; }
             public string coin { get; set; }
-        }
+       // }
     }
 }
