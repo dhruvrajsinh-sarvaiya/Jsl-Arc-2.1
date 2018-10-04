@@ -5,13 +5,13 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 {
-    public class FanoutWalletUnspentsResponse
+    public class FanoutWalletUnspentsResponse : BizResponseClass
     {
-        public class FanoutWalletUnspentsRootObject : BizResponseClass
-        {
+        //public class FanoutWalletUnspentsRootObject : BizResponseClass
+        //{
             public string txid { get; set; }
             public string tx { get; set; }
             public string status { get; set; }
-        }
+        //}
     }
 }
