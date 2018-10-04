@@ -22,7 +22,7 @@ namespace CleanArchitecture.Web
 {
     public class Startup
     {
-        
+
         // Order or run
         //1) Constructor
         //2) Configure services
@@ -150,7 +150,7 @@ namespace CleanArchitecture.Web
             loggerFactory.AddFile(Configuration["LogPath"].ToString());//Take from Setting file
             if (env.IsDevelopment())
             {
-               // app.UseDeveloperExceptionPage();
+                // app.UseDeveloperExceptionPage();
                 app.AddDevMiddlewares();
             }
             else
@@ -159,8 +159,6 @@ namespace CleanArchitecture.Web
                 app.UseResponseCompression();
             }
 
-            // NOTE: For SPA swagger needs adding before MVC
-            app.UseCustomSwaggerApi();
             app.UseHttpsRedirection();
 
             // https://github.com/openiddict/openiddict-core/issues/518
@@ -197,6 +195,7 @@ namespace CleanArchitecture.Web
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Clean Architecture Api V1");
             });
          */
+
             app.UseMvc();
         }
     }
