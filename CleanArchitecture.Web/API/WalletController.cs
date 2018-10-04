@@ -101,7 +101,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpPost("{coin}")]
-        public Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string coin)
+        public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string coin)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpPost("{coin}")]
-        public Task<IActionResult> AddWallet([FromBody]AddWalletRequest Request)
+        public async Task<IActionResult> AddWallet([FromBody]AddWalletRequest Request)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public Task<IActionResult> GetWallet(string id, bool allTokens = false)
+        public async Task<IActionResult> GetWallet(string id, bool allTokens = false)
         {
             try
             {
@@ -188,7 +188,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpPut("{coin}")]
-        public Task<IActionResult> UpdateWallet([FromBody]UpdateWalletRequest Request)
+        public async Task<IActionResult> UpdateWallet([FromBody]UpdateWalletRequest Request)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{coin}/{address}")]
-        public Task<IActionResult> GetWalletByAddress(string address, string coin)
+        public async Task<IActionResult> GetWalletByAddress(string address, string coin)
         {
             try
             {
