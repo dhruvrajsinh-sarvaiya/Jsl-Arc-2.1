@@ -1,4 +1,8 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Infrastructure.DTOClasses;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,38 +10,42 @@ using System.Text;
 
 namespace CleanArchitecture.Infrastructure.Data.Transaction
 {
-    public class WebApiDataRepository
+    public class WebApiDataRepository : IWebApiRepository
     {
         private readonly CleanArchitectureContext _dbContext;
-        public WebApiDataRepository(CleanArchitectureContext dbContext)
+        readonly ILogger<WebApiDataRepository> _log;
+
+
+        public WebApiDataRepository(CleanArchitectureContext dbContext, ILogger<WebApiDataRepository> log)
         {
             _dbContext = dbContext;
+            _log = log;
         }
-        
+
         public WebApiConfigurationResponse GetThirdPartyAPIData(long ThirPartyAPIID)
         {
             var result = from TP in _dbContext.ThirPartyAPIConfiguration
-                                where TP.Id == ThirPartyAPIID && TP.Status == 1
-                                select new WebApiConfigurationResponse
-                                {
-                                    ThirPartyAPIID = TP.Id,
-                                    APISendURL = TP.APISendURL,
-                                    APIValidateURL = TP.APIValidateURL,
-                                    APIBalURL = TP.APIBalURL,
-                                    APIStatusCheckURL = TP.APIStatusCheckURL,
-                                    APIRequestBody = TP.APIRequestBody,
-                                    TransactionIdPrefix = TP.TransactionIdPrefix,
-                                    MerchantCode = TP.MerchantCode,
-                                    UserID = TP.UserID,
-                                    Password = TP.Password,
-                                    AuthHeader = TP.AuthHeader,
-                                    ContentType = TP.ContentType,
-                                    MethodType = TP.MethodType,
-                                    HashCode = TP.HashCode,
-                                    HashCodeRecheck = TP.HashCodeRecheck,
-                                    HashType = TP.HashType,
-                                    AppType = TP.AppType
-                                };
+                         where TP.Id == ThirPartyAPIID && TP.Status == 1
+                         select new WebApiConfigurationResponse
+                         {
+                             ThirPartyAPIID = TP.Id,
+                             APISendURL = TP.APISendURL,
+                             APIValidateURL = TP.APIValidateURL,
+                             APIBalURL = TP.APIBalURL,
+                             APIStatusCheckURL = TP.APIStatusCheckURL,
+                             APIRequestBody = TP.APIRequestBody,
+                             TransactionIdPrefix = TP.TransactionIdPrefix,
+                             MerchantCode = TP.MerchantCode,
+                             UserID = TP.UserID,
+                             Password = TP.Password,
+                             AuthHeader = TP.AuthHeader,
+                             ContentType = TP.ContentType,
+                             MethodType = TP.MethodType,
+                             HashCode = TP.HashCode,
+                             HashCodeRecheck = TP.HashCodeRecheck,
+                             HashType = TP.HashType,
+                             AppType = TP.AppType
+                         };
             return result.FirstOrDefault();
         }
         public GetDataForParsingAPI GetDataForParsingAPI(long ThirPartyAPIID)
@@ -53,7 +61,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                              BalanceRegex = Regex.BalanceRegex,
                              StatusRegex = Regex.StatusRegex,
                              StatusMsgRegex = Regex.StatusMsgRegex,
-                             ResponseCodeRegex =Regex.ResponseCodeRegex,
+                             ResponseCodeRegex = Regex.ResponseCodeRegex,
                              ErrorCodeRegex = Regex.ErrorCodeRegex,
                              TrnRefNoRegex = Regex.TrnRefNoRegex,
                              OprTrnRefNoRegex = Regex.OprTrnRefNoRegex,
@@ -62,6 +70,31 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                              Param3Regex = Regex.Param3Regex
                          };
             return result.FirstOrDefault();
+        }
+
+        //ntrivedi fetch route
+        public IEnumerable<TransactionProviderResponse> GetProviderDataList(TransactionApiConfigurationRequest Request)
+        {
+            try
+            {
+                IQueryable<TransactionProviderResponse> Result = _dbContext.TransactionProviderResponse.FromSql(
+                 @"select SC.ID as ServiceID,SC.ServiceName,Prc.ID as SerProID,Prc.SerProName,RC.ID as RouteID,PC.ID as ProductID,RC.RouteName,SC.ServiceType,
+                  Prc.ThirPartyAPIID,Prc.AppType,RC.MinimumAmount as MinimumAmountItem,RC.MaximumAmount as MaximumAmountItem,SC.MinimumAmount as MinimumAmountService,SC.MaximumAmount as MaximumAmountService
+             from ServiceConfiguration SC inner join  ProductConfiguration PC on
+			 PC.ServiceID = SC.Id inner join RouteConfiguration RC on RC.ProductID = PC.Id 
+			 inner join ProviderConfiguration PrC on Prc.Id = RC.SerProID 
+			 where SC.SMSCode = '{0}' and RC.TrnType={1} 
+			 and {2} between RC.MinimumAmount and RC.MaximumAmount
+			 and {2} between SC.MinimumAmount and SC.MaximumAmount
+			 and SC.Status = 1 and RC.Status = 1 and Prc.Status=1 
+			 order by RC.Priority", Request.SMSCode, Request.trnType, Request.amount);
+                return Result.AsEnumerable();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "MethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
 }

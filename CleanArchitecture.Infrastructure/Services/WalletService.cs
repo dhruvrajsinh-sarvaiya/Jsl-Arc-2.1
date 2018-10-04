@@ -20,11 +20,13 @@ namespace CleanArchitecture.Infrastructure.Services
         readonly ICommonRepository<TrnAcBatch> _trnBatch;
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         readonly IWalletRepository _walletRepository1;
+        readonly IWebApiRepository _webApiRepository ;
+
 
         //readonly IBasePage _BaseObj;
 
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
-            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository,ILogger<BasePage> logger) : base(logger)
+            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository, IWebApiRepository webApiRepository, ILogger<BasePage> logger) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -32,6 +34,8 @@ namespace CleanArchitecture.Infrastructure.Services
             //_walletRepository = repository;
             //_walletOrderRepository = walletOrderRepository;           
             _trnBatch = BatchLogger;
+            _walletRepository1 = walletRepository;
+            _webApiRepository = webApiRepository;
             //_walletLedgerRepository = walletledgerrepo;
         }
         
@@ -44,7 +48,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
         }
@@ -58,7 +62,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
         }
@@ -76,7 +80,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
         }
@@ -91,10 +95,9 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (!IsValidWallet(Order.OWalletMasterID) == true)
                 {
                     response.OrderID = 0;
-                    response.ORemarks = "";
-                    response.ErrorCode = 7001;
+                    response.ORemarks = "";                   
                     response.ReturnMsg = "Invalid Account";
-                    response.ReturnCode = 1;
+                    response.ReturnCode = enResponseCodeService.Fail;
                     return response;
                 }
                 var orderItem = new WalletOrder()
@@ -113,14 +116,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 _walletOrderRepository.Add(orderItem);
                 response.OrderID = orderItem.Id;
                 response.ORemarks = "Successfully Inserted";
-                response.ErrorCode = 7002;
+                response.ErrorCode = enErrorCode.Success;
                 response.ReturnMsg = "Successfully Inserted";
                 response.ReturnCode = 0;
                 return response;
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
         }
@@ -143,7 +146,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     //return false;
                     bizResponse.ErrorCode = enErrorCode.InvalidAmount;
                     bizResponse.ReturnMsg = "Invalid Amount";
-                    bizResponse.StatusCode = 1;
+                    bizResponse.ReturnCode = enResponseCodeService.Fail;
                     return bizResponse;
                 }
                 if (balance < amount)
@@ -151,7 +154,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     // return false;
                     bizResponse.ErrorCode = enErrorCode.InsufficientBalance;
                     bizResponse.ReturnMsg = "Insufficient Balance";
-                    bizResponse.StatusCode = 1;
+                    bizResponse.ReturnCode = enResponseCodeService.Fail;
                     return bizResponse;
                 }
                     var dWalletobj = _commonRepository.GetById(DWalletID);
@@ -160,7 +163,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     // return false;
                     bizResponse.ErrorCode = enErrorCode.InvalidWallet;
                     bizResponse.ReturnMsg = "Invalid Wallet";
-                    bizResponse.StatusCode = 1;
+                    bizResponse.ReturnCode = enResponseCodeService.Fail;
                     return bizResponse;
                 }
                     var oWalletobj = _commonRepository.GetById(OWalletID);
@@ -168,7 +171,8 @@ namespace CleanArchitecture.Infrastructure.Services
                     {
                     bizResponse.ErrorCode = enErrorCode.InvalidWallet;
                     bizResponse.ReturnMsg = "Invalid Wallet";
-                    bizResponse.StatusCode = 1;
+                    bizResponse.ReturnCode = enResponseCodeService.Fail;
+
                     return bizResponse;
                     }
                     
@@ -246,12 +250,122 @@ namespace CleanArchitecture.Infrastructure.Services
                     _walletRepository1.WalletOperation(walletLedger,walletLedger2,tansAccObj,tansAccObj1, dWalletobj, oWalletobj);
                 bizResponse.ErrorCode = enErrorCode.Success;
                 bizResponse.ReturnMsg = "Success";
-                bizResponse.StatusCode = 0;
+                bizResponse.ReturnCode = enResponseCodeService.Success;
                 return bizResponse;
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
+        public BizResponse GenerateAddress(long walletID)
+        {
+            try
+            {
+                IEnumerable<TransactionProviderResponse> transactionProviderResponses;
+                WalletMaster walletMaster = _commonRepository.GetById(walletID);
+                if(walletMaster == null)
+                {
+                    //return false
+                    return new BizResponse {ErrorCode = enErrorCode.InvalidWallet , ReturnCode =  enResponseCodeService.Fail, ReturnMsg = "Invalid Amount" };
+                }
+                else if(walletMaster.Status != 1)
+                {
+                    //return false
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Invalid Amount" };
+                }
+
+                transactionProviderResponses = _webApiRepository.GetProviderDataList( new TransactionApiConfigurationRequest { amount = 0,SMSCode = walletMaster.CoinName , APIType = enWebAPIRouteType.TransactionAPI , trnType = enTrnType.Generate_Address });
+                if(transactionProviderResponses == null )
+                {
+                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };                    
+                }
+                // code need to be added
+                return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Success, ReturnMsg = "Success." };
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: "+ UTC_To_IST() +",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public AddressMaster GetAddressObj(long walletID,long serproID, string address,string coinName,string addressName,long createdBy, byte isDefaultAdd,short status)
+        {
+            try
+            {
+                AddressMaster addressMaster = new AddressMaster();
+                addressMaster.Address = address;
+                addressMaster.CoinName = coinName;
+                addressMaster.CreatedBy = createdBy;
+                addressMaster.CreatedDate = UTC_To_IST();
+                addressMaster.IsDefaultAddress = isDefaultAdd;
+                addressMaster.SerProID = serproID;
+                addressMaster.Status = status;
+                addressMaster.WalletId = walletID;
+                return addressMaster;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
+        public TradeBitGoDelayAddresses GetTradeBitGoDelayAddresses(long walletID, long WalletTypeId, string TrnID,string address, string coinName, string BitgoWalletId, long createdBy, string CoinSpecific, short status,byte generatebit)
+        {
+            try
+            {
+                TradeBitGoDelayAddresses addressMaster = new TradeBitGoDelayAddresses
+                {
+                    CoinSpecific = CoinSpecific,
+                    Address = address,
+                    BitgoWalletId = BitgoWalletId,
+                    CoinName = coinName,
+                    CreatedBy = createdBy,
+                    CreatedDate = UTC_To_IST(),
+                    GenerateBit = generatebit,
+                    Status = status,
+                    TrnID = TrnID,
+                    WalletId = walletID,
+                    WalletTypeId = WalletTypeId
+                };
+                 
+                return addressMaster;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
+        public WalletMaster GetWalletMaster(long WalletTypeId, string walletName, bool isValid, short status , long createdBy,string coinname)
+        {
+            try
+            {
+                WalletMaster addressMaster = new WalletMaster
+                {                   
+                    CoinName = coinname,
+                    CreatedBy = createdBy,
+                    CreatedDate = UTC_To_IST(),                   
+                    Status = status,
+                    Balance = 0,
+                    IsValid = isValid,
+                    Walletname = walletName,
+                    WalletTypeID = WalletTypeId                   
+                };
+
+                return addressMaster;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
         }

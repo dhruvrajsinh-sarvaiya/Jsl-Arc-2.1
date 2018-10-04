@@ -113,7 +113,7 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             try
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
-                return _dbContext.Set<TradeBitGoDelayAddresses>().Where(e => e.GenerateBit == 1 && e.WalletmasterID == 0).OrderBy(e => e.Id).FirstOrDefault();                
+                return _dbContext.Set<TradeBitGoDelayAddresses>().Where(e => e.GenerateBit == 1 && e.WalletId == 0).OrderBy(e => e.Id).FirstOrDefault();                
             }
             catch (Exception ex)
             {

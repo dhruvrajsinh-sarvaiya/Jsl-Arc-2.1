@@ -10,8 +10,8 @@ namespace CleanArchitecture.Core.Entities
     public class AddressMaster : BizBase
     {
         [Required]
-        public long WalletMasterId { get; set; }
-
+        public long WalletId { get; set; }
+        
         [Required]
         [StringLength(50)]
         public string Address { get; set; }
@@ -20,7 +20,11 @@ namespace CleanArchitecture.Core.Entities
         public byte IsDefaultAddress { get; set; }
 
         [Required]
-        public long SerProID { get; set; }             
+        public long SerProID { get; set; }
+        
+        [Required]
+        [StringLength(5)]
+        public string CoinName { get; set; }
 
 
     }

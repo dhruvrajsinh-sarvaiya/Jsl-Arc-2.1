@@ -19,7 +19,7 @@ namespace CleanArchitecture.Core.Entities
         public string ProductName { get; set; }
         //public short Status { get; set; }
         [Required]
-        public long ServceID { get; set; }
+        public long ServiceID { get; set; } // ntrivedi added 03-11-2018
 
         [Required]
         public long StateID { get; set; }        

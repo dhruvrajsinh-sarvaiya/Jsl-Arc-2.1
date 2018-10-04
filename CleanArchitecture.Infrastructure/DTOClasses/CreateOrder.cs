@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace CleanArchitecture.Core.ApiModels
+namespace CleanArchitecture.Infrastructure.DTOClasses
 {
-    public class CreateOrderRequest : BizRequestClass
+    public class CreateOrderRequest 
     {
         [Required]
         [Range(1, 99999), DataType(DataType.Currency)]
@@ -29,7 +29,7 @@ namespace CleanArchitecture.Core.ApiModels
 
     }
 
-    public class CreateOrderResponse : BizResponseClass
+    public class CreateOrderResponse : BizResponse
     {
         public long OrderID { get; set; }
 

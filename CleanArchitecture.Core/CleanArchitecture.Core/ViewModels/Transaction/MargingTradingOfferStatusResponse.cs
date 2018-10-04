@@ -1,10 +1,15 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Transaction
 {
-    public class MargingTradingOfferStatusResponse
+    public class MargingTradingOfferStatusResponse : BizResponseClass
+    {
+        public MargingTradingOfferStatusInfo response { get; set; }
+    }
+    public class MargingTradingOfferStatusInfo
     {
         public long offer_id { get; set; }
         public string currency { get; set; }

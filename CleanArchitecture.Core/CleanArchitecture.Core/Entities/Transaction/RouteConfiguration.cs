@@ -19,7 +19,7 @@ namespace CleanArchitecture.Core.Entities
         public string RouteName { get; set; }
         //public short Status { get; set; }
         [Required]
-        public long ServceID { get; set; }
+        public long ServiceID { get; set; } // spelling mistake ntrivedi 03-10-2018
 
         [Required]
         public long SerProID { get; set; }
@@ -44,6 +44,9 @@ namespace CleanArchitecture.Core.Entities
 
         [StringLength(50)]
         public string OpCode { get; set; }
+
+        [Required]
+        public enTrnType TrnType { get; set; }
 
         public void SetActiveRoute()
         {

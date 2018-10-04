@@ -127,8 +127,22 @@ namespace CleanArchitecture.Core.Enums
         InvalidAmount = 2251,
         InsufficientBalance = 2252,
         InvalidWallet = 2253,
-        Success = 2253
+        Success = 2253,
+        ItemNotFoundForGenerateAddress = 2254
 
+    }
+    public enum enResponseCodeService
+    {
+        Success = 1,
+        Fail = 0,
+        InternalError = 9
+    }
+
+    public enum enResponseCode
+    {
+        Success = 1,
+        Fail = 0,
+        InternalError = 9
     }
 
     public enum enRegisterType
