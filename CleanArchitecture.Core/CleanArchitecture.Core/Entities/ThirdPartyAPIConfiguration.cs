@@ -5,7 +5,7 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ThirPartyAPIConfiguration : BizBase
+    public class ThirdPartyAPIConfiguration : BizBase
     {
         //[Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]

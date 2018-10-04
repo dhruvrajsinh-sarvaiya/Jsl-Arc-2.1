@@ -61,7 +61,7 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{coin}/{id}")]
         //[Route("{coin}/{id}")]
         [Authorize]
-        public ActionResult ListwalletTransfer(string id, string coin, string prevId = null, bool allToken = false, bool includeHex = false, string searchLabel = null, string type = null)
+        public async Task<IActionResult> ListwalletTransfer(string id, string coin, string prevId = null, bool allToken = false, bool includeHex = false, string searchLabel = null, string type = null)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace CleanArchitecture.Web.API
                 ListWalletTransfersResponse Response = new ListWalletTransfersResponse();
                 Response = JsonConvert.DeserializeObject<ListWalletTransfersResponse>(responseString);
                 Response.ReturnCode = enResponseCode.Success;
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
+                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.None,
                             new JsonSerializerSettings
                             {
                                 NullValueHandling = NullValueHandling.Ignore
@@ -87,7 +87,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpGet("{coin}/{walletId}/{id}")]
         [Authorize]
-        public ActionResult GetwalletTransfer(string coin, string walletId, string id)
+        public async Task<IActionResult> GetwalletTransfer(string coin, string walletId, string id)
         {
             try
             {
@@ -109,7 +109,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpGet("{coin}/{walletId}/{sequenceId}")]
         [Authorize]
-        public ActionResult GetWalletTransBySeq(string coin, string walletId, string sequenceId)
+        public async Task<IActionResult> GetWalletTransBySeq(string coin, string walletId, string sequenceId)
         {
             try
             {
@@ -131,7 +131,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("{coin}/{id}/{wallet}")]
         [Authorize]
-        public ActionResult CreateWalletAddress(string coin, string wallet, string id, [FromBody]CreateWalletAddressReq Request)
+        public async Task<IActionResult> CreateWalletAddress(string coin, string wallet, string id, [FromBody]CreateWalletAddressReq Request)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpGet("{coin}/{walletId}/{addressOrId}")]
         [Authorize]
-        public ActionResult GetWalletAddress(string coin, string walletId, string addressOrId)
+        public async Task<IActionResult> GetWalletAddress(string coin, string walletId, string addressOrId)
         {
             try
             {
@@ -179,7 +179,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPut("{coin}/{walletId}/{addressOrId}")]
         [Authorize]
-        public ActionResult UpdateWalletAddress(string coin, string walletId, string addressOrId, [FromBody]UpdateWalletAddressReq Request)
+        public async Task<IActionResult> UpdateWalletAddress(string coin, string walletId, string addressOrId, [FromBody]UpdateWalletAddressReq Request)
         {
             try
             {
@@ -201,7 +201,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("{coin}/{walletid}")]
         [Authorize]
-        public ActionResult Withdrawal(string coin, string walletid, [FromBody]WithdrawalReq Request)
+        public async Task<IActionResult> Withdrawal(string coin, string walletid, [FromBody]WithdrawalReq Request)
         {
             try
             {
@@ -223,7 +223,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("{coin}/{walletid}")]
         [Authorize]
-        public ActionResult SendToMany(string coin, string walletid, [FromBody]SendTranToManyReq Request)
+        public async Task<IActionResult> SendToMany(string coin, string walletid, [FromBody]SendTranToManyReq Request)
         {
             try
             {

@@ -5,16 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using CleanArchitecture.Infrastructure.Interfaces;
+using System.Net;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
     class GetWebRequest : IGetWebRequest
     {
         readonly ICommonRepository<RouteConfiguration> _routeRepository;
-        readonly ICommonRepository<ThirPartyAPIConfiguration> _thirdPartyCommonRepository;
+        readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         readonly ICommonRepository<ProviderConfiguration> _providerRepository;
 
-        public  GetWebRequest(ICommonRepository<RouteConfiguration> routeRepository, ICommonRepository<ThirPartyAPIConfiguration> thirdPartyCommonRepository,
+        public  GetWebRequest(ICommonRepository<RouteConfiguration> routeRepository, ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyCommonRepository,
               ICommonRepository<ProviderConfiguration> providerRepository)
         {
             _thirdPartyCommonRepository = thirdPartyCommonRepository;
@@ -25,11 +26,11 @@ namespace CleanArchitecture.Infrastructure.Services
         public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproID)
         {
             RouteConfiguration routeConfiguration;
-            ThirPartyAPIConfiguration thirdPartyAPIConfiguration;
+            ThirdPartyAPIConfiguration thirdPartyAPIConfiguration;
             ProviderConfiguration providerConfiguration;
             ThirdPartyAPIRequest thirdPartyAPIRequest = new ThirdPartyAPIRequest ();
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-            Dictionary<string, string> keyValuePairsHeader = new Dictionary<string, string>();
+            WebHeaderCollection keyValuePairsHeader = new WebHeaderCollection();
 
 
             thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(thirdpartyID);
@@ -50,16 +51,16 @@ namespace CleanArchitecture.Infrastructure.Services
                 thirdPartyAPIRequest.RequestURL = thirdPartyAPIRequest.RequestURL.Replace(item.Key, item.Value);
                 thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item.Key, item.Value);
             }
-
-            if(thirdPartyAPIConfiguration.MethodType == "RPC")
+            if(thirdPartyAPIConfiguration.AuthHeader == "RPC")
             {
                 string authInfo = thirdPartyAPIConfiguration.UserID + ":" + thirdPartyAPIConfiguration.Password;
                 authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
                 authInfo = "Basic " + authInfo;
-                keyValuePairsHeader.Add("Authorization", authInfo);               
+                keyValuePairsHeader.Add("Authorization", authInfo);                
             }
             thirdPartyAPIRequest.keyValuePairsHeader = keyValuePairsHeader;
 
+            thirdPartyAPIRequest.DelayAddress = routeConfiguration.IsDelayAddress;
             return thirdPartyAPIRequest;        
     }
     }

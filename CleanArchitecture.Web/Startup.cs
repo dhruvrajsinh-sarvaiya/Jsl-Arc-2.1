@@ -17,6 +17,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using StructureMap;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Infrastructure.Services.Repository;
 
 namespace CleanArchitecture.Web
 {
@@ -135,7 +136,8 @@ namespace CleanArchitecture.Web
                 config.For(typeof(IWalletRepository)).Add(typeof(WalletRepository));
                 config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
                 config.For<IMediator>().Use<Mediator>();
-
+                // added by nirav savariya for common repository on 10-04-2018
+                config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
                 //Populate the container using the service collection
                 config.Populate(services);
 
@@ -159,6 +161,8 @@ namespace CleanArchitecture.Web
                 app.UseResponseCompression();
             }
 
+            // NOTE: For SPA swagger needs adding before MVC
+            app.UseCustomSwaggerApi();
             app.UseHttpsRedirection();
 
             // https://github.com/openiddict/openiddict-core/issues/518
@@ -195,7 +199,6 @@ namespace CleanArchitecture.Web
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Clean Architecture Api V1");
             });
          */
-
             app.UseMvc();
         }
     }

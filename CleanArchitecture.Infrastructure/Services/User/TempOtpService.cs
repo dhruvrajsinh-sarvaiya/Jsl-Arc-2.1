@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 
@@ -14,15 +15,15 @@ namespace CleanArchitecture.Infrastructure.Services.User
     {
         private readonly CleanArchitectureContext _dbContext;
         private readonly IUserService _userService;
-        private readonly IMessageRepository<TempOtpMaster> _temptodoRepository;
-        public TempOtpService(CleanArchitectureContext dbContext, IUserService userService, IMessageRepository<TempOtpMaster> temptodoRepository)
+        private readonly ICustomRepository<TempOtpMaster> _tempRepository;
+        public TempOtpService(CleanArchitectureContext dbContext, IUserService userService, ICustomRepository<TempOtpMaster> tempRepository)
         {
             _dbContext = dbContext;
             _userService = userService;
-            _temptodoRepository = temptodoRepository;
+            _tempRepository = tempRepository;
         }
 
-        public async Task<TempOtpMaster> AddTempOtp(int UserId, int RegTypeId)
+        public async Task<TempOtpViewModel> AddTempOtp(int UserId, int RegTypeId)
         {
             var currentTempotp = new TempOtpMaster
             {
@@ -32,17 +33,23 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 CreatedTime = DateTime.UtcNow,
                 ExpirTime = DateTime.UtcNow.AddHours(2),
                 Status = 0,
-                CreatedDate = DateTime.Now,
-                CreatedBy = UserId
-
+                CreatedDate = DateTime.UtcNow,
+                CreatedBy = UserId,
+                EnableStatus = false
             };
             _dbContext.Add(currentTempotp);
             _dbContext.SaveChanges();
 
-            return currentTempotp;
+            TempOtpViewModel model = new TempOtpViewModel();            
+            model.OTP = currentTempotp.OTP;
+            model.Id = currentTempotp.Id;
+            model.UserId = currentTempotp.UserId;
+            model.EnableStatus = currentTempotp.EnableStatus;
+            model.ExpirTime = currentTempotp.ExpirTime;
+            model.CreatedTime = currentTempotp.CreatedTime;
+            model.RegTypeId = currentTempotp.RegTypeId;
+            return model;
         }
-
-
 
         public async Task<TempOtpViewModel> GetTempData(int Id)
         {
@@ -55,7 +62,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 model.OTP = tempotp.OTP;
                 model.CreatedTime = tempotp.CreatedTime;
                 model.ExpirTime = tempotp.ExpirTime;
-                model.Status = tempotp.Status;
+                model.EnableStatus = tempotp.EnableStatus;
                 model.Id = tempotp.Id;
                 return model;
             }
@@ -65,10 +72,10 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
         public void Update(long Id)
         {
-            var tempdata = _temptodoRepository.GetById(Convert.ToInt16(Id));
+            var tempdata = _tempRepository.GetById(Id);
             tempdata.SetAsOTPStatus();
-            //tempdata.Status = true;
-            _temptodoRepository.Update(tempdata);
+            tempdata.SetAsUpdateDate(tempdata.UserId);
+            _tempRepository.Update(tempdata);
         }
     }
 }

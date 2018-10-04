@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace CleanArchitecture.Core.Interfaces
 
     public interface IWebApiSendRequest
     {
-        String SendAPIRequestAsync(string Url, string Request, string ContentType, int Timeout,Dictionary<string,string> headerDictionary ,string MethodType = "POST");
+        String SendAPIRequestAsync(string Url, string Request, string ContentType, int Timeout, WebHeaderCollection headerDictionary ,string MethodType = "POST");
         //Task<TResponse> GetTemplateConfigurationAsync(TRequest Request);
         // ntrivedi 04-10-2018 do not need async method due to single wait process
     }

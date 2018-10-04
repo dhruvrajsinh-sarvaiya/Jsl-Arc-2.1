@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel;
 
 namespace CleanArchitecture.Core.Entities
 {
@@ -47,6 +48,9 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public enTrnType TrnType { get; set; }
+
+        [DefaultValue(0)]
+        public byte IsDelayAddress { get; set; }
 
         public void SetActiveRoute()
         {

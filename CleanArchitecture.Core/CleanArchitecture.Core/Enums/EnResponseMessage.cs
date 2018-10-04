@@ -19,5 +19,12 @@ namespace CleanArchitecture.Core.Enums
         public static string SMSExceptionMessage = "Sorry! A technical error occurred while processing your request.";
         public static string EmailExceptionMessage = "Sorry! A technical error occurred while processing your request.";
         public static string NotificationExceptionMessage = "Sorry! A technical error occurred while processing your request.";
+        //=====================Common for all internal use only
+        public static string CommSuccessMsgInternal = "Success";
+        public static string CommFailMsgInternal = "Fail";
+        //=========================Transactional Msg
+        public static string CreateTrnSuccessMsg = "Success";
+        public static string CreateTrnFailMsg = "Fail";
+        //============================
     }
 }

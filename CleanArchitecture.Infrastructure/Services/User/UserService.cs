@@ -1,15 +1,17 @@
-﻿using CleanArchitecture.Core.Interfaces.User;
+﻿using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Core.Interfaces.User;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-
+using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services.User
 {
     public class UserService : IUserService
     {
         private readonly CleanArchitectureContext _dbContext;
-        private readonly ILogger<UserService> _log;
+        private readonly ILogger<UserService> _log;        
         public UserService(CleanArchitectureContext dbContext, ILogger<UserService> log)
         {
             _dbContext = dbContext;
@@ -24,6 +26,34 @@ namespace CleanArchitecture.Infrastructure.Services.User
             else
                 return true;
         }
+        /// <summary>
+        /// Get User Data
+        /// </summary>
+        /// <param name="MobileNumber"></param>
+        /// <returns></returns>
+        public async Task<ApplicationUser> FindByMobileNumber(string MobileNumber)
+        {
+            var userdata =  _dbContext.Users.Where(i => i.Mobile == MobileNumber).FirstOrDefault();
+            if (userdata!= null)
+                return userdata;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Get User Data
+        /// </summary>
+        /// <param name="MobileNumber"></param>
+        /// <returns></returns>
+        public async Task<ApplicationUser> FindByEmail(string Email)
+        {
+            var userdata = _dbContext.Users.Where(i => i.Email == Email).FirstOrDefault();
+            if (userdata != null)
+                return userdata;
+            else
+                return null;
+        }
+
         /// <summary>
         /// added by nirav savariya for random generate otp on 9/26/2018
         /// </summary>
