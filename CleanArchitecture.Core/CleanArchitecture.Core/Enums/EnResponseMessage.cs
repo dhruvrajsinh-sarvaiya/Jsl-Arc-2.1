@@ -25,6 +25,8 @@ namespace CleanArchitecture.Core.Enums
         //=========================Transactional Msg
         public static string CreateTrnSuccessMsg = "Success";
         public static string CreateTrnFailMsg = "Fail";
+        public static string CreateTrnNoPairSelectedMsg = "No Pair Selected";
+        public static string CreateTrnInvalidQtyPriceMsg = "Invalid Qty or Price";
         //============================
     }
 }

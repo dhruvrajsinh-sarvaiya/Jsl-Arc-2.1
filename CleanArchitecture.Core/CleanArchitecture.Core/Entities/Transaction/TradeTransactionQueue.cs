@@ -1,16 +1,20 @@
-﻿using System;
+﻿using CleanArchitecture.Core.SharedKernel;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class TradeTransactionQueue
+    public class TradeTransactionQueue : BizBase
     {
         [Key]
         public long TrnNo { get; set; }
 
         [Required]
+        [DataType(DataType.DateTime)]
+        [DefaultValue("dbo.GetISTdate()")]
         public DateTime TrnDate { get; set; }
 
         [Required]
@@ -34,23 +38,29 @@ namespace CleanArchitecture.Core.Entities
 
         public long DeliveryWalletID { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal BuyQty { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal BidPrice { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal SellQty { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal AskPrice { get; set; }
 
         public string Order_Currency { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal OrderTotalQty { get; set; }
 
         public string Delivery_Currency { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal DeliveryTotalQty { get; set; }
 
-        public short Status { get; set; }
+        //public short Status { get; set; }
 
         public int StatusCode { get; set; }
 
@@ -68,12 +78,15 @@ namespace CleanArchitecture.Core.Entities
 
         public short IsCancelled { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal SettledBuyQty { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal SettledSellQty { get; set; }
 
         public DateTime? SettledDate { get; set; }
 
+        [Range(0, 9999999999.99999999)]
         public decimal TakerPer { get; set; }
     }
 
