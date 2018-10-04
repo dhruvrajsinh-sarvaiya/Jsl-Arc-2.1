@@ -35,7 +35,7 @@ namespace CleanArchitecture.Infrastructure
         public virtual DbSet<RegisterType> RegisterType { get; set; }
         public virtual DbSet<TempUserRegister> TempUserRegister { get; set; }
         public virtual DbSet<TempOtpMaster> TempOtpMaster { get; set; }
-
+        public virtual DbSet<OtpMaster> OtpMaster { get; set; }
 
 
 
