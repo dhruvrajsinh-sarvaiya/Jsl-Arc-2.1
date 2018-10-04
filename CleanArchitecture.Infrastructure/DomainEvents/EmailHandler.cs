@@ -55,7 +55,6 @@ namespace CleanArchitecture.Infrastructure.Services
                         Email.Status = Convert.ToInt16(enMessageService.Success);
                         Email.SentMessage();
                         _MessageRepository.Update(Email);
-                        break;
                     }
                     else
                     {
@@ -65,11 +64,11 @@ namespace CleanArchitecture.Infrastructure.Services
                         continue;
                     }
                 }
-                return await Task.FromResult(new CommunicationResponse { ErrorCode = 101, ReturnMsg = "Message sent."});
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = "Message sent."});
             }
             catch(Exception ex)
             {
-                return await Task.FromResult(new CommunicationResponse { ErrorCode = 99, ReturnMsg = "Message not sent."});
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = "Message not sent."});
             }
         }
 

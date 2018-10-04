@@ -8,53 +8,52 @@ using CleanArchitecture.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Infrastructure.DTOClasses;
+using System.Linq;
 
 namespace CleanArchitecture.Infrastructure.Data
 {
-    public class AddTransactionRepository
+    public class AddTransactionRepository //: ITransactionRepository<NewTransactionRequestCls, BizResponse>
     {
         readonly ILogger _log;
-        BizResponseClass _Resp;
-        private readonly IRepository<TransactionQueue> _TransactionRepository;
+        BizResponse _Resp;
+        private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
 
-        public AddTransactionRepository(IRepository<TransactionQueue> TransactionRepository, ILogger log)
+        public AddTransactionRepository(EFCommonRepository<TransactionQueue> TransactionRepository, ILogger log)
         {
             _TransactionRepository = TransactionRepository;
             _log = log;
         }
 
-        public BizResponseClass CreateTransaction(TransactionQueue NewtransactionReq)
+        public BizResponse CreateTransaction(NewTransactionRequestCls NewtransactionReq)
         {
-            _Resp = new BizResponseClass();
+            _Resp = new BizResponse();
             try
             {
                 var Newtransaction = new TransactionQueue()
                 {                  
                     TrnMode = NewtransactionReq.TrnMode,
-                    TrnType = NewtransactionReq.TrnType,
+                    TrnType = Convert.ToInt16(NewtransactionReq.TrnType),
                     MemberID = NewtransactionReq.MemberID,
                     MemberMobile = NewtransactionReq.MemberMobile,                   
                     TransactionAccount = NewtransactionReq.TransactionAccount,
                     SMSCode = NewtransactionReq.SMSCode,
                     Amount = NewtransactionReq.Amount,                    
-                    Status = NewtransactionReq.Status,
-                    StatusCode = NewtransactionReq.StatusCode,
-                    StatusMsg = NewtransactionReq.StatusMsg,                   
-                    TrnRefNo = NewtransactionReq.TrnRefNo                   
+                    Status = 0,
+                    StatusCode = 0,
+                    StatusMsg = "Initialise",                   
+                    TrnRefNo = NewtransactionReq.TrnRefNo,                   
+                    AdditionalInfo = NewtransactionReq.AdditionalInfo
                 };
                 _TransactionRepository.Add(Newtransaction);
-                _Resp.ReturnCode = Convert.ToInt16(enResponseCodeService.Success);
+                return (new BizResponse { ReturnMsg = "Success", ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                _Resp.ReturnCode = Convert.ToInt16(enResponseCodeService.InternalError);
-                _Resp.ReturnMsg = ex.Message;
-            }
-                
-            return _Resp;
-        }
-
-        
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);               
+                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError });
+            }               
+           
+        }        
     }
 }

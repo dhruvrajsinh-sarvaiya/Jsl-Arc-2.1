@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.ApiModels
         public string  SMSBalURL { get; set; }
         public long  RequestID { get; set; }
         public string  RequestFormat { get; set; }
-        public string  contentType { get; set; }
+        public string  ContentType { get; set; }
         public string  MethodType { get; set; }
         public string  ServiceName { get; set; }
         public string  UserID { get; set; }

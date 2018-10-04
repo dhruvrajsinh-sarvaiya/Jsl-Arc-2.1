@@ -22,6 +22,13 @@ namespace CleanArchitecture.Core.Entities
         [StringLength(500)]
         public string DeviceID { get; set; }
 
+        [Required]
+        [StringLength(200)]
+        public string TickerText { get; set; }
+
+        [Required]
+        [StringLength(200)]
+        public string ContentTitle { get; set; }
 
         public void FailMessage()
         {

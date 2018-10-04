@@ -10,11 +10,11 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {   
-    public class TransactionQueue
+    public class TransactionQueue : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long TrnNo { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long TrnNo { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]
@@ -63,8 +63,8 @@ namespace CleanArchitecture.Core.Entities
         [DefaultValue(0)]
         //public int ItemID { get; set; }
         public int RoutID { get; set; }//change column as new structure
-        [Required]
-        public short Status { get; set; }
+        //[Required]
+        //public short Status { get; set; }
 
         public short StatusCode { get; set; }
        
@@ -112,7 +112,7 @@ namespace CleanArchitecture.Core.Entities
 
         public short? ChargeType { get; set; }
 
-        public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
+        //public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
 
         public void MakeTransactionSuccess()
         {
