@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 namespace CleanArchitecture.Infrastructure.Services
 {
     //Common Parsing method Implement Here
-    class WebApiParseResponse : IWebApiParseResponse<WebAPIParseResponseCls>
+    public class WebApiParseResponse : IWebApiParseResponse<WebAPIParseResponseCls>
     {
         readonly ILogger _log;
         readonly TransactionWebAPIConfiguration _txnWebAPIConf;
@@ -108,15 +108,15 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 if (_txnWebAPIParsingData.ResponseSuccess.Contains(StatusResp))
                 {
-                    _webapiParseResponse.Status = Convert.ToInt16(enTransactionStatus.Success);
+                    _webapiParseResponse.Status = enTransactionStatus.Success;
                 }
                 else if (_txnWebAPIParsingData.ResponseFailure.Contains(StatusResp))
                 {
-                    _webapiParseResponse.Status = Convert.ToInt16(enTransactionStatus.OperatorFail);
+                    _webapiParseResponse.Status = enTransactionStatus.OperatorFail;
                 }
                 else
                 {
-                    _webapiParseResponse.Status = Convert.ToInt16(enTransactionStatus.Hold);
+                    _webapiParseResponse.Status = enTransactionStatus.Hold;
                 }
                 if (!string.IsNullOrEmpty(BalanceResp))
                     _webapiParseResponse.Balance = Convert.ToDecimal(BalanceResp);

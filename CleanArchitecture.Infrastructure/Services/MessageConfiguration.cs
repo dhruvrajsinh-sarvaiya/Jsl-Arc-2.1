@@ -49,14 +49,17 @@ namespace CleanArchitecture.Infrastructure.Services
 
             IQueryable Result = _dbContext.CommunicationProviderList.FromSql(
                     @"select CASM.SenderID,CASM.SMSSendURL As SendURL,CASM.Priority,CASM.SMSBalURL,CSM.RequestID, RM.RequestFormat,
-             RM.ContentType,RM.MethodType, CSM.ServiceName,CSMP.UserID, CSMP.Password,CSMP.Balance ,CSM.CommServiceID
-              from ServiceTypeMaster SM
-             inner join CommServiceTypeMaster CSTM on SM.ServiceTypeID = CSTM.ServiceTypeID
-             inner join CommServiceproviderMaster CSMP on CSTM.CommServiceTypeID = CSMP.CommServiceTypeID
-             inner join CommServiceMaster CSM on CSMP.CommSerproID = CSM.CommSerproID
-             inner join CommAPIServiceMaster CASM on CSM.CommServiceID = CASM.CommServiceID
-             inner join RequestFormatMaster RM on CSM.RequestID = RM.RequestID
-             where SM.ServiceTypeID = {0} and CSTM.CommServiceTypeID = {1}", ServiceTypeID, CommServiceTypeID);
+                        RM.ContentType,RM.MethodType, CSM.ServiceName,CSMP.UserID, CSMP.Password,CSMP.Balance ,CSM.CommServiceID,
+                        CSM.ResponseFailure,CSM.ResponseSuccess,TC.StatusRegex,TC.StatusMsgRegex,TC.BalanceRegex,TC.ErrorCodeRegex,
+                        TC.OprTrnRefNoRegex,TC.TrnRefNoRegex,TC.ResponseCodeRegex,TC.Param1Regex,TC.Param2Regex,TC.Param3Regex
+                        from ServiceTypeMaster SM
+                        inner join CommServiceTypeMaster CSTM on SM.ServiceTypeID = CSTM.ServiceTypeID
+                        inner join CommServiceproviderMaster CSMP on CSTM.CommServiceTypeID = CSMP.CommServiceTypeID
+                        inner join CommServiceMaster CSM on CSMP.CommSerproID = CSM.CommSerproID
+                        inner join CommAPIServiceMaster CASM on CSM.CommServiceID = CASM.CommServiceID
+                        inner join RequestFormatMaster RM on CSM.RequestID = RM.RequestID
+                        left join ThirPartyAPIResponseConfiguration TC on TC.Id = CSM.ParsingDataID
+                        where SM.ServiceTypeID = {0} and CSTM.CommServiceTypeID = {1}", ServiceTypeID, CommServiceTypeID);
 
             return Task.FromResult(Result);
         }
