@@ -5,55 +5,55 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 {
-    //public class SignTransactionRequest
-    //{
-    //    [Required]
-    //    public TransactionRootObject root { get; set; }
-    //    public string prv { get; set; }
-    //    public string coldDerivationSeed { get; set; }
-    //    public List<KeyChainRootObject> keychain { get; set; }
-    //    public string walletPassphrase { get; set; }
-    //    //public recipientsRootObject recipients { get; set; }
-    //    public List<RecipientRoot> recipients { get; set; }
-    //}
-    //public class TxPrebuild
-    //{
-    //    public string txHex { get; set; }
-    //    public TxInfo txInfo { get; set; }
-    //    public FeeInfo feeInfo { get; set; }
-    //}
+    public class SignTransactionRequest
+    {
+        [Required]
+        public TransactionRootObject root { get; set; }
+        public string prv { get; set; }
+        public string coldDerivationSeed { get; set; }
+        public List<KeyChainRootObject> keychain { get; set; }
+        public string walletPassphrase { get; set; }
+        //public recipientsRootObject recipients { get; set; }
+        public List<RecipientRoot> recipients { get; set; }
+    }
+    public class TxPrebuild
+    {
+        public string txHex { get; set; }
+        public TxInfo txInfo { get; set; }
+        public FeeInfo feeInfo { get; set; }
+    }
 
-    //public class Key
-    //{
-    //    public string encryptedPrv { get; set; }
-    //    public string id { get; set; }
-    //    public string pub { get; set; }
-    //    public List<string> users { get; set; }
-    //}
+    public class Key
+    {
+        public string encryptedPrv { get; set; }
+        public string id { get; set; }
+        public string pub { get; set; }
+        public List<string> users { get; set; }
+    }
 
-    //public class KeyChainRootObject
-    //{
-    //    public List<Key> keys { get; set; }
-    //    public int limit { get; set; }
-    //    public string nextBatchPrevId { get; set; }
-    //}
+    public class KeyChainRootObject
+    {
+        public List<Key> keys { get; set; }
+        public int limit { get; set; }
+        public string nextBatchPrevId { get; set; }
+    }
 
-    //public class TransactionRootObject
-    //{
-    //    public TxPrebuild txPrebuild { get; set; }
-    //    public string prv { get; set; }
-    //}
+    public class TransactionRootObject
+    {
+        public TxPrebuild txPrebuild { get; set; }
+        public string prv { get; set; }
+    }
 
-    //public class RecipientRoot
-    //{
-    //    public string address { get; set; }
-    //    public int amount { get; set; }
-    //}
+    public class RecipientRoot
+    {
+        public string address { get; set; }
+        public int amount { get; set; }
+    }
 
-    ////public class recipientsRootObject
-    ////{
-    ////    public List<Recipient> recipients { get; set; }
-    ////}
+    //public class recipientsRootObject
+    //{
+    //    public List<Recipient> recipients { get; set; }
+    //}
     //public class FeeInfo
     //{
     //    public int size { get; set; }
