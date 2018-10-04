@@ -1,14 +1,13 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Transaction
 {
-    public class GetMarketSummaryResponse
+    public class GetMarketSummaryResponse : BizResponseClass
     {
-        public string pair_name { get; set; }
-
-        public PairInformation pair_detail { get; set; }
+        public List<GetMarketSummaryList> response { get; set; }
     }
     public class PairInformation
     {
@@ -21,5 +20,11 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public int open_buy_order { get; set; }
         public int open_sell_order { get; set; }
         public decimal prev_day { get; set; }
+    }
+    
+    public class GetMarketSummaryList
+    {
+        public string pair_name { get; set; }
+        public PairInformation pair_detail { get; set; }
     }
 }

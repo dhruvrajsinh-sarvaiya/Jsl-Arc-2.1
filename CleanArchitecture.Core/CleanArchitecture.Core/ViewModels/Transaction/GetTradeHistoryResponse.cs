@@ -1,10 +1,15 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Transaction
 {
-    public class GetTradeHistoryResponse
+    public class GetTradeHistoryResponse : BizResponseClass
+    {
+        public List<GetTradeHistoryInfo> response { get; set; }
+    }
+    public class GetTradeHistoryInfo
     {
         public long order_id { get; set; }
         public decimal price { get; set; }
