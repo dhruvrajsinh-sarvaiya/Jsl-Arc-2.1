@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ApiModels
 {
-    public class CommunicationProviderList
+    public class CommunicationProviderList : GetDataForParsingAPI
     {
         public string  SenderID { get; set; }
         public string  SendURL { get; set; }

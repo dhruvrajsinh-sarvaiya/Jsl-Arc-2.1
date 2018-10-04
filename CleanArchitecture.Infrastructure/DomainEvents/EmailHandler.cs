@@ -1,8 +1,10 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels;
+using CleanArchitecture.Infrastructure.DTOClasses;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -18,12 +20,16 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IMessageRepository<EmailQueue> _MessageRepository;
         private readonly IMessageConfiguration _MessageConfiguration;
         private readonly IMessageService _MessageService;
+        private readonly WebApiParseResponse _WebApiParseResponse;
+        private GetDataForParsingAPI _GetDataForParsingAPI;
 
-        public EmailHandler(IMessageRepository<EmailQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService)
+        public EmailHandler(IMessageRepository<EmailQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse)
         {
             _MessageRepository = MessageRepository;
             _MessageConfiguration = MessageConfiguration;
             _MessageService = MessageService;
+            _GetDataForParsingAPI = GetDataForParsingAPI;
+            _WebApiParseResponse = WebApiParseResponse;
         }
 
         public async Task<CommunicationResponse> Handle(SendEmailRequest Request, CancellationToken cancellationToken)
@@ -46,29 +52,29 @@ namespace CleanArchitecture.Infrastructure.Services
                 Email.InQueueMessage();
                 _MessageRepository.Update(Email);
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1, 2);
-                foreach (CommunicationProviderList g in Result)
+                foreach (CommunicationProviderList Provider in Result)
                 {
-                    string Resposne = await _MessageService.SendEmailAsync(Email.Recepient, Email.Subject, Email.BCC, Email.CC, Email.Body, g.SendURL,g.UserID , g.Password,Convert.ToInt16(g.SenderID));
-
-                    if (Resposne != "Fail")
+                    string Resposne = await _MessageService.SendEmailAsync(Email.Recepient, Email.Subject, Email.BCC, Email.CC, Email.Body, Provider.SendURL,Provider.UserID , Provider.Password,Convert.ToInt16(Provider.SenderID));
+                    CopyClass.CopyObject(Provider, ref _GetDataForParsingAPI);
+                    WebAPIParseResponseCls GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Resposne, _GetDataForParsingAPI);
+                    if (GenerateResponse.Status == enTransactionStatus.Success)
                     {
-                        Email.Status = Convert.ToInt16(enMessageService.Success);
                         Email.SentMessage();
                         _MessageRepository.Update(Email);
+                        return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EMailSuccessMessage });
                     }
                     else
-                    {
-                        Email.Status = Convert.ToInt16(enMessageService.Fail);
-                        Email.SentMessage();
-                        _MessageRepository.Update(Email);
+                    {                        
                         continue;
                     }
                 }
-                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = "Message sent."});
+                Email.SentMessage();
+                _MessageRepository.Update(Email);
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFailMessage});
             }
             catch(Exception ex)
             {
-                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = "Message not sent."});
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.EmailExceptionMessage});
             }
         }
 

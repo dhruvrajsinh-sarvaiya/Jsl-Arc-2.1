@@ -1,5 +1,4 @@
 ﻿using CleanArchitecture.Core.ApiModels;
-using CleanArchitecture.Core.ViewModels.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +6,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
 {
-    public class OTPViewModel : TrackerViewModel
+    public class OTPWithEmailViewModel
     {
         [Required]
         [StringLength(6, MinimumLength = 6)]
@@ -15,11 +14,13 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
         public string OTP { get; set; }
 
         [Required]
-        [Phone]
-        public string MobileNo { get; set; }
+        [StringLength(50)]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
     }
 
-    public class OTPResponse : BizResponseClass
+    public class OTPWithEmailResponse : BizResponseClass
     {
 
     }

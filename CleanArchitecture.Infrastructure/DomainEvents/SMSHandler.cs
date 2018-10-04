@@ -1,8 +1,10 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels;
+using CleanArchitecture.Infrastructure.DTOClasses;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -17,13 +19,17 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         private readonly IMessageRepository<MessagingQueue> _MessageRepository;
         private readonly IMessageConfiguration _MessageConfiguration;
-        private readonly IMessageService _MessageService;        
+        private readonly IMessageService _MessageService;       
+        private readonly WebApiParseResponse _WebApiParseResponse;
+        private GetDataForParsingAPI _GetDataForParsingAPI;
 
-        public SMSHandler(IMessageRepository<MessagingQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService)
+        public SMSHandler(IMessageRepository<MessagingQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse)
         {
             _MessageRepository = MessageRepository;
             _MessageConfiguration = MessageConfiguration;
             _MessageService = MessageService;
+            _GetDataForParsingAPI = GetDataForParsingAPI;
+            _WebApiParseResponse = WebApiParseResponse;
         }
 
         public async Task<CommunicationResponse> Handle(SendSMSRequest Request, CancellationToken cancellationToken)
@@ -46,25 +52,23 @@ namespace CleanArchitecture.Infrastructure.Services
                 foreach (CommunicationProviderList Provider in Result)
                 {
                     string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, Provider.SendURL, Provider.SenderID, Provider.UserID, Provider.Password);
-                    
-                    if (Resposne != "Fail")
+                    CopyClass.CopyObject(Provider, ref _GetDataForParsingAPI);
+                    WebAPIParseResponseCls GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Resposne, _GetDataForParsingAPI);
+                    if (GenerateResponse.Status == enTransactionStatus.Success)
                     {                       
-                        Message.Status = Convert.ToInt16(enMessageService.Success);
                         Message.SentMessage();
                         Message.RespText = Resposne;
                         _MessageRepository.Update(Message);
-                        break;
+                        return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SMSExceptionMessage });
                     }
                     else
-                    {
-                        Message.Status = Convert.ToInt16(enMessageService.Fail);
-                        Message.SentMessage();
-                        Message.RespText = Resposne;
-                        _MessageRepository.Update(Message);
+                    {                     
                         continue;
                     }
                 }
-                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SMSExceptionMessage });
+                Message.FailMessage();
+                _MessageRepository.Update(Message);
+                return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SMSFailMessage });
             }
             catch(Exception ex)
             {

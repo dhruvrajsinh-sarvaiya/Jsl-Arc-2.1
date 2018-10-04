@@ -7,10 +7,10 @@ using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 
 namespace CleanArchitecture.Core.Interfaces.User
 {
-   public interface ITempOtpService
+    public partial interface IOtpMasterService
     {
-        Task<TempOtpViewModel> AddTempOtp(int UserId, int RegTypeId);
-        Task<TempOtpViewModel> GetTempData(int Id);
-        void Update(long Id);
+        Task<OtpMaster> AddOtp(int UserId,string Email=null,string Mobile =null);
+        Task<OtpMasterViewModel> GetOtpData(int Id);
+        void UpdateOtp(long Id);
     }
 }
