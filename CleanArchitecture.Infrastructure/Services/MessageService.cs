@@ -71,13 +71,28 @@ namespace CleanArchitecture.Infrastructure.Services
             catch(Exception ex)
             {
                 throw ex;
-            }
-            
+            }            
         }
 
-        public Task<string> SendNotificationAsync(string DeviceID, string Message, string Url)
+        public async Task<string> SendNotificationAsync(string DeviceID,string tickerText,string contentTitle, string Message, string Url, string Request,string APIKey,string MethodType, string ContentType)
         {
-            return Task.FromResult("");
+            string Response = "";
+            try
+            {
+                //{ "registration_ids": [#DeviceID#], "data": {"tickerText":"#tickerText#", "contentTitle":"#contentTitle#","message": "#Message#"}}
+                Request = Request.Replace("#DeviceID#", DeviceID);
+                Request = Request.Replace("#tickerText#", tickerText);
+                Request = Request.Replace("#contentTitle#", contentTitle);
+                Request = Request.Replace("#Message#", Message);
+                WebHeaderCollection HeaderCollection = new WebHeaderCollection();
+                HeaderCollection.Add(string.Format("Authorization: key={0}", APIKey));
+                Response = await _WebAPISendRequest.SendRequestAsync(Url, Request,MethodType,ContentType, HeaderCollection);
+                return await Task.FromResult(Response);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         //public async Task SendEmail(string email, string subject, string message)

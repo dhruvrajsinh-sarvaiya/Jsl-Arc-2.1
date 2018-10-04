@@ -13,10 +13,12 @@ namespace CleanArchitecture.Infrastructure.Services
     public class WebAPISendRequest<T> : IWebApiSendRequest
     {
         public readonly ILogger<T> _log;
+
         public WebAPISendRequest(ILogger<T> log)
         {
             _log = log;
         }
+
         public Task<string> SendAPIRequestAsync(string Url, string Request, string ContentType,int Timeout, string MethodType = "POST")
         {
             string responseFromServer = "";
@@ -25,7 +27,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 object ResponseObj = new object();
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(Url);
                 httpWebRequest.ContentType = ContentType;
-
+                
                 httpWebRequest.Method = MethodType.ToUpper();
                 httpWebRequest.KeepAlive = false;
                 httpWebRequest.Timeout = Timeout;
@@ -59,7 +61,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return Task.FromResult(responseFromServer);
         }
 
-        public Task<string> SendRequestAsync(string Url, string MethodType = "GET")
+        public Task<string> SendRequestAsync(string Url, string Request="", string MethodType = "GET", string ContentType="application/json", WebHeaderCollection Headers = null, int Timeout = 45)
         {
             string responseFromServer = "";
             try
@@ -68,15 +70,23 @@ namespace CleanArchitecture.Infrastructure.Services
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(Url);
 
                 httpWebRequest.Method = MethodType.ToUpper();
+                httpWebRequest.Headers = Headers;
+                httpWebRequest.KeepAlive = false;
+                httpWebRequest.Timeout = Timeout;
+                httpWebRequest.ContentType = ContentType;
+                //if (!string.IsNullOrEmpty(Headers))
+                //{
+                // httpWebRequest.Headers.Add(string.Format("Authorization: key={0}", Headers));
+                // }
 
                 _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, MethodType);
 
-                //using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                //{
-                //    streamWriter.Write(Request);
-                //    streamWriter.Flush();
-                //    streamWriter.Close();
-                //}
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                {
+                    streamWriter.Write(Request);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
 
                 HttpWebResponse httpWebResponse = httpWebRequest.GetResponse() as HttpWebResponse;
                 using (StreamReader sr = new StreamReader(httpWebResponse.GetResponseStream()))
