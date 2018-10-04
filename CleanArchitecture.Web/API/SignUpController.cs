@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Primitives;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.Services;
@@ -213,9 +214,7 @@ namespace CleanArchitecture.Web.API
                         //return Ok("Your account has been created, < br /> please verify it by clicking the activation link that has been send to your email.");
 
                         RegisterResponse response = new RegisterResponse();
-                        response.ReturnCode = 200;
-                        response.StatusMessage = "Success";
-                        response.StatusCode = 200;
+                        response.ReturnCode = enResponseCode.Success;
                         response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
                         return Ok(response);
                     }
@@ -293,9 +292,7 @@ namespace CleanArchitecture.Web.API
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
 
                         SignUpWithEmailResponse response = new SignUpWithEmailResponse();
-                        response.ReturnCode = 200;
-                        response.StatusMessage = "Success";
-                        response.StatusCode = 200;
+                        response.ReturnCode = enResponseCode.Success;
                         response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
 
                         return Ok(response);
@@ -355,10 +352,8 @@ namespace CleanArchitecture.Web.API
                         var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
                         if (result != null)
                         {
-                            response.ReturnCode = 200;
+                            response.ReturnCode = enResponseCode.Success;
                             response.ReturnMsg = "Success";
-                            response.StatusCode = 200;
-                            response.StatusMessage = "Done";
                             return Ok(response);
                         }
                     }
@@ -392,11 +387,8 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> BlockChainSignUp([FromBody] BlockChainViewModel model)
         {
             BlockChainResponse response = new BlockChainResponse();
-            response.ReturnCode = 200;
+            response.ReturnCode = enResponseCode.Success;
             response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Done";
-
             return Ok(response);
         }
 
@@ -503,10 +495,8 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> ReSendOtp()
         {
             SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-            response.ReturnCode = 200;
+            response.ReturnCode = enResponseCode.Success;
             response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Done";
             return Ok(response);
         }
 

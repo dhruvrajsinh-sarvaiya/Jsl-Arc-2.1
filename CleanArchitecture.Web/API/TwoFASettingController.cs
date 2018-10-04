@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using CleanArchitecture.Core.ViewModels.ManageViewModels;
@@ -64,10 +65,8 @@ namespace CleanArchitecture.Web.API
             if (model != null)
             {
                 SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-                response.ReturnCode = 200;
+                response.ReturnCode = enResponseCode.Success;
                 response.ReturnMsg = "Success";
-                response.StatusCode = 200;
-                response.StatusMessage = "Done";
                 return Ok(response);
             }
             else
