@@ -70,11 +70,11 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpGet("{coin}")]
         // [Route("{coin}")]
-        public ActionResult ListWallet(string coin, int limit = 25, string prevId = null, bool allTokens = false)
+        public async Task<IActionResult> ListWallet(string coin, int limit = 25, string prevId = null, bool allTokens = false)
         {
             try
             {
-                var user=_userManager.GetUserAsync(HttpContext.User);
+                var user=await _userManager.GetUserAsync(HttpContext.User);
                 string requeststring = "{'wallets':[{'id':'585951a5df8380e0e3063e9f','users':[{'user':'55e8a1a5df8380e0e30e20c6','permissions':['admin','view','spend']}],'coin':'tbtc','label':'Alexs first wallet','m':2,'n':3,'keys':['585951a5df8380e0e304a553','585951a5df8380e0e30d645c','585951a5df8380e0e30b6147'],'tags':['585951a5df8380e0e30a198a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'coinSpecific':{}}]}";
                 ListWalletResponse Response = new ListWalletResponse();
                 Response = JsonConvert.DeserializeObject<ListWalletResponse>(requeststring);
@@ -101,7 +101,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpPost("{coin}")]
-        public ActionResult CreateWallet([FromBody]CreateWalletRequest Request, string coin)
+        public Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string coin)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpPost("{coin}")]
-        public ActionResult AddWallet([FromBody]AddWalletRequest Request)
+        public Task<IActionResult> AddWallet([FromBody]AddWalletRequest Request)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public ActionResult GetWallet(string id, bool allTokens = false)
+        public Task<IActionResult> GetWallet(string id, bool allTokens = false)
         {
             try
             {
@@ -188,7 +188,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpPut("{coin}")]
-        public ActionResult UpdateWallet([FromBody]UpdateWalletRequest Request)
+        public Task<IActionResult> UpdateWallet([FromBody]UpdateWalletRequest Request)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{coin}/{address}")]
-        public ActionResult GetWalletByAddress(string address, string coin)
+        public Task<IActionResult> GetWalletByAddress(string address, string coin)
         {
             try
             {
