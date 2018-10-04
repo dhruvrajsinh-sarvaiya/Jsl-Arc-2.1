@@ -130,4 +130,11 @@ namespace CleanArchitecture.Core.Enums
         Success = 2253
 
     }
+
+    public enum enRegisterType
+    {
+        Mobile = 1,
+        Email = 2,
+        Standerd = 3,
+    }
 }

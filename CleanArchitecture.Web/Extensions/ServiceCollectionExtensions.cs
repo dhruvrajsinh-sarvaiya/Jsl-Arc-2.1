@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Primitives;
-
-using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Session;
@@ -14,7 +10,6 @@ using CleanArchitecture.Core.Services;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.EFLocalizer;
-using CleanArchitecture.Infrastructure.Services;
 using CleanArchitecture.Infrastructure.Services.User;
 using CleanArchitecture.Web.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,7 +22,6 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
-using Microsoft.VisualStudio.Web.CodeGeneration.Utils.Messaging;
 
 namespace CleanArchitecture.Web.Extensions
 {

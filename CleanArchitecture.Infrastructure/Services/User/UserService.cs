@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 
 
-namespace CleanArchitecture.Infrastructure.Data
+namespace CleanArchitecture.Infrastructure.Services.User
 {
     public class UserService : IUserService
     {

@@ -7,7 +7,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
 {
     public class LinkTokenViewModel
     {
-        public string Id { get; set; }
+        public long Id { get; set; }
 
         public string Username { get; set; }
 

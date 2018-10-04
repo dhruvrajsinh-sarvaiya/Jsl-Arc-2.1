@@ -1,28 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using CleanArchitecture.Core.Enums.Modes;
-using CleanArchitecture.Core.Events;
+﻿using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.SharedKernel;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace CleanArchitecture.Core.Entities.User
+namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
 {
-    public class TempUserRegister : BizBase
+    public class TempUserRegisterViewModel : BizBase
     {
-        [Required]
         public int RegTypeId { get; set; }
-        [StringLength(100)]
         public string UserName { get; set; }
-        [EmailAddress]
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string SecurityStemp { get; set; }
         public string ConcurrencyStamp { get; set; }
         public string PhoneNumber { get; set; }
-        [StringLength(250)]
         public string FirstName { get; set; }
-        [StringLength(250)]
         public string LastName { get; set; }
         public string Mobile { get; set; }
         public bool RegisterStatus { get; set; }
@@ -33,13 +26,6 @@ namespace CleanArchitecture.Core.Entities.User
         //[DataType(DataType.DateTime)]
         //public DateTime UpdatedDate { get; set; }
         //public string UpdateBy { get; set; }
-
-        //public RegisterType RegisterType { get; set; }
-
-        public void SetAsStatus()
-        {
-            RegisterStatus = Convert.ToBoolean(ModeStatus.True);
-            Events.Add(new ServiceStatusEvent<TempUserRegister>(this));
-        }
+        public RegisterType RegisterType { get; set; }
     }
 }

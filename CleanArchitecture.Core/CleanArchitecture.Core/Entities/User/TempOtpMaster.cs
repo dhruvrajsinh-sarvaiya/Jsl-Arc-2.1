@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using CleanArchitecture.Core.Enums.Modes;
+using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities.User
@@ -20,10 +22,11 @@ namespace CleanArchitecture.Core.Entities.User
         public DateTime CreatedTime { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime ExpirTime { get; set; }
-        public bool EnableStatus { get; set; }
-
-
-        public ApplicationUser User { get; set; }
-        public RegisterType RegisterType { get; set; }
+        
+        public void SetAsOTPStatus()
+        {
+            Status = Convert.ToInt16(ModeStatus.True);
+            Events.Add(new ServiceStatusEvent<TempOtpMaster>(this));
+        }
     }
 }
