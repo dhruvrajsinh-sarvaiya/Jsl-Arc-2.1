@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ using Newtonsoft.Json.Linq;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
+    //[Authorize]
     public class WalletController : ControllerBase
     {
         private readonly IBasePage _basePage;
