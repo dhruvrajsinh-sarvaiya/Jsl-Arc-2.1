@@ -225,12 +225,42 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> StandardLogin([FromBody]StandardLoginViewModel model)
         {
-            StandardLoginResponse response = new StandardLoginResponse();
-            response.ReturnCode = 200;
-            response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Success";
-            return Ok(response);
+            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                var user = await _userManager.FindByNameAsync(model.UserName);
+                var roles = await _userManager.GetRolesAsync(user);
+                _logger.LogInformation(1, "User logged in.");
+
+                StandardLoginResponse response = new StandardLoginResponse();
+                response.ReturnCode = 200;
+                response.ReturnMsg = "Success";
+                response.StatusCode = 200;
+                response.StatusMessage = "Success";
+
+                return AppUtils.StanderdSignIn(user, response);
+            }
+            if (result.RequiresTwoFactor)
+            {
+                return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
+            }
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning(2, "User account locked out.");
+                return BadRequest(new ApiError("Lockout"));
+            }
+            else
+            {
+                return BadRequest(new ApiError("Invalid login attempt."));
+            }
+
+
+            //StandardLoginResponse response = new StandardLoginResponse();
+            //response.ReturnCode = 200;
+            //response.ReturnMsg = "Success";
+            //response.StatusCode = 200;
+            //response.StatusMessage = "Success";
+            //return Ok(response);
         }
         #endregion
 
@@ -244,6 +274,8 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithEmail([FromBody]LoginWithEmailViewModel model)
         {
+
+
             LoginWithEmailResponse response = new LoginWithEmailResponse();
             response.ReturnCode = 200;
             response.ReturnMsg = "Success";
@@ -263,6 +295,35 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithMobile([FromBody]LoginWithMobileViewModel model)
         {
+            //var result = await _signInManager.PasswordSignInAsync(model.Mobile, model.Password, model.RememberMe, lockoutOnFailure: false);
+            //if (result.Succeeded)
+            //{
+            //    var user = await _userManager.FindByEmailAsync(model.Mobile);
+            //    var roles = await _userManager.GetRolesAsync(user);
+            //    _logger.LogInformation(1, "User logged in.");
+
+            //    StandardLoginResponse response = new StandardLoginResponse();
+            //    response.ReturnCode = 200;
+            //    response.ReturnMsg = "Success";
+            //    response.StatusCode = 200;
+            //    response.StatusMessage = "Success";
+
+            //    return AppUtils.StanderdSignIn(user, response);
+            //}
+            //if (result.RequiresTwoFactor)
+            //{
+            //    return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
+            //}
+            //if (result.IsLockedOut)
+            //{
+            //    _logger.LogWarning(2, "User account locked out.");
+            //    return BadRequest(new ApiError("Lockout"));
+            //}
+            //else
+            //{
+            //    return BadRequest(new ApiError("Invalid login attempt."));
+            //}
+
             LoginWithMobileResponse response = new LoginWithMobileResponse();
             response.ReturnCode = 200;
             response.ReturnMsg = "Success";

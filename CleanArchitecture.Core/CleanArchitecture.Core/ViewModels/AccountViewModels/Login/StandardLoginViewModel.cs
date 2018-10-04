@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
         [RegularExpression("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$", ErrorMessage = "Passwords must be at least 6 characters and contain at 3 of 4 of the following: upper case (A-Z), lower case (a-z), number (0-9) and special character (e.g. !@#$%^&*)")]
         public string Password { get; set; }
 
-        //public bool RememberMe { get; set; }
+        public bool RememberMe { get; set; }
     }
 
     public class StandardLoginResponse : BizResponseClass
