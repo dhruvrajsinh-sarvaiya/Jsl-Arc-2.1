@@ -29,6 +29,8 @@ namespace CleanArchitecture.Infrastructure.Services
             ProviderConfiguration providerConfiguration;
             ThirdPartyAPIRequest thirdPartyAPIRequest = new ThirdPartyAPIRequest ();
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+            Dictionary<string, string> keyValuePairsHeader = new Dictionary<string, string>();
+
 
             thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(thirdpartyID);
             routeConfiguration = _routeRepository.GetById(routeID);
@@ -48,6 +50,16 @@ namespace CleanArchitecture.Infrastructure.Services
                 thirdPartyAPIRequest.RequestURL = thirdPartyAPIRequest.RequestURL.Replace(item.Key, item.Value);
                 thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item.Key, item.Value);
             }
+
+            if(thirdPartyAPIConfiguration.MethodType == "RPC")
+            {
+                string authInfo = thirdPartyAPIConfiguration.UserID + ":" + thirdPartyAPIConfiguration.Password;
+                authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+                authInfo = "Basic " + authInfo;
+                keyValuePairsHeader.Add("Authorization", authInfo);               
+            }
+            thirdPartyAPIRequest.keyValuePairsHeader = keyValuePairsHeader;
+
             return thirdPartyAPIRequest;        
     }
     }

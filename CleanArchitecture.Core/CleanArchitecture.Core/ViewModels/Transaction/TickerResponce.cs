@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,6 +14,9 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public decimal askPrice { get; set; }
         public decimal  askQty { get; set; }
     }
-
+    public class TickerWrapper : BizResponseClass
+    {
+        public List<TickerResponce> TickerResponces { get; set; }
+    }
     
 }
