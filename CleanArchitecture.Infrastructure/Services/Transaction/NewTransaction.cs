@@ -94,10 +94,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     //Select @WalletServiceID=WalletServiceID,@TradeWalletMasterID=WalletMasterID,@TradeServiceID=ServiceID,
                     //@PairName =PairName From TradePairMaster Where PairID=@PairID AND Status=1--Incase of PairID=0
                     
-                    if (TradeWalletMasterID == 0 || TradeWalletMasterID == null)
-                    {
+                    //if (TradeWalletMasterID == 0 || TradeWalletMasterID == null)
+                    //{
 
-                    }
+                    //}
 
 
                 }
