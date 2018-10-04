@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 ﻿using CleanArchitecture.Core.ApiModels;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,3 @@ namespace CleanArchitecture.Core.ViewModels.WalletOpnAdvanced
 
     //}
 }
-=======
-﻿
->>>>>>> a06cc1eb37d23369ce777a085dc2805e9b721c96
