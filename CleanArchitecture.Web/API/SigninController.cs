@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.ForgotPassword;
@@ -32,15 +33,19 @@ namespace CleanArchitecture.Web.API
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly IUserService _userService;
+        private readonly IOtpMasterService _otpMasterService;
         #endregion
 
         #region Ctore
-        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator)
+        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SigninController>();
             _mediator = mediator;
+            _userService = userService;
+            _otpMasterService = otpMasterService;
         }
         #endregion
 
@@ -186,7 +191,8 @@ namespace CleanArchitecture.Web.API
         #region Methods
 
         [HttpPost("login")]
-        [AllowAnonymous]        
+        [AllowAnonymous]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> Login([FromBody]Core.ViewModels.AccountViewModels.LoginViewModel model)
         {
             // This doesn't count login failures towards account lockout
@@ -235,7 +241,7 @@ namespace CleanArchitecture.Web.API
 
                 StandardLoginResponse response = new StandardLoginResponse();
                 response.ReturnCode = enResponseCode.Success;
-                response.ReturnMsg = "Success";              
+                response.ReturnMsg = "Success";
 
                 return AppUtils.StanderdSignIn(user, response);
             }
@@ -272,13 +278,30 @@ namespace CleanArchitecture.Web.API
         [HttpPost("LoginWithEmail")]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithEmail([FromBody]LoginWithEmailViewModel model)
-        {
+        {            
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null)
+            {
+                var otpData = _otpMasterService.AddOtp(user.Id, user.Email,"");
+                if (otpData != null)
+                {
+                    _logger.LogWarning(1, "User Login with Email Send Success.");
 
-
-            LoginWithEmailResponse response = new LoginWithEmailResponse();
-            response.ReturnCode = enResponseCode.Success;
-            response.ReturnMsg = "Success";
-            return Ok(response);
+                    LoginWithEmailResponse response = new LoginWithEmailResponse();
+                    response.ReturnCode = enResponseCode.Success;
+                    response.ReturnMsg = "Success";
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogWarning(2, "User Otp Data Not Send.");
+                    return BadRequest(new ApiError("Invalid login attempt."));
+                }
+            }        
+            else
+            {
+                return BadRequest(new ApiError("Invalid login attempt."));
+            }
         }
         #endregion
 
@@ -292,39 +315,30 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithMobile([FromBody]LoginWithMobileViewModel model)
         {
-            //var result = await _signInManager.PasswordSignInAsync(model.Mobile, model.Password, model.RememberMe, lockoutOnFailure: false);
-            //if (result.Succeeded)
-            //{
-            //    var user = await _userManager.FindByEmailAsync(model.Mobile);
-            //    var roles = await _userManager.GetRolesAsync(user);
-            //    _logger.LogInformation(1, "User logged in.");
+            var userdt = _userService.FindByMobileNumber(model.Mobile);
+            if (userdt.Result != null)
+            {
+                var otpData = _otpMasterService.AddOtp(userdt.Result.Id, "", userdt.Result.Mobile);
+                if (otpData != null)
+                {
+                    //var roles = await _userManager.GetRolesAsync(userdt.Result);
+                    _logger.LogWarning(1, "User Login with Mobile Send Success.");
 
-            //    StandardLoginResponse response = new StandardLoginResponse();
-            //    response.ReturnCode = 200;
-            //    response.ReturnMsg = "Success";
-            //    response.StatusCode = 200;
-            //    response.StatusMessage = "Success";
-
-            //    return AppUtils.StanderdSignIn(user, response);
-            //}
-            //if (result.RequiresTwoFactor)
-            //{
-            //    return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
-            //}
-            //if (result.IsLockedOut)
-            //{
-            //    _logger.LogWarning(2, "User account locked out.");
-            //    return BadRequest(new ApiError("Lockout"));
-            //}
-            //else
-            //{
-            //    return BadRequest(new ApiError("Invalid login attempt."));
-            //}
-
-            LoginWithMobileResponse response = new LoginWithMobileResponse();
-            response.ReturnCode = enResponseCode.Success;
-            response.ReturnMsg = "Success";
-            return Ok(response);
+                    LoginWithMobileResponse response = new LoginWithMobileResponse();
+                    response.ReturnCode = enResponseCode.Success;
+                    response.ReturnMsg = "Success";
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogWarning(2, "User Otp Data Not Send.");
+                    return BadRequest(new ApiError("Invalid login attempt."));
+                }
+            }
+            else
+            {
+                return BadRequest(new ApiError("Invalid login attempt."));
+            }
         }
         #endregion
 

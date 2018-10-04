@@ -22,10 +22,18 @@ namespace CleanArchitecture.Core.Entities.User
         public DateTime CreatedTime { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime ExpirTime { get; set; }
-        
+        public bool EnableStatus { get; set; }
+
         public void SetAsOTPStatus()
         {
-            Status = Convert.ToInt16(ModeStatus.True);
+            EnableStatus = true;
+            Events.Add(new ServiceStatusEvent<TempOtpMaster>(this));
+        }
+
+        public void SetAsUpdateDate(long Id)
+        {
+            UpdatedDate = DateTime.UtcNow;
+            UpdatedBy = Id;
             Events.Add(new ServiceStatusEvent<TempOtpMaster>(this));
         }
     }
