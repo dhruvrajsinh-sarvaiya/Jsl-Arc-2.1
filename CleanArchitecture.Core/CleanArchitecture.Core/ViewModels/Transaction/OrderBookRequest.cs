@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -13,7 +14,11 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 
         public long Count { get; set; }
     }
-    public class OrderBookResponce
+    public class OrderBookResponce : BizResponseClass
+    {
+        public OrderBook OrderBook { get; set; }
+    }
+    public class OrderBook
     {
         public long lastUpdateId { get; set; }
         public List<List<object>> bids { get; set; }
