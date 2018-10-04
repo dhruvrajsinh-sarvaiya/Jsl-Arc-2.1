@@ -314,10 +314,11 @@ namespace CleanArchitecture.Web.Extensions
             // added by birju for TempRegister Table on 02-10-2018
             services.AddScoped<IRegisterTypeService, RegisterTypeService>();
             services.AddScoped<ITempUserRegisterService, TempUserRegisterService>();
-            services.AddScoped<ITempOtpService, TempOtpService>(); 
+            services.AddScoped<ITempOtpService, TempOtpService>();
+            services.AddScoped<IOtpMasterService, OtpMasterService>();
             //services.AddTransient<IMessageSender, MessageService>();
             // added by nirav savariya for Encypted Decrypted on 10-02-2018
-            services.AddScoped<EncyptedDecrypted>();
+            services.AddScoped<EncyptedDecrypted>();            
             return services;
         }
     }
