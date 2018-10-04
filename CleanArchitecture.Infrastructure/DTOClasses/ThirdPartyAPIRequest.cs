@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace CleanArchitecture.Infrastructure.DTOClasses
@@ -9,7 +10,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         
         public string RequestURL { get; set; }
         public string RequestBody { get; set; }
-        public Dictionary<string, string> keyValuePairsHeader { get; set; }
+        public WebHeaderCollection keyValuePairsHeader { get; set; }
 
 
     }

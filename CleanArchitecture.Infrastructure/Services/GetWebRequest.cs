@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using CleanArchitecture.Infrastructure.Interfaces;
+using System.Net;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -29,7 +30,7 @@ namespace CleanArchitecture.Infrastructure.Services
             ProviderConfiguration providerConfiguration;
             ThirdPartyAPIRequest thirdPartyAPIRequest = new ThirdPartyAPIRequest ();
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-            Dictionary<string, string> keyValuePairsHeader = new Dictionary<string, string>();
+            WebHeaderCollection keyValuePairsHeader = new WebHeaderCollection();
 
 
             thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(thirdpartyID);
@@ -50,13 +51,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 thirdPartyAPIRequest.RequestURL = thirdPartyAPIRequest.RequestURL.Replace(item.Key, item.Value);
                 thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item.Key, item.Value);
             }
-
-            if(thirdPartyAPIConfiguration.MethodType == "RPC")
+            if(thirdPartyAPIConfiguration.AuthHeader == "RPC")
             {
                 string authInfo = thirdPartyAPIConfiguration.UserID + ":" + thirdPartyAPIConfiguration.Password;
                 authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
                 authInfo = "Basic " + authInfo;
-                keyValuePairsHeader.Add("Authorization", authInfo);               
+                keyValuePairsHeader.Add("Authorization", authInfo);                
             }
             thirdPartyAPIRequest.keyValuePairsHeader = keyValuePairsHeader;
 
