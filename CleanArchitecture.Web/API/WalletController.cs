@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
@@ -21,11 +23,13 @@ namespace CleanArchitecture.Web.API
     public class WalletController : ControllerBase
     {
         private readonly IBasePage _basePage;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<WalletController> _logger;
-        public WalletController(ILogger<WalletController> logger, IBasePage basePage)
+        public WalletController(ILogger<WalletController> logger, IBasePage basePage, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _basePage = basePage;
+            _userManager = userManager;
         }
         static int i = 1;
         private ActionResult returnDynamicResult(dynamic respObjJson)
@@ -70,6 +74,7 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
+                var user=_userManager.GetUserAsync(HttpContext.User);
                 string requeststring = "{'wallets':[{'id':'585951a5df8380e0e3063e9f','users':[{'user':'55e8a1a5df8380e0e30e20c6','permissions':['admin','view','spend']}],'coin':'tbtc','label':'Alexs first wallet','m':2,'n':3,'keys':['585951a5df8380e0e304a553','585951a5df8380e0e30d645c','585951a5df8380e0e30b6147'],'tags':['585951a5df8380e0e30a198a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'coinSpecific':{}}]}";
                 ListWalletResponse Response = new ListWalletResponse();
                 Response = JsonConvert.DeserializeObject<ListWalletResponse>(requeststring);
