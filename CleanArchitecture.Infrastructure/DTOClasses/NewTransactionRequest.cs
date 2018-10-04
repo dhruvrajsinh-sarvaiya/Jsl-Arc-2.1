@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,7 +12,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         [Required]
         public short TrnMode { get; set; }
         [Required]
-        public short TrnType { get; set; }
+        public enTrnType TrnType { get; set; }
         [Required]
         public long MemberID { get; set; }
         [Required]
@@ -36,5 +37,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 
         [Range(0, 9999999999.99999999)]
         public decimal Qty { get; set; } = 0;
+
+        public string TrnRefNo { get; set; }
+        public string AdditionalInfo { get; set; }
     }
 }
