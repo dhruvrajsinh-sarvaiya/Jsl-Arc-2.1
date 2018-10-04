@@ -18,5 +18,13 @@ namespace CleanArchitecture.Core.ViewModels
         [Required]
         [StringLength(500)]
         public string DeviceID { get; set; }
+
+        [Required]
+        [StringLength(200)]
+        public string TickerText { get; set; }
+
+        [Required]
+        [StringLength(200)]
+        public string ContentTitle { get; set; }
     }
 }

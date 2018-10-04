@@ -10,6 +10,6 @@ namespace CleanArchitecture.Core.Interfaces
         Task<string> SendEmailAsync(string Recepient, string Subject, string BCC,string CC, string Body, string Url, string UserID, string Password,int Port);
         //Task SendEmailViaSendgridAsync(string Email, string Recepient, string Subject, string BCC,string CC, string Body, string Url, string UserID, string Password);
         Task<string> SendSMSAsync(long Mobile, string Message, string Url, string SerderID, string UserID, string Password);
-        Task<string> SendNotificationAsync(string DeviceID, string Message, string Url);
+        Task<string> SendNotificationAsync(string DeviceID, string tickerText, string contentTitle, string Message, string Url, string Request, string APIKey, string MethodType, string ContentType);
     }
 }
