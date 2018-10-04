@@ -21,6 +21,12 @@ namespace CleanArchitecture.Core.Entities
         [StringLength(60)]
         public string ServiceName { get; set; }
 
+        public string ResponseSuccess { get; set; }
+
+        public string ResponseFailure { get; set; }
+
+        public long ParsingDataID { get; set; }
+
         public void DisableService()
         {
             Status = Convert.ToInt16(ServiceStatus.Disable);

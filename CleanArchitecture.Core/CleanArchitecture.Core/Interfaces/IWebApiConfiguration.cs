@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace CleanArchitecture.Core.Interfaces
 
     public interface IWebApiParseResponse<TResponse>
     {        
-        TResponse TransactionParseResponse(string TransactionResponse,long ThirPartyAPIID);       
+        TResponse TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID);       
       
     }
    
