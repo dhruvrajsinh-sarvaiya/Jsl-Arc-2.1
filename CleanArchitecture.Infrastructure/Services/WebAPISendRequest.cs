@@ -19,7 +19,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _log = log;
         }
 
-        public Task<string> SendAPIRequestAsync(string Url, string Request, string ContentType,int Timeout, string MethodType = "POST")
+        public string  SendAPIRequestAsync(string Url, string Request, string ContentType,int Timeout,Dictionary<string,string>  headerDictionary, string MethodType = "POST")
         {
             string responseFromServer = "";
             try
@@ -31,6 +31,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 httpWebRequest.Method = MethodType.ToUpper();
                 httpWebRequest.KeepAlive = false;
                 httpWebRequest.Timeout = Timeout;
+
+                foreach (KeyValuePair<string, string> item in headerDictionary)
+                {
+                    httpWebRequest.Headers[item.Key] = item.Value;
+                }
 
                 _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, Request);              
                
@@ -58,7 +63,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //throw ex;
             }
             
-            return Task.FromResult(responseFromServer);
+            return responseFromServer;
         }
 
         public Task<string> SendRequestAsync(string Url, string Request="", string MethodType = "GET", string ContentType="application/json", WebHeaderCollection Headers = null, int Timeout = 45)

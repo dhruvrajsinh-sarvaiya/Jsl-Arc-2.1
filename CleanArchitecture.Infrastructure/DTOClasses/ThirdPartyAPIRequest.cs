@@ -9,6 +9,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         
         public string RequestURL { get; set; }
         public string RequestBody { get; set; }
-        
+        public Dictionary<string, string> keyValuePairsHeader { get; set; }
+
+
     }
 }

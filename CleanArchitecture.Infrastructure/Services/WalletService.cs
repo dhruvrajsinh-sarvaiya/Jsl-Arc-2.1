@@ -9,6 +9,7 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Infrastructure.DTOClasses;
+using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -269,7 +270,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
 
-        public BizResponse GenerateAddress(long walletID)
+        public  BizResponse GenerateAddress(long walletID)
         {
             try
             {
@@ -302,8 +303,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
                 }
-                thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
-                _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60, thirdPartyAPIConfiguration.MethodType);
+                thirdPartyAPIRequest =_getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
+                string apiResponse =_webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60,thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
                 // code need to be added
                 return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Success, ReturnMsg = "Success." };
             }
