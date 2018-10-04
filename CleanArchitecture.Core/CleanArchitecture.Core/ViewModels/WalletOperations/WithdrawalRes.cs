@@ -5,12 +5,12 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOperations
 {
-    public class WithdrawalRes
+    public class WithdrawalRes : BizResponseClass
     {
-        public class WithdrawalRootObject: BizResponseClass
-        {
             public string txid { get; set; }
             public string status { get; set; }
-        }
     }
+    //public class WithdrawalRootObject
+    //{
+    //}
 }
