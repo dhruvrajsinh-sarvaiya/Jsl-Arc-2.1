@@ -161,9 +161,9 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> Register([FromBody]RegisterViewModel model, string returnUrl = null)
         {
             var result = await _userManager.FindByEmailAsync(model.Email);
-            if (string.IsNullOrEmpty(result.Email))
+            if (string.IsNullOrEmpty(result?.Email))
             {
-                bool IsSignEmail =await _tempUserRegisterService.GetEmail(model.Email);
+                bool IsSignEmail = await _tempUserRegisterService.GetEmail(model.Email);
                 if (IsSignEmail)
                 {
                     byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
@@ -190,7 +190,7 @@ namespace CleanArchitecture.Web.API
                         linkToken.Mobile = model.Mobile;
                         linkToken.CurrentTime = DateTime.UtcNow;
                         linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        linkToken.Password = tempcurrentUser.PasswordHash;
+                        //linkToken.Password = tempcurrentUser.PasswordHash;
 
                         string UserDetails = JsonConvert.SerializeObject(linkToken);
                         string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
@@ -235,19 +235,19 @@ namespace CleanArchitecture.Web.API
 
         #endregion
 
-        #region DirectSignUpWithEmail
+        #region SignUpWithEmail
 
         /// <summary>
         ///  This method are Direct signUp with email using verified link
         /// </summary>        
-        [HttpPost("DirectSignUpWithEmail")]
+        [HttpPost("SignUpWithEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> DirectSignUpWithEmail([FromBody]SignUpWithEmailViewModel model)
+        public async Task<IActionResult> SignUpWithEmail([FromBody]SignUpWithEmailViewModel model)
         {
             var result = await _userManager.FindByEmailAsync(model.Email);
             if (string.IsNullOrEmpty(result?.Email))
             {
-                bool IsTempSignEmail =await _tempUserRegisterService.GetEmail(model.Email);
+                bool IsTempSignEmail = await _tempUserRegisterService.GetEmail(model.Email);
                 if (IsTempSignEmail)
                 {
                     byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
@@ -255,37 +255,17 @@ namespace CleanArchitecture.Web.API
                     {
                         UserName = model.Email,
                         Email = model.Email,
-                        PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes),
                         RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Email)
                     };
 
                     var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
                     if (resultdata != null)
                     {
-                        LinkTokenViewModel linkToken = new LinkTokenViewModel();
-
-                        linkToken.Id = resultdata.Id;
-                        linkToken.Username = model.Email;
-                        linkToken.Email = model.Email;
-                        linkToken.CurrentTime = DateTime.UtcNow;
-                        linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        linkToken.Password = tempcurrentUser.PasswordHash;
-
-                        string UserDetails = JsonConvert.SerializeObject(linkToken);
-                        string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
-
-                        string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
-                        {
-                            emailConfirmCode = SubScriptionKey
-                        }, protocol: HttpContext.Request.Scheme);
-
-                        var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
-                        _logger.LogInformation(3, "User created a new account with password.");
-
+                        var resultotp = await _tempOtpService.GetTempData(Convert.ToInt32(resultdata.Id));
                         SendEmailRequest request = new SendEmailRequest();
                         request.Recepient = model.Email;
                         request.Subject = "Registration confirmation email";
-                        request.Body = confirmationLink;
+                        request.Body = "use this code:"+resultotp.OTP+"";
 
                         CommunicationResponse CommResponse = await _mediator.Send(request);
 
@@ -293,8 +273,7 @@ namespace CleanArchitecture.Web.API
 
                         SignUpWithEmailResponse response = new SignUpWithEmailResponse();
                         response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
-
+                        response.ReturnMsg = "Please verify it by clicking the otp that has been send to your email.";
                         return Ok(response);
                     }
                 }
@@ -315,20 +294,19 @@ namespace CleanArchitecture.Web.API
 
         #endregion
 
-        #region DirectSignUpWithMobile
+        #region SignUpWithMobile
 
         /// <summary>
         ///  This method are Direct signUp with mobile sms using verified opt.
         /// </summary>        
-        [HttpPost("DirectSignUpWithMobile")]
+        [HttpPost("SignUpWithMobile")]
         [AllowAnonymous]
-        public async Task<IActionResult> DirectSignUpWithMobile([FromBody]SignUpWithMobileViewModel model)
+        public async Task<IActionResult> SignUpWithMobile([FromBody]SignUpWithMobileViewModel model)
         {
-            SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+            
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
             string countryCode = "IN";
             PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
-
 
             bool isValidNumber = phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
 
@@ -339,8 +317,8 @@ namespace CleanArchitecture.Web.API
                 {
                     UserName = model.Mobile,
                     Mobile = model.Mobile,
-                    RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Mobile),
-                    PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes)
+                    RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Mobile),
+                    //PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes)
                 };
 
                 bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
@@ -352,6 +330,14 @@ namespace CleanArchitecture.Web.API
                         var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
                         if (result != null)
                         {
+                            var tempotp =await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
+
+                            SendSMSRequest request = new SendSMSRequest();
+                            request.MobileNo = Convert.ToInt64(model.Mobile);
+                            request.Message = "SMS for use this code " + tempotp.OTP + "";
+                            CommunicationResponse CommResponse = await _mediator.Send(request);
+
+                            SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
                             response.ReturnCode = enResponseCode.Success;
                             response.ReturnMsg = "Success";
                             return Ok(response);
@@ -398,10 +384,11 @@ namespace CleanArchitecture.Web.API
 
         /// <summary>
         ///  This method are Direct signUp with mobile sms using verified opt.
-        /// </summary>        
-        [HttpPost("DirectSignUpOtpVerification")]
+        /// </summary> 
+        
+        [HttpPost("MobileOtpVerification")]
         [AllowAnonymous]
-        public async Task<IActionResult> DirectSignUpOtpVerification([FromBody]OTPViewModel model)
+        public async Task<IActionResult> MobileOtpVerification([FromBody]OTPWithMobileViewModel model)
         {
             if (!string.IsNullOrEmpty(model?.MobileNo))
             {
@@ -420,7 +407,7 @@ namespace CleanArchitecture.Web.API
                             }
                             else if (model.OTP == tempotp.OTP)
                             {
-                                if (!tempdata.RegisterStatus)
+                                if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
                                 {
                                     byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
                                     var currentUser = new ApplicationUser
@@ -443,6 +430,7 @@ namespace CleanArchitecture.Web.API
                                         {
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
+                                            var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
                                             return Ok("Your account has been activated, you can now login.");
                                             //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
                                         }
@@ -488,16 +476,265 @@ namespace CleanArchitecture.Web.API
         }
 
         /// <summary>
-        ///  This method are Auto generate resend otp
-        /// </summary>        
-        [HttpPost("ReSendOtp")]
+        ///  This method are Direct signUp with email otp using verified.
+        /// </summary>
+        
+        [HttpPost("EmailOtpVerification")]
         [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtp()
+        public async Task<IActionResult> EmailOtpVerification([FromBody]OTPWithEmailViewModel model)
         {
-            SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-            response.ReturnCode = enResponseCode.Success;
-            response.ReturnMsg = "Success";
-            return Ok(response);
+            if (!string.IsNullOrEmpty(model?.Email))
+            {
+                var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
+                if (tempdata?.Id > 0)
+                {
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                    if (tempotp != null)
+                    {
+                        if (tempotp?.ExpirTime >= DateTime.UtcNow)
+                        {
+                            if (tempdata.Id == 0 && tempotp.Id == 0)
+                            {
+                                ModelState.AddModelError(string.Empty, "Error.");
+                                return BadRequest(new ApiError(ModelState));
+                            }
+                            else if (model.OTP == tempotp.OTP)
+                            {
+                                if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
+                                {
+                                    byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+                                    var currentUser = new ApplicationUser
+                                    {
+                                        UserName = tempdata.Email,
+                                        Email = tempdata.Email,
+                                        //PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
+                                    };
+                                    var result = await _userManager.CreateAsync(currentUser);
+                                    if (result.Succeeded)
+                                    {
+                                        if (currentUser.Mobile != null)
+                                        {
+                                            var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
+                                            await _userManager.AddClaimAsync(currentUser, officeClaim);
+                                        }
+                                        // Add to roles
+                                        var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                                        if (roleAddResult.Succeeded)
+                                        {
+                                            _tempUserRegisterService.Update(tempdata.Id);
+                                            _tempOtpService.Update(tempotp.Id);
+                                            var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
+                                            return Ok("Your account has been activated, you can now login.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                                        return BadRequest(new ApiError(ModelState));
+                                    }
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError(string.Empty, "This user is already registered.");
+                                    return BadRequest(new ApiError(ModelState));
+                                }
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
+                                return BadRequest(new ApiError(ModelState));
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                            return BadRequest(new ApiError(ModelState));
+                        }
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Error.");
+                    return BadRequest(new ApiError(ModelState));
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Error.");
+                return BadRequest(new ApiError(ModelState));
+            }
+            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+            return BadRequest(new ApiError(ModelState));
+        }
+
+        /// <summary>
+        ///  This method are Auto generate resend otp in Mobile
+        /// </summary>   
+        
+        [HttpPost("ReSendOtpWithMobile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtpWithMobile([FromBody]SignUpWithMobileViewModel model)
+        {
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
+            string countryCode = "IN";
+            PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
+            bool isValidNumber = phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
+            if (isValidNumber)
+            {
+                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                if (IsSignMobile)
+                {
+                    var tempdata = await _tempUserRegisterService.GetMobileNo(model.Mobile);
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                    if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)
+                    {
+                        _tempOtpService.Update(tempotp.Id);
+                        var result = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Mobile));
+
+                        SendSMSRequest request = new SendSMSRequest();
+                        request.MobileNo = Convert.ToInt64(model.Mobile);
+                        request.Message = "SMS for use this code " + result.OTP + "";
+                        CommunicationResponse CommResponse = await _mediator.Send(request);
+
+                        //return Ok("SMS sent successfully.");
+                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                        response.ReturnCode = enResponseCode.Success;
+                        response.ReturnMsg = "Success";
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        SendSMSRequest request = new SendSMSRequest();
+                        request.MobileNo = Convert.ToInt64(model.Mobile);
+                        request.Message = "SMS for use this code " + tempotp.OTP + "";
+                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        return Ok("SMS sent successfully.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                    return BadRequest(new ApiError(ModelState));
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "This mobile number is not valid.");
+                return BadRequest(new ApiError(ModelState));
+            }
+            //return BadRequest(new ApiError(ModelState));
+        }
+
+        /// <summary>
+        ///  This method are Auto generate resend otp in Email
+        /// </summary>  
+        
+        [HttpPost("ReSendOtpWithEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtpWithEmail([FromBody]SignUpWithEmailViewModel model)
+        {
+            var result = await _userManager.FindByEmailAsync(model.Email);
+            if (string.IsNullOrEmpty(result?.Email))
+            {
+                var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
+                var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)
+                {
+                    _tempOtpService.Update(tempotp.Id);
+                    var resultdata = _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Mobile));
+                    SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                    response.ReturnCode = enResponseCode.Success;
+                    response.ReturnMsg = "Success";
+                    return Ok(response);
+                }
+                else
+                {
+                    SendEmailRequest request = new SendEmailRequest();
+                    request.Recepient = model.Email;
+                    request.Subject = "Registration confirmation resend email";
+                    request.Body = "use this code:" + tempotp.OTP + "";
+
+                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    _logger.LogInformation(3, "Email sent successfully with your account");
+
+                    RegisterResponse response = new RegisterResponse();
+                    response.ReturnCode = enResponseCode.Success;
+                    response.ReturnMsg = "Please verify it by clicking the otp that has been resend to your email.";
+                    return Ok(response);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                return BadRequest(new ApiError(ModelState));
+            }
+        }
+
+        /// <summary>
+        ///  This method are resend Email Link to direct call this method
+        /// </summary>
+        
+        [HttpPost("ReSendRegisterlink")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendRegisterlink([FromBody]SignUpWithEmailViewModel model)
+        {
+            try
+            {
+                var result = await _userManager.FindByEmailAsync(model.Email);
+                if (string.IsNullOrEmpty(result?.Email))
+                {
+                    var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
+                    if (!tempdata.RegisterStatus)
+                    {
+                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+
+                        LinkTokenViewModel linkToken = new LinkTokenViewModel();
+                        linkToken.Id = tempdata.Id;
+                        linkToken.Username = model.Email;
+                        linkToken.Email = model.Email;
+                        linkToken.CurrentTime = DateTime.UtcNow;
+                        linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
+                        linkToken.Password = tempdata.PasswordHash;
+
+                        string UserDetails = JsonConvert.SerializeObject(linkToken);
+                        string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
+                        string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
+                        {
+                            emailConfirmCode = SubScriptionKey
+                        }, protocol: HttpContext.Request.Scheme);
+
+                        var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
+
+                        SendEmailRequest request = new SendEmailRequest();
+                        request.Recepient = model.Email;
+                        request.Subject = "Registration confirmation resend email";
+                        request.Body = confirmationLink;
+
+                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        _logger.LogInformation(3, "Email sent successfully with your account");
+
+                        RegisterResponse response = new RegisterResponse();
+                        response.ReturnCode = enResponseCode.Success;
+                        response.ReturnMsg = "Please verify it by clicking the activation link that has been resend to your email.";
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "This email is already registered.");
+                        return BadRequest(new ApiError(ModelState));
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                    return BadRequest(new ApiError(ModelState));
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+                //return await Task.FromResult(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = "Message not sent." });
+            }
         }
 
         #endregion

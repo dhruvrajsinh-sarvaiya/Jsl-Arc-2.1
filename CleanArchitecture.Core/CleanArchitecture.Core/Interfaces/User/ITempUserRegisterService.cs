@@ -12,5 +12,6 @@ namespace CleanArchitecture.Core.Interfaces.User
         void Update(long Id);
         Task<bool> GetEmail(string Email);
         Task<TempUserRegisterViewModel> GetMobileNo(string MobileNo);
+        Task<TempUserRegisterViewModel> GetEmailDet(string Email);
     }
 }
