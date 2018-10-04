@@ -1,10 +1,16 @@
-﻿using System;
+﻿using CleanArchitecture.Core.ApiModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Transaction
 {
-    public class GetOrderHistoryResponse
+    public class GetOrderHistoryResponse : BizResponseClass
+    {
+        public List<GetOrderHistoryInfo> response { get; set; }
+    }
+
+    public class GetOrderHistoryInfo
     {
         public long order_id { get; set; }
         public string pair_name { get; set; }

@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
+using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,7 +18,46 @@ namespace CleanArchitecture.Web.API
     [Route("api/[controller]")]
     public class TransactionController : Controller
     {
+        private readonly IBasePage _basePage;
+        private readonly ILogger<TransactionController> _logger;
         string dummyResponce = "";
+        static int i = 1;
+
+        public TransactionController(ILogger<TransactionController> logger, IBasePage basePage)
+        {
+            _logger = logger;
+            _basePage = basePage;
+        }
+
+        private ActionResult returnDynamicResult(dynamic respObjJson)
+        {
+            i++;
+            if (i % 2 == 0)
+            {
+                return Ok(respObjJson);
+            }
+            else if (i % 3 == 0)
+            {
+                return BadRequest();
+            }
+            else if (i % 5 == 0)
+            {
+                return Unauthorized();
+            }
+            else if (i % 7 == 0)
+            {
+                return NotFound();
+            }
+            else if (i % 9 == 0)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return Ok(respObjJson);
+            }
+
+        }
 
         #region "Komal Methods"
 
@@ -205,21 +247,31 @@ namespace CleanArchitecture.Web.API
         [HttpPost("GetAssetInformation")]
         public ActionResult GetAssetInformation([FromBody]GetAssetInfoRequest Request)
         {
-            //For Testing Purpose
-            string dummyreposne = "[{'asset_name':'BCH',asset_detail :{'altname':'BCH','aclass':'currency','decimals':10,'display_decimals':5}},{'asset_name':'BCH',asset_detail :{'altname':'BCH','aclass':'currency','decimals':10,'display_decimals':5}}]";
+            try
+            {
+                //For Testing Purpose
+                string dummyreposne = "{response : [{'asset_name':'BCH',asset_detail :{'altname':'BCH','aclass':'currency','decimals':10,'display_decimals':5}},{'asset_name':'BCH',asset_detail :{'altname':'BCH','aclass':'currency','decimals':10,'display_decimals':5}}]}";
 
-            var Response = JsonConvert.DeserializeObject<List<GetAssetInfoResponse>>(dummyreposne);
-            return Ok(Response);
+                var Response = JsonConvert.DeserializeObject<GetAssetInfoResponse>(dummyreposne);
+                Response.ReturnCode = enResponseCode.Success;
+                return returnDynamicResult(Response);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
         }
 
         [HttpPost("GetMarketSummary")]
         public ActionResult GetMarketSummary([FromBody]GetMarketSummaryRequest Request)
         {
             //For Testing Purpose
-            string dummyreposne = "[{'pair_name':'BCHEUR',pair_detail :{'high':0.00892105,'low':0.00859275,'volume':24045.37035813,'last_price':0.00861713,'bid':0.00861618,'ask':0.00861713,'open_buy_order':37,'open_sell_order':2080,prev_day:0.00880495}},{'pair_name':'BCHEUR',pair_detail :{'high':0.00892105,'low':0.00859275,'volume':24045.37035813,'last_price':0.00861713,'bid':0.00861618,'ask':0.00861713,'open_buy_order':37,'open_sell_order':2080,prev_day:0.00880495}}]";
+            string dummyreposne = "{response : [{'pair_name':'BCHEUR',pair_detail :{'high':0.00892105,'low':0.00859275,'volume':24045.37035813,'last_price':0.00861713,'bid':0.00861618,'ask':0.00861713,'open_buy_order':37,'open_sell_order':2080,prev_day:0.00880495}},{'pair_name':'BCHEUR',pair_detail :{'high':0.00892105,'low':0.00859275,'volume':24045.37035813,'last_price':0.00861713,'bid':0.00861618,'ask':0.00861713,'open_buy_order':37,'open_sell_order':2080,prev_day:0.00880495}}]}";
 
-            var Response = JsonConvert.DeserializeObject<List<GetMarketSummaryResponse>>(dummyreposne);
-            return Ok(Response);
+            var Response = JsonConvert.DeserializeObject<GetMarketSummaryResponse>(dummyreposne);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("GetRecentTrades")]
@@ -229,7 +281,8 @@ namespace CleanArchitecture.Web.API
             string dummyreposne = "{'pair_name':'ltcusd','recent_trades':[{'timestamp':1538399543,'tid':300697552,'price':'60.94','amount':'7.06677169','exchange':'bitfinex','type':'sell'},{'timestamp':1538399543,'tid':300697551,'price':'60.94','amount':'0.53322831','exchange':'bitfinex','type':'sell'},{'timestamp':1538399540,'tid':300697546,'price':'60.94','amount':'0.6','exchange':'bitfinex','type':'sell'},{'timestamp':1538399538,'tid':300697542,'price':'60.94','amount':'1.0','exchange':'bitfinex','type':'sell'},{'timestamp':1538399524,'tid':300697512,'price':'60.98','amount':'2.13174163','exchange':'bitfinex','type':'sell'},{'timestamp':1538399506,'tid':300697486,'price':'60.963','amount':'0.83','exchange':'bitfinex','type':'sell'}]}";
 
             var Response = JsonConvert.DeserializeObject<GetRecentTradesResponse>(dummyreposne);
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("CreateOrder")]
@@ -237,7 +290,8 @@ namespace CleanArchitecture.Web.API
         {
             //Do Process for CreateOrder
             //For Testing Purpose
-            CreateOrderResponse Response = new CreateOrderResponse()
+            CreateOrderResponse Response = new CreateOrderResponse();
+            Response.response = new CreateOrderInfo()
             {
                 order_id = 1000001,
                 pair_name = "ltcusd",
@@ -247,7 +301,8 @@ namespace CleanArchitecture.Web.API
                 volume = 10
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("CreateMultipleOrder")]
@@ -255,14 +310,16 @@ namespace CleanArchitecture.Web.API
         {
             //Do Process for CreateMultipleOrder
             //For Testing Purpose
-            List<CreateOrderResponse> Response = new List<CreateOrderResponse>()
+            CreateMultipleOrderResponse Response = new CreateMultipleOrderResponse();
+            Response.response = new List<CreateOrderInfo>()
             {
-               new CreateOrderResponse(){ order_id = 1000001,pair_name = "ltcusd",price = 10,side = "buy",type = "stop-loss",volume = 10},
-               new CreateOrderResponse(){ order_id = 1000001,pair_name = "BCHEUR",price = 20,side = "sell",type = "take-profit",volume = 5},
-               new CreateOrderResponse(){ order_id = 1000001,pair_name = "ltcusd",price = 20.25M,side = "buy",type = "stop-loss-profit",volume = 100},
+               new CreateOrderInfo(){ order_id = 1000001,pair_name = "ltcusd",price = 10,side = "buy",type = "stop-loss",volume = 10},
+               new CreateOrderInfo(){ order_id = 1000001,pair_name = "BCHEUR",price = 20,side = "sell",type = "take-profit",volume = 5},
+               new CreateOrderInfo(){ order_id = 1000001,pair_name = "ltcusd",price = 20.25M,side = "buy",type = "stop-loss-profit",volume = 100},
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("CancelOrder")]
@@ -270,87 +327,100 @@ namespace CleanArchitecture.Web.API
         {
             //Do Process for CreateOrder
             //For Testing Purpose
-            CancelOrderResponse Response = new CancelOrderResponse()
+            CancelOrderResponse Response = new CancelOrderResponse();
+            Response.response = new CancelOrderInfo()
             {
                 order_id = 100001,
                 message = "Order Cancelled"
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("CancelMultipleOrder")]
         public ActionResult CancelMultipleOrder([FromBody]List<CancelOrderRequest> Request)
         {
             //For Testing Purpose
-            List<CancelOrderResponse> Response = new List<CancelOrderResponse>()
+            CancelMultipleOrderResponse Response = new CancelMultipleOrderResponse();
+            Response.response = new List<CancelOrderInfo>()
             {
-                new CancelOrderResponse(){order_id = 100001,message = "Order Cancelled"},
-                new CancelOrderResponse(){order_id = 100002,message = "Order Cancelled"},
-                new CancelOrderResponse(){order_id = 100003,message = "Order Cancelled"},
+                new CancelOrderInfo(){order_id = 100001,message = "Order Cancelled"},
+                new CancelOrderInfo(){order_id = 100002,message = "Order Cancelled"},
+                new CancelOrderInfo(){order_id = 100003,message = "Order Cancelled"},
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("GetOpenOrders")]
         public ActionResult GetOpenOrders()
         {
             //For Testing Purpose
-            List<GetOpenOrderResponse> Response = new List<GetOpenOrderResponse>()
+            GetOpenOrderResponse Response = new GetOpenOrderResponse();
+            Response.response = new List<GetOpenOrderInfo>()
             {
-               new GetOpenOrderResponse() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
-               new GetOpenOrderResponse() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
+               new GetOpenOrderInfo() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
+               new GetOpenOrderInfo() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("GetActiveOrder")]
         public ActionResult GetActiveOrder()
         {
             //For Testing Purpose
-            List<GetActiveOrderResponse> Response = new List<GetActiveOrderResponse>()
+            GetActiveOrderResponse Response = new GetActiveOrderResponse();
+            Response.response = new List<GetActiveOrderInfo>()
             {
-               new GetActiveOrderResponse() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
-               new GetActiveOrderResponse() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
+               new GetActiveOrderInfo() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
+               new GetActiveOrderInfo() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("GetOrderHistory")]
         public ActionResult GetOrderHistory()
         {
             //For Testing Purpose
-            List<GetOrderHistoryResponse> Response = new List<GetOrderHistoryResponse>()
+            GetOrderHistoryResponse Response = new GetOrderHistoryResponse();
+            Response.response = new List<GetOrderHistoryInfo>()
             {
-               new GetOrderHistoryResponse() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10,is_live=true},
-               new GetOrderHistoryResponse() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10,is_live=false},
+               new GetOrderHistoryInfo() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10,is_live=true},
+               new GetOrderHistoryInfo() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10,is_live=false},
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("GetTradeHistory")]
         public ActionResult GetTradeHistory()
         {
             //For Testing Purpose
-            List<GetTradeHistoryResponse> Response = new List<GetTradeHistoryResponse>()
+            GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
+            Response.response = new List<GetTradeHistoryInfo>()
             {
-               new GetTradeHistoryResponse() {order_id=446913929,tid=11970839,type="buy",price=246.94M,amount=1.0M,fee_currency="USD",fee_amount=-0.49388M,timestamp=1444141857 },
-               new GetTradeHistoryResponse() {order_id=446913930,tid=11970839,type="sell",price=250.94M,amount=1.5M,fee_currency="USD",fee_amount=-0.49388M,timestamp=1444141858 },
-               new GetTradeHistoryResponse() {order_id=446913931,tid=11970839,type="buy",price=251.94M,amount=2.1M,fee_currency="USD",fee_amount=-0.49389M,timestamp=1444141859 },
+               new GetTradeHistoryInfo() {order_id=446913929,tid=11970839,type="buy",price=246.94M,amount=1.0M,fee_currency="USD",fee_amount=-0.49388M,timestamp=1444141857 },
+               new GetTradeHistoryInfo() {order_id=446913930,tid=11970839,type="sell",price=250.94M,amount=1.5M,fee_currency="USD",fee_amount=-0.49388M,timestamp=1444141858 },
+               new GetTradeHistoryInfo() {order_id=446913931,tid=11970839,type="buy",price=251.94M,amount=2.1M,fee_currency="USD",fee_amount=-0.49389M,timestamp=1444141859 },
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("CreateMargingTredingOffer")]
         public ActionResult CreateMargingTredingOffer([FromBody]CreateMarginTradingRequest Request)
         {
             //For Testing Purpose
-            CreateMarginTradingResponse Response = new CreateMarginTradingResponse()
+            CreateMarginTradingResponse Response = new CreateMarginTradingResponse();
+            Response.response = new CreateMarginTradingInfo()
             {
                 offer_id = 13800585,
                 currency = "USD",
@@ -365,15 +435,16 @@ namespace CleanArchitecture.Web.API
                 remaining_amount = 50.0M
             };
 
-            return Ok(Response);
-
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("GetMargingTradingOfferStatus")]
         public ActionResult GetMargingTradingOfferStatus([FromBody]MargingTradingOfferStatusRequest Request)
         {
             //For Testing Purpose
-            MargingTradingOfferStatusResponse Response = new MargingTradingOfferStatusResponse()
+            MargingTradingOfferStatusResponse Response = new MargingTradingOfferStatusResponse();
+            Response.response = new MargingTradingOfferStatusInfo()
             {
                 offer_id = 13800585,
                 currency = "USD",
@@ -388,44 +459,53 @@ namespace CleanArchitecture.Web.API
                 remaining_amount = 50.0M
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("GetMarginFundingTotalTakenFunds")]
         public ActionResult GetMarginFundingTotalTakenFunds()
         {
             //For Testing Purpose
-            List<GetMarginFundingTotalTakenFundsResponse> Response = new List<GetMarginFundingTotalTakenFundsResponse>()
+            GetMarginFundingTotalTakenFundsResponse Response = new GetMarginFundingTotalTakenFundsResponse();
+            Response.resposne = new List<GetMarginFundingTotalTakenFundsInfo>()
             {
-                new GetMarginFundingTotalTakenFundsResponse() {position_pair="BTCUSD",total_swaps=34.24603414M},
-                new GetMarginFundingTotalTakenFundsResponse() {position_pair="BCHUSD",total_swaps=30.24603414M}
+                new GetMarginFundingTotalTakenFundsInfo() {position_pair="BTCUSD",total_swaps=34.24603414M},
+                new GetMarginFundingTotalTakenFundsInfo() {position_pair="BCHUSD",total_swaps=30.24603414M}
             };
-            return Ok(Response);
+
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("MarginTradingBasketManage")]
         public ActionResult MarginTradingBasketManage([FromBody]MarginTradingBasketManageRequest Request)
         {
             //For Testing Purpose
-            MarginTradingBasketManageResponse Response = new MarginTradingBasketManageResponse()
+            MarginTradingBasketManageResponse Response = new MarginTradingBasketManageResponse();
+            Response.response = new MarginTradingBasketManageInfo()
             {
                 message = "Basket btc_btu success"
             };
-            return Ok(Response);
+
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("MarginTradingClosePosition")]
         public ActionResult MarginTradingClosePosition([FromBody]MarginTradingClosePositionRequest Request)
         {
             //For Testing Purpose
-            MarginTradingClosePositionResponse Response = new MarginTradingClosePositionResponse()
+            MarginTradingClosePositionResponse Response = new MarginTradingClosePositionResponse();
+            Response.response = new MarginTradingClosePositionInfo()
             {
                 message = "test",
                 order = new MarginTradingOrder(),
                 position = new MarginTradingPosition()
             };
 
-            return Ok(Response);
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
         #endregion
 
