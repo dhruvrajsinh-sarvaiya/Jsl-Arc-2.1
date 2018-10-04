@@ -156,9 +156,9 @@ namespace CleanArchitecture.Web.Extensions
                        .AllowRefreshTokenFlow()
                        .AllowImplicitFlow(); // To enable external logins to authenticate
 
-                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(5));
-                options.SetIdentityTokenLifetime(TimeSpan.FromMinutes(5));
-                options.SetRefreshTokenLifetime(TimeSpan.FromMinutes(1));
+                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(15));
+                options.SetIdentityTokenLifetime(TimeSpan.FromMinutes(15));
+                options.SetRefreshTokenLifetime(TimeSpan.FromMinutes(60));
                 // During development, you can disable the HTTPS requirement.
                 if (env.IsDevelopment())
                 {

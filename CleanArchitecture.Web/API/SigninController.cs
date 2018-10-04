@@ -234,10 +234,8 @@ namespace CleanArchitecture.Web.API
                 _logger.LogInformation(1, "User logged in.");
 
                 StandardLoginResponse response = new StandardLoginResponse();
-                response.ReturnCode = 200;
-                response.ReturnMsg = "Success";
-                response.StatusCode = 200;
-                response.StatusMessage = "Success";
+                response.ReturnCode = enResponseCode.Success;
+                response.ReturnMsg = "Success";              
 
                 return AppUtils.StanderdSignIn(user, response);
             }
