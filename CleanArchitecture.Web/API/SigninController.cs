@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
@@ -277,10 +278,8 @@ namespace CleanArchitecture.Web.API
 
 
             LoginWithEmailResponse response = new LoginWithEmailResponse();
-            response.ReturnCode = 200;
+            response.ReturnCode = enResponseCode.Success;
             response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Success";
             return Ok(response);
         }
         #endregion
@@ -325,10 +324,8 @@ namespace CleanArchitecture.Web.API
             //}
 
             LoginWithMobileResponse response = new LoginWithMobileResponse();
-            response.ReturnCode = 200;
+            response.ReturnCode = enResponseCode.Success;
             response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Success";
             return Ok(response);
         }
         #endregion
@@ -370,10 +367,8 @@ namespace CleanArchitecture.Web.API
         {
 
             ForgotPasswordResponse response = new ForgotPasswordResponse();
-            response.ReturnCode = 200;
+            response.ReturnCode = enResponseCode.Success;
             response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Success";
             return Ok(response);
 
             /*

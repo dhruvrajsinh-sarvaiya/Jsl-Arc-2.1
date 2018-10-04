@@ -25,6 +25,9 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public bool IsValid { get; set; }
+
+        [Required]
+        public string CoinName { get; set; }
                
         public void CreditBalance(decimal amount)
         {

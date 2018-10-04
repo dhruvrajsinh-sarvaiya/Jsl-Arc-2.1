@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using CleanArchitecture.Core.Enums.Modes;
+using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities.User
@@ -13,7 +15,7 @@ namespace CleanArchitecture.Core.Entities.User
         [StringLength(100)]
         public string UserName { get; set; }
         [EmailAddress]
-        public string Email { get; set; }        
+        public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string SecurityStemp { get; set; }
         public string ConcurrencyStamp { get; set; }
@@ -32,8 +34,12 @@ namespace CleanArchitecture.Core.Entities.User
         //public DateTime UpdatedDate { get; set; }
         //public string UpdateBy { get; set; }
 
-        public RegisterType RegisterType { get; set; }
+        //public RegisterType RegisterType { get; set; }
 
-
+        public void SetAsStatus()
+        {
+            RegisterStatus = Convert.ToBoolean(ModeStatus.True);
+            Events.Add(new ServiceStatusEvent<TempUserRegister>(this));
+        }
     }
 }

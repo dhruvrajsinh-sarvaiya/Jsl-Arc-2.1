@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Primitives;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.Services;
@@ -38,12 +39,12 @@ namespace CleanArchitecture.Web.API
         private readonly EncyptedDecrypted _encdecAEC;
         private readonly string _AESSalt = "rz8LuOtFBXphj9WQfvFh";
         private readonly ITempUserRegisterService _tempUserRegisterService;
-
-
+        private readonly IRegisterTypeService _registerTypeService;
+        private readonly ITempOtpService _tempOtpService;
         #endregion
 
         #region Ctore
-        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService,IMediator mediator,EncyptedDecrypted encdecAEC)
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
@@ -51,6 +52,8 @@ namespace CleanArchitecture.Web.API
             _tempUserRegisterService = tempUserRegisterService;
             _mediator = mediator;
             _encdecAEC = encdecAEC;
+            _registerTypeService = registerTypeService;
+            _tempOtpService = tempOtpService;
         }
         #endregion
 
@@ -69,7 +72,6 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string emailConfirmCode)
         {
-
             if (!string.IsNullOrEmpty(emailConfirmCode))
             {
                 byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
@@ -79,25 +81,54 @@ namespace CleanArchitecture.Web.API
                 LinkTokenViewModel dmodel = JsonConvert.DeserializeObject<LinkTokenViewModel>(DecryptToken);
                 if (dmodel?.Expirytime >= DateTime.UtcNow)
                 {
-                    if (string.IsNullOrEmpty(dmodel?.Id))
+                    if (dmodel.Id == 0)
                     {
-                        //return View("Error");
                         ModelState.AddModelError(string.Empty, "Error.");
                         return BadRequest(new ApiError(ModelState));
                     }
-                    var user = await _userManager.FindByIdAsync(dmodel.Id);
+                    var user = await _tempUserRegisterService.FindById(dmodel.Id);
                     if (user == null)
                     {
-                        //return View("Error");
                         ModelState.AddModelError(string.Empty, "Error");
                         return BadRequest(new ApiError(ModelState));
                     }
-                    else if (!user.EmailConfirmed)
+                    else if (!user.RegisterStatus)
                     {
-                        user.EmailConfirmed = true;
-                        var result = await _userManager.UpdateAsync(user); 
-                        //var result = await _userManager.ConfirmEmailAsync(user, emailConfirmCode);
-                        return View(result.Succeeded ? "ConfirmEmail" : "Error");
+                        var currentUser = new ApplicationUser
+                        {
+                            UserName = user.UserName,
+                            Email = user.Email,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Mobile = user.Mobile,
+                            PasswordHash = EncyptedDecrypted.Decrypt(user.PasswordHash, DecpasswordBytes)
+                        };
+
+                        var result = await _userManager.CreateAsync(currentUser, currentUser.PasswordHash);
+                        if (result.Succeeded)
+                        {
+                            if (currentUser.Mobile != null)
+                            {
+                                var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
+                                await _userManager.AddClaimAsync(currentUser, officeClaim);
+                            }
+                            // Add to roles
+                            var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                            if (roleAddResult.Succeeded)
+                            {
+                                currentUser.EmailConfirmed = true;
+                                var resultupdate = await _userManager.UpdateAsync(currentUser);
+                                _tempUserRegisterService.Update(user.Id);
+                                return Ok("Your account has been activated, you can now login.");
+                                //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "This email is already registered.");
+                            return BadRequest(new ApiError(ModelState));
+                        }
+                        // return View(result.Succeeded ? "ConfirmEmail" : "Error");
                     }
                     else
                     {
@@ -116,6 +147,8 @@ namespace CleanArchitecture.Web.API
                 ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
                 return BadRequest(new ApiError(ModelState));
             }
+            ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
+            return BadRequest(new ApiError(ModelState));
         }
         #endregion
 
@@ -127,86 +160,76 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody]RegisterViewModel model, string returnUrl = null)
         {
-            var currentUser = new ApplicationUser
+            var result = await _userManager.FindByEmailAsync(model.Email);
+            if (string.IsNullOrEmpty(result.Email))
             {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.Firstname,
-                LastName = model.Lastname,
-                Mobile = model.Mobile
-            };
-
-            var result = await _userManager.CreateAsync(currentUser, model.Password);
-            if (result.Succeeded)
-            {
-
-                //// ASP.NET Identity does not remember claim value types. So, if it was important that the office claim be an integer(rather than a string)
-                var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
-
-                await _userManager.AddClaimAsync(currentUser, officeClaim);
-
-                // Add to roles
-                var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-                if (roleAddResult.Succeeded)
+                bool IsSignEmail =await _tempUserRegisterService.GetEmail(model.Email);
+                if (IsSignEmail)
                 {
-                    LinkTokenViewModel linkToken = new LinkTokenViewModel();
-
-                    linkToken.Id = currentUser.Id.ToString();
-                    linkToken.Username = model.Email;
-                    linkToken.Email = model.Email;
-                    linkToken.Firstname = model.Firstname;
-                    linkToken.Lastname = model.Lastname;
-                    linkToken.Mobile = model.Mobile;
-                    linkToken.CurrentTime = DateTime.UtcNow;
-                    linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-
-
                     byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
 
-                    string UserDetails = JsonConvert.SerializeObject(linkToken);
-
-                    string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
-
-                    //string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
-                    string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
+                    var tempcurrentUser = new TempUserRegisterViewModel
                     {
-                        //userId = currentUser.Id,
-                        emailConfirmCode = SubScriptionKey
-                    }, protocol: HttpContext.Request.Scheme);
+                        UserName = model.Username,
+                        Email = model.Email,
+                        FirstName = model.Firstname,
+                        LastName = model.Lastname,
+                        Mobile = model.Mobile,
+                        PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes),
+                        RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Standerd)
+                    };
+                    var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                    if (resultdata != null)
+                    {
+                        LinkTokenViewModel linkToken = new LinkTokenViewModel();
+                        linkToken.Id = resultdata.Id;
+                        linkToken.Username = model.Email;
+                        linkToken.Email = model.Email;
+                        linkToken.Firstname = model.Firstname;
+                        linkToken.Lastname = model.Lastname;
+                        linkToken.Mobile = model.Mobile;
+                        linkToken.CurrentTime = DateTime.UtcNow;
+                        linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
+                        linkToken.Password = tempcurrentUser.PasswordHash;
 
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(currentUser);
+                        string UserDetails = JsonConvert.SerializeObject(linkToken);
+                        string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
+                        string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
+                        {
+                            //userId = currentUser.Id,
+                            emailConfirmCode = SubScriptionKey
+                        }, protocol: HttpContext.Request.Scheme);
 
-                    //var host = Request.Scheme + "://" + Request.Host;
-                    //var callbackUrl = host+ "/api/Account/ConfirmEmail" + "?userId=" + currentUser.Id + "&emailConfirmCode=" + code;
-                    var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
+                        var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 
-                    SendEmailRequest request = new SendEmailRequest();
-                    request.Recepient = model.Email;
-                    request.Subject = "Registration confirmation email";
-                    request.Body = confirmationLink;
+                        SendEmailRequest request = new SendEmailRequest();
+                        request.Recepient = model.Email;
+                        request.Subject = "Registration confirmation email";
+                        request.Body = confirmationLink;
 
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
-                    _logger.LogInformation(3, "User created a new account with password.");
+                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        _logger.LogInformation(3, "User created a new account with password.");
 
-                    //await _mediator.Publish(new EmailHandler())
-                    //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+                        //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+                        //return Ok("Your account has been created, < br /> please verify it by clicking the activation link that has been send to your email.");
 
-
-
-                    RegisterResponse response = new RegisterResponse();
-                    response.ReturnCode = 200;
-                    response.StatusMessage = "Success";
-                    response.StatusCode = 200;
-                    response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
-                    return Ok(response);
-
-                    ////await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-                    //return Ok("User created a new account with password.");
-
+                        RegisterResponse response = new RegisterResponse();
+                        response.ReturnCode = enResponseCode.Success;
+                        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+                        return Ok(response);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                    return BadRequest(new ApiError(ModelState));
                 }
             }
-            AddErrors(result);
-            // If we got this far, something failed, redisplay form
+            else
+            {
+                ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                return BadRequest(new ApiError(ModelState));
+            }
             return BadRequest(new ApiError(ModelState));
         }
 
@@ -221,40 +244,38 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> DirectSignUpWithEmail([FromBody]SignUpWithEmailViewModel model)
         {
-            var checkemail = await _userManager.FindByEmailAsync(model.Email);
-            if (string.IsNullOrEmpty(checkemail?.Email))
+            var result = await _userManager.FindByEmailAsync(model.Email);
+            if (string.IsNullOrEmpty(result?.Email))
             {
-                var currentUser = new ApplicationUser
+                bool IsTempSignEmail =await _tempUserRegisterService.GetEmail(model.Email);
+                if (IsTempSignEmail)
                 {
-                    Email = model.Email,
-                    UserName = model.Email,
-                    PasswordHash = model.Password
-                };
+                    byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+                    var tempcurrentUser = new TempUserRegisterViewModel
+                    {
+                        UserName = model.Email,
+                        Email = model.Email,
+                        PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes),
+                        RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Email)
+                    };
 
-                var result = await _userManager.CreateAsync(currentUser,model.Password);
-                if (result.Succeeded)
-                {
-                    // Add to roles
-                    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-
-                    if (roleAddResult.Succeeded)
+                    var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                    if (resultdata != null)
                     {
                         LinkTokenViewModel linkToken = new LinkTokenViewModel();
 
-                        linkToken.Id = currentUser.Id.ToString();
+                        linkToken.Id = resultdata.Id;
                         linkToken.Username = model.Email;
                         linkToken.Email = model.Email;
                         linkToken.CurrentTime = DateTime.UtcNow;
                         linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
+                        linkToken.Password = tempcurrentUser.PasswordHash;
 
-                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
                         string UserDetails = JsonConvert.SerializeObject(linkToken);
                         string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
 
-                        //string ctoken = _userManager.GenerateEmailConfirmationTokenAsync(currentUser).Result;
                         string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
                         {
-                            //userId = currentUser.Id,
                             emailConfirmCode = SubScriptionKey
                         }, protocol: HttpContext.Request.Scheme);
 
@@ -271,15 +292,17 @@ namespace CleanArchitecture.Web.API
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
 
                         SignUpWithEmailResponse response = new SignUpWithEmailResponse();
-                        response.ReturnCode = 200;
-                        response.StatusMessage = "Success";
-                        response.StatusCode = 200;
+                        response.ReturnCode = enResponseCode.Success;
                         response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
 
                         return Ok(response);
                     }
                 }
-                AddErrors(result);
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "This email is already registered.");
+                    return BadRequest(new ApiError(ModelState));
+                }
             }
             else
             {
@@ -302,84 +325,53 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> DirectSignUpWithMobile([FromBody]SignUpWithMobileViewModel model)
         {
             SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
-
             string countryCode = "IN";
             PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
 
 
             bool isValidNumber = phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
-            if (!isValidNumber)
+
+            if (isValidNumber)
             {
-                response.ReturnCode = 200;
-                response.ReturnMsg = "This mobile number is not Valid";
-                response.ErrorCode = 401;
-                response.StatusCode = 200;
-                response.StatusMessage = "error";
-                return Ok(response);
-                //   return Ok("This mobile number is  Valid");
-            }
-
-
-
-            bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
-            if (IsSignMobile)
-            {
-                bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
-                if (IsSignTempMobile)
+                byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+                var tempcurrentUser = new TempUserRegisterViewModel
                 {
-                   var result = await _tempUserRegisterService.AddTempRegister(model);
+                    UserName = model.Mobile,
+                    Mobile = model.Mobile,
+                    RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Mobile),
+                    PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes)
+                };
 
-                    if(result != null )
+                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                if (IsSignMobile)
+                {
+                    bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
+                    if (IsSignTempMobile)
                     {
-                        response.ReturnCode = 200;
-                        response.ReturnMsg = "Success";
-                        response.StatusCode = 200;
-                        response.StatusMessage = "Done";
-                        return Ok(response);
+                        var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                        if (result != null)
+                        {
+                            response.ReturnCode = enResponseCode.Success;
+                            response.ReturnMsg = "Success";
+                            return Ok(response);
+                        }
                     }
-                    //var currentUser = new TempUserRegister
-                    //{
-                    //    Mobile = model.Mobile,
-                    //    UserName = model.Mobile,
-                     //  TempOtpMaster. OTP = _userdata.GenerateRandomOTP()
-                    //};
-
-                    /*
-
-                    //var result = await _userManager.CreateAsync(currentUser);
-                    if (result.Succeeded)
+                    else
                     {
-                        var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile, ClaimValueTypes.Integer);
-                        await _userManager.AddClaimAsync(currentUser, officeClaim);
-                        ////// Add to roles
-                        ////var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-
-                        //if (roleAddResult.Succeeded)
-                        //{
-                        //await _messageSender.SendSMSAsync(model.Mobile, "");
-                        // SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-                        response.ReturnCode = 200;
-                        response.ReturnMsg = "Success";
-                        response.StatusCode = 200;
-                        response.StatusMessage = "Done";
-                        return Ok(response);
-                        //}
+                        ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                        return BadRequest(new ApiError(ModelState));
                     }
-                    */
                 }
-                //AddErrors(result);
-
-                //response.ReturnCode = 200;
-                //response.ReturnMsg = "Success";
-                //response.StatusCode = 200;
-                //response.StatusMessage = "Done";
-                //return Ok(response);
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                    return BadRequest(new ApiError(ModelState));
+                }
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                ModelState.AddModelError(string.Empty, "This mobile number is not valid.");
                 return BadRequest(new ApiError(ModelState));
             }
             // If we got this far, something failed, redisplay form
@@ -395,11 +387,8 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> BlockChainSignUp([FromBody] BlockChainViewModel model)
         {
             BlockChainResponse response = new BlockChainResponse();
-            response.ReturnCode = 200;
+            response.ReturnCode = enResponseCode.Success;
             response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Done";
-
             return Ok(response);
         }
 
@@ -414,22 +403,88 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> DirectSignUpOtpVerification([FromBody]OTPViewModel model)
         {
-
-            if (model != null)
+            if (!string.IsNullOrEmpty(model?.MobileNo))
             {
-                OTPResponse response = new OTPResponse();
-                response.ReturnCode = 200;
-                response.ReturnMsg = "Success";
-                response.StatusCode = 200;
-                response.StatusMessage = "Done";
-                return Ok(response);
+                var tempdata = await _tempUserRegisterService.GetMobileNo(model.MobileNo);
+                if (tempdata?.Id > 0)
+                {
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                    if (tempotp != null)
+                    {
+                        if (tempotp?.ExpirTime >= DateTime.UtcNow)
+                        {
+                            if (tempdata.Id == 0 && tempotp.Id == 0)
+                            {
+                                ModelState.AddModelError(string.Empty, "Error.");
+                                return BadRequest(new ApiError(ModelState));
+                            }
+                            else if (model.OTP == tempotp.OTP)
+                            {
+                                if (!tempdata.RegisterStatus)
+                                {
+                                    byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+                                    var currentUser = new ApplicationUser
+                                    {
+                                        UserName = tempdata.Mobile,
+                                        Mobile = tempdata.Mobile,
+                                        PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
+                                    };
+                                    var result = await _userManager.CreateAsync(currentUser, currentUser.PasswordHash);
+                                    if (result.Succeeded)
+                                    {
+                                        if (currentUser.Mobile != null)
+                                        {
+                                            var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
+                                            await _userManager.AddClaimAsync(currentUser, officeClaim);
+                                        }
+                                        // Add to roles
+                                        var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                                        if (roleAddResult.Succeeded)
+                                        {
+                                            _tempUserRegisterService.Update(tempdata.Id);
+                                            _tempOtpService.Update(tempotp.Id);
+                                            return Ok("Your account has been activated, you can now login.");
+                                            //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                                        return BadRequest(new ApiError(ModelState));
+                                    }
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError(string.Empty, "This user is already registered.");
+                                    return BadRequest(new ApiError(ModelState));
+                                }
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
+                                return BadRequest(new ApiError(ModelState));
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                            return BadRequest(new ApiError(ModelState));
+                        }
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Error.");
+                    return BadRequest(new ApiError(ModelState));
+                }
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid OTP.");
+                ModelState.AddModelError(string.Empty, "Error.");
                 return BadRequest(new ApiError(ModelState));
             }
-
+            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+            return BadRequest(new ApiError(ModelState));
         }
 
         /// <summary>
@@ -440,10 +495,8 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> ReSendOtp()
         {
             SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-            response.ReturnCode = 200;
+            response.ReturnCode = enResponseCode.Success;
             response.ReturnMsg = "Success";
-            response.StatusCode = 200;
-            response.StatusMessage = "Done";
             return Ok(response);
         }
 

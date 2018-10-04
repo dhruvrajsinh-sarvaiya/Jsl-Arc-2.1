@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Data.Transaction;
+using CleanArchitecture.Infrastructure.DTOClasses;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,20 +12,20 @@ using System.Text.RegularExpressions;
 namespace CleanArchitecture.Infrastructure.Services
 {
     //Common Parsing method Implement Here
-    class WebApiParseResponse : IWebApiParseResponse<WebAPIParseResponse>
+    class WebApiParseResponse : IWebApiParseResponse<WebAPIParseResponseCls>
     {
-        readonly ILogger<WalletService> _log;
+        readonly ILogger _log;
         readonly TransactionWebAPIConfiguration _txnWebAPIConf;
         GetDataForParsingAPI _txnWebAPIParsingData;
-        WebAPIParseResponse _webapiParseResponse;
+        WebAPIParseResponseCls _webapiParseResponse;
         private readonly WebApiDataRepository _webapiDataRepository;
-        public WebApiParseResponse(ILogger<WalletService> log, TransactionWebAPIConfiguration txnWebAPIConf, WebApiDataRepository webapiDataRepository)
+        public WebApiParseResponse(ILogger log, TransactionWebAPIConfiguration txnWebAPIConf, WebApiDataRepository webapiDataRepository)
         {
             _log = log;
             _txnWebAPIConf = txnWebAPIConf;
             _webapiDataRepository = webapiDataRepository;
         }
-        public WebAPIParseResponse TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
+        public WebAPIParseResponseCls TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
         {
             try
             {

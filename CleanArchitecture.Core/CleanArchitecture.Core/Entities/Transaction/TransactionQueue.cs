@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -9,14 +10,15 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {   
-    public class TransactionQueue
+    public class TransactionQueue : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long TrnNo { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long TrnNo { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]
+        [DefaultValue("dbo.GetISTdate()")]
         public DateTime TrnDate { get; set; }
         //[Required]
         //public DateTime SMSDate { get; set; }
@@ -28,16 +30,16 @@ namespace CleanArchitecture.Core.Entities
         public long MemberID { get; set; }
         [Required]
         public string MemberMobile { get; set; }
-        [Required]
-        public string SMSText { get; set; }
+        //[Required]
+        //public string SMSText { get; set; }
 
         [Required]
         [StringLength(10)]
         public string SMSCode { get; set; }
 
         [Required]
-        [StringLength(15)]
-        public string CustomerMobile { get; set; }
+        [StringLength(200)]
+        public string TransactionAccount { get; set; }//Mob for txn , address for crypto
 
         [Required]
         //[Range(0, 9999999999.99999999)]
@@ -45,29 +47,29 @@ namespace CleanArchitecture.Core.Entities
         [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
-        [Required]
-        [StringLength(4)]
-        public string SMSPwd { get; set; }
+        //[Required]
+        //[StringLength(4)]
+        //public string SMSPwd { get; set; }
 
         //[Required]
         //public short IsSTV { get; set; }
-       
+
+        [DefaultValue(0)]
         public long ServiceID { get; set; }
-       
+        [DefaultValue(0)]
         public long SerProID { get; set; }
-        
+        [DefaultValue(0)]
         public int ProductID { get; set; }
-       
+        [DefaultValue(0)]
         //public int ItemID { get; set; }
         public int RoutID { get; set; }//change column as new structure
-        [Required]
-        public short Status { get; set; }
+        //[Required]
+        //public short Status { get; set; }
 
-        [Required]
         public short StatusCode { get; set; }
-
-        [Required]
+       
         public string StatusMsg { get; set; }
+        [DefaultValue(0)]
         public short VerifyDone { get; set; }
 
         public string TrnRefNo { get; set; }
@@ -110,7 +112,7 @@ namespace CleanArchitecture.Core.Entities
 
         public short? ChargeType { get; set; }
 
-        public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
+        //public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
 
         public void MakeTransactionSuccess()
         {
