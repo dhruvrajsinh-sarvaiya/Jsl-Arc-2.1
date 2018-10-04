@@ -271,8 +271,8 @@ namespace CleanArchitecture.Web.API
         public ActionResult SignTransaction(string coin, string id, [FromBody]SignTransactionRequest Request)
         {
             string requeststring = "{'txHex': '010000000179b0b5ad6641de8fed13270395e52515236c922d1dd5bee3a9dae68c3cbbf57d0100000000ffffffff0240420f000000000017a914f600974688ccdf5e72ce3f2b187afabbf4f1d3ec878e7835000000000017a9140c0a513cb9d8e46113c57aa46ae42d1bad29063d8700000000'}";
-            SignTransactionResRootObject Response = new SignTransactionResRootObject();
-            Response = JsonConvert.DeserializeObject<SignTransactionResRootObject>(requeststring);
+            SignTransactionResponse Response = new SignTransactionResponse();
+            Response = JsonConvert.DeserializeObject<SignTransactionResponse>(requeststring);
             Response.ReturnCode = enResponseCode.Success;
             var respObj = JsonConvert.SerializeObject(Response);
             dynamic respObjJson = JObject.Parse(respObj);

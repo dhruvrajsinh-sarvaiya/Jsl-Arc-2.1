@@ -5,12 +5,13 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOperations
 {
-    public class SendTranToManyRes
+    public class SendTranToManyRes : BizResponseClass
     {
-        public class SendTranToManyRootObject : BizResponseClass
-        {
-            public string txid { get; set; }
-            public string status { get; set; }
-        }
+        public string txid { get; set; }
+        public string status { get; set; }
     }
+    //public class SendTranToManyRootObject
+    //{
+
+    //}
 }
