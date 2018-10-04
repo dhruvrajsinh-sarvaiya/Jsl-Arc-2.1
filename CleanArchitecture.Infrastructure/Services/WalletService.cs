@@ -16,17 +16,22 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         readonly ILogger<WalletService> _log;
         readonly ICommonRepository<WalletMaster> _commonRepository;
+        readonly ICommonRepository<ThirPartyAPIConfiguration> _thirdPartyCommonRepository;      
         readonly ICommonRepository<WalletOrder> _walletOrderRepository;
         readonly ICommonRepository<TrnAcBatch> _trnBatch;
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         readonly IWalletRepository _walletRepository1;
         readonly IWebApiRepository _webApiRepository ;
-
+        readonly IWebApiSendRequest _webApiSendRequest;
+        readonly IGetWebRequest _getWebRequest;
 
         //readonly IBasePage _BaseObj;
 
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
-            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository, IWebApiRepository webApiRepository, ILogger<BasePage> logger) : base(logger)
+            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
+            IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirPartyAPIConfiguration> thirdpartyCommonRepo,
+            IGetWebRequest getWebRequest,
+            ILogger<BasePage> logger) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -36,6 +41,9 @@ namespace CleanArchitecture.Infrastructure.Services
             _trnBatch = BatchLogger;
             _walletRepository1 = walletRepository;
             _webApiRepository = webApiRepository;
+            _webApiSendRequest = webApiSendRequest;
+            _thirdPartyCommonRepository = thirdpartyCommonRepo;
+            _getWebRequest = getWebRequest;
             //_walletLedgerRepository = walletledgerrepo;
         }
         
@@ -265,7 +273,8 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                IEnumerable<TransactionProviderResponse> transactionProviderResponses;
+                ThirdPartyAPIRequest thirdPartyAPIRequest;
+                List<TransactionProviderResponse> transactionProviderResponses;
                 WalletMaster walletMaster = _commonRepository.GetById(walletID);
                 if(walletMaster == null)
                 {
@@ -281,8 +290,20 @@ namespace CleanArchitecture.Infrastructure.Services
                 transactionProviderResponses = _webApiRepository.GetProviderDataList( new TransactionApiConfigurationRequest { amount = 0,SMSCode = walletMaster.CoinName , APIType = enWebAPIRouteType.TransactionAPI , trnType = enTrnType.Generate_Address });
                 if(transactionProviderResponses == null )
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };                    
+                    return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };                    
                 }
+                if (transactionProviderResponses[0].ThirPartyAPIID == 0)
+                {
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                }
+
+                ThirPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
+                if (thirdPartyAPIConfiguration == null)
+                {
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                }
+                thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
+                _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60, thirdPartyAPIConfiguration.MethodType);
                 // code need to be added
                 return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Success, ReturnMsg = "Success." };
             }
@@ -369,6 +390,6 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
+       
     }
 }

@@ -73,7 +73,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         }
 
         //ntrivedi fetch route
-        public IEnumerable<TransactionProviderResponse> GetProviderDataList(TransactionApiConfigurationRequest Request)
+        public List<TransactionProviderResponse> GetProviderDataList(TransactionApiConfigurationRequest Request)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 			 and {2} between SC.MinimumAmount and SC.MaximumAmount
 			 and SC.Status = 1 and RC.Status = 1 and Prc.Status=1 
 			 order by RC.Priority", Request.SMSCode, Request.trnType, Request.amount);
-                return Result.AsEnumerable();
+                return Result.ToList();
             }
             catch (Exception ex)
             {

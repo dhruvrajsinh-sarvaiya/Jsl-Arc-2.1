@@ -13,7 +13,7 @@ namespace CleanArchitecture.Core.Interfaces
         GetDataForParsingAPI GetDataForParsingAPI(long ThirPartyAPIID);
 
         //ntrivedi fetch route
-        IEnumerable<TransactionProviderResponse> GetProviderDataList(TransactionApiConfigurationRequest Request);
+        List<TransactionProviderResponse> GetProviderDataList(TransactionApiConfigurationRequest Request);
 
     }
 }
