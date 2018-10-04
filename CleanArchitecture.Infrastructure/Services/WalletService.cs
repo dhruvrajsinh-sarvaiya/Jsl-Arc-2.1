@@ -17,9 +17,10 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         readonly ILogger<WalletService> _log;
         readonly ICommonRepository<WalletMaster> _commonRepository;
-        readonly ICommonRepository<ThirPartyAPIConfiguration> _thirdPartyCommonRepository;      
+        readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;      
         readonly ICommonRepository<WalletOrder> _walletOrderRepository;
         readonly ICommonRepository<TrnAcBatch> _trnBatch;
+        readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         readonly IWalletRepository _walletRepository1;
         readonly IWebApiRepository _webApiRepository ;
@@ -30,15 +31,15 @@ namespace CleanArchitecture.Infrastructure.Services
 
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
-            IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirPartyAPIConfiguration> thirdpartyCommonRepo,
-            IGetWebRequest getWebRequest,
+            IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
+            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository,
             ILogger<BasePage> logger) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
             _walletOrderRepository = walletOrderRepository;
             //_walletRepository = repository;
-            //_walletOrderRepository = walletOrderRepository;           
+            _bitgoDelayRepository = bitgoDelayRepository;           
             _trnBatch = BatchLogger;
             _walletRepository1 = walletRepository;
             _webApiRepository = webApiRepository;
@@ -275,9 +276,15 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 ThirdPartyAPIRequest thirdPartyAPIRequest;
+                TradeBitGoDelayAddresses delayAddressesObj;
                 List<TransactionProviderResponse> transactionProviderResponses;
                 WalletMaster walletMaster = _commonRepository.GetById(walletID);
-                if(walletMaster == null)
+                AddressMaster addressMaster;
+                string address="";
+                string CoinSpecific = null;
+                string TrnID = null;
+                               
+                if (walletMaster == null)
                 {
                     //return false
                     return new BizResponse {ErrorCode = enErrorCode.InvalidWallet , ReturnCode =  enResponseCodeService.Fail, ReturnMsg = "Invalid Amount" };
@@ -298,13 +305,22 @@ namespace CleanArchitecture.Infrastructure.Services
                     return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
                 }
 
-                ThirPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
+                ThirdPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
                 if (thirdPartyAPIConfiguration == null)
                 {
                     return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
                 }
                 thirdPartyAPIRequest =_getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
                 string apiResponse =_webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60,thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
+                // parse response logic need to be implemented
+                if(string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
+                {
+                    delayAddressesObj = GetTradeBitGoDelayAddresses(walletID,walletMaster.WalletTypeID,TrnID,address, walletMaster.CoinName,"",walletMaster.CreatedBy,CoinSpecific,0,0);
+
+                }
+
+                addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, walletMaster.CoinName, "Self Address", walletMaster.UserID, 0, 1);
+
                 // code need to be added
                 return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Success, ReturnMsg = "Success." };
             }

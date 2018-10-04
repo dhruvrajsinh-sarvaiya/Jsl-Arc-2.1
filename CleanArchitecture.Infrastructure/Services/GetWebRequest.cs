@@ -12,10 +12,10 @@ namespace CleanArchitecture.Infrastructure.Services
     class GetWebRequest : IGetWebRequest
     {
         readonly ICommonRepository<RouteConfiguration> _routeRepository;
-        readonly ICommonRepository<ThirPartyAPIConfiguration> _thirdPartyCommonRepository;
+        readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         readonly ICommonRepository<ProviderConfiguration> _providerRepository;
 
-        public  GetWebRequest(ICommonRepository<RouteConfiguration> routeRepository, ICommonRepository<ThirPartyAPIConfiguration> thirdPartyCommonRepository,
+        public  GetWebRequest(ICommonRepository<RouteConfiguration> routeRepository, ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyCommonRepository,
               ICommonRepository<ProviderConfiguration> providerRepository)
         {
             _thirdPartyCommonRepository = thirdPartyCommonRepository;
@@ -26,7 +26,7 @@ namespace CleanArchitecture.Infrastructure.Services
         public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproID)
         {
             RouteConfiguration routeConfiguration;
-            ThirPartyAPIConfiguration thirdPartyAPIConfiguration;
+            ThirdPartyAPIConfiguration thirdPartyAPIConfiguration;
             ProviderConfiguration providerConfiguration;
             ThirdPartyAPIRequest thirdPartyAPIRequest = new ThirdPartyAPIRequest ();
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
@@ -60,6 +60,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             thirdPartyAPIRequest.keyValuePairsHeader = keyValuePairsHeader;
 
+            thirdPartyAPIRequest.DelayAddress = routeConfiguration.IsDelayAddress;
             return thirdPartyAPIRequest;        
     }
     }

@@ -28,7 +28,10 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public string CoinName { get; set; }
-               
+
+        [Required]
+        public long UserID { get; set; }
+        
         public void CreditBalance(decimal amount)
         {
             Balance = Balance + amount;

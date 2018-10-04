@@ -11,7 +11,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public string RequestURL { get; set; }
         public string RequestBody { get; set; }
         public WebHeaderCollection keyValuePairsHeader { get; set; }
-
+        public byte DelayAddress { get; set; }
 
     }
 }
