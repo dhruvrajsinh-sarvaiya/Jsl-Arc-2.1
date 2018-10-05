@@ -15,6 +15,7 @@ using CleanArchitecture.Core.Entities.Modes;
 using CleanArchitecture.Core.Entities.Log;
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
+using CleanArchitecture.Core.Entities.Transaction;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -61,7 +62,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<AddressMaster> AddressMasters { get; set; }
 
         //========Transaction Tables
-
+        public DbSet <TradeTransactionQueue>TradeTransactionQueue { get; set; }
+        public DbSet <TradePairMaster> TradePairMaster { get; set; }
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
         public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }       
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
