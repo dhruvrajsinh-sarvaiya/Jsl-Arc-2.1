@@ -30,5 +30,13 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrnInvalidQtyNAmountMsg = "Invalid Order Qty and Amount";
         public static string CreateTrnNoCreditAccountFoundMsg = "No Credit Account Found";
         //============================
+
+        //============================walelt=================================//
+        public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
+        public static string CreateWalletFailMsg = "Fail";
+        public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
+        public static string CreateAddressFailMsg = "Failed to generate Address.";
+        public static string InvalidWallet = "Invalid Wallet or wallet is disabled.";
+        public static string ItemOrThirdprtyNotFound = "Unable to Process your request please contact admin.";
     }
 }

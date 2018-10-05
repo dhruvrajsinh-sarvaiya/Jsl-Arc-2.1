@@ -96,6 +96,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
         public CreateOrderResponse CreateOrder (CreateOrderRequest Order)
         {
             try
@@ -139,7 +140,6 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
 
         public BizResponse ProcessOrder(long RefNo,long DWalletID,long OWalletID,decimal amount,string remarks, enTrnType enTrnType,enServiceType serviceType)
         {
@@ -272,7 +272,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-
         public  BizResponse GenerateAddress(long walletID)
         {
             try
@@ -289,12 +288,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (walletMaster == null)
                 {
                     //return false
-                    return new BizResponse {ErrorCode = enErrorCode.InvalidWallet , ReturnCode =  enResponseCodeService.Fail, ReturnMsg = "Invalid Amount" };
+                    return new BizResponse {ErrorCode = enErrorCode.InvalidWallet , ReturnCode =  enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
                 else if(walletMaster.Status != 1)
                 {
                     //return false
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Invalid Amount" };
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
 
                 transactionProviderResponses = _webApiRepository.GetProviderDataList( new TransactionApiConfigurationRequest { amount = 0,SMSCode = walletMaster.CoinName , APIType = enWebAPIRouteType.TransactionAPI , trnType = enTrnType.Generate_Address });
@@ -304,13 +303,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 if (transactionProviderResponses[0].ThirPartyAPIID == 0)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
 
                 ThirdPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
                 if (thirdPartyAPIConfiguration == null)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
                 thirdPartyAPIRequest =_getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
                 string apiResponse =_webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60,thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
@@ -333,11 +332,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, walletMaster.CoinName, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
-                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = "Success." };
+                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg};
                 }
                 else
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Failed to generate Address." };
+                    return new BizResponse { ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.CreateWalletFailMsg };
                 }
 
                 // code need to be added
@@ -371,7 +370,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-
         public TradeBitGoDelayAddresses GetTradeBitGoDelayAddresses(long walletID, long WalletTypeId, string TrnID,string address, string coinName, string BitgoWalletId, long createdBy, string CoinSpecific, short status,byte generatebit)
         {
             try
@@ -400,7 +398,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-
         public WalletMaster GetWalletMaster(long WalletTypeId, string walletName, bool isValid, short status , long createdBy,string coinname)
         {
             try
@@ -420,6 +417,36 @@ namespace CleanArchitecture.Infrastructure.Services
                 return addressMaster;
             }
             catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public DepositHistory GetDepositHistory (string fromAddress, string toAddress,string coinName, string  trnID, long confirmations, decimal amount,
+        short status, string statusMsg , string confirmedTime, string UnconfirmedTime, string epochtimePure , byte isProcessing ,long serproid,long createdby)
+        {
+            try
+            {
+                DepositHistory dh = new DepositHistory
+                {
+                    Address = toAddress,
+                    Confirmations = confirmations,
+                    IsProcessing = isProcessing,
+                    SerProID = serproid,
+                    SMSCode = coinName,
+                    TrnID = trnID,
+                    CreatedBy = createdby,
+                    CreatedDate = UTC_To_IST(),
+                    TimeEpoch = confirmedTime,
+                    EpochTimePure = epochtimePure,
+                    Status = status,
+                    StatusMsg = statusMsg
+                    
+                };
+                return dh;
+            }
+            catch(Exception ex)
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
