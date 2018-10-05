@@ -19,120 +19,39 @@ namespace CleanArchitecture.Web.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.ApplicationRole", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.AddressMaster", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(50);
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(250);
+                    b.Property<string>("CoinName")
+                        .IsRequired()
+                        .HasMaxLength(5);
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("BizRoles");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.ApplicationUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AccessFailedCount");
-
-                    b.Property<decimal>("Balance");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                    b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(256);
+                    b.Property<byte>("IsDefaultAddress");
 
-                    b.Property<bool>("EmailConfirmed");
+                    b.Property<long>("SerProID");
 
-                    b.Property<string>("FirstName")
-                        .HasMaxLength(250);
+                    b.Property<short>("Status");
 
-                    b.Property<bool>("IsEnabled");
+                    b.Property<long?>("UpdatedBy");
 
-                    b.Property<string>("LastName")
-                        .HasMaxLength(250);
+                    b.Property<DateTime>("UpdatedDate");
 
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<string>("Mobile");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256);
-
-                    b.Property<long>("OTP");
-
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256);
+                    b.Property<long>("WalletId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("BizUser");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.ApplicationUserPhotos", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ApplicationUserId");
-
-                    b.Property<byte[]>("Content");
-
-                    b.Property<string>("ContentType");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId")
-                        .IsUnique();
-
-                    b.ToTable("BizUserPhotos");
+                    b.ToTable("AddressMasters");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.CommAPIServiceMaster", b =>
@@ -153,11 +72,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("SMSBalURL")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasMaxLength(200);
 
                     b.Property<string>("SMSSendURL")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasMaxLength(200);
 
                     b.Property<string>("SenderID")
                         .IsRequired()
@@ -166,6 +85,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<short>("Status");
 
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -186,7 +107,13 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<long>("ParsingDataID");
+
                     b.Property<long>("RequestID");
+
+                    b.Property<string>("ResponseFailure");
+
+                    b.Property<string>("ResponseSuccess");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()
@@ -195,6 +122,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<short>("Status");
 
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -230,9 +159,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.Property<string>("UserID")
                         .IsRequired()
-                        .HasMaxLength(20);
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -261,12 +192,14 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.HasKey("Id");
 
                     b.ToTable("CommServiceTypeMaster");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Cultures", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Culture.Cultures", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -277,6 +210,72 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Cultures");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.DepositHistory", b =>
+                {
+                    b.Property<string>("TrnID")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100);
+
+                    b.Property<string>("APITopUpRefNo");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<long>("Confirmations");
+
+                    b.Property<string>("ConfirmedTime")
+                        .IsRequired();
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("EpochTimePure")
+                        .IsRequired();
+
+                    b.Property<string>("FromAddress")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<byte>("IsProcessing");
+
+                    b.Property<long>("OrderID");
+
+                    b.Property<string>("RouteTag");
+
+                    b.Property<string>("SMSCode")
+                        .IsRequired();
+
+                    b.Property<long>("SerProID");
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("StatusMsg")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<string>("SystemRemarks");
+
+                    b.Property<string>("TimeEpoch")
+                        .IsRequired();
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.HasKey("TrnID");
+
+                    b.ToTable("DepositHistorys");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.EmailQueue", b =>
@@ -317,12 +316,14 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.HasKey("Id");
 
                     b.ToTable("EmailQueue");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.LoginLog", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Log.LoginLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -380,12 +381,14 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.HasKey("Id");
 
                     b.ToTable("MessagingQueue");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Mode", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Modes.Mode", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -408,6 +411,10 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("ContentTitle")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
@@ -425,7 +432,13 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("Subject")
                         .HasMaxLength(50);
 
+                    b.Property<string>("TickerText")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -446,13 +459,15 @@ namespace CleanArchitecture.Web.Migrations
                         .IsRequired()
                         .HasMaxLength(30);
 
-                    b.Property<long>("ServceID");
+                    b.Property<long>("ServiceID");
 
                     b.Property<long>("StateID");
 
                     b.Property<short>("Status");
 
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -465,8 +480,6 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("APIServiceID");
-
                     b.Property<short>("AppType");
 
                     b.Property<long>("CreatedBy");
@@ -478,7 +491,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("Status");
 
+                    b.Property<long>("ThirPartyAPIID");
+
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -510,6 +527,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.Property<string>("contentType")
                         .IsRequired()
                         .HasMaxLength(60);
@@ -519,7 +538,7 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("RequestFormatMaster");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Resources", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Resource.Resources", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -548,6 +567,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<byte>("IsDelayAddress");
+
                     b.Property<decimal>("MaximumAmount")
                         .HasColumnType("decimal(18, 8)");
 
@@ -561,13 +582,16 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long>("ProductID");
 
+                    b.Property<string>("ProviderWalletID")
+                        .HasMaxLength(100);
+
                     b.Property<string>("RouteName")
                         .IsRequired()
                         .HasMaxLength(30);
 
                     b.Property<long>("SerProID");
 
-                    b.Property<long>("ServceID");
+                    b.Property<long>("ServiceID");
 
                     b.Property<short>("Status");
 
@@ -575,7 +599,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("TransactionUrl");
 
+                    b.Property<int>("TrnType");
+
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.Property<string>("ValidationUrl");
 
@@ -612,6 +640,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.HasKey("Id");
 
                     b.ToTable("ServiceConfiguration");
@@ -636,6 +666,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<short>("Status");
 
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -672,12 +704,14 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.HasKey("Id");
 
                     b.ToTable("TemplateMaster");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.ThirPartyAPIConfiguration", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.ThirdPartyAPIConfiguration", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -688,6 +722,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("APIName")
                         .IsRequired()
                         .HasMaxLength(30);
+
+                    b.Property<string>("APIRequestBody");
 
                     b.Property<string>("APISendURL")
                         .IsRequired();
@@ -732,11 +768,13 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.Property<string>("UserID");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ThirPartyAPIConfiguration");
+                    b.ToTable("ThirdPartyAPIConfiguration");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.ThirPartyAPIResponseConfiguration", b =>
@@ -751,6 +789,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<string>("ErrorCodeRegex");
+
                     b.Property<string>("OprTrnRefNoRegex");
 
                     b.Property<string>("Param1Regex");
@@ -758,6 +798,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("Param2Regex");
 
                     b.Property<string>("Param3Regex");
+
+                    b.Property<string>("ResponseCodeRegex");
 
                     b.Property<short>("Status");
 
@@ -768,6 +810,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("TrnRefNoRegex");
 
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -789,6 +833,53 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ToDoItems");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.TradeBitGoDelayAddresses", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<string>("BitgoWalletId")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<string>("CoinName")
+                        .IsRequired()
+                        .HasMaxLength(5);
+
+                    b.Property<string>("CoinSpecific")
+                        .IsRequired()
+                        .HasMaxLength(250);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<byte>("GenerateBit");
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("TrnID")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<long>("WalletId");
+
+                    b.Property<long>("WalletTypeId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TradeBitGoDelayAddressess");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.TransactionAccount", b =>
@@ -823,6 +914,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.Property<long>("WalletID");
 
                     b.HasKey("Id");
@@ -832,7 +925,7 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.TransactionQueue", b =>
                 {
-                    b.Property<long>("TrnNo")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -849,9 +942,9 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short?>("ChargeType");
 
-                    b.Property<string>("CustomerMobile")
-                        .IsRequired()
-                        .HasMaxLength(15);
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
 
                     b.Property<long>("MemberID");
 
@@ -866,13 +959,6 @@ namespace CleanArchitecture.Web.Migrations
                         .IsRequired()
                         .HasMaxLength(10);
 
-                    b.Property<string>("SMSPwd")
-                        .IsRequired()
-                        .HasMaxLength(4);
-
-                    b.Property<string>("SMSText")
-                        .IsRequired();
-
                     b.Property<long>("SerProID");
 
                     b.Property<long>("ServiceID");
@@ -881,8 +967,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("StatusCode");
 
-                    b.Property<string>("StatusMsg")
-                        .IsRequired();
+                    b.Property<string>("StatusMsg");
+
+                    b.Property<string>("TransactionAccount")
+                        .IsRequired()
+                        .HasMaxLength(200);
 
                     b.Property<DateTime>("TrnDate");
 
@@ -892,11 +981,272 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("TrnType");
 
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.Property<short>("VerifyDone");
 
-                    b.HasKey("TrnNo");
+                    b.HasKey("Id");
 
                     b.ToTable("TransactionQueue");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.ApplicationRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(250);
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("BizRoles");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.ApplicationUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AccessFailedCount");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256);
+
+                    b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(250);
+
+                    b.Property<bool>("IsEnabled");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(250);
+
+                    b.Property<bool>("LockoutEnabled");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<string>("Mobile");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("PasswordHash");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("TwoFactorEnabled");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("BizUser");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.ApplicationUserPhotos", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ApplicationUserId");
+
+                    b.Property<byte[]>("Content");
+
+                    b.Property<string>("ContentType");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique();
+
+                    b.ToTable("BizUserPhotos");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.OtpMaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<DateTime>("CreatedTime");
+
+                    b.Property<bool>("EnableStatus");
+
+                    b.Property<DateTime>("ExpirTime");
+
+                    b.Property<string>("OTP")
+                        .IsRequired()
+                        .HasMaxLength(6);
+
+                    b.Property<int>("RegTypeId");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OtpMaster");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.RegisterType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("ActiveStatus");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("Type");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RegisterType");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.TempOtpMaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<DateTime>("CreatedTime");
+
+                    b.Property<bool>("EnableStatus");
+
+                    b.Property<DateTime>("ExpirTime");
+
+                    b.Property<string>("OTP")
+                        .IsRequired()
+                        .HasMaxLength(6);
+
+                    b.Property<int>("RegTypeId");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TempOtpMaster");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.TempUserRegister", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ConcurrencyStamp");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("Email");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(250);
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(250);
+
+                    b.Property<string>("Mobile");
+
+                    b.Property<string>("PasswordHash");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<int>("RegTypeId");
+
+                    b.Property<bool>("RegisterStatus");
+
+                    b.Property<string>("SecurityStemp");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TempUserRegister");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.WalletLedger", b =>
@@ -929,11 +1279,17 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("Status");
 
+                    b.Property<long>("ToWalletMasterId");
+
                     b.Property<DateTime>("TrnDate");
 
                     b.Property<long>("TrnNo");
 
+                    b.Property<int>("TrnType");
+
                     b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
 
                     b.Property<long>("WalletMasterId");
 
@@ -948,7 +1304,11 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("Balance");
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<string>("CoinName")
+                        .IsRequired();
 
                     b.Property<long>("CreatedBy");
 
@@ -960,7 +1320,15 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<long>("UserID");
+
                     b.Property<long>("WalletTypeID");
+
+                    b.Property<string>("Walletname")
+                        .IsRequired()
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -1005,6 +1373,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
+                    b.Property<DateTime>("UpdatedDate");
+
                     b.HasKey("Id");
 
                     b.ToTable("WalletOrders");
@@ -1020,11 +1390,19 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<string>("Discription")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
                     b.Property<short>("Status");
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<string>("WalletTypeName");
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<string>("WalletTypeName")
+                        .IsRequired()
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -1250,31 +1628,31 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("OpenIddictTokens");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.ApplicationUserPhotos", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Log.LoginLog", b =>
                 {
-                    b.HasOne("CleanArchitecture.Core.Entities.ApplicationUser", "ApplicationUser")
-                        .WithOne("ProfilePhoto")
-                        .HasForeignKey("CleanArchitecture.Core.Entities.ApplicationUserPhotos", "ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.LoginLog", b =>
-                {
-                    b.HasOne("CleanArchitecture.Core.Entities.Mode", "Mode")
+                    b.HasOne("CleanArchitecture.Core.Entities.Modes.Mode", "Mode")
                         .WithMany()
                         .HasForeignKey("ModeId");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Resources", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Resource.Resources", b =>
                 {
-                    b.HasOne("CleanArchitecture.Core.Entities.Cultures", "Culture")
+                    b.HasOne("CleanArchitecture.Core.Entities.Culture.Cultures", "Culture")
                         .WithMany("Resources")
                         .HasForeignKey("CultureId");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.ApplicationUserPhotos", b =>
+                {
+                    b.HasOne("CleanArchitecture.Core.Entities.User.ApplicationUser", "ApplicationUser")
+                        .WithOne("ProfilePhoto")
+                        .HasForeignKey("CleanArchitecture.Core.Entities.User.ApplicationUserPhotos", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("CleanArchitecture.Core.Entities.ApplicationRole")
+                    b.HasOne("CleanArchitecture.Core.Entities.User.ApplicationRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1282,7 +1660,7 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("CleanArchitecture.Core.Entities.ApplicationUser")
+                    b.HasOne("CleanArchitecture.Core.Entities.User.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1290,7 +1668,7 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("CleanArchitecture.Core.Entities.ApplicationUser")
+                    b.HasOne("CleanArchitecture.Core.Entities.User.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1298,12 +1676,12 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("CleanArchitecture.Core.Entities.ApplicationRole")
+                    b.HasOne("CleanArchitecture.Core.Entities.User.ApplicationRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("CleanArchitecture.Core.Entities.ApplicationUser")
+                    b.HasOne("CleanArchitecture.Core.Entities.User.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1311,7 +1689,7 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("CleanArchitecture.Core.Entities.ApplicationUser")
+                    b.HasOne("CleanArchitecture.Core.Entities.User.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
