@@ -5627,10 +5627,11 @@
       ]
     },
     "Microsoft.AspNet.WebApi.Client/5.2.4": {
-      "sha512": "OdBVC2bQWkf9qDd7Mt07ev4SwIdu6VmLBMTWC0D5cOP/HWSXyv/77otwtXVrAo42duNjvXOjzjP5oOI9m1+DTQ==",
+      "sha512": "3ZUyFJevFGCOiBAv4zf41bADtofQ+waCuUIMregNdDpVFtH0BQxmMPdBDDuoLCEClxsXjxnel9USHBlnrRpthA==",
       "type": "package",
       "path": "microsoft.aspnet.webapi.client/5.2.4",
       "files": [
+        ".signature.p7s",
         "lib/net45/System.Net.Http.Formatting.dll",
         "lib/net45/System.Net.Http.Formatting.xml",
         "lib/netstandard2.0/System.Net.Http.Formatting.dll",
@@ -6207,7 +6208,7 @@
       ]
     },
     "Microsoft.AspNetCore.Identity/2.1.3": {
-      "sha512": "6mXatDedHB2wL7tCzFtOKcr6F5ji/OHuqo3IH0XV38nK/3kn78bek0X586JbpvJ9ihtfsDyAaq3M0zghj1zh+Q==",
+      "sha512": "HTOZ2C0aUtUPjb6OOA5/SI5K/ilEyl8Fu2/vyXscw1jWtl6eAF02FAcneB9LK4dGBqn8xCKEWaYBiQqo4uWeYw==",
       "type": "package",
       "path": "microsoft.aspnetcore.identity/2.1.3",
       "files": [
@@ -6219,7 +6220,7 @@
       ]
     },
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore/2.1.3": {
-      "sha512": "tv8Xv9/PoGS8KBmNpNDKZKsYy0crnfOYTuhDIw8Dovdpv96XbMtNsiiQKy6cq4pwrt1rYEXJFRwIAgY9SLc7PQ==",
+      "sha512": "tOIWdfnTDyDUwJudATZSK9BV6haxahlufRWwgui7/0bp4Mr6fstsfun21q2+xz1rhbhFmAibfrwv/MgczNVJSg==",
       "type": "package",
       "path": "microsoft.aspnetcore.identity.entityframeworkcore/2.1.3",
       "files": [
@@ -6304,7 +6305,7 @@
       ]
     },
     "Microsoft.AspNetCore.Mvc.Abstractions/2.1.2": {
-      "sha512": "F8jCw3ZoqQJEDusddLfCO4Dn6Rf836NbD3l2n8dt4xAtJZvWzctHKDO96sAxcA3j4Ci4sei4ZUfmI2MpnNM9IA==",
+      "sha512": "/IYE+0EYrvP9epDMkN7W7vyFIclbZqysMA/Mf26smDlV5y/tACRN3OAKJF0NepCCSkzR0PCABFQ1csuxRDIEtg==",
       "type": "package",
       "path": "microsoft.aspnetcore.mvc.abstractions/2.1.2",
       "files": [
@@ -6339,7 +6340,7 @@
       ]
     },
     "Microsoft.AspNetCore.Mvc.Core/2.1.2": {
-      "sha512": "wYwDCtHVwJaP58b6ph1aVdMqaeyucM+YynZyBw6eXMqLmd7TspOk5zkOEkTvpBRHZCr4+DGwJGjU9MF2M+oY9w==",
+      "sha512": "vSL47yO49mfkzm66qKb5EZjEWv1ON0KBAvBbs+FoCiXycHfAFakQ0xKcq9PACcY29mafL3+9C+H3W7ZmDHZGOw==",
       "type": "package",
       "path": "microsoft.aspnetcore.mvc.core/2.1.2",
       "files": [
@@ -6363,7 +6364,7 @@
       ]
     },
     "Microsoft.AspNetCore.Mvc.DataAnnotations/2.1.2": {
-      "sha512": "qF0cqRtM1JZB/u9CYNlTQTPq8kpU++W8ZXX3fhj/VFTfUYbxXObjzjTOwAVw2XZEEzRLONydSRKBMLl+1nBskg==",
+      "sha512": "ictmJAj8JZ4SXDd+4YpYucIouCTfI4uu2aDhiI62li4fmrhdydNcuwlQI9qRBwlJthVKpdMhyz3evO7GdmumEQ==",
       "type": "package",
       "path": "microsoft.aspnetcore.mvc.dataannotations/2.1.2",
       "files": [
@@ -6375,7 +6376,7 @@
       ]
     },
     "Microsoft.AspNetCore.Mvc.Formatters.Json/2.1.2": {
-      "sha512": "zPdZP9dpVpA6XiRW+b3vtCef7e9OpvCopMvL2dWoomHhRZNB3HXBA/MxHPwgXwZK4HEKtsijCrqbd8KglZzKdA==",
+      "sha512": "QTQc7GWkMNb58iWbcPwFIjVSc9Bj7kZDpMtR2vyzKvxcpij4LdJ8SdZs1uxLncNI/NzsW2HYC70U7Bpkszb74A==",
       "type": "package",
       "path": "microsoft.aspnetcore.mvc.formatters.json/2.1.2",
       "files": [
@@ -6478,7 +6479,7 @@
       ]
     },
     "Microsoft.AspNetCore.Mvc.ViewFeatures/2.1.2": {
-      "sha512": "Hs9CVEl1DzXCGwXPVAYyfPHt56GNEyp8ksaUu8cxNbZL1ykEWAoGVE5PFcEVzkMNVFhSW5EtbQeSdnU0rV5idA==",
+      "sha512": "aquIv1JnXfeJFJPGn11IJYACuucJt+NxjnDJxoEtcsLe6wY4vWGV+vW/QKqC53CIbFd4IipxF5ihw385rA0Dqg==",
       "type": "package",
       "path": "microsoft.aspnetcore.mvc.viewfeatures/2.1.2",
       "files": [
@@ -6933,7 +6934,7 @@
       ]
     },
     "Microsoft.CodeAnalysis.Analyzers/1.1.0": {
-      "sha512": "HS3iRWZKcUw/8eZ/08GXKY2Bn7xNzQPzf8gRPHGSowX7u7XXu9i9YEaBeBNKUXWfI7qjvT2zXtLUvbN0hds8vg==",
+      "sha512": "I3JL7Qa1qBP6a5pR/f8PXrdOPkLhRhUJstCA2hbbmtPofBGIJgmmp14mPUgr+X/Eul42ncL0tEnae83m4XPZlA==",
       "type": "package",
       "path": "microsoft.codeanalysis.analyzers/1.1.0",
       "files": [
@@ -7720,7 +7721,7 @@
       ]
     },
     "Microsoft.Extensions.Identity.Stores/2.1.3": {
-      "sha512": "VX9gTTjXlbtJ4NauKAi5ZPCon0MVhKyXu1rMYY5E1wqgZ0JBKBUsIEDHy4Ujmptf5361BgUtwIvXhwxTrWXghg==",
+      "sha512": "OjEC+PQNIxs+Eac3HXRDwcd7afYxhyW5hIxv70os/vhechaSpkE2Q01TJkVldZirsQ1wB0WDkYEZpnkkbd/Wdw==",
       "type": "package",
       "path": "microsoft.extensions.identity.stores/2.1.3",
       "files": [
@@ -7888,7 +7889,7 @@
       ]
     },
     "Microsoft.Extensions.PlatformAbstractions/1.1.0": {
-      "sha512": "H6ZsQzxYw/6k2DfEQRXdC+vQ6obd6Uba3uGJrnJ2vG4PRXjQZ7seB13JdCfE72abp8E6Fk3gGgDzfJiLZi5ZpQ==",
+      "sha512": "UMlN++q5qqzQ2HH+uOrKxN5fmBXMQDhrYkSaPJxhmyzfJaFPirrVr1raim/Ocq1psAZoB9+7JSAf0GDAX35wUg==",
       "type": "package",
       "path": "microsoft.extensions.platformabstractions/1.1.0",
       "files": [
@@ -9685,7 +9686,7 @@
       ]
     },
     "System.Diagnostics.Contracts/4.3.0": {
-      "sha512": "k6pWjsOAzxWw3PVPs6KNS+zCNyJ9ymcL4rGzvJ8EGct3wUXoNvAs3pIls6H5sVy4qJVAK07M29Xgyrt41BUzrQ==",
+      "sha512": "eelRRbnm+OloiQvp9CXS0ixjNQldjjkHO4iIkR5XH2VIP8sUB/SIpa1TdUW6/+HDcQ+MlhP3pNa1u5SbzYuWGA==",
       "type": "package",
       "path": "system.diagnostics.contracts/4.3.0",
       "files": [
@@ -13964,23 +13965,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\LENOVO\\.nuget\\packages\\": {},
+    "C:\\Users\\JBSPL-0065\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Nirav\\Project\\GitHub\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj",
+      "projectUniqueName": "D:\\Git\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj",
       "projectName": "CleanArchitecture.Infrastructure",
-      "projectPath": "D:\\Nirav\\Project\\GitHub\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj",
-      "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-      "outputPath": "D:\\Nirav\\Project\\GitHub\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\obj\\",
+      "projectPath": "D:\\Git\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\CleanArchitecture.Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\JBSPL-0065\\.nuget\\packages\\",
+      "outputPath": "D:\\Git\\Jsl-Arc-2.1\\CleanArchitecture.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\JBSPL-0065\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -13993,8 +13994,8 @@
       "frameworks": {
         "netcoreapp2.1": {
           "projectReferences": {
-            "D:\\Nirav\\Project\\GitHub\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj": {
-              "projectPath": "D:\\Nirav\\Project\\GitHub\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj"
+            "D:\\Git\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj": {
+              "projectPath": "D:\\Git\\Jsl-Arc-2.1\\CleanArchitecture.core\\CleanArchitecture.core\\CleanArchitecture.Core.csproj"
             }
           }
         }
