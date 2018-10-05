@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.Interfaces.User
 {
     public partial interface IOtpMasterService
     {
-        Task<OtpMaster> AddOtp(int UserId,string Email=null,string Mobile =null);
+        Task<OtpMasterViewModel> AddOtp(int UserId,string Email=null,string Mobile =null);
         Task<OtpMasterViewModel> GetOtpData(int Id);
         void UpdateOtp(long Id);
     }
