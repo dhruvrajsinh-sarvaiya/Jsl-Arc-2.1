@@ -194,7 +194,7 @@ namespace CleanArchitecture.Web.API
         [HttpPost("login")]
         [AllowAnonymous]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> Login([FromBody]Core.ViewModels.AccountViewModels.LoginViewModel model)
+        public async Task<IActionResult> Login(Core.ViewModels.AccountViewModels.LoginViewModel model)
         {
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, set lockoutOnFailure: true
@@ -231,24 +231,22 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpPost("StandardLogin")]
         [AllowAnonymous]
-        public async Task<IActionResult> StandardLogin([FromBody]StandardLoginViewModel model)
+        public async Task<IActionResult> StandardLogin(StandardLoginViewModel model)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+            //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, false, lockoutOnFailure: false);
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByNameAsync(model.UserName);
                 var roles = await _userManager.GetRolesAsync(user);
                 _logger.LogInformation(1, "User logged in.");
 
-                StandardLoginResponse response = new StandardLoginResponse();
-                response.ReturnCode = enResponseCode.Success;
-                response.ReturnMsg = "Success";
-
-                return AppUtils.StanderdSignIn(user, response);
+                return AppUtils.StanderdSignIn(user, roles);
             }
             if (result.RequiresTwoFactor)
             {
-                return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
+                //return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
+                return RedirectToAction(nameof(SendCode), new { RememberMe = false });
             }
             if (result.IsLockedOut)
             {
@@ -278,7 +276,7 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpPost("LoginWithEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginWithEmail([FromBody]LoginWithEmailViewModel model)
+        public async Task<IActionResult> LoginWithEmail(LoginWithEmailViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user != null)
@@ -287,11 +285,7 @@ namespace CleanArchitecture.Web.API
                 if (otpData != null)
                 {
                     _logger.LogWarning(1, "User Login with Email Send Success.");
-
-                    LoginWithEmailResponse response = new LoginWithEmailResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Success";
-                    return Ok(response);
+                    return Ok("You have send OTP on email");
                 }
                 else
                 {
@@ -314,7 +308,7 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpPost("LoginWithMobile")]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginWithMobile([FromBody]LoginWithMobileViewModel model)
+        public async Task<IActionResult> LoginWithMobile(LoginWithMobileViewModel model)
         {
             var userdt = await _userService.FindByMobileNumber(model.Mobile);
             if (userdt != null)
@@ -324,11 +318,7 @@ namespace CleanArchitecture.Web.API
                 {
                     //var roles = await _userManager.GetRolesAsync(userdt.Result);
                     _logger.LogWarning(1, "User Login with Mobile Send Success.");
-
-                    LoginWithMobileResponse response = new LoginWithMobileResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Success";
-                    return Ok(response);
+                    return Ok("You have send OTP on email");
                 }
                 else
                 {
@@ -382,7 +372,7 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpPost("ReSendOtpWithEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithEmail([FromBody]LoginWithEmailViewModel model)
+        public async Task<IActionResult> ReSendOtpWithEmail(LoginWithEmailViewModel model)
         {
             var userdt = await _userService.FindByEmail(model.Email);
             if (!string.IsNullOrEmpty(userdt?.Email))
@@ -397,10 +387,7 @@ namespace CleanArchitecture.Web.API
                     {
                         _logger.LogWarning(1, "User Login with Email OTP Send Success.");
 
-                        LoginWithEmailResponse response = new LoginWithEmailResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Success";
-                        return Ok(response);
+                        return Ok("User Login with Email OTP Send Success.");
                     }
                     else
                     {
@@ -418,10 +405,7 @@ namespace CleanArchitecture.Web.API
                     CommunicationResponse CommResponse = await _mediator.Send(request);
                     _logger.LogWarning(1, "User Login with Email OTP Send Success.");
 
-                    LoginWithEmailResponse response = new LoginWithEmailResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Success";
-                    return Ok(response);
+                    return Ok("User Login with Email OTP Send Success.");
                 }
             }
             else
@@ -441,7 +425,7 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpPost("ReSendOtpWithMobile")]
         [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithMobile([FromBody]LoginWithMobileViewModel model)
+        public async Task<IActionResult> ReSendOtpWithMobile(LoginWithMobileViewModel model)
         {
             var userdt = await _userService.FindByMobileNumber(model.Mobile);
             if (!string.IsNullOrEmpty(userdt?.Mobile))
@@ -456,10 +440,7 @@ namespace CleanArchitecture.Web.API
                     {
                         _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
 
-                        LoginWithMobileResponse response = new LoginWithMobileResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Success";
-                        return Ok(response);
+                        return Ok("User Login with Mobile OTP Send Success.");
                     }
                     else
                     {
@@ -477,10 +458,7 @@ namespace CleanArchitecture.Web.API
 
                     _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
 
-                    LoginWithMobileResponse response = new LoginWithMobileResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Success";
-                    return Ok(response);
+                    return Ok("User Login with Mobile OTP Send Success.");
                 }
             }
             else
@@ -500,7 +478,7 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpPost("MobileOtpVerification")]
         [AllowAnonymous]
-        public async Task<IActionResult> MobileOtpVerification([FromBody]OTPWithMobileViewModel model)
+        public async Task<IActionResult> MobileOtpVerification(OTPWithMobileViewModel model)
         {
             try
             {
@@ -516,12 +494,17 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
-                                    _logger.LogWarning(1, "You are successfully logged in");
+                                    _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
-                                    OTPWithMobileResponse response = new OTPWithMobileResponse();
-                                    response.ReturnCode = enResponseCode.Success;
-                                    response.ReturnMsg = "You are successfully logged in";
-                                    return Ok(response);
+                                    //var user = await _userService.FindByMobileNumber(model.MobileNo);
+                                    var currentUser = new ApplicationUser
+                                    {
+                                        UserName = logindata.Mobile,                                        
+                                        Mobile = logindata.Mobile,
+                                        Id = (int)logindata.Id
+                                    };
+                                    var roles = await _userManager.GetRolesAsync(currentUser);
+                                    return AppUtils.SignIn(currentUser, roles);
                                 }
                                 else
                                 {
@@ -565,7 +548,7 @@ namespace CleanArchitecture.Web.API
         /// <returns></returns>
         [HttpPost("EmailOtpVerification")]
         [AllowAnonymous]
-        public async Task<IActionResult> EmailOtpVerification([FromBody]OTPWithEmailViewModel model)
+        public async Task<IActionResult> EmailOtpVerification(OTPWithEmailViewModel model)
         {
             try
             {
@@ -581,12 +564,20 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
-                                    _logger.LogWarning(1, "You are successfully logged in");
+                                    _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
-                                    OTPWithEmailResponse response = new OTPWithEmailResponse();
-                                    response.ReturnCode = enResponseCode.Success;
-                                    response.ReturnMsg = "You are successfully logged in";
-                                    return Ok(response);
+
+                                    var currentUser = new ApplicationUser
+                                    {
+                                        UserName = logindata.Email,
+                                        Email = logindata.Email,
+                                        Id = (int)logindata.Id
+                                    };
+                                    var roles = await _userManager.GetRolesAsync(currentUser);
+                                    return AppUtils.SignIn(currentUser, roles);
+                                    //var user = await _userManager.FindByEmailAsync(model.Email);
+                                    //var roles = await _userManager.GetRolesAsync(user);
+                                    //return AppUtils.SignIn(user, roles);
                                 }
                                 else
                                 {
@@ -626,13 +617,10 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("ForgotPassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ForgotPassword([FromBody]ForgotPasswordViewModel model)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
 
-            ForgotPasswordResponse response = new ForgotPasswordResponse();
-            response.ReturnCode = enResponseCode.Success;
-            response.ReturnMsg = "Success";
-            return Ok(response);
+            return Ok("Success");
 
             /*
             var currentUser = await _userManager.FindByNameAsync(model.Email);
@@ -664,7 +652,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("resetpassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Email);
 
