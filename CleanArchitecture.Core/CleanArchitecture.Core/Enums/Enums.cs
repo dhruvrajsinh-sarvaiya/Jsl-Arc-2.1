@@ -130,12 +130,10 @@ namespace CleanArchitecture.Core.Enums
         Success = 2253,
         ItemNotFoundForGenerateAddress = 2254,
         InvalidThirdpartyID = 2255,
-        //====================Transactional
+        AddressGenerationFailed = 2256,
         TransactionInsertSuccess = 1,
         TransactionInsertFail =1,
         TransactionInsertInternalError =1
-
-
     }
     public enum enResponseCodeService
     {

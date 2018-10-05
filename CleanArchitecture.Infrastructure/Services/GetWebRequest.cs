@@ -45,6 +45,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
 
             keyValuePairs.Add("##SMSCODE##", routeConfiguration.OpCode);
+            keyValuePairs.Add("##WALLETID##", routeConfiguration.ProviderWalletID); 
+
 
             foreach (KeyValuePair<string, string> item in keyValuePairs)
             {
@@ -61,6 +63,7 @@ namespace CleanArchitecture.Infrastructure.Services
             thirdPartyAPIRequest.keyValuePairsHeader = keyValuePairsHeader;
 
             thirdPartyAPIRequest.DelayAddress = routeConfiguration.IsDelayAddress;
+            thirdPartyAPIRequest.walletID = routeConfiguration.ProviderWalletID;
             return thirdPartyAPIRequest;        
     }
     }

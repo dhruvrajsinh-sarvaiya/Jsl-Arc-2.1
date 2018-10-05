@@ -159,7 +159,7 @@ namespace CleanArchitecture.Web.Extensions
             app.UseDeveloperExceptionPage();
             app.UseDatabaseErrorPage();
             // NOTE: For SPA swagger needs adding before MVC
-           // app.UseCustomSwaggerApi();
+            app.UseCustomSwaggerApi();
 
             app.UseSession();
 

@@ -190,7 +190,7 @@ namespace CleanArchitecture.Web.API
                         linkToken.Mobile = model.Mobile;
                         linkToken.CurrentTime = DateTime.UtcNow;
                         linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        linkToken.Password = EncyptedDecrypted.Encrypt(tempcurrentUser.PasswordHash, passwordBytes);
+                        //linkToken.Password = tempcurrentUser.PasswordHash;
 
                         string UserDetails = JsonConvert.SerializeObject(linkToken);
                         string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
@@ -265,7 +265,7 @@ namespace CleanArchitecture.Web.API
                         SendEmailRequest request = new SendEmailRequest();
                         request.Recepient = model.Email;
                         request.Subject = "Registration confirmation email";
-                        request.Body = "use this code:" + resultotp.OTP + "";
+                        request.Body = "use this code:"+resultotp.OTP+"";
 
                         CommunicationResponse CommResponse = await _mediator.Send(request);
 
@@ -303,7 +303,7 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> SignUpWithMobile([FromBody]SignUpWithMobileViewModel model)
         {
-
+            
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
             string countryCode = "IN";
             PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
@@ -330,7 +330,7 @@ namespace CleanArchitecture.Web.API
                         var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
                         if (result != null)
                         {
-                            var tempotp = await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
+                            var tempotp =await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
 
                             SendSMSRequest request = new SendSMSRequest();
                             request.MobileNo = Convert.ToInt64(model.Mobile);
@@ -385,7 +385,7 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Direct signUp with mobile sms using verified opt.
         /// </summary> 
-
+        
         [HttpPost("MobileOtpVerification")]
         [AllowAnonymous]
         public async Task<IActionResult> MobileOtpVerification([FromBody]OTPWithMobileViewModel model)
@@ -414,9 +414,9 @@ namespace CleanArchitecture.Web.API
                                     {
                                         UserName = tempdata.Mobile,
                                         Mobile = tempdata.Mobile,
-                                        //PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
+                                        PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
                                     };
-                                    var result = await _userManager.CreateAsync(currentUser);
+                                    var result = await _userManager.CreateAsync(currentUser, currentUser.PasswordHash);
                                     if (result.Succeeded)
                                     {
                                         if (currentUser.Mobile != null)
@@ -430,7 +430,6 @@ namespace CleanArchitecture.Web.API
                                         {
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
-                                            currentUser.PhoneNumberConfirmed = true;
                                             var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
                                             return Ok("Your account has been activated, you can now login.");
                                             //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
@@ -479,7 +478,7 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Direct signUp with email otp using verified.
         /// </summary>
-
+        
         [HttpPost("EmailOtpVerification")]
         [AllowAnonymous]
         public async Task<IActionResult> EmailOtpVerification([FromBody]OTPWithEmailViewModel model)
@@ -571,7 +570,7 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Auto generate resend otp in Mobile
         /// </summary>   
-
+        
         [HttpPost("ReSendOtpWithMobile")]
         [AllowAnonymous]
         public async Task<IActionResult> ReSendOtpWithMobile([FromBody]SignUpWithMobileViewModel model)
@@ -629,7 +628,7 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Auto generate resend otp in Email
         /// </summary>  
-
+        
         [HttpPost("ReSendOtpWithEmail")]
         [AllowAnonymous]
         public async Task<IActionResult> ReSendOtpWithEmail([FromBody]SignUpWithEmailViewModel model)
@@ -683,7 +682,7 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are resend Email Link to direct call this method
         /// </summary>
-
+        
         [HttpPost("ReSendRegisterlink")]
         [AllowAnonymous]
         public async Task<IActionResult> ReSendRegisterlink([FromBody]SignUpWithEmailViewModel model)
@@ -704,8 +703,7 @@ namespace CleanArchitecture.Web.API
                         linkToken.Email = model.Email;
                         linkToken.CurrentTime = DateTime.UtcNow;
                         linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        //linkToken.Password = tempdata.PasswordHash;
-                        //linkToken.Password = EncyptedDecrypted.Encrypt(tempcurrentUser.PasswordHash, passwordBytes);
+                        linkToken.Password = tempdata.PasswordHash;
 
                         string UserDetails = JsonConvert.SerializeObject(linkToken);
                         string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
