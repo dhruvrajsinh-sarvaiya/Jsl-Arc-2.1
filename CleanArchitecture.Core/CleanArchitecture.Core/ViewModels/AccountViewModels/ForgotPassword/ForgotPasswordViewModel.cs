@@ -9,11 +9,6 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.ForgotPassword
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-    }
-
-    public class ForgotPasswordResponse : BizResponseClass
-    {
-
-    }
+    }   
 
 }
