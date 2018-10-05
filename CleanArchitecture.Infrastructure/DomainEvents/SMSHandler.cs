@@ -20,16 +20,18 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IMessageRepository<MessagingQueue> _MessageRepository;
         private readonly IMessageConfiguration _MessageConfiguration;
         private readonly IMessageService _MessageService;       
-        private readonly WebApiParseResponse _WebApiParseResponse;
+        private WebApiParseResponse _WebApiParseResponse;
         private GetDataForParsingAPI _GetDataForParsingAPI;
+        private WebAPIParseResponseCls _GenerateResponse;
 
-        public SMSHandler(IMessageRepository<MessagingQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse)
+        public SMSHandler(IMessageRepository<MessagingQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse, WebAPIParseResponseCls GenerateResponse)
         {
             _MessageRepository = MessageRepository;
             _MessageConfiguration = MessageConfiguration;
             _MessageService = MessageService;
             _GetDataForParsingAPI = GetDataForParsingAPI;
             _WebApiParseResponse = WebApiParseResponse;
+            _GenerateResponse = GenerateResponse;
         }
 
         public async Task<CommunicationResponse> Handle(SendSMSRequest Request, CancellationToken cancellationToken)
@@ -51,15 +53,16 @@ namespace CleanArchitecture.Infrastructure.Services
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1,1);
                 foreach (CommunicationProviderList Provider in Result)
                 {
-                    string Resposne = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, Provider.SendURL, Provider.SenderID, Provider.UserID, Provider.Password);
+                    string Response = await _MessageService.SendSMSAsync(Message.MobileNo, Message.SMSText, Provider.SendURL, Provider.SenderID, Provider.UserID, Provider.Password);
+                    //string Response = " GUID:2387354506261631296 , responseTime:2018-10-05 16:00:46";
                     CopyClass.CopyObject(Provider, ref _GetDataForParsingAPI);
-                    WebAPIParseResponseCls GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Resposne, _GetDataForParsingAPI);
-                    if (GenerateResponse.Status == enTransactionStatus.Success)
+                    _GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Response, _GetDataForParsingAPI);
+                    if (_GenerateResponse.Status == enTransactionStatus.Success)
                     {                       
                         Message.SentMessage();
-                        Message.RespText = Resposne;
+                        Message.RespText = Response;
                         _MessageRepository.Update(Message);
-                        return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SMSExceptionMessage });
+                        return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SMSSuccessMessage });
                     }
                     else
                     {                     

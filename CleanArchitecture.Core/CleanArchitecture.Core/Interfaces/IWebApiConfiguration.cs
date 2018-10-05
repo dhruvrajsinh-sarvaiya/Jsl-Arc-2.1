@@ -26,7 +26,7 @@ namespace CleanArchitecture.Core.Interfaces
 
     public interface IWebApiParseResponse<TResponse>
     {        
-        TResponse TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID);       
+        //TResponse TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID);       
       
     }
    

@@ -13,7 +13,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
     public class WebApiDataRepository : IWebApiRepository
     {
         private readonly CleanArchitectureContext _dbContext;
-        readonly ILogger<WebApiDataRepository> _log;
+        public readonly ILogger<WebApiDataRepository> _log;
 
 
         public WebApiDataRepository(CleanArchitectureContext dbContext, ILogger<WebApiDataRepository> log)
