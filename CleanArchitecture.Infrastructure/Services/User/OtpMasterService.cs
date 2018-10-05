@@ -17,7 +17,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
     {
         private readonly CleanArchitectureContext _dbContext;
         private readonly IUserService _userService;
-       // private readonly ICustomRepository<OtpMaster> _customRepository;
+        //private readonly ICustomRepository<OtpMaster> _customRepository;
         private readonly IMessageRepository<OtpMaster> _customRepository;
         private readonly IRegisterTypeService _registerTypeService;
         private readonly IMediator _mediator;
@@ -29,8 +29,8 @@ namespace CleanArchitecture.Infrastructure.Services.User
         {
             _dbContext = dbContext;
             _userService = userService;
-            //_customRepository = customRepository;
             _customRepository = customRepository;
+            //_customRepository = customRepository;
             _registerTypeService = registerTypeService;
             _mediator = mediator;
         }
@@ -103,7 +103,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
         public async Task<OtpMasterViewModel> GetOtpData(int Id)
         {
-            var otpmaster = _dbContext.OtpMaster.Where(i => i.UserId == Id).FirstOrDefault();
+            var otpmaster = _dbContext.OtpMaster.Where(i => i.UserId == Id).LastOrDefault();
             if (otpmaster != null)
             {
                 OtpMasterViewModel model = new OtpMasterViewModel();
@@ -125,6 +125,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
         {
             var tempdata = _customRepository.GetById(Convert.ToInt16(Id));
             tempdata.SetAsOTPStatus();
+            tempdata.SetAsUpdateDate(tempdata.UserId);
             //tempdata.Status = true;
             _customRepository.Update(tempdata);
         }
