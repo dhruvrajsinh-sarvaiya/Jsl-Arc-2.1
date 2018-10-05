@@ -430,8 +430,6 @@ namespace CleanArchitecture.Web.API
                                         {
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
-                                            currentUser.PhoneNumberConfirmed = true;
-                                            var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
                                             return Ok("Your account has been activated, you can now login.");
                                             //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
                                         }
@@ -632,111 +630,12 @@ namespace CleanArchitecture.Web.API
         
         [HttpPost("ReSendOtpWithEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithEmail([FromBody]SignUpWithEmailViewModel model)
+        public async Task<IActionResult> ReSendOtp()
         {
-            var result = await _userManager.FindByEmailAsync(model.Email);
-            if (string.IsNullOrEmpty(result?.Email))
-            {
-                var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
-                var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
-                if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)
-                {
-                    _tempOtpService.Update(tempotp.Id);
-                    var resultdata = _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Mobile));
-                    SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Success";
-                    return Ok(response);
-                }
-                else
-                {
-                    SendEmailRequest request = new SendEmailRequest();
-                    request.Recepient = model.Email;
-                    request.Subject = "Registration confirmation resend email";
-                    request.Body = "use this code:" + tempotp.OTP + "";
-
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
-                    _logger.LogInformation(3, "Email sent successfully with your account");
-
-                    RegisterResponse response = new RegisterResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Please verify it by clicking the otp that has been resend to your email.";
-                    return Ok(response);
-                }
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                return BadRequest(new ApiError(ModelState));
-            }
-        }
-
-        /// <summary>
-        ///  This method are resend Email Link to direct call this method
-        /// </summary>
-        
-        [HttpPost("ReSendRegisterlink")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ReSendRegisterlink([FromBody]SignUpWithEmailViewModel model)
-        {
-            try
-            {
-                var result = await _userManager.FindByEmailAsync(model.Email);
-                if (string.IsNullOrEmpty(result?.Email))
-                {
-                    var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
-                    if (!tempdata.RegisterStatus)
-                    {
-                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
-
-                        LinkTokenViewModel linkToken = new LinkTokenViewModel();
-                        linkToken.Id = tempdata.Id;
-                        linkToken.Username = model.Email;
-                        linkToken.Email = model.Email;
-                        linkToken.CurrentTime = DateTime.UtcNow;
-                        linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        //linkToken.Password = tempdata.PasswordHash;
-                        //linkToken.Password = EncyptedDecrypted.Encrypt(tempcurrentUser.PasswordHash, passwordBytes);
-
-                        string UserDetails = JsonConvert.SerializeObject(linkToken);
-                        string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
-                        string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
-                        {
-                            emailConfirmCode = SubScriptionKey
-                        }, protocol: HttpContext.Request.Scheme);
-
-                        var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
-
-                        SendEmailRequest request = new SendEmailRequest();
-                        request.Recepient = model.Email;
-                        request.Subject = "Registration confirmation resend email";
-                        request.Body = confirmationLink;
-
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
-                        _logger.LogInformation(3, "Email sent successfully with your account");
-
-                        RegisterResponse response = new RegisterResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Please verify it by clicking the activation link that has been resend to your email.";
-                        return Ok(response);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "This email is already registered.");
-                        return BadRequest(new ApiError(ModelState));
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                    return BadRequest(new ApiError(ModelState));
-                }
-            }
-            catch (Exception ex)
-            {
-                return null;
-                //return await Task.FromResult(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = "Message not sent." });
-            }
+            SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+            response.ReturnCode = enResponseCode.Success;
+            response.ReturnMsg = "Success";
+            return Ok(response);
         }
 
         #endregion
