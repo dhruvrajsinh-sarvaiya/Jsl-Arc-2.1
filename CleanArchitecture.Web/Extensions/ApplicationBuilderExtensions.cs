@@ -142,7 +142,7 @@ namespace CleanArchitecture.Web.Extensions
             // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
             app.UseSwaggerUI(c =>
             {                
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Clean Architecture Api V1");
+                c.SwaggerEndpoint("/SPAOnCoreV1/swagger/v1/swagger.json", "Clean Architecture Api V1");
                 // add search options in swagger ui by nirav savariya 9-29-2018  
                 c.EnableFilter("");
             });
@@ -159,7 +159,7 @@ namespace CleanArchitecture.Web.Extensions
             app.UseDeveloperExceptionPage();
             app.UseDatabaseErrorPage();
             // NOTE: For SPA swagger needs adding before MVC
-            app.UseCustomSwaggerApi();
+            //app.UseCustomSwaggerApi();
 
             app.UseSession();
 
