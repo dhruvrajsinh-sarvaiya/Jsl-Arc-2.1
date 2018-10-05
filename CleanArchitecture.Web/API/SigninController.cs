@@ -278,11 +278,11 @@ namespace CleanArchitecture.Web.API
         [HttpPost("LoginWithEmail")]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithEmail([FromBody]LoginWithEmailViewModel model)
-        {            
+        {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user != null)
             {
-                var otpData = _otpMasterService.AddOtp(user.Id, user.Email,"");
+                var otpData = _otpMasterService.AddOtp(user.Id, user.Email, "");
                 if (otpData != null)
                 {
                     _logger.LogWarning(1, "User Login with Email Send Success.");
@@ -297,7 +297,7 @@ namespace CleanArchitecture.Web.API
                     _logger.LogWarning(2, "User Otp Data Not Send.");
                     return BadRequest(new ApiError("Invalid login attempt."));
                 }
-            }        
+            }
             else
             {
                 return BadRequest(new ApiError("Invalid login attempt."));
@@ -315,10 +315,10 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithMobile([FromBody]LoginWithMobileViewModel model)
         {
-            var userdt = _userService.FindByMobileNumber(model.Mobile);
-            if (userdt.Result != null)
+            var userdt = await _userService.FindByMobileNumber(model.Mobile);
+            if (userdt != null)
             {
-                var otpData = _otpMasterService.AddOtp(userdt.Result.Id, "", userdt.Result.Mobile);
+                var otpData = _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
                 if (otpData != null)
                 {
                     //var roles = await _userManager.GetRolesAsync(userdt.Result);
@@ -372,6 +372,122 @@ namespace CleanArchitecture.Web.API
 
 
         #endregion
+
+        #region Resend OTP With Email
+        /// <summary>
+        /// This method are used login with email resend otp base verify 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("ReSendOtpWithEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtpWithEmail([FromBody]LoginWithEmailViewModel model)
+        {
+            var userdt = await _userService.FindByEmail(model.Email);
+            if (!string.IsNullOrEmpty(userdt?.Email))
+            {
+                var optcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
+
+                if (optcheck.ExpirTime <= DateTime.UtcNow)
+                {
+                    var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), userdt.Email, "");
+                    if (otpData != null)
+                    {
+                        _logger.LogWarning(1, "User Login with Email OTP Send Success.");
+
+                        LoginWithEmailResponse response = new LoginWithEmailResponse();
+                        response.ReturnCode = enResponseCode.Success;
+                        response.ReturnMsg = "Success";
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(2, "User Otp Data Not Send.");
+                        return BadRequest(new ApiError("User Otp Data Not Send."));
+                    }
+                }
+                else
+                {
+                    SendEmailRequest request = new SendEmailRequest();
+                    request.Recepient = userdt.Email;
+                    request.Subject = "Login With Email Otp";
+                    request.Body = "use this code:" + optcheck.OTP + "";
+
+                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    _logger.LogWarning(1, "User Login with Email OTP Send Success.");
+
+                    LoginWithEmailResponse response = new LoginWithEmailResponse();
+                    response.ReturnCode = enResponseCode.Success;
+                    response.ReturnMsg = "Success";
+                    return Ok(response);
+                }
+            }
+            else
+            {
+                return BadRequest(new ApiError("Invalid login email."));
+            }
+            // return BadRequest(new ApiError("Invalid login attempt."));
+        }
+        #endregion
+
+
+        #region Resend OTP With Mobile
+        /// <summary>
+        /// This method are used login with mobile resend otp base verify 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("ReSendOtpWithMobile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtpWithMobile([FromBody]LoginWithMobileViewModel model)
+        {
+            var userdt = await _userService.FindByMobileNumber(model.Mobile);
+            if (!string.IsNullOrEmpty(userdt?.Mobile))
+            {
+                var optcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
+
+                if (optcheck.ExpirTime <= DateTime.UtcNow)
+                {
+                    var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
+                    if (otpData != null)
+                    {
+                        _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
+
+                        LoginWithMobileResponse response = new LoginWithMobileResponse();
+                        response.ReturnCode = enResponseCode.Success;
+                        response.ReturnMsg = "Success";
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(2, "User Otp Data Not Send.");
+                        return BadRequest(new ApiError("User Otp Data Not Send."));
+                    }
+                }
+                else
+                {
+                    SendSMSRequest request = new SendSMSRequest();
+                    request.MobileNo = Convert.ToInt64(model.Mobile);
+                    request.Message = "SMS for use this code " + optcheck.OTP + "";
+
+                    CommunicationResponse CommResponse = await _mediator.Send(request);
+
+                    _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
+
+                    LoginWithMobileResponse response = new LoginWithMobileResponse();
+                    response.ReturnCode = enResponseCode.Success;
+                    response.ReturnMsg = "Success";
+                    return Ok(response);
+                }
+            }
+            else
+            {
+                return BadRequest(new ApiError("Invalid login Mobile."));
+            }
+            // return BadRequest(new ApiError("Invalid login attempt."));
+        }
+        #endregion
+
 
         [HttpPost("ForgotPassword")]
         [AllowAnonymous]
