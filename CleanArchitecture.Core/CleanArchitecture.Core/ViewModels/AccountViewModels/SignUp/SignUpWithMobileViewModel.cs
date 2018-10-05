@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
         //public string Password { get; set; }
     }
 
-    public class SignUpMobileWithOTPResponse : BizResponseClass
+    public class SignUpWithMobileResponse : BizResponseClass
     {
 
     }

@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.User;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
     public class UserService : IUserService
     {
         private readonly CleanArchitectureContext _dbContext;
-        private readonly ILogger<UserService> _log;        
+        private readonly ILogger<UserService> _log;
         public UserService(CleanArchitectureContext dbContext, ILogger<UserService> log)
         {
             _dbContext = dbContext;
@@ -31,11 +32,16 @@ namespace CleanArchitecture.Infrastructure.Services.User
         /// </summary>
         /// <param name="MobileNumber"></param>
         /// <returns></returns>
-        public async Task<ApplicationUser> FindByMobileNumber(string MobileNumber)
+        public async Task<TempUserRegister> FindByMobileNumber(string MobileNumber)
         {
-            var userdata =  _dbContext.Users.Where(i => i.Mobile == MobileNumber).FirstOrDefault();
-            if (userdata!= null)
-                return userdata;
+            var userdata = _dbContext.Users.Where(i => i.Mobile == MobileNumber).FirstOrDefault();
+            if (userdata != null)
+            {
+                TempUserRegister model = new TempUserRegister();
+                model.Mobile = userdata.Mobile;
+                model.Id = userdata.Id;
+                return model;
+            }
             else
                 return null;
         }
@@ -43,13 +49,18 @@ namespace CleanArchitecture.Infrastructure.Services.User
         /// <summary>
         /// Get User Data
         /// </summary>
-        /// <param name="MobileNumber"></param>
+        /// <param name="Email"></param>
         /// <returns></returns>
-        public async Task<ApplicationUser> FindByEmail(string Email)
+        public async Task<TempUserRegister> FindByEmail(string Email)
         {
             var userdata = _dbContext.Users.Where(i => i.Email == Email).FirstOrDefault();
             if (userdata != null)
-                return userdata;
+            {
+                TempUserRegister model = new TempUserRegister();
+                model.Email = userdata.Email;
+                model.Id = userdata.Id;
+                return model;
+            }
             else
                 return null;
         }

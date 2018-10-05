@@ -337,7 +337,7 @@ namespace CleanArchitecture.Web.API
                             request.Message = "SMS for use this code " + tempotp.OTP + "";
                             CommunicationResponse CommResponse = await _mediator.Send(request);
 
-                            SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                            SignUpWithMobileResponse response = new SignUpWithMobileResponse();
                             response.ReturnCode = enResponseCode.Success;
                             response.ReturnMsg = "Success";
                             return Ok(response);
@@ -597,7 +597,7 @@ namespace CleanArchitecture.Web.API
                         CommunicationResponse CommResponse = await _mediator.Send(request);
 
                         //return Ok("SMS sent successfully.");
-                        SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                        SignUpWithMobileResponse response = new SignUpWithMobileResponse();
                         response.ReturnCode = enResponseCode.Success;
                         response.ReturnMsg = "Success";
                         return Ok(response);
@@ -608,7 +608,11 @@ namespace CleanArchitecture.Web.API
                         request.MobileNo = Convert.ToInt64(model.Mobile);
                         request.Message = "SMS for use this code " + tempotp.OTP + "";
                         CommunicationResponse CommResponse = await _mediator.Send(request);
-                        return Ok("SMS sent successfully.");
+
+                        SignUpWithMobileResponse response = new SignUpWithMobileResponse();
+                        response.ReturnCode = enResponseCode.Success;
+                        response.ReturnMsg = "Success";
+                        return Ok(response);
                     }
                 }
                 else
@@ -651,7 +655,7 @@ namespace CleanArchitecture.Web.API
                     CommunicationResponse CommResponse = await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
-                    SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                    SignUpWithEmailResponse response = new SignUpWithEmailResponse();
                     response.ReturnCode = enResponseCode.Success;
                     response.ReturnMsg = "Success";
                     return Ok(response);
@@ -666,7 +670,7 @@ namespace CleanArchitecture.Web.API
                     CommunicationResponse CommResponse = await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
-                    RegisterResponse response = new RegisterResponse();
+                    SignUpWithEmailResponse response = new SignUpWithEmailResponse();
                     response.ReturnCode = enResponseCode.Success;
                     response.ReturnMsg = "Please verify it by clicking the otp that has been resend to your email.";
                     return Ok(response);

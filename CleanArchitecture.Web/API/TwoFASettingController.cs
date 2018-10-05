@@ -64,7 +64,7 @@ namespace CleanArchitecture.Web.API
 
             if (model != null)
             {
-                SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
+                SignUpWithMobileResponse response = new SignUpWithMobileResponse();
                 response.ReturnCode = enResponseCode.Success;
                 response.ReturnMsg = "Success";
                 return Ok(response);

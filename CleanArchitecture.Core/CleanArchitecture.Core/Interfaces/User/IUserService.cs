@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.Interfaces.User
     {
         bool GetMobileNumber(string MobileNumber);
         long GenerateRandomOTP();
-        Task<ApplicationUser> FindByMobileNumber(string MobileNumber);
-        Task<ApplicationUser> FindByEmail(string Email);
+        Task<TempUserRegister> FindByMobileNumber(string MobileNumber);
+        Task<TempUserRegister> FindByEmail(string Email);
     }
 }
