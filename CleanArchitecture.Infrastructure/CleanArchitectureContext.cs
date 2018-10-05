@@ -16,6 +16,7 @@ using CleanArchitecture.Core.Entities.Log;
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.ViewModels.Transaction;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -74,6 +75,7 @@ namespace CleanArchitecture.Infrastructure
 
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
+        public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; }
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {

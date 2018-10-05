@@ -7,6 +7,6 @@ namespace CleanArchitecture.Core.Interfaces.Repository
 {
     public interface IFrontTrnRepository
     {
-        List<GetActiveOrderInfo> GetActiveOrder(long MemberID);
+        List<ActiveOrderDataResponse> GetActiveOrder(long MemberID);
     }
 }

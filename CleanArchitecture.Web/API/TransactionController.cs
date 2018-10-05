@@ -474,13 +474,16 @@ namespace CleanArchitecture.Web.API
         {
             //For Testing Purpose
             long MemberID = 0;
+            var dataresponse = _frontTrnService.GetActiveOrder(MemberID);
             GetActiveOrderResponse Response = new GetActiveOrderResponse();
-            Response.response = _frontTrnService.GetActiveOrder(MemberID);
-            //Response.response = new List<GetActiveOrderInfo>()
-            //{
-            //   new GetActiveOrderInfo() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
-            //   new GetActiveOrderInfo() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
-            //};
+            if (dataresponse.Count == 0)
+            {
+                Response.response = new List<GetActiveOrderInfo>()
+                {
+                   new GetActiveOrderInfo() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
+                   new GetActiveOrderInfo() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
+                };
+            }
 
             Response.ReturnCode = enResponseCode.Success;
             return returnDynamicResult(Response);
