@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanArchitecture.Infrastructure.Services.Repository
 {
-    public partial class CustomRepository<TEntity> : ICustomRepository<TEntity> where TEntity : BaseEntity
+    public partial class CustomRepository<TEntity> : ICustomRepository<TEntity> where TEntity : BizBase
     {
         #region Fields
 

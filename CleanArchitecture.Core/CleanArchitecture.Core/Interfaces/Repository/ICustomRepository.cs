@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.Interfaces.Repository
     /// Represents an entity repository
     /// </summary>
     /// <typeparam name="TEntity">Entity type</typeparam>
-    public interface ICustomRepository<TEntity> where TEntity : BaseEntity
+    public interface ICustomRepository<TEntity> where TEntity : BizBase
     {
         #region Methods
 
