@@ -166,8 +166,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 var DuplicateTxn=_TransactionRepository.GetSingle(item => item.MemberMobile == Req.MemberMobile && item.TransactionAccount == Req.TransactionAccount && item.Amount==Req.Amount && item.TrnDate.AddMinutes(10) > Helpers.UTC_To_IST());
                 if(DuplicateTxn != null)
                 {
-                    Req.StatusMsg = EnResponseMessage.CreateInvalidAmountMsg;
-                    return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateInvalidAmount);
+                    Req.StatusMsg = EnResponseMessage.CreateDuplicateTrnMsg;
+                    return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateDuplicateTrn);
                 }
 
 

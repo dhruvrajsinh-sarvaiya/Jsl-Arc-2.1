@@ -31,6 +31,7 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrnNoCreditAccountFoundMsg = "No Credit Account Found";
         public static string CreateTrnNoDebitAccountFoundMsg = "No Debit Account Found";
         public static string CreateInvalidAmountMsg = "Invalid Amount";
+        public static string CreateDuplicateTrnMsg = "Duplicate Transaction for Same Address, Please Try After 10 Minutes";
         //============================
 
         //============================walelt=================================//
