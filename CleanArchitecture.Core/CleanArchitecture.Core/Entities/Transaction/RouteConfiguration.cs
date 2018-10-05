@@ -52,6 +52,9 @@ namespace CleanArchitecture.Core.Entities
         [DefaultValue(0)]
         public byte IsDelayAddress { get; set; }
 
+        [StringLength(100)]
+        public string ProviderWalletID { get; set; }
+
         public void SetActiveRoute()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);

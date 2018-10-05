@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
@@ -14,9 +15,9 @@ namespace CleanArchitecture.Infrastructure.Services.User
 {
     public partial class OtpMasterService : IOtpMasterService
     {
-        //private readonly CleanArchitectureContext _dbContext;
+        private readonly CleanArchitectureContext _dbContext;
         private readonly IUserService _userService;
-       // private readonly ICustomRepository<OtpMaster> _customRepository;
+        //private readonly ICustomRepository<OtpMaster> _customRepository;
         private readonly IMessageRepository<OtpMaster> _customRepository;
         private readonly IRegisterTypeService _registerTypeService;
         private readonly IMediator _mediator;
@@ -26,15 +27,15 @@ namespace CleanArchitecture.Infrastructure.Services.User
             IMessageRepository<OtpMaster> customRepository,
         IRegisterTypeService registerTypeService, IMediator mediator)
         {
-            //_dbContext = dbContext;
+            _dbContext = dbContext;
             _userService = userService;
-            //_customRepository = customRepository;
             _customRepository = customRepository;
+            //_customRepository = customRepository;
             _registerTypeService = registerTypeService;
             _mediator = mediator;
         }
 
-        public async Task<OtpMaster> AddOtp(int UserId, string Email = null,string Mobile=null)
+        public async Task<OtpMasterViewModel> AddOtp(int UserId, string Email = null,string Mobile=null)
         {
             string OtpValue = _userService.GenerateRandomOTP().ToString();
             int Regtypeid = 0;
@@ -64,13 +65,13 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
             if (!String.IsNullOrEmpty(Email))
             {
-                var OtpLink = "<a class='btn-primary' href=\"" + OtpValue + "\"> Login with Email Otp = " + OtpValue + " </a>";
+                //var OtpLink = "<a class='btn-primary' href=\"" + OtpValue + "\"> Login with Email Otp = " + OtpValue + " </a>";
                 //_logger.LogInformation(3, "User created a new account with password.");
 
                 SendEmailRequest request = new SendEmailRequest();
                 request.Recepient = Email;
                 request.Subject = "Login With Email Otp";
-                request.Body = OtpLink;
+                request.Body = "use this code: " + OtpValue +"";
 
                 CommunicationResponse CommResponse = await _mediator.Send(request);
             }
@@ -81,14 +82,28 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 request.Message = OtpValue;
                 CommunicationResponse CommResponse = await _mediator.Send(request);
             }
-            return currentotp;
+
+            OtpMasterViewModel model = new OtpMasterViewModel();
+            if(currentotp !=null)
+            {
+                model.UserId = model.UserId;
+                model.RegTypeId = model.RegTypeId;
+                model.OTP = model.OTP;
+                model.CreatedTime = model.CreatedTime;
+                model.ExpirTime = model.ExpirTime;
+                model.Status = model.Status;
+                model.Id = model.Id;
+                return model;
+            }
+            else
+                return null;
         }
 
 
 
         public async Task<OtpMasterViewModel> GetOtpData(int Id)
         {
-            var otpmaster = _customRepository.GetById(Id); // .TempOtpMaster.Where(i => i.UserId == Id).FirstOrDefault();
+            var otpmaster = _dbContext.OtpMaster.Where(i => i.UserId == Id).LastOrDefault();
             if (otpmaster != null)
             {
                 OtpMasterViewModel model = new OtpMasterViewModel();
@@ -101,7 +116,6 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 model.Status = otpmaster.Status;
                 model.Id = otpmaster.Id;
                 return model;
-
             }
             else
                 return null;
@@ -111,6 +125,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
         {
             var tempdata = _customRepository.GetById(Convert.ToInt16(Id));
             tempdata.SetAsOTPStatus();
+            tempdata.SetAsUpdateDate(tempdata.UserId);
             //tempdata.Status = true;
             _customRepository.Update(tempdata);
         }

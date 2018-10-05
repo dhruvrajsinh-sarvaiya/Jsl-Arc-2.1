@@ -29,25 +29,25 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public long Confirmations { get; set; }
 
-        [Required]
-        public decimal Value { get; set; }
+        //[Required]
+        //public decimal Value { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
         [Required]
         [StringLength(100)]
-
         public string StatusMsg { get; set; }
 
         [Required]
-        public string confirmedTime { get; set; }
+        public string TimeEpoch { get; set; }
 
         [Required]
-        public string UnconfirmedTime { get; set; }
+        public string ConfirmedTime { get; set; }
 
         [Required]
-        public string CreatedTime { get; set; }
+        public string EpochTimePure { get; set; } // time converted from epoch time 
                
         public long OrderID { get; set; }
 
@@ -63,7 +63,7 @@ namespace CleanArchitecture.Core.Entities
 
         public string RouteTag { get; set; }
 
-        public long? SerProID { get; set; }
+        public long SerProID { get; set; }
 
         public void OrderIdUpdated(long orderid)
         {

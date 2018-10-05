@@ -26,7 +26,7 @@ namespace CleanArchitecture.Web.API
             _logger = logger;
             _basePage = basePage;
         }
-        [Authorize]
+        //[Authorize]
         private ActionResult returnDynamicResult(dynamic respObjJson)
         {
             i++;
@@ -60,7 +60,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpGet("{coin}/{id}")]
         //[Route("{coin}/{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> ListwalletTransfer(string id, string coin, string prevId = null, bool allToken = false, bool includeHex = false, string searchLabel = null, string type = null)
         {
             try
@@ -86,7 +86,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpGet("{coin}/{walletId}/{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetwalletTransfer(string coin, string walletId, string id)
         {
             try
@@ -108,7 +108,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpGet("{coin}/{walletId}/{sequenceId}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetWalletTransBySeq(string coin, string walletId, string sequenceId)
         {
             try
@@ -130,7 +130,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpPost("{coin}/{id}/{wallet}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> CreateWalletAddress(string coin, string wallet, string id, [FromBody]CreateWalletAddressReq Request)
         {
             try
@@ -152,7 +152,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpGet("{coin}/{walletId}/{addressOrId}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetWalletAddress(string coin, string walletId, string addressOrId)
         {
             try
@@ -178,7 +178,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpPut("{coin}/{walletId}/{addressOrId}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> UpdateWalletAddress(string coin, string walletId, string addressOrId, [FromBody]UpdateWalletAddressReq Request)
         {
             try
@@ -200,7 +200,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpPost("{coin}/{walletid}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Withdrawal(string coin, string walletid, [FromBody]WithdrawalReq Request)
         {
             try
@@ -222,7 +222,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpPost("{coin}/{walletid}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> SendToMany(string coin, string walletid, [FromBody]SendTranToManyReq Request)
         {
             try

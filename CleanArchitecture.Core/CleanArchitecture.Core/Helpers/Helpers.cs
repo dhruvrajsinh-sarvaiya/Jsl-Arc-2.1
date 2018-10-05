@@ -20,6 +20,27 @@ namespace CleanArchitecture.Core.Helpers
                             ContractResolver = new CamelCasePropertyNamesContractResolver()
                         });
         }
+        public static decimal DoRoundForTrading(decimal Value,short FractionalLength)
+        {
+            return Math.Round(Value, FractionalLength, MidpointRounding.AwayFromZero);
+        }
+        public static DateTime UTC_To_IST()
+        {
+            try
+            {
+                DateTime myUTC = DateTime.UtcNow;
+                // 'Dim utcdate As DateTime = DateTime.ParseExact(DateTime.UtcNow, "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                // Dim utcdate As DateTime = DateTime.ParseExact(myUTC, "M/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+                // 'Dim utcdate As DateTime = DateTime.ParseExact("11/09/2016 6:31:00 PM", "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                DateTime istdate = TimeZoneInfo.ConvertTimeFromUtc(myUTC, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                // MsgBox(myUTC & " - " & utcdate & " - " & istdate)
+                return istdate;
+            }
+            catch (Exception ex)
+            {                
+                throw ex;
+            }
+        }
 
     }
 

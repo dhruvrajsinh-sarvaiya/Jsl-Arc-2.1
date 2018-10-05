@@ -130,24 +130,32 @@ namespace CleanArchitecture.Core.Enums
         Success = 2253,
         ItemNotFoundForGenerateAddress = 2254,
         InvalidThirdpartyID = 2255,
+        AddressGenerationFailed = 2256,
         //====================Transactional
         TransactionInsertSuccess = 1,
         TransactionInsertFail =1,
-        TransactionInsertInternalError =1
-
-
+        TransactionInsertInternalError =1,
+        CreateTrnNoPairSelected = 1,
+        CreateTrnInvalidQtyPrice = 1,
+        CreateTrnInvalidQtyNAmount = 1,
+        CreateTrnNoCreditAccountFound = 1,
+        CreateTrnNoDebitAccountFound = 1,
+        CreateInvalidAmount = 1,
+        CreateDuplicateTrn=1
+        //=======================
     }
+    //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
     {
-        Success = 1,
-        Fail = 0,
+        Success = 0, 
+        Fail = 1,
         InternalError = 9
     }
 
     public enum enResponseCode
     {
-        Success = 1,
-        Fail = 0,
+        Success = 0,
+        Fail = 1,
         InternalError = 9
     }
 

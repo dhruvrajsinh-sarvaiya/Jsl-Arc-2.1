@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.Interfaces;
@@ -20,13 +21,15 @@ namespace CleanArchitecture.Web.API
     {
         private readonly IBasePage _basePage;
         private readonly ILogger<TransactionController> _logger;
+        private readonly IFrontTrnService _frontTrnService;
         string dummyResponce = "";
         static int i = 1;
 
-        public TransactionController(ILogger<TransactionController> logger, IBasePage basePage)
+        public TransactionController(ILogger<TransactionController> logger, IBasePage basePage, IFrontTrnService frontTrnService)
         {
             _logger = logger;
             _basePage = basePage;
+            _frontTrnService = frontTrnService;
         }
 
         private ActionResult returnDynamicResult(dynamic respObjJson)
@@ -470,12 +473,17 @@ namespace CleanArchitecture.Web.API
         public ActionResult GetActiveOrder()
         {
             //For Testing Purpose
+            long MemberID = 0;
+            var dataresponse = _frontTrnService.GetActiveOrder(MemberID);
             GetActiveOrderResponse Response = new GetActiveOrderResponse();
-            Response.response = new List<GetActiveOrderInfo>()
+            if (dataresponse.Count == 0)
             {
-               new GetActiveOrderInfo() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
-               new GetActiveOrderInfo() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
-            };
+                Response.response = new List<GetActiveOrderInfo>()
+                {
+                   new GetActiveOrderInfo() {order_id=10001,pair_name="ltcusd",price=10.20M,side="buy",timestamp=152424515,type="market-limit",volume=10},
+                   new GetActiveOrderInfo() {order_id=10001,pair_name="BCHEUR",price=10.20M,side="sell",timestamp=152424515,type="stop-loss",volume=10},
+                };
+            }
 
             Response.ReturnCode = enResponseCode.Success;
             return returnDynamicResult(Response);

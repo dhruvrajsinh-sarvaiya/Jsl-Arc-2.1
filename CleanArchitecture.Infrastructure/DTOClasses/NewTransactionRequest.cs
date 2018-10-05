@@ -40,7 +40,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 
         public string TrnRefNo { get; set; }
         public string AdditionalInfo { get; set; }
-        public enTransactionStatus Status { get; set; }       
+        public enTransactionStatus Status { get; set; }
         public int StatusCode { get; set; }
         public string StatusMsg { get; set; }
     }

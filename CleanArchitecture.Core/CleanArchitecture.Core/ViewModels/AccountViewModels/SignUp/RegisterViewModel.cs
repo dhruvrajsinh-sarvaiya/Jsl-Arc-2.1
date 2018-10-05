@@ -1,5 +1,6 @@
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.ViewModels.Configuration;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
@@ -8,6 +9,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
     {
         [Required]
         [Display(Name = "Username")]
+        [StringLength(50)]
         public string Username { get; set; }
 
         [Required]
@@ -34,12 +36,10 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
 
         [Required]
         [Phone]
+        [StringLength(10, MinimumLength = 10)]
+        [Range(10, Int64.MaxValue)]
         public string Mobile { get; set; }
 
     }
 
-    public class RegisterResponse : BizResponseClass
-    {
-
-    }
 }

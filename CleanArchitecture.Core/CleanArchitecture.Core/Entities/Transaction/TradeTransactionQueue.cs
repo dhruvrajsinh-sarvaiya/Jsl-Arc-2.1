@@ -57,7 +57,6 @@ namespace CleanArchitecture.Core.Entities
 
         public string Delivery_Currency { get; set; }
 
-        [Range(0, 9999999999.99999999)]
         public decimal DeliveryTotalQty { get; set; }
 
         //public short Status { get; set; }
@@ -86,7 +85,6 @@ namespace CleanArchitecture.Core.Entities
 
         public DateTime? SettledDate { get; set; }
 
-        [Range(0, 9999999999.99999999)]
         public decimal TakerPer { get; set; }
     }
 

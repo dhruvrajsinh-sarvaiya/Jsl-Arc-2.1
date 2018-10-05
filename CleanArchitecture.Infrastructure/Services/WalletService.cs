@@ -19,6 +19,7 @@ namespace CleanArchitecture.Infrastructure.Services
         readonly ICommonRepository<WalletMaster> _commonRepository;
         readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;      
         readonly ICommonRepository<WalletOrder> _walletOrderRepository;
+        readonly ICommonRepository<AddressMaster> _addressMstRepository;
         readonly ICommonRepository<TrnAcBatch> _trnBatch;
         readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
@@ -32,7 +33,7 @@ namespace CleanArchitecture.Infrastructure.Services
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
-            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository,
+            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger) : base(logger)
         {
             _log = log;
@@ -46,6 +47,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _webApiSendRequest = webApiSendRequest;
             _thirdPartyCommonRepository = thirdpartyCommonRepo;
             _getWebRequest = getWebRequest;
+            _addressMstRepository = addressMaster;
             //_walletLedgerRepository = walletledgerrepo;
         }
         
@@ -94,6 +96,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
         public CreateOrderResponse CreateOrder (CreateOrderRequest Order)
         {
             try
@@ -137,7 +140,6 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
 
         public BizResponse ProcessOrder(long RefNo,long DWalletID,long OWalletID,decimal amount,string remarks, enTrnType enTrnType,enServiceType serviceType)
         {
@@ -270,13 +272,12 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-
         public  BizResponse GenerateAddress(long walletID)
         {
             try
             {
                 ThirdPartyAPIRequest thirdPartyAPIRequest;
-                TradeBitGoDelayAddresses delayAddressesObj;
+                TradeBitGoDelayAddresses delayAddressesObj, delayGeneratedAddressesObj;
                 List<TransactionProviderResponse> transactionProviderResponses;
                 WalletMaster walletMaster = _commonRepository.GetById(walletID);
                 AddressMaster addressMaster;
@@ -287,12 +288,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (walletMaster == null)
                 {
                     //return false
-                    return new BizResponse {ErrorCode = enErrorCode.InvalidWallet , ReturnCode =  enResponseCodeService.Fail, ReturnMsg = "Invalid Amount" };
+                    return new BizResponse {ErrorCode = enErrorCode.InvalidWallet , ReturnCode =  enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
                 else if(walletMaster.Status != 1)
                 {
                     //return false
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Invalid Amount" };
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
 
                 transactionProviderResponses = _webApiRepository.GetProviderDataList( new TransactionApiConfigurationRequest { amount = 0,SMSCode = walletMaster.CoinName , APIType = enWebAPIRouteType.TransactionAPI , trnType = enTrnType.Generate_Address });
@@ -302,27 +303,43 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 if (transactionProviderResponses[0].ThirPartyAPIID == 0)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
 
                 ThirdPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
                 if (thirdPartyAPIConfiguration == null)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
                 thirdPartyAPIRequest =_getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
                 string apiResponse =_webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60,thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
                 // parse response logic need to be implemented
                 if(string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
                 {
-                    delayAddressesObj = GetTradeBitGoDelayAddresses(walletID,walletMaster.WalletTypeID,TrnID,address, walletMaster.CoinName,"",walletMaster.CreatedBy,CoinSpecific,0,0);
-
+                    delayAddressesObj = GetTradeBitGoDelayAddresses(walletID,walletMaster.WalletTypeID,TrnID,address, walletMaster.CoinName, thirdPartyAPIRequest.walletID ,walletMaster.CreatedBy,CoinSpecific,0,0);
+                    delayAddressesObj = _bitgoDelayRepository.Add(delayAddressesObj);
+                    delayGeneratedAddressesObj = _walletRepository1.GetUnassignedETH();
+                    if(delayGeneratedAddressesObj != null)
+                    {
+                        address = delayGeneratedAddressesObj.Address;
+                        delayGeneratedAddressesObj.WalletId = walletID;
+                        delayGeneratedAddressesObj.UpdatedBy = walletMaster.UserID;
+                        delayGeneratedAddressesObj.UpdatedDate = UTC_To_IST();
+                        _bitgoDelayRepository.Update(delayGeneratedAddressesObj);
+                    }
+                }
+                if(!string.IsNullOrEmpty(address))
+                {
+                    addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, walletMaster.CoinName, "Self Address", walletMaster.UserID, 0, 1);
+                    addressMaster = _addressMstRepository.Add(addressMaster);
+                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg};
+                }
+                else
+                {
+                    return new BizResponse { ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.CreateWalletFailMsg };
                 }
 
-                addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, walletMaster.CoinName, "Self Address", walletMaster.UserID, 0, 1);
-
                 // code need to be added
-                return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Success, ReturnMsg = "Success." };
             }
             catch (Exception ex)
             {
@@ -353,7 +370,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-
         public TradeBitGoDelayAddresses GetTradeBitGoDelayAddresses(long walletID, long WalletTypeId, string TrnID,string address, string coinName, string BitgoWalletId, long createdBy, string CoinSpecific, short status,byte generatebit)
         {
             try
@@ -382,7 +398,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-
         public WalletMaster GetWalletMaster(long WalletTypeId, string walletName, bool isValid, short status , long createdBy,string coinname)
         {
             try
@@ -402,6 +417,36 @@ namespace CleanArchitecture.Infrastructure.Services
                 return addressMaster;
             }
             catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public DepositHistory GetDepositHistory (string fromAddress, string toAddress,string coinName, string  trnID, long confirmations, decimal amount,
+        short status, string statusMsg , string confirmedTime, string UnconfirmedTime, string epochtimePure , byte isProcessing ,long serproid,long createdby)
+        {
+            try
+            {
+                DepositHistory dh = new DepositHistory
+                {
+                    Address = toAddress,
+                    Confirmations = confirmations,
+                    IsProcessing = isProcessing,
+                    SerProID = serproid,
+                    SMSCode = coinName,
+                    TrnID = trnID,
+                    CreatedBy = createdby,
+                    CreatedDate = UTC_To_IST(),
+                    TimeEpoch = confirmedTime,
+                    EpochTimePure = epochtimePure,
+                    Status = status,
+                    StatusMsg = statusMsg
+                    
+                };
+                return dh;
+            }
+            catch(Exception ex)
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
