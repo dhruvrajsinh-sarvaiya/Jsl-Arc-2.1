@@ -138,7 +138,9 @@ namespace CleanArchitecture.Core.Enums
         CreateTrnNoPairSelected = 1,
         CreateTrnInvalidQtyPrice = 1,
         CreateTrnInvalidQtyNAmount = 1,
-        CreateTrnNoCreditAccountFound = 1
+        CreateTrnNoCreditAccountFound = 1,
+        CreateTrnNoDebitAccountFound = 1,
+        CreateInvalidAmount = 1
         //=======================
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail

@@ -29,6 +29,8 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrnInvalidQtyPriceMsg = "Invalid Qty or Price";
         public static string CreateTrnInvalidQtyNAmountMsg = "Invalid Order Qty and Amount";
         public static string CreateTrnNoCreditAccountFoundMsg = "No Credit Account Found";
+        public static string CreateTrnNoDebitAccountFoundMsg = "No Debit Account Found";
+        public static string CreateInvalidAmountMsg = "Invalid Amount";
         //============================
 
         //============================walelt=================================//

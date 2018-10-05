@@ -7,6 +7,7 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.DTOClasses;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             decimal SellQty = 0;
             decimal AskPrice = 0;
             string INRSMSCode = "INR";
-            string Amount2 = "";
+            decimal Amount2 = 0;
             string MemberMobile1 = "";
             TradePairMaster _TradePairObj;
             NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
@@ -142,8 +143,33 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         Req.StatusMsg = EnResponseMessage.CreateTrnNoCreditAccountFoundMsg;
                         return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnNoCreditAccountFound);
                     }
-
                 }
+                if (Req.TrnType == enTrnType.Shoping_Cart)//IF TRNTYPE = 7 THEN FETCH BALANCE OF INR WALLET 
+                {
+                    Amount2 = Convert.ToDecimal(Req.AdditionalInfo);
+                    if(Amount2 < Req.Amount)
+                    {
+                        Req.StatusMsg = EnResponseMessage.CreateInvalidAmountMsg;
+                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateInvalidAmount);
+                    }
+                    //Take balance base on @INRSMSCode and take OrderWalletID,Balance
+                }
+                else
+                {
+                    //Take balance base on @SMSCode and take OrderWalletID,Balance
+                }
+                if(_TradeTransactionObj.OrderWalletID==0)
+                {
+                    Req.StatusMsg = EnResponseMessage.CreateTrnNoDebitAccountFoundMsg;
+                    return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnNoDebitAccountFound);
+                }
+                var DuplicateTxn=_TransactionRepository.GetSingle(item => item.MemberMobile == Req.MemberMobile && item.TransactionAccount == Req.TransactionAccount && item.Amount==Req.Amount && item.TrnDate.AddMinutes(10) > Helpers.UTC_To_IST());
+                if(DuplicateTxn != null)
+                {
+                    Req.StatusMsg = EnResponseMessage.CreateInvalidAmountMsg;
+                    return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateInvalidAmount);
+                }
+
 
                 return (new BizResponse { ReturnMsg = "", ReturnCode = enResponseCodeService.Success });
             }
