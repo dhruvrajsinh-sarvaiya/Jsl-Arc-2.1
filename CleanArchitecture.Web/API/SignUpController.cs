@@ -642,7 +642,16 @@ namespace CleanArchitecture.Web.API
                 if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)
                 {
                     _tempOtpService.Update(tempotp.Id);
-                    var resultdata = _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Mobile));
+                    var resultdata = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Email));
+
+                    SendEmailRequest request = new SendEmailRequest();
+                    request.Recepient = model.Email;
+                    request.Subject = "Registration confirmation resend email";
+                    request.Body = "use this code:" + resultdata.OTP + "";
+
+                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    _logger.LogInformation(3, "Email sent successfully with your account");
+
                     SignUpMobileWithOTPResponse response = new SignUpMobileWithOTPResponse();
                     response.ReturnCode = enResponseCode.Success;
                     response.ReturnMsg = "Success";
