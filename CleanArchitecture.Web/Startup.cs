@@ -17,7 +17,6 @@ using Swashbuckle.AspNetCore.Swagger;
 using StructureMap;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.Interfaces.Repository;
-using CleanArchitecture.Infrastructure.Services.Repository;
 
 namespace CleanArchitecture.Web
 {
@@ -136,8 +135,7 @@ namespace CleanArchitecture.Web
                 config.For(typeof(IWalletRepository)).Add(typeof(WalletRepository));
                 config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
                 config.For<IMediator>().Use<Mediator>();
-                // added by nirav savariya for common repository on 10-04-2018
-                config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
+
                 //Populate the container using the service collection
                 config.Populate(services);
 

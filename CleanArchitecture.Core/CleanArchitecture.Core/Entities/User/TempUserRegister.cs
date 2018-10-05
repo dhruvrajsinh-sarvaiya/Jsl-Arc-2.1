@@ -41,13 +41,5 @@ namespace CleanArchitecture.Core.Entities.User
             RegisterStatus = Convert.ToBoolean(ModeStatus.True);
             Events.Add(new ServiceStatusEvent<TempUserRegister>(this));
         }
-
-        public void SetAsUpdateDate(long Id)
-        {
-            UpdatedDate =DateTime.UtcNow;
-            UpdatedBy = Id;
-            Events.Add(new ServiceStatusEvent<TempUserRegister>(this));
-        }
-
     }
 }

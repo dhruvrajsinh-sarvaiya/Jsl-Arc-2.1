@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.Interfaces.User
 {
    public interface ITempOtpService
     {
-        Task<TempOtpViewModel> AddTempOtp(int UserId, int RegTypeId);
+        Task<TempOtpMaster> AddTempOtp(int UserId, int RegTypeId);
         Task<TempOtpViewModel> GetTempData(int Id);
         void Update(long Id);
     }
