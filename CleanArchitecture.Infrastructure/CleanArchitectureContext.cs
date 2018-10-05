@@ -62,8 +62,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<AddressMaster> AddressMasters { get; set; }
 
         //========Transaction Tables
-        public DbSet <TradeTransactionQueue>TradeTransactionQueue { get; set; } // komal 04-10-2018
-        public DbSet <TradePairMaster> TradePairMaster { get; set; } // komal 04-10-2018
+        public DbSet <TradeTransactionQueue>TradeTransactionQueue { get; set; }
+        public DbSet <TradePairMaster> TradePairMaster { get; set; }
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
         public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }       
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
@@ -121,7 +121,6 @@ namespace CleanArchitecture.Infrastructure
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
 
-            modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new {e.Id , e.TrnNo }); // komal 04-10-2018 composite primary key
         }
 
         /// <summary>
