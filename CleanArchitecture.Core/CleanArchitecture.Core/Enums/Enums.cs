@@ -135,17 +135,18 @@ namespace CleanArchitecture.Core.Enums
         TransactionInsertFail =1,
         TransactionInsertInternalError =1
     }
+    //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
     {
-        Success = 1,
-        Fail = 0,
+        Success = 0, 
+        Fail = 1,
         InternalError = 9
     }
 
     public enum enResponseCode
     {
-        Success = 1,
-        Fail = 0,
+        Success = 0,
+        Fail = 1,
         InternalError = 9
     }
 
