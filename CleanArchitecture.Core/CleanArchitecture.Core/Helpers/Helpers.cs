@@ -20,6 +20,10 @@ namespace CleanArchitecture.Core.Helpers
                             ContractResolver = new CamelCasePropertyNamesContractResolver()
                         });
         }
+        public static decimal DoRoundForTrading(decimal Value,short FractionalLength)
+        {
+            return Math.Round(Value, FractionalLength, MidpointRounding.AwayFromZero);
+        }
 
     }
 

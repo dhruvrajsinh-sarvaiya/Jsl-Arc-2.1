@@ -23,8 +23,12 @@ namespace CleanArchitecture.Core.Enums
         public static string CommSuccessMsgInternal = "Success";
         public static string CommFailMsgInternal = "Fail";
         //=========================Transactional Msg
-        public static string CreateTrnSuccessMsg = "Success";
-        public static string CreateTrnFailMsg = "Fail";
+        //public static string CreateTrnSuccessMsg = "Success";
+        //public static string CreateTrnFailMsg = "Fail";
+        public static string CreateTrnNoPairSelectedMsg = "No Pair Selected";
+        public static string CreateTrnInvalidQtyPriceMsg = "Invalid Qty or Price";
+        public static string CreateTrnInvalidQtyNAmountMsg = "Invalid Order Qty and Amount";
+        public static string CreateTrnNoCreditAccountFoundMsg = "No Credit Account Found";
         //============================
     }
 }

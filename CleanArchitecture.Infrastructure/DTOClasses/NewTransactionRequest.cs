@@ -40,5 +40,37 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 
         public string TrnRefNo { get; set; }
         public string AdditionalInfo { get; set; }
+        public enTransactionStatus Status { get; set; }
+        public int StatusCode { get; set; }
+        public string StatusMsg { get; set; }
+    }
+
+    public class NewTradeTransactionRequestCls
+    {
+        public long TrnNo { get; set; }
+        public string TrnTypeName { get; set; }
+        public string PairName { get; set; }
+        public long OrderWalletID { get; set; }
+        public long DeliveryWalletID { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal BuyQty { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal BidPrice { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal SellQty { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal AskPrice { get; set; }
+        public string Order_Currency { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal OrderTotalQty { get; set; }
+        public string Delivery_Currency { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal DeliveryTotalQty { get; set; }
+        //public long? TrnRefNo { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal SettledBuyQty { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal SettledSellQty { get; set; }
+        //public decimal TakerPer { get; set; }
     }
 }
