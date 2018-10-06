@@ -28,6 +28,8 @@ namespace CleanArchitecture.Core.Entities.Log
 
         public int HostId { get; set; }
 
+        public string NishitTest { get; set; }
+
 
         public void EndTimeUpdated()
         {   
