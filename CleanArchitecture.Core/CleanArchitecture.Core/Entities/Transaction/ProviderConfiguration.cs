@@ -22,6 +22,9 @@ namespace CleanArchitecture.Core.Entities
 
         public long ThirPartyAPIID { get; set; }
 
+        // ntrivedi 08-10-2018 bit go api having multiple api for address generate and deposit 
+        public short TrnType { get; set; }
+
         public void SetActiveProvider()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);

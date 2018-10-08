@@ -43,6 +43,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public enTransactionStatus Status { get; set; }
         public int StatusCode { get; set; }
         public string StatusMsg { get; set; }
+        public long WalletID { get; set; }
+
     }
 
     public class NewTradeTransactionRequestCls
