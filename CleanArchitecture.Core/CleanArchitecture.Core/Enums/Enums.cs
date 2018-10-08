@@ -93,7 +93,7 @@ namespace CleanArchitecture.Core.Enums
     public enum enWebAPIRouteType //ThirdParty Apptype-Types of API
     {
         TransactionAPI = 1,
-        SMSAPI = 2
+        CommunicationAPI = 2
     }
 
     public enum enProviderAppType //Provider Apptype-Types of Transaction
@@ -164,5 +164,12 @@ namespace CleanArchitecture.Core.Enums
         Mobile = 1,
         Email = 2,
         Standerd = 3,
+    }
+
+    public enum enCommunicationServiceType
+    {
+        SMS = 1,
+        Email = 2,
+        PushNotification = 3,
     }
 }
