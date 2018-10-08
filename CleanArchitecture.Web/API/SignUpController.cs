@@ -97,7 +97,7 @@ namespace CleanArchitecture.Web.API
                     {
                         var currentUser = new ApplicationUser
                         {
-                            UserName = user.UserName,
+                            UserName = user.Email,
                             Email = user.Email,
                             FirstName = user.FirstName,
                             LastName = user.LastName,
