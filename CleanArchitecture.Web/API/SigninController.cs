@@ -284,7 +284,7 @@ namespace CleanArchitecture.Web.API
                 if (otpData != null)
                 {
                     _logger.LogWarning(1, "User Login with Email Send Success.");
-                    return Ok("You have send OTP on email");
+                    return AppUtils.Standerdlogin("You have send OTP on email");
                 }
                 else
                 {
@@ -317,7 +317,7 @@ namespace CleanArchitecture.Web.API
                 {
                     //var roles = await _userManager.GetRolesAsync(userdt.Result);
                     _logger.LogWarning(1, "User Login with Mobile Send Success.");
-                    return Ok("You have send OTP on email");
+                    return AppUtils.Standerdlogin("You have send OTP on mobile.");
                 }
                 else
                 {
@@ -385,8 +385,7 @@ namespace CleanArchitecture.Web.API
                     if (otpData != null)
                     {
                         _logger.LogWarning(1, "User Login with Email OTP Send Success.");
-
-                        return Ok("User Login with Email OTP Send Success.");
+                        return AppUtils.Standerdlogin("User Login with Email OTP Send Success.");
                     }
                     else
                     {
@@ -438,8 +437,7 @@ namespace CleanArchitecture.Web.API
                     if (otpData != null)
                     {
                         _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
-
-                        return Ok("User Login with Mobile OTP Send Success.");
+                        return AppUtils.Standerdlogin("User Login with Mobile OTP Send Success.");
                     }
                     else
                     {
@@ -496,13 +494,6 @@ namespace CleanArchitecture.Web.API
                                 {
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
-                                    //var user = await _userService.FindByMobileNumber(model.MobileNo);
-                                    //var currentUser = new ApplicationUser
-                                    //{
-                                    //    UserName = logindata.Mobile,
-                                    //    Mobile = logindata.Mobile,
-                                    //    Id = (int)logindata.Id
-                                    //};
                                     var roles = await _userManager.GetRolesAsync(result);
                                     return AppUtils.SignIn(result, roles);
                                 }
@@ -526,11 +517,6 @@ namespace CleanArchitecture.Web.API
                                 {
                                     return BadRequest(new ApiError("Invalid login attempt."));
                                 }
-                                //else
-                                //{
-                                //    ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
-                                //    return BadRequest(new ApiError(ModelState));
-                                //}
                             }
                             else
                             {
@@ -595,13 +581,6 @@ namespace CleanArchitecture.Web.API
                                 {
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
-
-                                    //var currentUser = new ApplicationUser
-                                    //{
-                                    //    UserName = checkmail.Email,
-                                    //    Email = checkmail.Email,
-                                    //    Id = (int)checkmail.Id
-                                    //};
                                     var roles = await _userManager.GetRolesAsync(checkmail);
                                     return AppUtils.SignIn(checkmail, roles);
                                 }
@@ -655,12 +634,6 @@ namespace CleanArchitecture.Web.API
                         return BadRequest(new ApiError(ModelState));
                     }
                 }
-                //}
-                //else
-                //{
-                //    ModelState.AddModelError(string.Empty, "Invalid Email.");
-                //    return BadRequest(new ApiError(ModelState));
-                //}
                 ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
                 return BadRequest(new ApiError(ModelState));
             }
@@ -678,7 +651,7 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
 
-            return Ok("Success");
+            return AppUtils.Standerdlogin("Success");
 
             /*
             var currentUser = await _userManager.FindByNameAsync(model.Email);
@@ -717,12 +690,14 @@ namespace CleanArchitecture.Web.API
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return Ok("Reset confirmed");
+                //return Ok("Reset confirmed");
+                return AppUtils.Standerdlogin("Reset confirmed");
             }
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
-                return Ok("Reset confirmed"); ;
+                //return Ok("Reset confirmed");
+                return AppUtils.Standerdlogin("Reset confirmed");
             }
             AddErrors(result);
             return BadRequest(new ApiError(ModelState));

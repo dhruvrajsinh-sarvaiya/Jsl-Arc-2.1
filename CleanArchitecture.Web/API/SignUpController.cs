@@ -120,7 +120,9 @@ namespace CleanArchitecture.Web.API
                                 currentUser.EmailConfirmed = true;
                                 var resultupdate = await _userManager.UpdateAsync(currentUser);
                                 _tempUserRegisterService.Update(user.Id);
-                                return Ok("Your account has been activated, you can now login.");
+
+                                //return Ok("Your account has been activated, you can now login.");
+                                return AppUtils.StanderdSignUp("Your account has been activated, you can now login.");
                                 //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
                             }
                         }
@@ -171,7 +173,7 @@ namespace CleanArchitecture.Web.API
 
                     var tempcurrentUser = new TempUserRegisterViewModel
                     {
-                        UserName = model.Username,
+                        UserName = model.Email,
                         Email = model.Email,
                         FirstName = model.Firstname,
                         LastName = model.Lastname,
@@ -212,12 +214,9 @@ namespace CleanArchitecture.Web.API
                         _logger.LogInformation(3, "User created a new account with password.");
 
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-                        //return Ok("Your account has been created, < br /> please verify it by clicking the activation link that has been send to your email.");
-
-                        //RegisterResponse response = new RegisterResponse();
-                        //response.ReturnCode = enResponseCode.Success;
-                        //response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
-                        return Ok("Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.");
+                        
+                        //return Ok("Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.");
+                        return AppUtils.StanderdSignUp("Your account has been created, please verify it by clicking the activation link that has been send to your email.");
                     }
                 }
                 else
@@ -270,7 +269,7 @@ namespace CleanArchitecture.Web.API
                         await _mediator.Send(request);
 
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-                        return Ok("Please verify it by clicking the otp that has been send to your email.");
+                        return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been send to your email.");
                     }
                 }
                 else
@@ -330,7 +329,7 @@ namespace CleanArchitecture.Web.API
                             request.MobileNo = Convert.ToInt64(model.Mobile);
                             request.Message = "SMS for use this code " + tempotp.OTP + "";
                             await _mediator.Send(request);
-                            return Ok("Success");
+                            return AppUtils.StanderdSignUp("Success");
                         }
                     }
                     else
@@ -362,7 +361,7 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> BlockChainSignUp(BlockChainViewModel model)
         {
-            return Ok("Success");
+            return AppUtils.StanderdSignUp("Success");
         }
 
         #endregion
@@ -414,8 +413,7 @@ namespace CleanArchitecture.Web.API
                                         _tempUserRegisterService.Update(tempdata.Id);
                                         _tempOtpService.Update(tempotp.Id);
                                         var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
-                                        return Ok("You have successfully verified.");
-                                        //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
+                                        return AppUtils.StanderdSignUp("You have successfully verified.");
                                     }
                                 }
                                 else
@@ -499,7 +497,7 @@ namespace CleanArchitecture.Web.API
                                         _tempOtpService.Update(tempotp.Id);
                                         var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
                                         //return Ok("Your account has been activated, you can now login.");
-                                        return Ok("You have successfully verified.");
+                                        return AppUtils.StanderdSignUp("You have successfully verified.");
                                     }
                                 }
                                 else
@@ -564,12 +562,7 @@ namespace CleanArchitecture.Web.API
                         request.MobileNo = Convert.ToInt64(model.Mobile);
                         request.Message = "SMS for use this code " + result.OTP + "";
                         await _mediator.Send(request);
-
-                        //return Ok("SMS sent successfully.");
-                        //SignUpWithMobileResponse response = new SignUpWithMobileResponse();
-                        //response.ReturnCode = enResponseCode.Success;
-                        //response.ReturnMsg = "Success";
-                        return Ok("You have successfully login.");
+                        return AppUtils.StanderdSignUp("You have successfully send Otp in mobile.");
                     }
                     else
                     {
@@ -577,7 +570,7 @@ namespace CleanArchitecture.Web.API
                         request.MobileNo = Convert.ToInt64(model.Mobile);
                         request.Message = "SMS for use this code " + tempotp.OTP + "";
                         await _mediator.Send(request);
-                        return Ok("Success");
+                        return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your mobile.");
                     }
                 }
                 else
@@ -620,7 +613,8 @@ namespace CleanArchitecture.Web.API
                     await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
-                    return Ok("Success");
+                    ///return Ok("Success");
+                    return AppUtils.StanderdSignUp("You have successfully send Otp in email.");
                 }
                 else
                 {
@@ -632,7 +626,7 @@ namespace CleanArchitecture.Web.API
                     await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
-                    return Ok("Please verify it by clicking the otp that has been resend to your email.");
+                    return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your email.");
                 }
             }
             else
@@ -685,10 +679,7 @@ namespace CleanArchitecture.Web.API
                         await _mediator.Send(request);
                         _logger.LogInformation(3, "Email sent successfully with your account");
 
-                        //RegisterResponse response = new RegisterResponse();
-                        //response.ReturnCode = enResponseCode.Success;
-                        //response.ReturnMsg = "Please verify it by clicking the activation link that has been resend to your email.";
-                        return Ok("Please verify it by clicking the activation link that has been resend to your email.");
+                        return AppUtils.StanderdSignUp("Please verify it by clicking the activation link that has been resend to your email.");
                     }
                     else
                     {
