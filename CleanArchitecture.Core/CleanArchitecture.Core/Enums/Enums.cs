@@ -174,4 +174,9 @@ namespace CleanArchitecture.Core.Enums
         Email = 2,
         PushNotification = 3,
     }
+
+    public enum enumHistoryType
+    {
+        Login = 1,
+    }
 }
