@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         public string MemberType { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [StringLength(250)]
         public string DeviceId { get; set; }
 
         [Required]
