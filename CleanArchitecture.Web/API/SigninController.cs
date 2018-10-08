@@ -102,7 +102,7 @@ namespace CleanArchitecture.Web.API
                 request.Subject = "Security Code";
                 request.Body = message;
 
-                CommunicationResponse Response = await _mediator.Send(request);
+                await _mediator.Send(request);
                 //await _emailSender.SendEmailAsync(user.Email, "Security Code", message);
             }
             // else if (model.SelectedProvider == "Phone")
@@ -402,7 +402,7 @@ namespace CleanArchitecture.Web.API
                     request.Subject = "Login With Email Otp";
                     request.Body = "use this code:" + otpcheck.OTP + "";
 
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    await _mediator.Send(request);
                     _logger.LogWarning(1, "User Login with Email OTP Send Success.");
 
                     return Ok("User Login with Email OTP Send Success.");
@@ -454,7 +454,7 @@ namespace CleanArchitecture.Web.API
                     request.MobileNo = Convert.ToInt64(model.Mobile);
                     request.Message = "SMS for use this code " + otpcheck.OTP + "";
 
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    await _mediator.Send(request);
 
                     _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
 
