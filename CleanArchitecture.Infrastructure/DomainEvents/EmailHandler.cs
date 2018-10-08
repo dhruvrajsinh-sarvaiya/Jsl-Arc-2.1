@@ -20,16 +20,18 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IMessageRepository<EmailQueue> _MessageRepository;
         private readonly IMessageConfiguration _MessageConfiguration;
         private readonly IMessageService _MessageService;
-        private readonly WebApiParseResponse _WebApiParseResponse;
+        private WebApiParseResponse _WebApiParseResponse;
         private GetDataForParsingAPI _GetDataForParsingAPI;
+        private WebAPIParseResponseCls _GenerateResponse;
 
-        public EmailHandler(IMessageRepository<EmailQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse)
+        public EmailHandler(IMessageRepository<EmailQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse, WebAPIParseResponseCls GenerateResponse)
         {
             _MessageRepository = MessageRepository;
             _MessageConfiguration = MessageConfiguration;
             _MessageService = MessageService;
             _GetDataForParsingAPI = GetDataForParsingAPI;
             _WebApiParseResponse = WebApiParseResponse;
+            _GenerateResponse = GenerateResponse;
         }
 
         public async Task<CommunicationResponse> Handle(SendEmailRequest Request, CancellationToken cancellationToken)
@@ -54,10 +56,10 @@ namespace CleanArchitecture.Infrastructure.Services
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1, 2);
                 foreach (CommunicationProviderList Provider in Result)
                 {
-                    string Resposne = await _MessageService.SendEmailAsync(Email.Recepient, Email.Subject, Email.BCC, Email.CC, Email.Body, Provider.SendURL,Provider.UserID , Provider.Password,Convert.ToInt16(Provider.SenderID));
+                    string Response = await _MessageService.SendEmailAsync(Email.Recepient, Email.Subject, Email.BCC, Email.CC, Email.Body, Provider.SendURL,Provider.UserID , Provider.Password,Convert.ToInt16(Provider.SenderID));
                     CopyClass.CopyObject(Provider, ref _GetDataForParsingAPI);
-                    WebAPIParseResponseCls GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Resposne, _GetDataForParsingAPI);
-                    if (GenerateResponse.Status == enTransactionStatus.Success)
+                    _GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Response, _GetDataForParsingAPI);
+                    if (_GenerateResponse.Status == enTransactionStatus.Success)
                     {
                         Email.SentMessage();
                         _MessageRepository.Update(Email);

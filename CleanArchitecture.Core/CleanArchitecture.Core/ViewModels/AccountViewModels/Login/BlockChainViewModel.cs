@@ -16,17 +16,17 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
         public string KeyPassword { get; set; }
     }
 
-    public class BlockChainResponse : BizResponseClass
-    {
-        public string PasswordNotes { get; set; }
+    //public class BlockChainResponse : BizResponseClass
+    //{
+    //    public string PasswordNotes { get; set; }
 
-        public string KeystoreNotes { get; set; }
+    //    public string KeystoreNotes { get; set; }
 
-        public string EncryptedPrivateKey { get; set; }
+    //    public string EncryptedPrivateKey { get; set; }
 
-        public string  PaperWalletLink { get; set; }
+    //    public string  PaperWalletLink { get; set; }
 
-        public string KeyStoreFileLink { get; set; }
+    //    public string KeyStoreFileLink { get; set; }
 
-    }
+    //}
 }

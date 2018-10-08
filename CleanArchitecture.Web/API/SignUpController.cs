@@ -144,7 +144,7 @@ namespace CleanArchitecture.Web.API
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
+                ModelState.AddModelError(string.Empty, "Please fill link url.");
                 return BadRequest(new ApiError(ModelState));
             }
             ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
@@ -158,7 +158,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody]RegisterViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             var result = await _userManager.FindByEmailAsync(model.Email);
             if (string.IsNullOrEmpty(result?.Email))
@@ -207,16 +207,16 @@ namespace CleanArchitecture.Web.API
                         request.Subject = "Registration confirmation email";
                         request.Body = confirmationLink;
 
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
                         _logger.LogInformation(3, "User created a new account with password.");
 
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
                         //return Ok("Your account has been created, < br /> please verify it by clicking the activation link that has been send to your email.");
 
-                        RegisterResponse response = new RegisterResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
-                        return Ok(response);
+                        //RegisterResponse response = new RegisterResponse();
+                        //response.ReturnCode = enResponseCode.Success;
+                        //response.ReturnMsg = "Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.";
+                        return Ok("Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.");
                     }
                 }
                 else
@@ -242,7 +242,7 @@ namespace CleanArchitecture.Web.API
         /// </summary>        
         [HttpPost("SignUpWithEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> SignUpWithEmail([FromBody]SignUpWithEmailViewModel model)
+        public async Task<IActionResult> SignUpWithEmail(SignUpWithEmailViewModel model)
         {
             var result = await _userManager.FindByEmailAsync(model.Email);
             if (string.IsNullOrEmpty(result?.Email))
@@ -265,16 +265,12 @@ namespace CleanArchitecture.Web.API
                         SendEmailRequest request = new SendEmailRequest();
                         request.Recepient = model.Email;
                         request.Subject = "Registration confirmation email";
-                        request.Body = "use this code:"+resultotp.OTP+"";
+                        request.Body = "use this code:" + resultotp.OTP + "";
 
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
 
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-
-                        SignUpWithEmailResponse response = new SignUpWithEmailResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Please verify it by clicking the otp that has been send to your email.";
-                        return Ok(response);
+                        return Ok("Please verify it by clicking the otp that has been send to your email.");
                     }
                 }
                 else
@@ -301,9 +297,9 @@ namespace CleanArchitecture.Web.API
         /// </summary>        
         [HttpPost("SignUpWithMobile")]
         [AllowAnonymous]
-        public async Task<IActionResult> SignUpWithMobile([FromBody]SignUpWithMobileViewModel model)
+        public async Task<IActionResult> SignUpWithMobile(SignUpWithMobileViewModel model)
         {
-            
+
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
             string countryCode = "IN";
             PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
@@ -330,17 +326,13 @@ namespace CleanArchitecture.Web.API
                         var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
                         if (result != null)
                         {
-                            var tempotp =await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
+                            var tempotp = await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
 
                             SendSMSRequest request = new SendSMSRequest();
                             request.MobileNo = Convert.ToInt64(model.Mobile);
                             request.Message = "SMS for use this code " + tempotp.OTP + "";
-                            CommunicationResponse CommResponse = await _mediator.Send(request);
-
-                            SignUpWithMobileResponse response = new SignUpWithMobileResponse();
-                            response.ReturnCode = enResponseCode.Success;
-                            response.ReturnMsg = "Success";
-                            return Ok(response);
+                            await _mediator.Send(request);
+                            return Ok("Success");
                         }
                     }
                     else
@@ -370,12 +362,9 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("BlockChainSignUp")]
         [AllowAnonymous]
-        public async Task<IActionResult> BlockChainSignUp([FromBody] BlockChainViewModel model)
+        public async Task<IActionResult> BlockChainSignUp(BlockChainViewModel model)
         {
-            BlockChainResponse response = new BlockChainResponse();
-            response.ReturnCode = enResponseCode.Success;
-            response.ReturnMsg = "Success";
-            return Ok(response);
+            return Ok("Success");
         }
 
         #endregion
@@ -385,10 +374,10 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Direct signUp with mobile sms using verified opt.
         /// </summary> 
-        
+
         [HttpPost("MobileOtpVerification")]
         [AllowAnonymous]
-        public async Task<IActionResult> MobileOtpVerification([FromBody]OTPWithMobileViewModel model)
+        public async Task<IActionResult> MobileOtpVerification(OTPWithMobileViewModel model)
         {
             if (!string.IsNullOrEmpty(model?.MobileNo))
             {
@@ -431,7 +420,7 @@ namespace CleanArchitecture.Web.API
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
                                             var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
-                                            return Ok("Your account has been activated, you can now login.");
+                                            return Ok("You have successfully verified.");
                                             //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
                                         }
                                     }
@@ -478,10 +467,10 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Direct signUp with email otp using verified.
         /// </summary>
-        
+
         [HttpPost("EmailOtpVerification")]
         [AllowAnonymous]
-        public async Task<IActionResult> EmailOtpVerification([FromBody]OTPWithEmailViewModel model)
+        public async Task<IActionResult> EmailOtpVerification(OTPWithEmailViewModel model)
         {
             if (!string.IsNullOrEmpty(model?.Email))
             {
@@ -524,12 +513,13 @@ namespace CleanArchitecture.Web.API
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
                                             var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
-                                            return Ok("Your account has been activated, you can now login.");
+                                            //return Ok("Your account has been activated, you can now login.");
+                                            return Ok("You have successfully verified.");
                                         }
                                     }
                                     else
                                     {
-                                        ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                                        ModelState.AddModelError(string.Empty, "This Email is already registered.");
                                         return BadRequest(new ApiError(ModelState));
                                     }
                                 }
@@ -570,10 +560,10 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Auto generate resend otp in Mobile
         /// </summary>   
-        
+
         [HttpPost("ReSendOtpWithMobile")]
         [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithMobile([FromBody]SignUpWithMobileViewModel model)
+        public async Task<IActionResult> ReSendOtpWithMobile(SignUpWithMobileViewModel model)
         {
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
             string countryCode = "IN";
@@ -594,25 +584,21 @@ namespace CleanArchitecture.Web.API
                         SendSMSRequest request = new SendSMSRequest();
                         request.MobileNo = Convert.ToInt64(model.Mobile);
                         request.Message = "SMS for use this code " + result.OTP + "";
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
 
                         //return Ok("SMS sent successfully.");
-                        SignUpWithMobileResponse response = new SignUpWithMobileResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Success";
-                        return Ok(response);
+                        //SignUpWithMobileResponse response = new SignUpWithMobileResponse();
+                        //response.ReturnCode = enResponseCode.Success;
+                        //response.ReturnMsg = "Success";
+                        return Ok("You have successfully login.");
                     }
                     else
                     {
                         SendSMSRequest request = new SendSMSRequest();
                         request.MobileNo = Convert.ToInt64(model.Mobile);
                         request.Message = "SMS for use this code " + tempotp.OTP + "";
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
-
-                        SignUpWithMobileResponse response = new SignUpWithMobileResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Success";
-                        return Ok(response);
+                        await _mediator.Send(request);
+                        return Ok("Success");
                     }
                 }
                 else
@@ -632,10 +618,10 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are Auto generate resend otp in Email
         /// </summary>  
-        
+
         [HttpPost("ReSendOtpWithEmail")]
         [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithEmail([FromBody]SignUpWithEmailViewModel model)
+        public async Task<IActionResult> ReSendOtpWithEmail(SignUpWithEmailViewModel model)
         {
             var result = await _userManager.FindByEmailAsync(model.Email);
             if (string.IsNullOrEmpty(result?.Email))
@@ -652,13 +638,10 @@ namespace CleanArchitecture.Web.API
                     request.Subject = "Registration confirmation resend email";
                     request.Body = "use this code:" + resultdata.OTP + "";
 
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
-                    SignUpWithEmailResponse response = new SignUpWithEmailResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Success";
-                    return Ok(response);
+                    return Ok("Success");
                 }
                 else
                 {
@@ -667,13 +650,10 @@ namespace CleanArchitecture.Web.API
                     request.Subject = "Registration confirmation resend email";
                     request.Body = "use this code:" + tempotp.OTP + "";
 
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
-                    SignUpWithEmailResponse response = new SignUpWithEmailResponse();
-                    response.ReturnCode = enResponseCode.Success;
-                    response.ReturnMsg = "Please verify it by clicking the otp that has been resend to your email.";
-                    return Ok(response);
+                    return Ok("Please verify it by clicking the otp that has been resend to your email.");
                 }
             }
             else
@@ -686,10 +666,10 @@ namespace CleanArchitecture.Web.API
         /// <summary>
         ///  This method are resend Email Link to direct call this method
         /// </summary>
-        
+
         [HttpPost("ReSendRegisterlink")]
         [AllowAnonymous]
-        public async Task<IActionResult> ReSendRegisterlink([FromBody]SignUpWithEmailViewModel model)
+        public async Task<IActionResult> ReSendRegisterlink(SignUpWithEmailViewModel model)
         {
             try
             {
@@ -723,13 +703,13 @@ namespace CleanArchitecture.Web.API
                         request.Subject = "Registration confirmation resend email";
                         request.Body = confirmationLink;
 
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
                         _logger.LogInformation(3, "Email sent successfully with your account");
 
-                        RegisterResponse response = new RegisterResponse();
-                        response.ReturnCode = enResponseCode.Success;
-                        response.ReturnMsg = "Please verify it by clicking the activation link that has been resend to your email.";
-                        return Ok(response);
+                        //RegisterResponse response = new RegisterResponse();
+                        //response.ReturnCode = enResponseCode.Success;
+                        //response.ReturnMsg = "Please verify it by clicking the activation link that has been resend to your email.";
+                        return Ok("Please verify it by clicking the activation link that has been resend to your email.");
                     }
                     else
                     {

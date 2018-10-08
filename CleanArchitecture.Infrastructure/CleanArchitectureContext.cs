@@ -15,6 +15,8 @@ using CleanArchitecture.Core.Entities.Modes;
 using CleanArchitecture.Core.Entities.Log;
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
+using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.ViewModels.Transaction;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -61,7 +63,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<AddressMaster> AddressMasters { get; set; }
 
         //========Transaction Tables
-
+        public DbSet <TradeTransactionQueue>TradeTransactionQueue { get; set; }
+        public DbSet <TradePairMaster> TradePairMaster { get; set; }
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
         public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }       
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
@@ -72,6 +75,7 @@ namespace CleanArchitecture.Infrastructure
 
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
+        public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; }
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
@@ -118,7 +122,7 @@ namespace CleanArchitecture.Infrastructure
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
-
+            modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
         }
 
         /// <summary>

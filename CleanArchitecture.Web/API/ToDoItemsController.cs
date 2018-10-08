@@ -72,7 +72,7 @@ namespace CleanArchitecture.Web.Api
             }
             catch(Exception ex)
             {
-                return BadRequest(Response);
+                return BadRequest(ex.Message);
             }
         }
 

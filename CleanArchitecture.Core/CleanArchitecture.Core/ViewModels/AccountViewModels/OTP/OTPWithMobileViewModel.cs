@@ -16,11 +16,8 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
 
         [Required]
         [Phone]
+        [StringLength(10, MinimumLength = 10)]
+        [Range(10, Int64.MaxValue)]
         public string MobileNo { get; set; }
-    }
-
-    public class OTPWithMobileResponse : BizResponseClass
-    {
-
     }
 }

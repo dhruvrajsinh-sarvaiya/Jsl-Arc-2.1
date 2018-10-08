@@ -4,12 +4,15 @@ using System.Globalization;
 using AspNet.Security.OpenIdConnect.Primitives;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.Session;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.Services;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data;
+using CleanArchitecture.Infrastructure.Data.Transaction;
 using CleanArchitecture.Infrastructure.EFLocalizer;
+using CleanArchitecture.Infrastructure.Services.Transaction;
 using CleanArchitecture.Infrastructure.Services.User;
 using CleanArchitecture.Web.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -318,7 +321,9 @@ namespace CleanArchitecture.Web.Extensions
             services.AddScoped<IOtpMasterService, OtpMasterService>();
             //services.AddTransient<IMessageSender, MessageService>();
             // added by nirav savariya for Encypted Decrypted on 10-02-2018
-            services.AddScoped<EncyptedDecrypted>();            
+            services.AddScoped<EncyptedDecrypted>();
+            services.AddTransient<IFrontTrnService, FrontTrnService>();
+            services.AddTransient<IFrontTrnRepository, FrontTrnRepository>();
             return services;
         }
     }

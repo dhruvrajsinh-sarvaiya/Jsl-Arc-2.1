@@ -50,8 +50,9 @@ namespace CleanArchitecture.Infrastructure.Services
             IQueryable Result = _dbContext.CommunicationProviderList.FromSql(
                     @"select CASM.SenderID,CASM.SMSSendURL As SendURL,CASM.Priority,CASM.SMSBalURL,CSM.RequestID, RM.RequestFormat,
                         RM.ContentType,RM.MethodType, CSM.ServiceName,CSMP.UserID, CSMP.Password,CSMP.Balance ,CSM.CommServiceID,
-                        CSM.ResponseFailure,CSM.ResponseSuccess,TC.StatusRegex,TC.StatusMsgRegex,TC.BalanceRegex,TC.ErrorCodeRegex,
-                        TC.OprTrnRefNoRegex,TC.TrnRefNoRegex,TC.ResponseCodeRegex,TC.Param1Regex,TC.Param2Regex,TC.Param3Regex
+                        ISNull(CSM.ResponseFailure,'') AS ResponseFailure ,ISNull(CSM.ResponseSuccess,'') AS ResponseSuccess ,ISNULL(TC.StatusRegex,'') AS StatusRegex,
+                        ISNull(TC.StatusMsgRegex,'') AS StatusMsgRegex,ISNull(TC.BalanceRegex,'') AS BalanceRegex,ISNull(TC.ErrorCodeRegex,'') AS ErrorCodeRegex,
+                        ISNull(TC.OprTrnRefNoRegex,'') AS OprTrnRefNoRegex,ISNull(TC.TrnRefNoRegex,'') AS TrnRefNoRegex,ISNull(TC.ResponseCodeRegex,'') AS ResponseCodeRegex,ISNull(TC.Param1Regex,'') AS Param1Regex,ISNull(TC.Param2Regex,'') AS Param2Regex,ISNull(TC.Param3Regex,'') AS Param3Regex
                         from ServiceTypeMaster SM
                         inner join CommServiceTypeMaster CSTM on SM.ServiceTypeID = CSTM.ServiceTypeID
                         inner join CommServiceproviderMaster CSMP on CSTM.CommServiceTypeID = CSMP.CommServiceTypeID

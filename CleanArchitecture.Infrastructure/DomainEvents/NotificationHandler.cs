@@ -20,16 +20,18 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IMessageRepository<NotificationQueue> _MessageRepository;
         private readonly IMessageConfiguration _MessageConfiguration;
         private readonly IMessageService _MessageService;
-        private readonly WebApiParseResponse _WebApiParseResponse;
+        private WebApiParseResponse _WebApiParseResponse;
         private GetDataForParsingAPI _GetDataForParsingAPI;
+        private WebAPIParseResponseCls _GenerateResponse;
 
-        public NotificationHandler(IMessageRepository<NotificationQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse)
+        public NotificationHandler(IMessageRepository<NotificationQueue> MessageRepository, MessageConfiguration MessageConfiguration, MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, WebApiParseResponse WebApiParseResponse, WebAPIParseResponseCls GenerateResponse)
         {
             _MessageRepository = MessageRepository;
             _MessageConfiguration = MessageConfiguration;
             _MessageService = MessageService;
             _GetDataForParsingAPI = GetDataForParsingAPI;
             _WebApiParseResponse = WebApiParseResponse;
+            _GenerateResponse = GenerateResponse;
         }
 
         public async Task<CommunicationResponse> Handle(SendNotificationRequest Request, CancellationToken cancellationToken)
@@ -53,10 +55,10 @@ namespace CleanArchitecture.Infrastructure.Services
                 IQueryable Result = await _MessageConfiguration.GetAPIConfigurationAsync(1, 2);
                 foreach (CommunicationProviderList Provider in Result)
                 {
-                    string Resposne = await _MessageService.SendNotificationAsync(Notification.DeviceID,Notification.TickerText, Notification.ContentTitle, Notification.Message, Provider.SendURL,Provider.RequestFormat,Provider.SenderID,Provider.MethodType,Provider.ContentType);
+                    string Response = await _MessageService.SendNotificationAsync(Notification.DeviceID,Notification.TickerText, Notification.ContentTitle, Notification.Message, Provider.SendURL,Provider.RequestFormat,Provider.SenderID,Provider.MethodType,Provider.ContentType);
                     CopyClass.CopyObject(Provider, ref _GetDataForParsingAPI);
-                    WebAPIParseResponseCls GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Resposne, _GetDataForParsingAPI);
-                    if (GenerateResponse.Status == enTransactionStatus.Success)
+                    _GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Response, _GetDataForParsingAPI);
+                    if (_GenerateResponse.Status == enTransactionStatus.Success)
                     {
                         Notification.SentMessage();
                         _MessageRepository.Update(Notification);

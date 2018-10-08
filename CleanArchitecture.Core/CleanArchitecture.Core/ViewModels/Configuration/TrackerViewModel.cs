@@ -8,6 +8,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     public class TrackerViewModel
     {
         [Required]
+        [StringLength(50)]
         public string MemberType { get; set; }
 
         [Required]

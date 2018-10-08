@@ -63,7 +63,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return responseFromServer;
         }
 
-        public Task<string> SendRequestAsync(string Url, string Request="", string MethodType = "GET", string ContentType="application/json", WebHeaderCollection Headers = null, int Timeout = 45)
+        public Task<string> SendRequestAsync(string Url, string Request="", string MethodType = "GET", string ContentType="application/json", WebHeaderCollection Headers = null, int Timeout = 9000)
         {
             string responseFromServer = "";
             try
@@ -72,7 +72,10 @@ namespace CleanArchitecture.Infrastructure.Services
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(Url);
 
                 httpWebRequest.Method = MethodType.ToUpper();
-                httpWebRequest.Headers = Headers;
+                if(Headers != null)
+                {
+                    httpWebRequest.Headers = Headers;
+                }                
                 httpWebRequest.KeepAlive = false;
                 httpWebRequest.Timeout = Timeout;
                 httpWebRequest.ContentType = ContentType;
@@ -83,12 +86,15 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, MethodType);
 
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                if(Request != "")
                 {
-                    streamWriter.Write(Request);
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }
+                    using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                    {
+                        streamWriter.Write(Request);
+                        streamWriter.Flush();
+                        streamWriter.Close();
+                    }
+                }               
 
                 HttpWebResponse httpWebResponse = httpWebRequest.GetResponse() as HttpWebResponse;
                 using (StreamReader sr = new StreamReader(httpWebResponse.GetResponseStream()))

@@ -18,6 +18,7 @@ using StructureMap;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Infrastructure.Services.Repository;
+using CleanArchitecture.Infrastructure.Data.Transaction;
 
 namespace CleanArchitecture.Web
 {
@@ -135,6 +136,7 @@ namespace CleanArchitecture.Web
                 config.For(typeof(ICommonRepository<>)).Add(typeof(EFCommonRepository<>));
                 config.For(typeof(IWalletRepository)).Add(typeof(WalletRepository));
                 config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
+                config.For(typeof(IWebApiRepository)).Add(typeof(WebApiDataRepository));
                 config.For<IMediator>().Use<Mediator>();
                 // added by nirav savariya for common repository on 10-04-2018
                 config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
