@@ -37,14 +37,14 @@ namespace CleanArchitecture.Web.API
         private readonly IUserService _userdata;
         private readonly IMediator _mediator;
         private readonly EncyptedDecrypted _encdecAEC;
-        private readonly string _AESSalt = "rz8LuOtFBXphj9WQfvFh";
         private readonly ITempUserRegisterService _tempUserRegisterService;
         private readonly IRegisterTypeService _registerTypeService;
         private readonly ITempOtpService _tempOtpService;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         #endregion
 
         #region Ctore
-        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService)
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
@@ -54,6 +54,7 @@ namespace CleanArchitecture.Web.API
             _encdecAEC = encdecAEC;
             _registerTypeService = registerTypeService;
             _tempOtpService = tempOtpService;
+            _configuration = configuration;
         }
         #endregion
 
@@ -74,7 +75,7 @@ namespace CleanArchitecture.Web.API
         {
             if (!string.IsNullOrEmpty(emailConfirmCode))
             {
-                byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+                byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
                 string DecryptToken = EncyptedDecrypted.Decrypt(emailConfirmCode, DecpasswordBytes);
 
@@ -166,7 +167,7 @@ namespace CleanArchitecture.Web.API
                 bool IsSignEmail = await _tempUserRegisterService.GetEmail(model.Email);
                 if (IsSignEmail)
                 {
-                    byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+                    byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
                     var tempcurrentUser = new TempUserRegisterViewModel
                     {
@@ -250,12 +251,11 @@ namespace CleanArchitecture.Web.API
                 bool IsTempSignEmail = await _tempUserRegisterService.GetEmail(model.Email);
                 if (IsTempSignEmail)
                 {
-                    byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
                     var tempcurrentUser = new TempUserRegisterViewModel
                     {
                         UserName = model.Email,
                         Email = model.Email,
-                        RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Email)
+                        RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Email)
                     };
 
                     var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
@@ -308,13 +308,11 @@ namespace CleanArchitecture.Web.API
 
             if (isValidNumber)
             {
-                byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
                 var tempcurrentUser = new TempUserRegisterViewModel
                 {
                     UserName = model.Mobile,
                     Mobile = model.Mobile,
                     RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Mobile),
-                    //PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes)
                 };
 
                 bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
@@ -379,80 +377,70 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> MobileOtpVerification(OTPWithMobileViewModel model)
         {
-            if (!string.IsNullOrEmpty(model?.MobileNo))
+            var tempdata = await _tempUserRegisterService.GetMobileNo(model.MobileNo);
+            if (tempdata?.Id > 0)
             {
-                var tempdata = await _tempUserRegisterService.GetMobileNo(model.MobileNo);
-                if (tempdata?.Id > 0)
+                var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                if (tempotp != null)
                 {
-                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
-                    if (tempotp != null)
+                    if (tempotp?.ExpirTime >= DateTime.UtcNow)
                     {
-                        if (tempotp?.ExpirTime >= DateTime.UtcNow)
+                        if (tempdata.Id == 0 && tempotp.Id == 0)
                         {
-                            if (tempdata.Id == 0 && tempotp.Id == 0)
+                            ModelState.AddModelError(string.Empty, "Error.");
+                            return BadRequest(new ApiError(ModelState));
+                        }
+                        else if (model.OTP == tempotp.OTP)
+                        {
+                            if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
                             {
-                                ModelState.AddModelError(string.Empty, "Error.");
-                                return BadRequest(new ApiError(ModelState));
-                            }
-                            else if (model.OTP == tempotp.OTP)
-                            {
-                                if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
+                                var currentUser = new ApplicationUser
                                 {
-                                    byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
-                                    var currentUser = new ApplicationUser
+                                    UserName = tempdata.Mobile,
+                                    Mobile = tempdata.Mobile,
+                                };
+                                var result = await _userManager.CreateAsync(currentUser);
+                                if (result.Succeeded)
+                                {
+                                    if (currentUser.Mobile != null)
                                     {
-                                        UserName = tempdata.Mobile,
-                                        Mobile = tempdata.Mobile,
-                                        PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
-                                    };
-                                    var result = await _userManager.CreateAsync(currentUser, currentUser.PasswordHash);
-                                    if (result.Succeeded)
-                                    {
-                                        if (currentUser.Mobile != null)
-                                        {
-                                            var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
-                                            await _userManager.AddClaimAsync(currentUser, officeClaim);
-                                        }
-                                        // Add to roles
-                                        var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-                                        if (roleAddResult.Succeeded)
-                                        {
-                                            _tempUserRegisterService.Update(tempdata.Id);
-                                            _tempOtpService.Update(tempotp.Id);
-                                            var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
-                                            return Ok("You have successfully verified.");
-                                            //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
-                                        }
+                                        var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
+                                        await _userManager.AddClaimAsync(currentUser, officeClaim);
                                     }
-                                    else
+                                    // Add to roles
+                                    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                                    if (roleAddResult.Succeeded)
                                     {
-                                        ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
-                                        return BadRequest(new ApiError(ModelState));
+                                        _tempUserRegisterService.Update(tempdata.Id);
+                                        _tempOtpService.Update(tempotp.Id);
+                                        var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
+                                        return Ok("You have successfully verified.");
+                                        //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
                                     }
                                 }
                                 else
                                 {
-                                    ModelState.AddModelError(string.Empty, "This user is already registered.");
+                                    ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
                                     return BadRequest(new ApiError(ModelState));
                                 }
                             }
                             else
                             {
-                                ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
+                                ModelState.AddModelError(string.Empty, "This user is already registered.");
                                 return BadRequest(new ApiError(ModelState));
                             }
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                            ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
                             return BadRequest(new ApiError(ModelState));
                         }
                     }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Error.");
-                    return BadRequest(new ApiError(ModelState));
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                        return BadRequest(new ApiError(ModelState));
+                    }
                 }
             }
             else
@@ -460,6 +448,7 @@ namespace CleanArchitecture.Web.API
                 ModelState.AddModelError(string.Empty, "Error.");
                 return BadRequest(new ApiError(ModelState));
             }
+
             ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
             return BadRequest(new ApiError(ModelState));
         }
@@ -472,80 +461,70 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> EmailOtpVerification(OTPWithEmailViewModel model)
         {
-            if (!string.IsNullOrEmpty(model?.Email))
+            var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
+            if (tempdata?.Id > 0)
             {
-                var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
-                if (tempdata?.Id > 0)
+                var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                if (tempotp != null)
                 {
-                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
-                    if (tempotp != null)
+                    if (tempotp?.ExpirTime >= DateTime.UtcNow)
                     {
-                        if (tempotp?.ExpirTime >= DateTime.UtcNow)
+                        if (tempdata.Id == 0 && tempotp.Id == 0)
                         {
-                            if (tempdata.Id == 0 && tempotp.Id == 0)
+                            ModelState.AddModelError(string.Empty, "Error.");
+                            return BadRequest(new ApiError(ModelState));
+                        }
+                        else if (model.OTP == tempotp.OTP)
+                        {
+                            if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
                             {
-                                ModelState.AddModelError(string.Empty, "Error.");
-                                return BadRequest(new ApiError(ModelState));
-                            }
-                            else if (model.OTP == tempotp.OTP)
-                            {
-                                if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
+                                var currentUser = new ApplicationUser
                                 {
-                                    byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
-                                    var currentUser = new ApplicationUser
+                                    UserName = tempdata.Email,
+                                    Email = tempdata.Email,
+                                };
+                                var result = await _userManager.CreateAsync(currentUser);
+                                if (result.Succeeded)
+                                {
+                                    if (currentUser.Mobile != null)
                                     {
-                                        UserName = tempdata.Email,
-                                        Email = tempdata.Email,
-                                        //PasswordHash = EncyptedDecrypted.Decrypt(tempdata.PasswordHash, DecpasswordBytes),
-                                    };
-                                    var result = await _userManager.CreateAsync(currentUser);
-                                    if (result.Succeeded)
-                                    {
-                                        if (currentUser.Mobile != null)
-                                        {
-                                            var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
-                                            await _userManager.AddClaimAsync(currentUser, officeClaim);
-                                        }
-                                        // Add to roles
-                                        var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-                                        if (roleAddResult.Succeeded)
-                                        {
-                                            _tempUserRegisterService.Update(tempdata.Id);
-                                            _tempOtpService.Update(tempotp.Id);
-                                            var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
-                                            //return Ok("Your account has been activated, you can now login.");
-                                            return Ok("You have successfully verified.");
-                                        }
+                                        var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
+                                        await _userManager.AddClaimAsync(currentUser, officeClaim);
                                     }
-                                    else
+                                    // Add to roles
+                                    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                                    if (roleAddResult.Succeeded)
                                     {
-                                        ModelState.AddModelError(string.Empty, "This Email is already registered.");
-                                        return BadRequest(new ApiError(ModelState));
+                                        _tempUserRegisterService.Update(tempdata.Id);
+                                        _tempOtpService.Update(tempotp.Id);
+                                        var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
+                                        //return Ok("Your account has been activated, you can now login.");
+                                        return Ok("You have successfully verified.");
                                     }
                                 }
                                 else
                                 {
-                                    ModelState.AddModelError(string.Empty, "This user is already registered.");
+                                    ModelState.AddModelError(string.Empty, "This Email is already registered.");
                                     return BadRequest(new ApiError(ModelState));
                                 }
                             }
                             else
                             {
-                                ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
+                                ModelState.AddModelError(string.Empty, "This user is already registered.");
                                 return BadRequest(new ApiError(ModelState));
                             }
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                            ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
                             return BadRequest(new ApiError(ModelState));
                         }
                     }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Error.");
-                    return BadRequest(new ApiError(ModelState));
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                        return BadRequest(new ApiError(ModelState));
+                    }
                 }
             }
             else
@@ -679,7 +658,7 @@ namespace CleanArchitecture.Web.API
                     var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
                     if (!tempdata.RegisterStatus)
                     {
-                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_AESSalt);
+                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
                         LinkTokenViewModel linkToken = new LinkTokenViewModel();
                         linkToken.Id = tempdata.Id;
