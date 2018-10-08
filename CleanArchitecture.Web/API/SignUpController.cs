@@ -207,7 +207,7 @@ namespace CleanArchitecture.Web.API
                         request.Subject = "Registration confirmation email";
                         request.Body = confirmationLink;
 
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
                         _logger.LogInformation(3, "User created a new account with password.");
 
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
@@ -267,7 +267,7 @@ namespace CleanArchitecture.Web.API
                         request.Subject = "Registration confirmation email";
                         request.Body = "use this code:" + resultotp.OTP + "";
 
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
 
                         //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
                         return Ok("Please verify it by clicking the otp that has been send to your email.");
@@ -331,7 +331,7 @@ namespace CleanArchitecture.Web.API
                             SendSMSRequest request = new SendSMSRequest();
                             request.MobileNo = Convert.ToInt64(model.Mobile);
                             request.Message = "SMS for use this code " + tempotp.OTP + "";
-                            CommunicationResponse CommResponse = await _mediator.Send(request);
+                            await _mediator.Send(request);
                             return Ok("Success");
                         }
                     }
@@ -584,7 +584,7 @@ namespace CleanArchitecture.Web.API
                         SendSMSRequest request = new SendSMSRequest();
                         request.MobileNo = Convert.ToInt64(model.Mobile);
                         request.Message = "SMS for use this code " + result.OTP + "";
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
 
                         //return Ok("SMS sent successfully.");
                         //SignUpWithMobileResponse response = new SignUpWithMobileResponse();
@@ -597,7 +597,7 @@ namespace CleanArchitecture.Web.API
                         SendSMSRequest request = new SendSMSRequest();
                         request.MobileNo = Convert.ToInt64(model.Mobile);
                         request.Message = "SMS for use this code " + tempotp.OTP + "";
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
                         return Ok("Success");
                     }
                 }
@@ -638,7 +638,7 @@ namespace CleanArchitecture.Web.API
                     request.Subject = "Registration confirmation resend email";
                     request.Body = "use this code:" + resultdata.OTP + "";
 
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
                     return Ok("Success");
@@ -650,7 +650,7 @@ namespace CleanArchitecture.Web.API
                     request.Subject = "Registration confirmation resend email";
                     request.Body = "use this code:" + tempotp.OTP + "";
 
-                    CommunicationResponse CommResponse = await _mediator.Send(request);
+                    await _mediator.Send(request);
                     _logger.LogInformation(3, "Email sent successfully with your account");
 
                     return Ok("Please verify it by clicking the otp that has been resend to your email.");
@@ -703,7 +703,7 @@ namespace CleanArchitecture.Web.API
                         request.Subject = "Registration confirmation resend email";
                         request.Body = confirmationLink;
 
-                        CommunicationResponse CommResponse = await _mediator.Send(request);
+                        await _mediator.Send(request);
                         _logger.LogInformation(3, "Email sent successfully with your account");
 
                         //RegisterResponse response = new RegisterResponse();

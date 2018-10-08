@@ -28,10 +28,11 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrnNoPairSelectedMsg = "No Pair Selected";
         public static string CreateTrnInvalidQtyPriceMsg = "Invalid Qty or Price";
         public static string CreateTrnInvalidQtyNAmountMsg = "Invalid Order Qty and Amount";
-        public static string CreateTrnNoCreditAccountFoundMsg = "No Credit Account Found";
-        public static string CreateTrnNoDebitAccountFoundMsg = "No Debit Account Found";
-        public static string CreateInvalidAmountMsg = "Invalid Amount";
-        public static string CreateDuplicateTrnMsg = "Duplicate Transaction for Same Address, Please Try After 10 Minutes";
+        public static string CreateTrn_NoCreditAccountFoundMsg = "No Credit Account Found";
+        public static string CreateTrn_NoDebitAccountFoundMsg = "No Debit Account Found";
+        public static string CreateTrnInvalidAmountMsg = "Invalid Amount";
+        public static string CreateTrnDuplicateTrnMsg = "Duplicate Transaction for Same Address, Please Try After 10 Minutes";
+        public static string CreateTrn_NoSelfAddressWithdrawAllowMsg = "Invalid Amount";
         //============================
 
         //============================walelt=================================//

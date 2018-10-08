@@ -22,6 +22,7 @@ namespace CleanArchitecture.Core.Enums
     }
     public enum enTransactionStatus
     {
+        Initialize=0,
         Success = 1,
         OperatorFail = 2,
         SystemFail = 3,
@@ -135,13 +136,14 @@ namespace CleanArchitecture.Core.Enums
         TransactionInsertSuccess = 1,
         TransactionInsertFail =1,
         TransactionInsertInternalError =1,
-        CreateTrnNoPairSelected = 1,
+        CreateTrn_NoPairSelected = 1,
         CreateTrnInvalidQtyPrice = 1,
         CreateTrnInvalidQtyNAmount = 1,
-        CreateTrnNoCreditAccountFound = 1,
-        CreateTrnNoDebitAccountFound = 1,
-        CreateInvalidAmount = 1,
-        CreateDuplicateTrn=1
+        CreateTrn_NoCreditAccountFound = 1,
+        CreateTrn_NoDebitAccountFound = 1,
+        CreateTrnInvalidAmount = 1,
+        CreateTrnDuplicateTrn=1,
+        CreateTrn_NoSelfAddressWithdrawAllow=1
         //=======================
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
