@@ -21,7 +21,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly ICommonRepository<ServiceConfiguration> _ServiceConfi;
-        private readonly ICommonRepository<AddressMaster> _AddressMasterRepository;        
+        private readonly ICommonRepository<AddressMaster> _AddressMasterRepository;
         BizResponse _Resp;
         readonly ILogger _log;
         BizResponse _CreateTransactionResp;
@@ -47,9 +47,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 return _Resp;
             }
-
-
             //=========================PROCESS
+
 
 
 
@@ -60,32 +59,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             return null;
         }
 
+        #region RegionInitTransaction    
         public BizResponse CreateTransaction(NewTransactionRequestCls Req)
         {
-            string TrnTypeName = "";
-            decimal Balance = 0;
-            long TABactchNo = 0;
-            string ServiceName = "";
-            string Order_Currency = "";
-            decimal OrderTotalQty = 0;
-            string Delivery_Currency = "";
-            decimal DeliveryTotalQty = 0;
-            long OrderWalletID = 0;
-            long DeliveryWalletID = 0;
-            decimal BuyQty = 0;
-            decimal BidPrice = 0;
-            decimal SellQty = 0;
-            decimal AskPrice = 0;
-            string INRSMSCode = "INR";
+            //long DeliveryWalletID = 0;           
+            //string INRSMSCode = "INR";
             decimal Amount2 = 0;
-            string MemberMobile1 = "";
+            //string MemberMobile1 = "";
             TradePairMaster _TradePairObj;
             NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
-            //AddressMaster _AddressMasterObj;
-            //string PairName = "";
-            //long TradeWalletMasterID = 0;
-            //long TradeServiceID = 0;
-            //long WalletServiceID = 0;
+            long TrnNo = 0;
             try
             {
                 if (Req.TrnType == enTrnType.Buy_Trade)
@@ -137,7 +120,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
                     Req.SMSCode = _TradeTransactionObj.Order_Currency;
                     //Balace check Here , take DeliveryWalletID output
-                    _TradeTransactionObj.DeliveryWalletID = DeliveryWalletID;
+                    _TradeTransactionObj.DeliveryWalletID = Req.DeliveryWalletID;
 
                     Req.Amount = _TradeTransactionObj.OrderTotalQty;
                     if (_TradeTransactionObj.DeliveryWalletID == 0)
@@ -194,12 +177,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
                     }
                 }
-                //Req.Status = enTransactionStatus.Initialize;
-                //InsertTransactionInQueue(Req, ref TrnNo);
-                //_TradeTransactionObj.TrnNo = TrnNo;
-                //InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
-
-
+                Req.Status = enTransactionStatus.Initialize;
+                InsertTransactionInQueue(Req, ref TrnNo);
+                _TradeTransactionObj.TrnNo = TrnNo;
+                Req.TrnNo = TrnNo;
+                if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
+                    InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
                 return (new BizResponse { ReturnMsg = "", ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
@@ -217,7 +200,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 Req.Status = enTransactionStatus.SystemFail;
                 InsertTransactionInQueue(Req, ref TrnNo);
                 _TradeTransactionObj.TrnNo = TrnNo;
-                InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
+                Req.TrnNo = TrnNo;
+                if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
+                    InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
                 //DI of SMS here
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.Fail, ErrorCode = ErrorCode });
             }
@@ -259,7 +244,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-
         public BizResponse InsertTradeTransactionInQueue(NewTransactionRequestCls NewtransactionReq, NewTradeTransactionRequestCls NewTradetransactionReq)
         {
             _Resp = new BizResponse();
@@ -299,6 +283,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
+        #endregion
+
+        #region RegionProcessTransaction
+
+        #endregion
+
 
     }
 }
