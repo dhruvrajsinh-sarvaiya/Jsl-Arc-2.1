@@ -71,7 +71,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
         public DbSet<RouteConfiguration> RouteConfiguration { get; set; }
         public DbSet<ThirdPartyAPIConfiguration> ThirdPartyAPIConfiguration { get; set; }
-        public DbSet<ThirPartyAPIResponseConfiguration> ThirPartyAPIResponseConfiguration { get; set; }
+        public DbSet<ThirdPartyAPIResponseConfiguration> ThirdPartyAPIResponseConfiguration { get; set; }
 
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018

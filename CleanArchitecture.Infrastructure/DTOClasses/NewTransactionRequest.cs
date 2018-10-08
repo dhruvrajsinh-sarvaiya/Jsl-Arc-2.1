@@ -9,6 +9,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 {
     public class NewTransactionRequestCls
     {
+        public long TrnNo { get; set; }
         [Required]
         public short TrnMode { get; set; }
         [Required]
@@ -44,7 +45,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public int StatusCode { get; set; }
         public string StatusMsg { get; set; }
         public long WalletID { get; set; }
-
+        public long DeliveryWalletID { get; set; } //use only in case of Trading
+        
     }
 
     public class NewTradeTransactionRequestCls

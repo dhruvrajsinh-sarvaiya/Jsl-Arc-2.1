@@ -51,7 +51,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public GetDataForParsingAPI GetDataForParsingAPI(long ThirPartyAPIID)
         {
             var result = from TP in _dbContext.ThirdPartyAPIConfiguration
-                         join Regex in _dbContext.ThirPartyAPIResponseConfiguration on TP.ParsingDataID equals Regex.Id
+                         join Regex in _dbContext.ThirdPartyAPIResponseConfiguration on TP.ParsingDataID equals Regex.Id
                          where TP.Id == ThirPartyAPIID && TP.Status == 1
                          select new GetDataForParsingAPI
                          {

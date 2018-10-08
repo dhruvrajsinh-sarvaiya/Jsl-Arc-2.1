@@ -59,7 +59,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         inner join CommServiceMaster CSM on CSMP.CommSerproID = CSM.CommSerproID
                         inner join CommAPIServiceMaster CASM on CSM.CommServiceID = CASM.CommServiceID
                         inner join RequestFormatMaster RM on CSM.RequestID = RM.RequestID
-                        left join ThirPartyAPIResponseConfiguration TC on TC.Id = CSM.ParsingDataID
+                        left join ThirdPartyAPIResponseConfiguration TC on TC.Id = CSM.ParsingDataID
                         where SM.ServiceTypeID = {0} and CSTM.CommServiceTypeID = {1}", ServiceTypeID, CommServiceTypeID);
 
             return Task.FromResult(Result);
