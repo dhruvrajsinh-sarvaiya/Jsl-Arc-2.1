@@ -35,33 +35,47 @@ namespace CleanArchitecture.Infrastructure.Services.User
             _mediator = mediator;
         }
 
-        public async Task<OtpMasterViewModel> AddOtp(int UserId, string Email = null,string Mobile=null)
+        public async Task<OtpMasterViewModel> AddOtp(int UserId, string Email = null, string Mobile = null)
         {
-            string OtpValue = _userService.GenerateRandomOTP().ToString();
-            int Regtypeid = 0;
-            if (!String.IsNullOrEmpty(Email))
+            var checkotp = await GetOtpData(UserId);
+            string OtpValue = string.Empty;
+            var currentotp = (dynamic)null;
+            if ((checkotp?.ExpirTime <= DateTime.UtcNow && !checkotp.EnableStatus) || checkotp == null)
             {
-                Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Email);
+                if (checkotp != null)
+                    UpdateOtp(checkotp.Id);
+                OtpValue = _userService.GenerateRandomOTP().ToString();
+                int Regtypeid = 0;
+                if (!String.IsNullOrEmpty(Email))
+                {
+                    Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Email);
+                }
+                else if (!String.IsNullOrEmpty(Mobile))
+                {
+                    Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Mobile);
+                }
+
+                currentotp = new OtpMaster
+                {
+                    UserId = UserId,
+                    RegTypeId = Regtypeid,
+                    OTP = OtpValue,
+                    CreatedTime = DateTime.UtcNow,
+                    ExpirTime = DateTime.UtcNow.AddHours(2),
+                    Status = 0,
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = UserId
+
+                };
+                _customRepository.Add(currentotp);
+                //_customRepository.Insert(currentotp);
             }
-            else if (!String.IsNullOrEmpty(Mobile))
+            else
             {
-                Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Mobile);
+                OtpValue = checkotp.OTP;
+                currentotp = checkotp;
             }
 
-            var currentotp = new OtpMaster
-            {
-                UserId = UserId,
-                RegTypeId = Regtypeid,
-                OTP = OtpValue,
-                CreatedTime = DateTime.UtcNow,
-                ExpirTime = DateTime.UtcNow.AddHours(2),
-                Status = 0,
-                CreatedDate = DateTime.Now,
-                CreatedBy = UserId
-
-            };
-            _customRepository.Add(currentotp);
-            //_customRepository.Insert(currentotp);
 
             if (!String.IsNullOrEmpty(Email))
             {
@@ -71,28 +85,27 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 SendEmailRequest request = new SendEmailRequest();
                 request.Recepient = Email;
                 request.Subject = "Login With Email Otp";
-                request.Body = "use this code: " + OtpValue +"";
-
-                CommunicationResponse CommResponse = await _mediator.Send(request);
+                request.Body = "use this code: " + OtpValue + "";
+               await _mediator.Send(request);
             }
-            if(!String.IsNullOrEmpty(Mobile))
+            if (!String.IsNullOrEmpty(Mobile))
             {
                 SendSMSRequest request = new SendSMSRequest();
                 request.MobileNo = Convert.ToInt64(Mobile);
                 request.Message = OtpValue;
-                CommunicationResponse CommResponse = await _mediator.Send(request);
+                await _mediator.Send(request);
             }
 
             OtpMasterViewModel model = new OtpMasterViewModel();
-            if(currentotp !=null)
+            if (currentotp != null)
             {
-                model.UserId = model.UserId;
-                model.RegTypeId = model.RegTypeId;
-                model.OTP = model.OTP;
-                model.CreatedTime = model.CreatedTime;
-                model.ExpirTime = model.ExpirTime;
-                model.Status = model.Status;
-                model.Id = model.Id;
+                model.UserId = currentotp.UserId;
+                model.RegTypeId = currentotp.RegTypeId;
+                model.OTP = currentotp.OTP;
+                model.CreatedTime = currentotp.CreatedTime;
+                model.ExpirTime = currentotp.ExpirTime;
+                model.Status = currentotp.Status;
+                model.Id = currentotp.Id;
                 return model;
             }
             else
@@ -113,7 +126,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 model.OTP = otpmaster.OTP;
                 model.CreatedTime = otpmaster.CreatedTime;
                 model.ExpirTime = otpmaster.ExpirTime;
-                model.Status = otpmaster.Status;
+                model.EnableStatus = otpmaster.EnableStatus;
                 model.Id = otpmaster.Id;
                 return model;
             }

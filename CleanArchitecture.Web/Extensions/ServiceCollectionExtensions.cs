@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using AspNet.Security.OpenIdConnect.Primitives;
+using AutoMapper.Configuration;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
@@ -25,6 +26,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Configuration;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -84,7 +86,7 @@ namespace CleanArchitecture.Web.Extensions
             return services;
         }
 
-        public static IServiceCollection AddCustomIdentity(this IServiceCollection services)
+        public static IServiceCollection AddCustomIdentity(this IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -105,8 +107,8 @@ namespace CleanArchitecture.Web.Extensions
                 options.Password.RequiredUniqueChars = 1;
 
                 // Lockout settings.
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(Convert.ToInt64(configuration["DefaultLockoutTimeSpan"]));
+                options.Lockout.MaxFailedAccessAttempts = Convert.ToInt16(configuration["MaxFailedAttempts"]);
                 options.Lockout.AllowedForNewUsers = true;
 
                 // User settings.

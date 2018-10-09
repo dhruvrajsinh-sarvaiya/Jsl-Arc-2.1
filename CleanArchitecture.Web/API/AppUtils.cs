@@ -15,7 +15,19 @@ namespace CleanArchitecture.Web.API
 
         internal static IActionResult StanderdSignIn(ApplicationUser user, object obj)
         {
-            var userResult = new { User = new { DisplayName = user.UserName, Response = obj } };
+            var userResult = new { User = new { DisplayName = user.UserName, Roles = obj } };
+            return new ObjectResult(userResult);
+        }
+
+        internal static IActionResult StanderdSignUp(string message)
+        {
+            var userResult = new { message = message };
+            return new ObjectResult(userResult);
+        }
+
+        internal static IActionResult Standerdlogin(string message)
+        {
+            var userResult = new { message = message };
             return new ObjectResult(userResult);
         }
 

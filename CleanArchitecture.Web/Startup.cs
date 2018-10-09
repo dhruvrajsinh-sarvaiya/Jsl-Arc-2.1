@@ -62,7 +62,7 @@ namespace CleanArchitecture.Web
             services.AddCustomDbContext();
 
             //// custom token
-            services.AddCustomIdentity();
+            services.AddCustomIdentity(Configuration);
             //// OpenIddict
             services.AddCustomOpenIddict(HostingEnvironment);
 
