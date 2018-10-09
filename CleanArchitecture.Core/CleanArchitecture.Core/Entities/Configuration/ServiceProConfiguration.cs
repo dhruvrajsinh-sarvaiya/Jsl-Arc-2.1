@@ -1,4 +1,6 @@
-﻿using CleanArchitecture.Core.SharedKernel;
+﻿using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Events;
+using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,6 +18,17 @@ namespace CleanArchitecture.Core.Entities.Configuration
         public string SecretKey { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+
+        public void DisableProvider()
+        {
+            Status = Convert.ToInt16(ServiceStatus.Disable);
+            Events.Add(new ServiceStatusEvent<ServiceProConfiguration>(this));
+        }
+        public void EnableProvider()
+        {
+            Status = Convert.ToInt16(ServiceStatus.Active);
+            Events.Add(new ServiceStatusEvent<ServiceProConfiguration>(this));
+        }
 
     }
 }   

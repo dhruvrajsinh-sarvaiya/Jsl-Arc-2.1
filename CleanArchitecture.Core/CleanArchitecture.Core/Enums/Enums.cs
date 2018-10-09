@@ -189,7 +189,7 @@ namespace CleanArchitecture.Core.Enums
         Login = 1,
     }
 
-    public enum AppType
+    public enum enAppType
     {
         WebSocket = 1,
         JsonRPC = 2,
@@ -198,6 +198,12 @@ namespace CleanArchitecture.Core.Enums
         HttpApi = 5,
         SocketApi = 6,
         BitcoinDeamon = 7
+    }
+
+    public enum enServiceMasterType
+    {
+        Coin = 1,
+        Token = 2
     }
 
 }
