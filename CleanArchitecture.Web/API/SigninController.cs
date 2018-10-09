@@ -14,6 +14,7 @@ using CleanArchitecture.Core.ViewModels.AccountViewModels.ForgotPassword;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.Login;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.OTP;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.ResetPassword;
+using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Web.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -39,10 +40,11 @@ namespace CleanArchitecture.Web.API
         private readonly IUserService _userService;
         private readonly IOtpMasterService _otpMasterService;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+        private readonly IBasePage _basePage;
         #endregion
 
         #region Ctore
-        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -51,6 +53,7 @@ namespace CleanArchitecture.Web.API
             _userService = userService;
             _otpMasterService = otpMasterService;
             _configuration = configuration;
+            _basePage = basePage;
         }
         #endregion
 
@@ -237,32 +240,40 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> StandardLogin(StandardLoginViewModel model)
         {
-            //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
-            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, false, lockoutOnFailure: false);
-            var checkmail = await _userManager.FindByEmailAsync(model.UserName);
-            if (result.Succeeded)
+            try
             {
-                var user = await _userManager.FindByNameAsync(model.UserName);
-                var roles = await _userManager.GetRolesAsync(user);
-                _logger.LogInformation(1, "User logged in.");
+                //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: false);
+                var checkmail = await _userManager.FindByEmailAsync(model.Username);
+                if (result.Succeeded)
+                {
+                    var user = await _userManager.FindByNameAsync(model.Username);
+                    var roles = await _userManager.GetRolesAsync(user);
+                    _logger.LogInformation(1, "User logged in.");
 
-                return AppUtils.StanderdSignIn(user, roles);
+                    return AppUtils.StanderdSignIn(user, roles);
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    //return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
+                    return RedirectToAction(nameof(SendCode), new { RememberMe = false });
+                }
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning(2, "User account locked out for two hours.");
+                    return BadRequest(new ApiError("User account locked out for two hours."));
+                }
+                else
+                {
+                    if (checkmail != null)
+                        await _userManager.AccessFailedAsync(checkmail);
+                    return BadRequest(new ApiError("Login failed : Invalid username or password."));
+                }
             }
-            if (result.RequiresTwoFactor)
+            catch (Exception ex)
             {
-                //return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
-                return RedirectToAction(nameof(SendCode), new { RememberMe = false });
-            }
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning(2, "User account locked out for two hours.");
-                return BadRequest(new ApiError("User account locked out for two hours."));
-            }
-            else
-            {
-                if (checkmail != null)
-                    await _userManager.AccessFailedAsync(checkmail);
-                return BadRequest(new ApiError("Login failed : Invalid username or password."));
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
         }
         #endregion
@@ -277,24 +288,32 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithEmail(LoginWithEmailViewModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null)
+            try
             {
-                var otpData = _otpMasterService.AddOtp(user.Id, user.Email, "");
-                if (otpData != null)
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
                 {
-                    _logger.LogWarning(1, "User Login with Email Send Success.");
-                    return AppUtils.Standerdlogin("You have send OTP on email");
+                    var otpData = _otpMasterService.AddOtp(user.Id, user.Email, "");
+                    if (otpData != null)
+                    {
+                        _logger.LogWarning(1, "User Login with Email Send Success.");
+                        return AppUtils.Standerdlogin("You have send OTP on email");
+                    }
+                    else
+                    {
+                        _logger.LogWarning(2, "User Otp Data Not Send.");
+                        return BadRequest(new ApiError("Invalid login attempt."));
+                    }
                 }
                 else
                 {
-                    _logger.LogWarning(2, "User Otp Data Not Send.");
-                    return BadRequest(new ApiError("Invalid login attempt."));
+                    return BadRequest(new ApiError("Login failed: Invalid email."));
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new ApiError("Login failed: Invalid email."));
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
         }
         #endregion
@@ -309,25 +328,33 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithMobile(LoginWithMobileViewModel model)
         {
-            var userdt = await _userService.FindByMobileNumber(model.Mobile);
-            if (userdt != null)
+            try
             {
-                var otpData = _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
-                if (otpData != null)
+                var userdt = await _userService.FindByMobileNumber(model.Mobile);
+                if (userdt != null)
                 {
-                    //var roles = await _userManager.GetRolesAsync(userdt.Result);
-                    _logger.LogWarning(1, "User Login with Mobile Send Success.");
-                    return AppUtils.Standerdlogin("You have send OTP on mobile.");
+                    var otpData = _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
+                    if (otpData != null)
+                    {
+                        //var roles = await _userManager.GetRolesAsync(userdt.Result);
+                        _logger.LogWarning(1, "User Login with Mobile Send Success.");
+                        return AppUtils.Standerdlogin("You have send OTP on mobile.");
+                    }
+                    else
+                    {
+                        _logger.LogWarning(2, "User Otp Data Not Send.");
+                        return BadRequest(new ApiError("Invalid login attempt."));
+                    }
                 }
                 else
                 {
-                    _logger.LogWarning(2, "User Otp Data Not Send.");
-                    return BadRequest(new ApiError("Invalid login attempt."));
+                    return BadRequest(new ApiError("Login failed: Invalid mobileno."));
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new ApiError("Login failed: Invalid mobileno."));
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
         }
         #endregion
@@ -355,9 +382,17 @@ namespace CleanArchitecture.Web.API
         //[ValidateAntiForgeryToken]
         public IActionResult Sociallogin(string ProviderName, string returnUrl = null)
         {
-            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(ProviderName, redirectUrl);
-            return new ChallengeResult(ProviderName, properties);
+            try
+            {
+                var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+                var properties = _signInManager.ConfigureExternalAuthenticationProperties(ProviderName, redirectUrl);
+                return new ChallengeResult(ProviderName, properties);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
         }
 
 
@@ -373,44 +408,51 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> ReSendOtpWithEmail(LoginWithEmailViewModel model)
         {
-            var userdt = await _userManager.FindByEmailAsync(model.Email);
-            if (!string.IsNullOrEmpty(userdt?.Email))
+            try
             {
-                var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
-
-                if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)
+                var userdt = await _userManager.FindByEmailAsync(model.Email);
+                if (!string.IsNullOrEmpty(userdt?.Email))
                 {
-                    _otpMasterService.UpdateOtp(otpcheck.Id);
-                    var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), userdt.Email, "");
-                    if (otpData != null)
+                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
+
+                    if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)
                     {
-                        _logger.LogWarning(1, "User Login with Email OTP Send Success.");
-                        return AppUtils.Standerdlogin("User Login with Email OTP Send Success.");
+                        _otpMasterService.UpdateOtp(otpcheck.Id);
+                        var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), userdt.Email, "");
+                        if (otpData != null)
+                        {
+                            _logger.LogWarning(1, "User Login with Email OTP Send Success.");
+                            return AppUtils.Standerdlogin("User Login with Email OTP Send Success.");
+                        }
+                        else
+                        {
+                            _logger.LogWarning(2, "User Otp Data Not Send.");
+                            return BadRequest(new ApiError("User Otp Data Not Send."));
+                        }
                     }
                     else
                     {
-                        _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new ApiError("User Otp Data Not Send."));
+                        SendEmailRequest request = new SendEmailRequest();
+                        request.Recepient = userdt.Email;
+                        request.Subject = "Login With Email Otp";
+                        request.Body = "use this code:" + otpcheck.OTP + "";
+
+                        await _mediator.Send(request);
+                        _logger.LogWarning(1, "User Login with Email OTP Send Success.");
+
+                        return Ok("User Login with Email OTP Send Success.");
                     }
                 }
                 else
                 {
-                    SendEmailRequest request = new SendEmailRequest();
-                    request.Recepient = userdt.Email;
-                    request.Subject = "Login With Email Otp";
-                    request.Body = "use this code:" + otpcheck.OTP + "";
-
-                    await _mediator.Send(request);
-                    _logger.LogWarning(1, "User Login with Email OTP Send Success.");
-
-                    return Ok("User Login with Email OTP Send Success.");
+                    return BadRequest(new ApiError("Invalid login email."));
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new ApiError("Invalid login email."));
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
-            // return BadRequest(new ApiError("Invalid login attempt."));
         }
         #endregion
 
@@ -425,44 +467,51 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> ReSendOtpWithMobile(LoginWithMobileViewModel model)
         {
-            var userdt = await _userService.FindByMobileNumber(model.Mobile);
-            if (!string.IsNullOrEmpty(userdt?.Mobile))
+            try
             {
-                var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
-
-                if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)
+                var userdt = await _userService.FindByMobileNumber(model.Mobile);
+                if (!string.IsNullOrEmpty(userdt?.Mobile))
                 {
-                    _otpMasterService.UpdateOtp(otpcheck.Id);
-                    var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
-                    if (otpData != null)
+                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
+
+                    if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)
                     {
-                        _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
-                        return AppUtils.Standerdlogin("User Login with Mobile OTP Send Success.");
+                        _otpMasterService.UpdateOtp(otpcheck.Id);
+                        var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
+                        if (otpData != null)
+                        {
+                            _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
+                            return AppUtils.Standerdlogin("User Login with Mobile OTP Send Success.");
+                        }
+                        else
+                        {
+                            _logger.LogWarning(2, "User Otp Data Not Send.");
+                            return BadRequest(new ApiError("User Otp Data Not Send."));
+                        }
                     }
                     else
                     {
-                        _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new ApiError("User Otp Data Not Send."));
+                        SendSMSRequest request = new SendSMSRequest();
+                        request.MobileNo = Convert.ToInt64(model.Mobile);
+                        request.Message = "SMS for use this code " + otpcheck.OTP + "";
+
+                        await _mediator.Send(request);
+
+                        _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
+
+                        return Ok("User Login with Mobile OTP Send Success.");
                     }
                 }
                 else
                 {
-                    SendSMSRequest request = new SendSMSRequest();
-                    request.MobileNo = Convert.ToInt64(model.Mobile);
-                    request.Message = "SMS for use this code " + otpcheck.OTP + "";
-
-                    await _mediator.Send(request);
-
-                    _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
-
-                    return Ok("User Login with Mobile OTP Send Success.");
+                    return BadRequest(new ApiError("Invalid login Mobile."));
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new ApiError("Invalid login Mobile."));
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
-            // return BadRequest(new ApiError("Invalid login attempt."));
         }
         #endregion
 
@@ -479,7 +528,7 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                var logindata = await _userService.FindByMobileNumber(model.MobileNo);
+                var logindata = await _userService.FindByMobileNumber(model.Mobile);
                 var result = await _userManager.FindByIdAsync(logindata?.Id.ToString());
                 if (!string.IsNullOrEmpty(result?.Mobile) && (result.LockoutEnd <= DateTime.UtcNow || result.LockoutEnd == null))
                 {
@@ -499,7 +548,7 @@ namespace CleanArchitecture.Web.API
                                 }
                                 if (result?.AccessFailedCount < Convert.ToInt16(_configuration["MaxFailedAttempts"]))
                                 {
-                                    result.AccessFailedCount = result.AccessFailedCount + 1;                                    
+                                    result.AccessFailedCount = result.AccessFailedCount + 1;
                                     if (result.AccessFailedCount == Convert.ToInt16(_configuration["MaxFailedAttempts"]))
                                     {
                                         result.LockoutEnd = DateTime.UtcNow.AddHours(Convert.ToInt64(_configuration["DefaultLockoutTimeSpan"]));
@@ -547,10 +596,10 @@ namespace CleanArchitecture.Web.API
                 ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
                 return BadRequest(new ApiError(ModelState));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
         }
 
@@ -637,10 +686,10 @@ namespace CleanArchitecture.Web.API
                 ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
                 return BadRequest(new ApiError(ModelState));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
         }
 
@@ -650,9 +699,15 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
-
-            return AppUtils.Standerdlogin("Success");
-
+            try
+            {
+                return AppUtils.Standerdlogin("Success");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
             /*
             var currentUser = await _userManager.FindByNameAsync(model.Email);
             if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
@@ -685,31 +740,49 @@ namespace CleanArchitecture.Web.API
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.Email);
+            try
+            {
 
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                //return Ok("Reset confirmed");
-                return AppUtils.Standerdlogin("Reset confirmed");
+
+                var user = await _userManager.FindByNameAsync(model.Email);
+
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    //return Ok("Reset confirmed");
+                    return AppUtils.Standerdlogin("Reset confirmed");
+                }
+                var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+                if (result.Succeeded)
+                {
+                    //return Ok("Reset confirmed");
+                    return AppUtils.Standerdlogin("Reset confirmed");
+                }
+                AddErrors(result);
+                return BadRequest(new ApiError(ModelState));
             }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (result.Succeeded)
+            catch (Exception ex)
             {
-                //return Ok("Reset confirmed");
-                return AppUtils.Standerdlogin("Reset confirmed");
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
-            AddErrors(result);
-            return BadRequest(new ApiError(ModelState));
         }
 
         #region Logout        
         [HttpPost("logout")]
         public async Task<IActionResult> LogOff()
         {
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation(4, "User logged out.");
-            return NoContent();
+            try
+            {
+                await _signInManager.SignOutAsync();
+                _logger.LogInformation(4, "User logged out.");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
         }
         #endregion
 

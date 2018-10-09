@@ -18,6 +18,6 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
         [Phone]
         [StringLength(10, MinimumLength = 10)]
         [Range(10, Int64.MaxValue)]
-        public string MobileNo { get; set; }
+        public string Mobile { get; set; }
     }
 }
