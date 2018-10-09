@@ -42,12 +42,5 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateAddressFailMsg = "Failed to generate Address.";
         public static string InvalidWallet = "Invalid Wallet or wallet is disabled.";
         public static string ItemOrThirdprtyNotFound = "Unable to Process your request please contact admin.";
-
-        //========================My Account===============================//
-        public static string SendMailSubject = "Registration confirmation email";
-        public static string ReSendMailSubject = "Registration confirmation resend email";
-        public static string SendMailBody = "use this code: ";
-        public static string SendSMSSubject = "SMS for use this code ";
-        public static string LoginEmailSubject = "Login With Email Otp ";
     }
 }

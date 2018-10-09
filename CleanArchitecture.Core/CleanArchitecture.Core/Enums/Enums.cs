@@ -196,10 +196,4 @@ namespace CleanArchitecture.Core.Enums
         BitcoinDeamon = 7
     }
 
-    public enum enServiceMasterType
-    {
-        Coin = 1,
-        Token = 2
-    }
-
 }

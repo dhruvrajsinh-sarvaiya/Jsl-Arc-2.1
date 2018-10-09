@@ -220,7 +220,7 @@ namespace CleanArchitecture.Web.API
 
                             SendEmailRequest request = new SendEmailRequest();
                             request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.SendMailSubject;
+                            request.Subject = "Registration confirmation email";
                             request.Body = confirmationLink;
 
                             await _mediator.Send(request);
@@ -284,9 +284,8 @@ namespace CleanArchitecture.Web.API
                             var resultotp = await _tempOtpService.GetTempData(Convert.ToInt32(resultdata.Id));
                             SendEmailRequest request = new SendEmailRequest();
                             request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.SendMailSubject;
-                            //request.Body = "use this code:" + resultotp.OTP + "";
-                            request.Body = EnResponseMessage.SendMailBody + resultotp.OTP;
+                            request.Subject = "Registration confirmation email";
+                            request.Body = "use this code:" + resultotp.OTP + "";
 
                             await _mediator.Send(request);
 
@@ -359,7 +358,7 @@ namespace CleanArchitecture.Web.API
 
                                 SendSMSRequest request = new SendSMSRequest();
                                 request.MobileNo = Convert.ToInt64(model.Mobile);
-                                request.Message = EnResponseMessage.SendMailBody + tempotp.OTP;
+                                request.Message = "SMS for use this code " + tempotp.OTP + "";
                                 await _mediator.Send(request);
                                 return AppUtils.StanderdSignUp("Success");
                             }
@@ -625,7 +624,7 @@ namespace CleanArchitecture.Web.API
 
                             SendSMSRequest request = new SendSMSRequest();
                             request.MobileNo = Convert.ToInt64(model.Mobile);
-                            request.Message = EnResponseMessage.SendSMSSubject + result.OTP;
+                            request.Message = "SMS for use this code " + result.OTP + "";
                             await _mediator.Send(request);
                             return AppUtils.StanderdSignUp("You have successfully send Otp in mobile.");
                         }
@@ -685,8 +684,8 @@ namespace CleanArchitecture.Web.API
 
                         SendEmailRequest request = new SendEmailRequest();
                         request.Recepient = model.Email;
-                        request.Subject = EnResponseMessage.ReSendMailSubject;
-                        request.Body = EnResponseMessage.SendMailBody + resultdata.OTP;
+                        request.Subject = "Registration confirmation resend email";
+                        request.Body = "use this code:" + resultdata.OTP + "";
 
                         await _mediator.Send(request);
                         _logger.LogInformation(3, "Email sent successfully with your account");
@@ -759,7 +758,7 @@ namespace CleanArchitecture.Web.API
 
                         SendEmailRequest request = new SendEmailRequest();
                         request.Recepient = model.Email;
-                        request.Subject = EnResponseMessage.ReSendMailSubject;
+                        request.Subject = "Registration confirmation resend email";
                         request.Body = confirmationLink;
 
                         await _mediator.Send(request);
