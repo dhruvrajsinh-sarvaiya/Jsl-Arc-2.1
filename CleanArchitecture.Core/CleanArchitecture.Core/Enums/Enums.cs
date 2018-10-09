@@ -148,8 +148,12 @@ namespace CleanArchitecture.Core.Enums
         CreateTrn_NoDebitAccountFound = 1,
         CreateTrnInvalidAmount = 1,
         CreateTrnDuplicateTrn=1,
-        CreateTrn_NoSelfAddressWithdrawAllow=1
+        CreateTrn_NoSelfAddressWithdrawAllow=1,
         //=======================
+        //=====================MyAccount
+        Status500InternalServerError = 500,
+        Status400BadRequest = 400,
+        Status423Locked = 423
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
