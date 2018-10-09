@@ -39,43 +39,42 @@ namespace CleanArchitecture.Infrastructure.Services.User
         {
             var checkotp = await GetOtpData(UserId);
             string OtpValue = string.Empty;
-            var currentotp = (dynamic)null;
-            if ((checkotp?.ExpirTime <= DateTime.UtcNow && !checkotp.EnableStatus) || checkotp == null)
+            //var currentotp = (dynamic)null;
+            //if ((checkotp?.ExpirTime <= DateTime.UtcNow && !checkotp.EnableStatus) || checkotp == null) // Remove expiretime as per discuss with nishit bhai 10-09-2018
+            //{
+            if (checkotp != null)
+                UpdateOtp(checkotp.Id);
+            OtpValue = _userService.GenerateRandomOTP().ToString();
+            int Regtypeid = 0;
+            if (!String.IsNullOrEmpty(Email))
             {
-                if (checkotp != null)
-                    UpdateOtp(checkotp.Id);
-                OtpValue = _userService.GenerateRandomOTP().ToString();
-                int Regtypeid = 0;
-                if (!String.IsNullOrEmpty(Email))
-                {
-                    Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Email);
-                }
-                else if (!String.IsNullOrEmpty(Mobile))
-                {
-                    Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Mobile);
-                }
-
-                currentotp = new OtpMaster
-                {
-                    UserId = UserId,
-                    RegTypeId = Regtypeid,
-                    OTP = OtpValue,
-                    CreatedTime = DateTime.UtcNow,
-                    ExpirTime = DateTime.UtcNow.AddHours(2),
-                    Status = 0,
-                    CreatedDate = DateTime.Now,
-                    CreatedBy = UserId
-
-                };
-                _customRepository.Add(currentotp);
-                //_customRepository.Insert(currentotp);
+                Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Email);
             }
-            else
+            else if (!String.IsNullOrEmpty(Mobile))
             {
-                OtpValue = checkotp.OTP;
-                currentotp = checkotp;
+                Regtypeid = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Mobile);
             }
 
+            var currentotp = new OtpMaster
+            {
+                UserId = UserId,
+                RegTypeId = Regtypeid,
+                OTP = OtpValue,
+                CreatedTime = DateTime.UtcNow,
+                ExpirTime = DateTime.UtcNow.AddHours(2),
+                Status = 0,
+                CreatedDate = DateTime.Now,
+                CreatedBy = UserId
+
+            };
+            _customRepository.Add(currentotp);
+            //_customRepository.Insert(currentotp);
+            //}
+            //else
+            //{
+            //    OtpValue = checkotp.OTP;
+            //    currentotp = checkotp;
+            //}
 
             if (!String.IsNullOrEmpty(Email))
             {
@@ -86,7 +85,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 request.Recepient = Email;
                 request.Subject = "Login With Email Otp";
                 request.Body = "use this code: " + OtpValue + "";
-               await _mediator.Send(request);
+                await _mediator.Send(request);
             }
             if (!String.IsNullOrEmpty(Mobile))
             {

@@ -53,7 +53,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
         public async Task<TempOtpViewModel> GetTempData(int Id)
         {
-            var tempotp = _dbContext.TempOtpMaster.Where(i => i.UserId == Id).FirstOrDefault();
+            var tempotp = _dbContext.TempOtpMaster.Where(i => i.UserId == Id).LastOrDefault();
             TempOtpViewModel model = new TempOtpViewModel();
             if (tempotp != null)
             {
