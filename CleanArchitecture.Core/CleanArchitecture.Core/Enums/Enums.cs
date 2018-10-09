@@ -94,7 +94,11 @@ namespace CleanArchitecture.Core.Enums
     public enum enWebAPIRouteType //ThirdParty Apptype-Types of API
     {
         TransactionAPI = 1,
-        CommunicationAPI = 2
+        CommunicationAPI = 2,
+        LiquidityProvider=3,
+        PaymentGateway=4,
+        MarketData=5
+
     }
 
     public enum enProviderAppType //Provider Apptype-Types of Transaction
@@ -180,4 +184,16 @@ namespace CleanArchitecture.Core.Enums
     {
         Login = 1,
     }
+
+    public enum AppType
+    {
+        WebSocket = 1,
+        JsonRPC = 2,
+        TCPSocket = 3,
+        RestAPI = 4,
+        HttpApi = 5,
+        SocketApi = 6,
+        BitcoinDeamon = 7
+    }
+
 }
