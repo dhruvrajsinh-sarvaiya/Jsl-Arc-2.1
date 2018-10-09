@@ -415,7 +415,8 @@ namespace CleanArchitecture.Web.API
                 {
                     var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
 
-                    if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)
+                    //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus) // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                    if (!otpcheck.EnableStatus)
                     {
                         _otpMasterService.UpdateOtp(otpcheck.Id);
                         var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), userdt.Email, "");
@@ -432,15 +433,16 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        SendEmailRequest request = new SendEmailRequest();
-                        request.Recepient = userdt.Email;
-                        request.Subject = "Login With Email Otp";
-                        request.Body = "use this code:" + otpcheck.OTP + "";
+                        return BadRequest(new ApiError("Invalid email."));
+                        //SendEmailRequest request = new SendEmailRequest();
+                        //request.Recepient = userdt.Email;
+                        //request.Subject = "Login With Email Otp";
+                        //request.Body = "use this code:" + otpcheck.OTP + "";
 
-                        await _mediator.Send(request);
-                        _logger.LogWarning(1, "User Login with Email OTP Send Success.");
+                        //await _mediator.Send(request);
+                        //_logger.LogWarning(1, "User Login with Email OTP Send Success.");
 
-                        return Ok("User Login with Email OTP Send Success.");
+                        //return Ok("User Login with Email OTP Send Success.");
                     }
                 }
                 else
@@ -474,7 +476,8 @@ namespace CleanArchitecture.Web.API
                 {
                     var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
 
-                    if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)
+                    //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                    if (!otpcheck.EnableStatus)
                     {
                         _otpMasterService.UpdateOtp(otpcheck.Id);
                         var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
@@ -491,15 +494,16 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        SendSMSRequest request = new SendSMSRequest();
-                        request.MobileNo = Convert.ToInt64(model.Mobile);
-                        request.Message = "SMS for use this code " + otpcheck.OTP + "";
+                        return BadRequest(new ApiError("Invalid Mobileno."));
+                        //SendSMSRequest request = new SendSMSRequest();
+                        //request.MobileNo = Convert.ToInt64(model.Mobile);
+                        //request.Message = "SMS for use this code " + otpcheck.OTP + "";
 
-                        await _mediator.Send(request);
+                        //await _mediator.Send(request);
 
-                        _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
+                        //_logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
 
-                        return Ok("User Login with Mobile OTP Send Success.");
+                        //return Ok("User Login with Mobile OTP Send Success.");
                     }
                 }
                 else

@@ -514,8 +514,6 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-
-
                 var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
                 if (tempdata?.Id > 0)
                 {
@@ -607,8 +605,6 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-
-
                 PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
                 string countryCode = "IN";
                 PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
@@ -620,7 +616,8 @@ namespace CleanArchitecture.Web.API
                     {
                         var tempdata = await _tempUserRegisterService.GetMobileNo(model.Mobile);
                         var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
-                        if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)
+                        //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow) // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                        if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
                         {
                             _tempOtpService.Update(tempotp.Id);
                             var result = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Mobile));
@@ -633,12 +630,17 @@ namespace CleanArchitecture.Web.API
                         }
                         else
                         {
-                            SendSMSRequest request = new SendSMSRequest();
-                            request.MobileNo = Convert.ToInt64(model.Mobile);
-                            request.Message = "SMS for use this code " + tempotp.OTP + "";
-                            await _mediator.Send(request);
-                            return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your mobile.");
+                            ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                            return BadRequest(new ApiError(ModelState));
                         }
+                        //else
+                        //{
+                        //    SendSMSRequest request = new SendSMSRequest();
+                        //    request.MobileNo = Convert.ToInt64(model.Mobile);
+                        //    request.Message = "SMS for use this code " + tempotp.OTP + "";
+                        //    await _mediator.Send(request);
+                        //    return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your mobile.");
+                        //}
                     }
                     else
                     {
@@ -669,14 +671,13 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-
-
                 var result = await _userManager.FindByEmailAsync(model.Email);
                 if (string.IsNullOrEmpty(result?.Email))
                 {
                     var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
                     var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
-                    if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)
+                    //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                    if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
                     {
                         _tempOtpService.Update(tempotp.Id);
                         var resultdata = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Email));
@@ -694,15 +695,17 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        SendEmailRequest request = new SendEmailRequest();
-                        request.Recepient = model.Email;
-                        request.Subject = "Registration confirmation resend email";
-                        request.Body = "use this code:" + tempotp.OTP + "";
+                        ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                        return BadRequest(new ApiError(ModelState));
+                        //SendEmailRequest request = new SendEmailRequest();
+                        //request.Recepient = model.Email;
+                        //request.Subject = "Registration confirmation resend email";
+                        //request.Body = "use this code:" + tempotp.OTP + "";
 
-                        await _mediator.Send(request);
-                        _logger.LogInformation(3, "Email sent successfully with your account");
+                        //await _mediator.Send(request);
+                        //_logger.LogInformation(3, "Email sent successfully with your account");
 
-                        return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your email.");
+                        //return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your email.");
                     }
                 }
                 else
