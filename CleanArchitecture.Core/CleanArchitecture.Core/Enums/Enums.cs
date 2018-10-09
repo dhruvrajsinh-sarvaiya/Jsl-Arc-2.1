@@ -185,7 +185,7 @@ namespace CleanArchitecture.Core.Enums
         Login = 1,
     }
 
-    public enum AppType
+    public enum enAppType
     {
         WebSocket = 1,
         JsonRPC = 2,
