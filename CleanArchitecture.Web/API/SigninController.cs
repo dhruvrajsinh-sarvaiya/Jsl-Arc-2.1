@@ -250,30 +250,31 @@ namespace CleanArchitecture.Web.API
                     var user = await _userManager.FindByNameAsync(model.Username);
                     var roles = await _userManager.GetRolesAsync(user);
                     _logger.LogInformation(1, "User logged in.");
-
-                    return AppUtils.StanderdSignIn(user, roles);
+                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });                   
                 }
                 if (result.RequiresTwoFactor)
-                {
-                    //return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
+                {                    
                     return RedirectToAction(nameof(SendCode), new { RememberMe = false });
                 }
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning(2, "User account locked out for two hours.");
-                    return BadRequest(new ApiError("User account locked out for two hours."));
+                    
+                    return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
                 }
                 else
                 {
                     if (checkmail != null)
                         await _userManager.AccessFailedAsync(checkmail);
-                    return BadRequest(new ApiError("Login failed : Invalid username or password."));
+                    //return BadRequest(new ApiError("Login failed : Invalid username or password."));
+                    return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status400BadRequest });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                //return BadRequest();
+                return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         #endregion
@@ -297,23 +298,28 @@ namespace CleanArchitecture.Web.API
                     if (otpData != null)
                     {
                         _logger.LogWarning(1, "User Login with Email Send Success.");
-                        return AppUtils.Standerdlogin("You have send OTP on email");
+                        //return AppUtils.Standerdlogin("You have send OTP on email");
+                        return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithOtpSuccessSend });
                     }
                     else
                     {
                         _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new ApiError("Invalid login attempt."));
+                        //return BadRequest(new ApiError("Invalid login attempt."));
+                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status400BadRequest });
+                        
                     }
                 }
                 else
                 {
-                    return BadRequest(new ApiError("Login failed: Invalid email."));
+                    //return BadRequest(new ApiError("Login failed: Invalid email."));
+                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status400BadRequest });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                //return BadRequest();
+                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         #endregion

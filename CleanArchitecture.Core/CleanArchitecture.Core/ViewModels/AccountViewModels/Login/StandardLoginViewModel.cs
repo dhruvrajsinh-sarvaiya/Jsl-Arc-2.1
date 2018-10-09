@@ -22,4 +22,9 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
 
        // public bool RememberMe { get; set; }
     }
+
+    public class StandardLoginResponse : BizResponseClass
+    {
+
+    }
 }
