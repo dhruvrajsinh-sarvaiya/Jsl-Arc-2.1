@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.User;
@@ -83,15 +84,15 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
                 SendEmailRequest request = new SendEmailRequest();
                 request.Recepient = Email;
-                request.Subject = "Login With Email Otp";
-                request.Body = "use this code: " + OtpValue + "";
+                request.Subject = EnResponseMessage.LoginEmailSubject;
+                request.Body = EnResponseMessage.SendMailBody + OtpValue;
                 await _mediator.Send(request);
             }
             if (!String.IsNullOrEmpty(Mobile))
             {
                 SendSMSRequest request = new SendSMSRequest();
                 request.MobileNo = Convert.ToInt64(Mobile);
-                request.Message = OtpValue;
+                request.Message = EnResponseMessage.SendMailBody  + OtpValue;
                 await _mediator.Send(request);
             }
 
