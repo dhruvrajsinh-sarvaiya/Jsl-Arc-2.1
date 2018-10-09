@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services.Transaction
 {
@@ -25,22 +26,35 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         BizResponse _Resp;
         readonly ILogger _log;
         BizResponse _CreateTransactionResp;
+        TradePairMaster _TradePairObj;
 
 
-        public NewTransaction(ILogger log, ICommonRepository<TradePairMaster> TradePairMaster, EFCommonRepository<TransactionQueue> TransactionRepository)
+        public NewTransaction(ILogger log, ICommonRepository<TradePairMaster> TradePairMaster,
+            EFCommonRepository<TransactionQueue> TransactionRepository,
+            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository,
+            ICommonRepository<ServiceConfiguration> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
             _TransactionRepository = TransactionRepository;
+            _TradeTransactionRepository = TradeTransactionRepository;
+            _ServiceConfi = ServiceConfi;
+            _AddressMasterRepository = AddressMasterRepository;
+        }
+        public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
+        {
+            //_Resp = new BizResponse();
+           CombineAllInitTransactionAsync(Req);
+            return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess});
+            
         }
 
-        public BizResponse ProcessNewTransaction(NewTransactionRequestCls Req)
+        public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req)
         {
             _Resp = new BizResponse();
 
 
             //=========================INSERT
-
             //Take memberMobile for sms
             _Resp = CreateTransaction(Req);
             if (_Resp.ReturnCode != enResponseCodeService.Success)
@@ -65,8 +79,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             //long DeliveryWalletID = 0;           
             //string INRSMSCode = "INR";
             decimal Amount2 = 0;
-            //string MemberMobile1 = "";
-            TradePairMaster _TradePairObj;
+            //string MemberMobile1 = "";            
             NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
             long TrnNo = 0;
             try

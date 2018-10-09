@@ -133,6 +133,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidThirdpartyID = 2255,
         AddressGenerationFailed = 2256,
         //====================Transactional
+        TransactionProcessSuccess = 1,
         TransactionInsertSuccess = 1,
         TransactionInsertFail =1,
         TransactionInsertInternalError =1,
