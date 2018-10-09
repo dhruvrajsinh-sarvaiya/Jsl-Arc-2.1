@@ -19,9 +19,11 @@ namespace CleanArchitecture.Infrastructure.Data
 
         readonly ILogger<EFCommonRepository<T>> _log;
 
-        public EFCommonRepository(ILogger<EFCommonRepository<T>> log)
+        public EFCommonRepository(ILogger<EFCommonRepository<T>> log, CleanArchitectureContext dbContext)
         {
             _log = log;
+            //vsolanki 8-10-2018 
+            _dbContext = dbContext;
         }
 
         public T GetById(long id)

@@ -13,28 +13,30 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    class WalletService : BasePage, IWalletService 
+    public class WalletService : BasePage, IWalletService 
     {
-        readonly ILogger<WalletService> _log;
-        readonly ICommonRepository<WalletMaster> _commonRepository;
-        readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;      
-        readonly ICommonRepository<WalletOrder> _walletOrderRepository;
-        readonly ICommonRepository<AddressMaster> _addressMstRepository;
-        readonly ICommonRepository<TrnAcBatch> _trnBatch;
-        readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
-        //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
-        readonly IWalletRepository _walletRepository1;
-        readonly IWebApiRepository _webApiRepository ;
-        readonly IWebApiSendRequest _webApiSendRequest;
-        readonly IGetWebRequest _getWebRequest;
+       private readonly ILogger<WalletService> _log;
+       private readonly ICommonRepository<WalletMaster> _commonRepository;
+       private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;      
+       private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
+       private readonly ICommonRepository<AddressMaster> _addressMstRepository;
+       private readonly ICommonRepository<TrnAcBatch> _trnBatch;
+       private readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
+       //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
+       private readonly IWalletRepository _walletRepository1;
+       private readonly IWebApiRepository _webApiRepository ;
+       private readonly IWebApiSendRequest _webApiSendRequest;
+       private readonly IGetWebRequest _getWebRequest;
 
+        //vsolanki 8-10-2018 
+        private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
         //readonly IBasePage _BaseObj;
 
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
-            ILogger<BasePage> logger) : base(logger)
+            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -48,6 +50,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _thirdPartyCommonRepository = thirdpartyCommonRepo;
             _getWebRequest = getWebRequest;
             _addressMstRepository = addressMaster;
+            _WalletTypeMasterRepository = WalletTypeMasterRepository;
             //_walletLedgerRepository = walletledgerrepo;
         }
         
@@ -452,6 +455,21 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-       
+
+        //vsolanki 8-10-2018 get coin list from WalletTypeMaster table
+        public IEnumerable<WalletTypeMaster> GetWalletTypeMaster()
+        {
+            try
+            {
+                IEnumerable<WalletTypeMaster> coin = new List<WalletTypeMaster>();
+                coin = _WalletTypeMasterRepository.FindBy(item => item.Status == Convert.ToInt16(ServiceStatus.Active));
+                return coin;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 }

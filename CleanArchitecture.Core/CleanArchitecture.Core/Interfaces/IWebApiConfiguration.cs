@@ -22,6 +22,8 @@ namespace CleanArchitecture.Core.Interfaces
         String SendAPIRequestAsync(string Url, string Request, string ContentType, int Timeout, WebHeaderCollection headerDictionary ,string MethodType = "POST");
         //Task<TResponse> GetTemplateConfigurationAsync(TRequest Request);
         // ntrivedi 04-10-2018 do not need async method due to single wait process
+        //vsolanki 8-10-2018 define the method
+       Task<string> SendRequestAsync(string Url, string Request = "", string MethodType = "GET", string ContentType = "application/json", WebHeaderCollection Headers = null, int Timeout = 9000);
     }
 
     public interface IWebApiParseResponse<TResponse>

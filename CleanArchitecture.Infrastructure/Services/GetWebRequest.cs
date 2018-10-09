@@ -9,7 +9,7 @@ using System.Net;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    class GetWebRequest : IGetWebRequest
+    public class GetWebRequest : IGetWebRequest
     {
         readonly ICommonRepository<RouteConfiguration> _routeRepository;
         readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;

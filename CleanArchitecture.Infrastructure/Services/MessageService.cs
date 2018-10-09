@@ -14,9 +14,9 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         //public EmailSettings _emailSettings { get; }
         //public SMSSetting _smsSettings { get; set; }
-        public WebAPISendRequest<MessageService> _WebAPISendRequest { get; set; }
+        public WebAPISendRequest _WebAPISendRequest { get; set; }
 
-        public MessageService(WebAPISendRequest<MessageService> WebAPISendRequest)
+        public MessageService(WebAPISendRequest WebAPISendRequest)
         {
             //_emailSettings = emailSettings.Value;
             //_smsSettings = SmsSetting.Value;

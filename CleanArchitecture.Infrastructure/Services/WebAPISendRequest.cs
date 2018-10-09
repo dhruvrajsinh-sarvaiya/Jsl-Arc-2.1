@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.SharedKernel;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,11 @@ using System.Threading.Tasks;
 namespace CleanArchitecture.Infrastructure.Services
 {
     //For All type of Web Request
-    public class WebAPISendRequest<T> : IWebApiSendRequest
+    public class WebAPISendRequest : IWebApiSendRequest
     {
-        public readonly ILogger<T> _log;
+        public readonly ILogger<WebAPISendRequest> _log;
 
-        public WebAPISendRequest(ILogger<T> log)
+        public WebAPISendRequest(ILogger<WebAPISendRequest> log)
         {
             _log = log;
         }

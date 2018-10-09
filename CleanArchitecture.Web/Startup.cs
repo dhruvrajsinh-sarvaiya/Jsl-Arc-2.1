@@ -19,6 +19,8 @@ using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Infrastructure.Services.Repository;
 using CleanArchitecture.Infrastructure.Data.Transaction;
+using CleanArchitecture.Infrastructure.Interfaces;
+using CleanArchitecture.Infrastructure.Services;
 
 namespace CleanArchitecture.Web
 {
@@ -138,11 +140,18 @@ namespace CleanArchitecture.Web
                 config.For(typeof(IMessageRepository<>)).Add(typeof(MessageRepository<>));
                 config.For(typeof(IWebApiRepository)).Add(typeof(WebApiDataRepository));
                 config.For<IMediator>().Use<Mediator>();
+                //vsolanki 8-10-2018 for wallet
+                config.For(typeof(IBasePage)).Add(typeof(BasePage));
+                config.For(typeof(IWalletService)).Add(typeof(WalletService));
+                config.For(typeof(IWebApiSendRequest)).Add(typeof(WebAPISendRequest));
+                config.For(typeof(IGetWebRequest)).Add(typeof(GetWebRequest));
+                //  config.For(typeof(ILogger));
+
                 // added by nirav savariya for common repository on 10-04-2018
                 config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
                 //Populate the container using the service collection
                 config.Populate(services);
-
+               
             });
 
             return container.GetInstance<IServiceProvider>();

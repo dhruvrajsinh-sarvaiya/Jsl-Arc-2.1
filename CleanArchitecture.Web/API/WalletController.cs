@@ -22,14 +22,16 @@ namespace CleanArchitecture.Web.API
     //[Authorize]
     public class WalletController : ControllerBase
     {
+        private readonly IWalletService _walletService;
         private readonly IBasePage _basePage;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<WalletController> _logger;
-        public WalletController(ILogger<WalletController> logger, IBasePage basePage, UserManager<ApplicationUser> userManager)
+        public WalletController(ILogger<WalletController> logger, IBasePage basePage, UserManager<ApplicationUser> userManager, IWalletService walletService)
         {
             _logger = logger;
             _basePage = basePage;
             _userManager = userManager;
+            _walletService = walletService;
         }
         static int i = 1;
         private ActionResult returnDynamicResult(dynamic respObjJson)
@@ -62,6 +64,17 @@ namespace CleanArchitecture.Web.API
 
         }
         #region"Methods"
+
+        /// <summary>
+        /// vsolanki 8-10-2018 Get the coin list 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult CoinList()
+        {
+            var items = _walletService.GetWalletTypeMaster();
+            return Ok(items);
+        }
 
         /// <summary>
         /// vsolanki 1-10-2018 Create Wallet

@@ -31,7 +31,23 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public long UserID { get; set; }
-        
+
+       // --------------------------------------------------
+       //vsolanki 8-10-2018 add property for wallet
+        [Required]
+        public string UserKey { get; set; }
+
+        [Required]
+        public string BackupKey { get; set; }
+
+        [Required]
+        public string PublicKey { get; set; }
+
+        public string passcodeEncryptionCode { get; set; }
+
+        public bool disableTransactionNotifications { get; set; }
+
+     ///   -------------------------------------------------
         public void CreditBalance(decimal amount)
         {
             Balance = Balance + amount;
