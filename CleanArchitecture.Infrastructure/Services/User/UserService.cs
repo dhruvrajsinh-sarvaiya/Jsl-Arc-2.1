@@ -88,7 +88,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
 
                 Random generator = new Random();
-                String sOTP = generator.Next(000000, 999999).ToString("D6");
+                String sOTP = generator.Next(1, 999999).ToString("D6");
                 return Convert.ToInt64(sOTP);
 
             }
