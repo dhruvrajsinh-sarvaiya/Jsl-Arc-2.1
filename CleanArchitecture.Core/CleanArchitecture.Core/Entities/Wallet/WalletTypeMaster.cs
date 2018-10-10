@@ -16,5 +16,15 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         [StringLength(100)]
         public string Discription { get; set; }
+
+        [Required]
+        public short IsDepositionAllow { get; set; }
+
+        [Required]
+        public short IsWithdrawalAllow { get; set; }
+
+        [Required]
+        public short IsTransactionWallet { get; set; }
+        
     }
 }

@@ -10,7 +10,7 @@ using CleanArchitecture.Core.SharedKernel;
 namespace CleanArchitecture.Core.Entities
 {
     public class WalletMaster : BizBase
-    {      
+    {
 
         [Required]
         [StringLength(50)]
@@ -27,27 +27,19 @@ namespace CleanArchitecture.Core.Entities
         public bool IsValid { get; set; }
 
         [Required]
-        public string CoinName { get; set; }
+        [StringLength(16)]
+        [Key]
+        public string AccWalletID { get; set; } // dynamically generated accountid 
 
         [Required]
         public long UserID { get; set; }
 
-       // --------------------------------------------------
-       //vsolanki 8-10-2018 add property for wallet
         [Required]
-        public string UserKey { get; set; }
+        [StringLength(50)]
+        public string PublicAddress { get; set; }
 
-        [Required]
-        public string BackupKey { get; set; }
 
-        [Required]
-        public string PublicKey { get; set; }
 
-        public string passcodeEncryptionCode { get; set; }
-
-        public bool disableTransactionNotifications { get; set; }
-
-     ///   -------------------------------------------------
         public void CreditBalance(decimal amount)
         {
             Balance = Balance + amount;
@@ -64,3 +56,4 @@ namespace CleanArchitecture.Core.Entities
     }
 
 }
+
