@@ -19,6 +19,7 @@ namespace CleanArchitecture.Web.API.Configuration
     {
         private readonly ITransactionConfigService _transactionConfigService;
         private readonly ILogger<TransactionConfigurationController> _logger;
+
         public TransactionConfigurationController(ITransactionConfigService transactionConfigService)
         {
             _transactionConfigService = transactionConfigService;
@@ -51,6 +52,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
+
         [HttpPost("UpdateServiceConfiguration")]
         public IActionResult UpdateServiceConfiguration([FromBody]ServiceConfigurationRequest Request)
         {
@@ -78,6 +80,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
+
         [HttpGet("GetServiceConfiguration/{ServiceId}")]
         public IActionResult GetServiceConfiguration(long ServiceId)
         {
@@ -103,6 +106,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
+
         [HttpGet("GetAllServiceConfiguration")]
         public IActionResult GetAllServiceConfiguration()
         {
@@ -177,6 +181,74 @@ namespace CleanArchitecture.Web.API.Configuration
                 Response.ReturnCode = enResponseCode.InternalError;
                 return Ok(Response);
             }
+        }
+
+        [HttpGet("GetProviderList")]
+        public IActionResult GetProviderList()
+        {
+            ServiceProviderResponce res = new ServiceProviderResponce();
+            res.responce = _transactionConfigService.GetAllProvider();
+            res.ReturnCode = enResponseCode.Success;
+            return Ok(res);
+        }
+
+        [HttpGet("GetProviderListById/{id:long}")]
+        public IActionResult GetProviderListById(long id)
+        {
+            ServiceProviderResponceData res = new ServiceProviderResponceData();
+
+            res.responce = _transactionConfigService.GetPoviderByID(id);
+            if (res.responce == null)
+            {
+                res.ReturnCode = enResponseCode.Fail;
+                res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                return Ok(res);
+            }
+            res.ReturnCode = enResponseCode.Success;
+            return Ok(res);
+        }
+
+        [HttpPost("AddServiceProvider")]
+        public IActionResult AddServiceProvider(ServiceProviderRequest request)
+        {
+            _transactionConfigService.AddProviderService(request);
+            return Ok();
+        }
+
+        [HttpGet("GetAppType")]
+        public IActionResult GetAppType()
+        {
+            AppTypeResponce res = new AppTypeResponce();
+            res.responce = _transactionConfigService.GetAppType();
+            res.ReturnCode = enResponseCode.Success;
+            return Ok(res);
+        }
+
+        [HttpGet("GetAppTypeById/{id:long}")]
+        public IActionResult GetAppTypeById(long id)
+        {
+            AppTypeResponceData res = new AppTypeResponceData();
+            res.responce = _transactionConfigService.GetAppTypeById(id);
+            res.ReturnCode = enResponseCode.Success;
+            return Ok(res);
+        }
+
+        [HttpGet("GetServiceProviderType")]
+        public IActionResult GetServiceProviderType()
+        {
+            ProviderTypeResponce res = new ProviderTypeResponce();
+            res.responce = _transactionConfigService.GetProviderType();
+            res.ReturnCode = enResponseCode.Success;
+            return Ok(res);
+        }
+
+        [HttpGet("GetServiceProviderTypeById/{id:long}")]
+        public IActionResult GetServiceProviderTypeById(long id)
+        {
+            ProviderTypeResponceData res = new ProviderTypeResponceData();
+            res.responce = _transactionConfigService.GetProviderTypeById(id);
+            res.ReturnCode = enResponseCode.Success;
+            return Ok(res);
         }
     }
 }

@@ -13,5 +13,15 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         List<ServiceConfigurationRequest> GetAllServiceConfiguration();
         int SetActiveService(int ServiceId);
         int SetInActiveService(int ServiceId);
+
+        IEnumerable<ServiceProviderViewModel> GetAllProvider();
+        ServiceProviderViewModel GetPoviderByID(long ID);
+        bool AddProviderService(ServiceProviderRequest request);
+
+        IEnumerable<AppTypeViewModel> GetAppType();
+        AppTypeViewModel GetAppTypeById(long id);
+
+        IEnumerable<ProviderTypeViewModel> GetProviderType();
+        ProviderTypeViewModel GetProviderTypeById(long id);
     }
 }

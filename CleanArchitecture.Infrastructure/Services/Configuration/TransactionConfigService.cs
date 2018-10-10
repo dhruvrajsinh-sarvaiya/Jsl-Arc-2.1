@@ -16,15 +16,29 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<ServiceMaster> _serviceMasterRepository;
         private readonly ICommonRepository<ServiceDetail> _serviceDetailRepository;
         private readonly ICommonRepository<ServiceStastics> _serviceStasticsRepository;
+        private readonly ICommonRepository<ServiceProviderMaster> _ServiceProviderMaster;
+        private readonly ICommonRepository<AppType> _ApptypeRepository;
+        private readonly ICommonRepository<ServiceProviderType> _ProviderTypeRepository;
         private readonly ILogger<TransactionConfigService> _logger;
 
-        public TransactionConfigService(ICommonRepository<ServiceMaster> serviceMasterRepository, ICommonRepository<ServiceDetail> serviceDetailRepository, ICommonRepository<ServiceStastics> serviceStasticsRepository, ILogger<TransactionConfigService> logger)
+        public TransactionConfigService(
+            ICommonRepository<ServiceMaster> serviceMasterRepository, 
+            ICommonRepository<ServiceDetail> serviceDetailRepository, 
+            ICommonRepository<ServiceStastics> serviceStasticsRepository, 
+            ILogger<TransactionConfigService> logger,
+            ICommonRepository<ServiceProviderMaster> ServiceProviderMaster,
+            ICommonRepository<AppType> ApptypeRepository,
+            ICommonRepository<ServiceProviderType> ProviderTypeRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
             _serviceStasticsRepository = serviceStasticsRepository;
+            _ServiceProviderMaster = ServiceProviderMaster;
+            _ApptypeRepository = ApptypeRepository;
+            _ProviderTypeRepository = ProviderTypeRepository;
             _logger = logger;
         }
+
         public long AddServiceConfiguration(ServiceConfigurationRequest Request)
         {
             try
@@ -77,6 +91,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
+
         public long UpdateServiceConfiguration(ServiceConfigurationRequest Request)
         {
             try
@@ -128,6 +143,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
+
         public List<ServiceConfigurationRequest> GetAllServiceConfiguration()
         {
             List<ServiceConfigurationRequest> responsedata;
@@ -181,6 +197,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
             throw new NotImplementedException();
         }
+
         public ServiceConfigurationRequest GetServiceConfiguration(long ServiceId)
         {
             ServiceConfigurationRequest responsedata;
@@ -266,6 +283,122 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+
+        public bool AddProviderService(ServiceProviderRequest request)
+        {
+            var model = new ServiceProviderMaster
+            {
+                Id = request.Id,
+                ProviderName = request.ProviderName,
+                Status = request.Status,
+                CreatedDate = DateTime.Now,
+                CreatedBy = 1,
+                UpdatedDate = DateTime.Now,
+                UpdatedBy = null
+            };
+            _ServiceProviderMaster.Add(model);
+            return true;
+        }
+
+        public IEnumerable<ServiceProviderViewModel> GetAllProvider()
+        {
+            var list = _ServiceProviderMaster.List();
+            List<ServiceProviderViewModel> providerList = new List<ServiceProviderViewModel>();
+            foreach (ServiceProviderMaster model in list)
+            {
+                providerList.Add(new ServiceProviderViewModel
+                {
+                    Id = model.Id,
+                    ProviderName = model.ProviderName,
+                    Status = model.Status,
+
+                });
+            }
+            return providerList;
+        }
+
+        public ServiceProviderViewModel GetPoviderByID(long ID)
+        {
+            ServiceProviderMaster model = _ServiceProviderMaster.GetById(ID);
+            if (model == null)
+            {
+                return null;
+            }
+            var viewmodel = new ServiceProviderViewModel
+            {
+                Id = model.Id,
+                ProviderName = model.ProviderName,
+                Status = model.Status,
+
+            };
+            return viewmodel;
+        }
+
+        public IEnumerable<AppTypeViewModel> GetAppType()
+        {
+            var list = _ApptypeRepository.List();
+            List<AppTypeViewModel> AppList = new List<AppTypeViewModel>();
+            foreach (AppType model in list)
+            {
+                AppList.Add(new AppTypeViewModel
+                {
+                    Id = model.Id,
+                    AppTypeName = model.AppTypeName,
+                    Status = model.Status
+                });
+            }
+            return AppList;
+        }
+
+        public AppTypeViewModel GetAppTypeById(long id)
+        {
+            AppType model = _ApptypeRepository.GetById(id);
+            if (model == null)
+            {
+                return null;
+            }
+            var viewmodel = new AppTypeViewModel
+            {
+                Id = model.Id,
+                AppTypeName = model.AppTypeName,
+                Status = model.Status
+
+            };
+            return viewmodel;
+        }
+
+        public IEnumerable<ProviderTypeViewModel> GetProviderType()
+        {
+            var list = _ProviderTypeRepository.List();
+            List<ProviderTypeViewModel> ProTypeList = new List<ProviderTypeViewModel>();
+            foreach (ServiceProviderType model in list)
+            {
+                ProTypeList.Add(new ProviderTypeViewModel
+                {
+                    Id = model.Id,
+                    ServiveProType = model.ServiveProTypeName,
+                    Status = model.Status
+                });
+            }
+            return ProTypeList;
+        }
+
+        public ProviderTypeViewModel GetProviderTypeById(long id)
+        {
+            ServiceProviderType model = _ProviderTypeRepository.GetById(id);
+            if (model == null)
+            {
+                return null;
+            }
+            var viewmodel = new ProviderTypeViewModel
+            {
+                Id = model.Id,
+                ServiveProType = model.ServiveProTypeName,
+                Status = model.Status
+
+            };
+            return viewmodel;
         }
     }
 }

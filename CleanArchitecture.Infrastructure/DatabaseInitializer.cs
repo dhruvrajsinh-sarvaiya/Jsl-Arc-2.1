@@ -60,8 +60,9 @@ namespace CleanArchitecture.Infrastructure
             await AddOpenIdConnectOptions(configuration);
             AddWalletType(); // ntrivedi 01-10-2018 added default wallettype master entry
             CreateRegisterType(); // Birju 02-10-2018  added by default Register type add;
+            AddAppType();  //komal 10-10-2018 default Apptype entry
+            AddProviderType();  //komal 10-10-2018 default ServiceProviderType entry        }
         }
-
         private void CreateRegisterType()
         {
             var TypeToAdd = new List<RegisterType>(){
@@ -150,7 +151,7 @@ namespace CleanArchitecture.Infrastructure
             }
 
         }
-        
+
         private async Task AddOpenIdConnectOptions(IConfiguration configuration)
         {
             if (await _openIddictApplicationManager.FindByClientIdAsync("cleanarchitecture") == null)
@@ -177,7 +178,6 @@ namespace CleanArchitecture.Infrastructure
             }
 
         }
-
 
         private void AddWalletType()
         {
@@ -212,6 +212,36 @@ namespace CleanArchitecture.Infrastructure
             }
         }
 
+        private void AddAppType()
+        {
+            if (!_context.AppType.Any())
+            {
+                _context.AppType.AddRange(
+                    new Core.Entities.Configuration.AppType { CreatedBy = 900, CreatedDate = DateTime.Now, AppTypeName = "WebSocket", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.AppType { CreatedBy = 900, CreatedDate = DateTime.Now, AppTypeName = "JsonRPC", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.AppType { CreatedBy = 900, CreatedDate = DateTime.Now, AppTypeName = "TCPSocket", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.AppType { CreatedBy = 900, CreatedDate = DateTime.Now, AppTypeName = "RestAPI", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.AppType { CreatedBy = 900, CreatedDate = DateTime.Now, AppTypeName = "HttpApi", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.AppType { CreatedBy = 900, CreatedDate = DateTime.Now, AppTypeName = "SocketApi", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.AppType { CreatedBy = 900, CreatedDate = DateTime.Now, AppTypeName = "BitcoinDeamon", Status = 1, UpdatedDate = DateTime.Now }
 
-    }
+                    );
+            }
+        }
+
+        private void AddProviderType()
+        {
+            if (!_context.ServiceProviderType.Any())
+            {
+                _context.ServiceProviderType.AddRange(
+                    new Core.Entities.Configuration.ServiceProviderType { CreatedBy = 900, CreatedDate = DateTime.Now, ServiveProTypeName = "TransactionAPI", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.ServiceProviderType { CreatedBy = 900, CreatedDate = DateTime.Now, ServiveProTypeName = "CommunicationAPI", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.ServiceProviderType { CreatedBy = 900, CreatedDate = DateTime.Now, ServiveProTypeName = "LiquidityProvider", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.ServiceProviderType { CreatedBy = 900, CreatedDate = DateTime.Now, ServiveProTypeName = "PaymentGateway", Status = 1, UpdatedDate = DateTime.Now },
+                    new Core.Entities.Configuration.ServiceProviderType { CreatedBy = 900, CreatedDate = DateTime.Now, ServiveProTypeName = "MarketData", Status = 1, UpdatedDate = DateTime.Now }
+                    );
+            }
+        }
+
+    }  
 }

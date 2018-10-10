@@ -79,10 +79,17 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; }
 
         //Add Tables for Service Master (Not Commited)
+
         public DbSet<ServiceMaster> ServiceMaster { get; set; }
         public DbSet<ServiceDetail> ServiceDetail { get; set; }
         public DbSet<ServiceStastics> ServiceStastics { get; set; }
         public DbSet<Limits> Limits { get; set; }
+        public DbSet<AppType> AppType { get; set; }
+        public DbSet<DemonConfiguration> DemonConfiguration { get; set; }
+        public DbSet<ServiceProConfiguration> ServiceProConfiguration { get; set; }
+        public DbSet<ServiceProviderDetail> ServiceProviderDetail { get; set; }
+        public DbSet<ServiceProviderType> ServiceProviderType { get; set; }
+        public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
