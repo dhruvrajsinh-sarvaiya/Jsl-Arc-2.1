@@ -40,7 +40,7 @@ namespace CleanArchitecture.Core.Entities
         [StringLength(50)]
         public string PublicAddress { get; set; }
 
-        public byte IsDefaultWallet { get; set; }
+
 
         public void CreditBalance(decimal amount)
         {
