@@ -174,6 +174,16 @@ namespace CleanArchitecture.Infrastructure.Data
             return await _dbContext.Set<T>().Where(predicate).ToListAsync();
         }
 
+        public decimal GetSum(Expression<Func<T, bool>> predicate, Expression<Func<T, decimal>> sumPredicate)
+        {
+            decimal sum = _dbContext.Set<T>().Where(predicate).Sum(sumPredicate);
+            return sum;
+        }
+        public async Task<decimal> GetSumAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, decimal>> sumPredicate)
+        {
+            decimal sum = await _dbContext.Set<T>().Where(predicate).SumAsync(sumPredicate);
+            return sum;
+        }
 
 
     }

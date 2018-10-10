@@ -31,6 +31,8 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
         //readonly IBasePage _BaseObj;
+        private static Random random = new Random((int)DateTime.Now.Ticks);
+
 
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
@@ -471,5 +473,23 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
+        public string RandomGenerateAccWalletId(long userID, byte isDefaultWallet)
+        {
+            try
+            {
+                long maxValue = 9999999999;
+                long minValue = 1000000000;
+                long x = (long)Math.Round(random.NextDouble() * (maxValue - minValue - 1)) + minValue;
+                string userIDStr = x.ToString() + userID.ToString().PadLeft(5) + isDefaultWallet.ToString();
+                return userIDStr;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
     }
 }
