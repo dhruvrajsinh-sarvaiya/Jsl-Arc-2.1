@@ -14,8 +14,8 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [Required]
         [StringLength(60)]
         public string ProviderName { get; set; }
-        [Required]
-        public short Status { get; set; }
+        //[Required]
+        //public short Status { get; set; }
     }
     public class ServiceProviderResponce : BizResponseClass
     {

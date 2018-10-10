@@ -12,7 +12,5 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [Required]
         [StringLength(20)]
         public String AppTypeName { get; set; }
-
-        public short Status { get; set; }
     }
 }

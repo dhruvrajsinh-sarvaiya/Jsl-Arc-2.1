@@ -183,72 +183,324 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
+        //providermaster
         [HttpGet("GetProviderList")]
         public IActionResult GetProviderList()
         {
             ServiceProviderResponce res = new ServiceProviderResponce();
-            res.responce = _transactionConfigService.GetAllProvider();
-            res.ReturnCode = enResponseCode.Success;
-            return Ok(res);
+            try
+            {
+                res.responce = _transactionConfigService.GetAllProvider();
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
         }
 
         [HttpGet("GetProviderListById/{id:long}")]
         public IActionResult GetProviderListById(long id)
         {
             ServiceProviderResponceData res = new ServiceProviderResponceData();
-
-            res.responce = _transactionConfigService.GetPoviderByID(id);
-            if (res.responce == null)
+            try
             {
-                res.ReturnCode = enResponseCode.Fail;
-                res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                res.responce = _transactionConfigService.GetPoviderByID(id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
                 return Ok(res);
             }
-            res.ReturnCode = enResponseCode.Success;
-            return Ok(res);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
         }
 
         [HttpPost("AddServiceProvider")]
-        public IActionResult AddServiceProvider(ServiceProviderRequest request)
+        public IActionResult AddServiceProvider([FromBody]ServiceProviderRequest request)
         {
-            _transactionConfigService.AddProviderService(request);
-            return Ok();
+            BizResponseClass  res = new BizResponseClass();
+            try
+            {
+                long Id= _transactionConfigService.AddProviderService(request);
+                if(Id != 0 )
+                {
+                    //res.responce = new ServiceProviderViewModel { Id = Id };
+                    res.ReturnCode = enResponseCode.Success;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Fail ;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
         }
 
+        [HttpPost("UpdateServiceProvider")]
+        public IActionResult UpdateServiceProvider([FromBody]ServiceProviderRequest request)
+        {
+            ServiceProviderResponceData res = new ServiceProviderResponceData();
+            bool state = false;
+            try
+            {
+                state = _transactionConfigService .UpdateProviderService(request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.responce = _transactionConfigService.GetPoviderByID(request.Id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        //Apptype
         [HttpGet("GetAppType")]
         public IActionResult GetAppType()
         {
             AppTypeResponce res = new AppTypeResponce();
-            res.responce = _transactionConfigService.GetAppType();
-            res.ReturnCode = enResponseCode.Success;
-            return Ok(res);
+            try
+            {
+                res.responce = _transactionConfigService.GetAppType();
+                if(res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
         }
 
         [HttpGet("GetAppTypeById/{id:long}")]
         public IActionResult GetAppTypeById(long id)
         {
             AppTypeResponceData res = new AppTypeResponceData();
-            res.responce = _transactionConfigService.GetAppTypeById(id);
-            res.ReturnCode = enResponseCode.Success;
-            return Ok(res);
+            try
+            {
+                res.responce = _transactionConfigService.GetAppTypeById(id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
         }
 
+        [HttpPost("AddAppType")]
+        public IActionResult AddAppType([FromBody]AppTypeRequest request)
+        {
+            AppTypeResponceData res = new AppTypeResponceData();
+            //BizResponseClass res = new BizResponseClass();
+            try
+            {
+                long id=_transactionConfigService.AddAppType(request);
+                if(id !=0)
+                {
+                    res.responce = _transactionConfigService.GetAppTypeById(id);
+                    res.ReturnCode = enResponseCode.Fail ;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
+        }
+
+        [HttpPost("UpdateAppType")]
+        public IActionResult UpdateAppType([FromBody]AppTypeRequest request)
+        {
+            AppTypeResponceData res = new AppTypeResponceData();
+            bool state = false;
+            try
+            {
+
+                state=_transactionConfigService.UpdateAppType(request);
+                if(state == false )
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.responce = _transactionConfigService.GetAppTypeById(request.Id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
+        }
+
+        //providerType
         [HttpGet("GetServiceProviderType")]
         public IActionResult GetServiceProviderType()
         {
+
             ProviderTypeResponce res = new ProviderTypeResponce();
-            res.responce = _transactionConfigService.GetProviderType();
-            res.ReturnCode = enResponseCode.Success;
-            return Ok(res);
+            try
+            {
+                res.responce = _transactionConfigService.GetProviderType();
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
         }
 
         [HttpGet("GetServiceProviderTypeById/{id:long}")]
         public IActionResult GetServiceProviderTypeById(long id)
         {
             ProviderTypeResponceData res = new ProviderTypeResponceData();
-            res.responce = _transactionConfigService.GetProviderTypeById(id);
-            res.ReturnCode = enResponseCode.Success;
-            return Ok(res);
+            try
+            {
+                res.responce = _transactionConfigService.GetProviderTypeById(id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
         }
+
+        [HttpPost("AddProviderType")]
+        public IActionResult AddProviderType([FromBody]ProviderTypeRequest request )
+        {
+            ProviderTypeResponceData res = new ProviderTypeResponceData();
+            //BizResponseClass res = new BizResponseClass();
+            try
+            {
+                long id = _transactionConfigService.AddProviderType(request);
+                if (id != 0)
+                {
+                    res.responce = _transactionConfigService.GetProviderTypeById(id);
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+            
+        }
+
+        [HttpPost("UpdateProviderType")]
+        public IActionResult UpdateProviderType([FromBody]ProviderTypeRequest request)
+        {
+            ProviderTypeResponceData res = new ProviderTypeResponceData();
+            bool state = false;
+            try
+            {
+                state=_transactionConfigService.UpdateProviderType(request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.responce = _transactionConfigService.GetProviderTypeById(request.Id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+           
+        }
+
     }
 }

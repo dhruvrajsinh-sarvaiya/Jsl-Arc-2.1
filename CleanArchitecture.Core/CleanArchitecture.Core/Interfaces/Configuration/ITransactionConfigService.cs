@@ -16,12 +16,17 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
 
         IEnumerable<ServiceProviderViewModel> GetAllProvider();
         ServiceProviderViewModel GetPoviderByID(long ID);
-        bool AddProviderService(ServiceProviderRequest request);
+        long AddProviderService(ServiceProviderRequest request);
+        bool UpdateProviderService(ServiceProviderRequest request);
 
         IEnumerable<AppTypeViewModel> GetAppType();
         AppTypeViewModel GetAppTypeById(long id);
+        long AddAppType(AppTypeRequest request);
+        bool UpdateAppType(AppTypeRequest request);
 
         IEnumerable<ProviderTypeViewModel> GetProviderType();
         ProviderTypeViewModel GetProviderTypeById(long id);
+        long AddProviderType(ProviderTypeRequest request);
+        bool UpdateProviderType(ProviderTypeRequest request);
     }
 }
