@@ -299,13 +299,12 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
-
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
                 }
             }
             catch (Exception ex)
@@ -363,22 +362,22 @@ namespace CleanArchitecture.Web.API
                             }
                             else
                             {
-                                return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                             }
                         }
                         else
                         {
-                            return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                     }
                     else
                     {
-                        return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpWithMobileValid, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpWithMobileValid, ErrorCode = enErrorCode.Status400BadRequest });
                 }
             }
             catch (Exception ex)
@@ -432,7 +431,7 @@ namespace CleanArchitecture.Web.API
                             if (tempdata.Id == 0 && tempotp.Id == 0)
                             {
                                 ModelState.AddModelError(string.Empty, "Error.");
-                                return BadRequest(new ApiError(ModelState));
+                                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                             }
                             else if (model.OTP == tempotp.OTP)
                             {
@@ -458,47 +457,48 @@ namespace CleanArchitecture.Web.API
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
                                             var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
-                                            return AppUtils.StanderdSignUp("You have successfully verified.");
+                                            //return AppUtils.StanderdSignUp("You have successfully verified.");
+                                            return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUPVerification });
+                                        }
+                                        else
+                                        {
+                                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpRole, ErrorCode = enErrorCode.Status400BadRequest });
                                         }
                                     }
                                     else
                                     {
-                                        ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
-                                        return BadRequest(new ApiError(ModelState));
+                                        return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                                     }
                                 }
                                 else
                                 {
-                                    ModelState.AddModelError(string.Empty, "This user is already registered.");
-                                    return BadRequest(new ApiError(ModelState));
+                                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                                 }
                             }
                             else
                             {
-                                ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
-                                return BadRequest(new ApiError(ModelState));
+                                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpOTP, ErrorCode = enErrorCode.Status400BadRequest });
                             }
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                            return BadRequest(new ApiError(ModelState));
+                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status400BadRequest });
                         }
+                    }
+                    else
+                    {
+                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Error.");
-                    return BadRequest(new ApiError(ModelState));
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                 }
-
-                ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                return BadRequest(new ApiError(ModelState));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -571,13 +571,13 @@ namespace CleanArchitecture.Web.API
                                 }
                             }
                             else
-                            {                               
+                            {
                                 return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpOTP, ErrorCode = enErrorCode.Status400BadRequest });
                             }
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                            //ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
                             return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                     }
@@ -629,12 +629,13 @@ namespace CleanArchitecture.Web.API
                             request.MobileNo = Convert.ToInt64(model.Mobile);
                             request.Message = EnResponseMessage.SendSMSSubject + result.OTP;
                             await _mediator.Send(request);
-                            return AppUtils.StanderdSignUp("You have successfully send Otp in mobile.");
+                            //return AppUtils.StanderdSignUp("You have successfully send Otp in mobile.");
+                            return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithResendMobile });
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
-                            return BadRequest(new ApiError(ModelState));
+                            //ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                         //else
                         //{
@@ -647,20 +648,20 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
-                        return BadRequest(new ApiError(ModelState));
+                        //ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                        return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "This mobile number is not valid.");
-                    return BadRequest(new ApiError(ModelState));
+                    //ModelState.AddModelError(string.Empty, "This mobile number is not valid.");
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpWithMobileValid, ErrorCode = enErrorCode.Status400BadRequest });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -691,7 +692,7 @@ namespace CleanArchitecture.Web.API
                         request.Body = EnResponseMessage.SendMailBody + resultdata.OTP;
 
                         await _mediator.Send(request);
-                        _logger.LogInformation(3, "Email sent successfully with your account");                        
+                        _logger.LogInformation(3, "Email sent successfully with your account");
                         //return AppUtils.StanderdSignUp("You have successfully send Otp in email.");
                         return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithResendEmail });
                     }
@@ -769,7 +770,7 @@ namespace CleanArchitecture.Web.API
                         _logger.LogInformation(3, "Email sent successfully with your account");
 
                         //return AppUtils.StanderdSignUp("Please verify it by clicking the activation link that has been resend to your email.");
-                        return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardResendSignUp});
+                        return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardResendSignUp });
                     }
                     else
                     {

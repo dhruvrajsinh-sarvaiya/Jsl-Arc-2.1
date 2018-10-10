@@ -51,7 +51,7 @@ namespace CleanArchitecture.Core.Enums
         public static string LoginEmailSubject = "Login With Email Otp ";
         public static string StandardSignUp = "Your account has been created, please verify it by clicking the activation link that has been send to your email.";
         public static string SignUpValidation = "This username or email is already registered.";
-        public static string SignUpUser = "This user data are null.";
+        public static string SignUpUser = "This user data not available.";
         public static string SignWithEmail = "Please verify it by clicking the otp that has been send to your email.";
         public static string SignUpEmailValidation = "This email is already registered.";
         public static string SignUpEmailConfirm= "Your account has been activated, you can now login.";
@@ -73,5 +73,6 @@ namespace CleanArchitecture.Core.Enums
         public static string SignUpResendOTP = "Resend OTP immediately not valid or expired.";
         public static string SignUpRole = "This User roles not available.";
         public static string SignUpWithResendEmail = "You have successfully resend Otp in email.";
+        public static string SignUpWithResendMobile = "You have successfully resend Otp in mobile.";
     }
 }
