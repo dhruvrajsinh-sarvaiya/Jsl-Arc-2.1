@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.ViewModels.Wallet;
@@ -118,17 +119,19 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                string requeststring = "{'wallet':{'_wallet':{'id':'591a40dd9fdde805252f0d8aefed79b3','users':[{'user':'55cce42633dc60ca06db38e643622a86','permissions':['admin','view','spend']}],'coin':'tltc','label':'My Test Wallet','m':2,'n':3,'keys':['591a40dc422326ff248919e62a02b2be','591a40dd422326ff248919e91caa8b6a','591a40dc9fdde805252f0d87f76577f8'],'tags':['591a40dd9fdde805252f0d8a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'isCold':false,'coinSpecific':{},'balance':0,'confirmedBalance':0,'spendableBalance':0,'balanceString':'0','confirmedBalanceString':'0','spendableBalanceString':'0','receiveAddress':{'address':'QRWXF9VxJnbSx5uYbX99kuw55pUW4DrmTx','chain':0,'index':0,'coin':'tltc','wallet':'591a40dd9fdde805252f0d8aefed79b3','coinSpecific':{'redeemScript':'522103e8bc…c7ac0e53ae'}},'pendingApprovals':[]}}}";
                 CreateWalletResponse Response = new CreateWalletResponse();
-                Response = JsonConvert.DeserializeObject<CreateWalletResponse>(requeststring);
-                Response.ReturnCode = enResponseCode.Success;
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                          new JsonSerializerSettings
-                                          {
-                                              NullValueHandling = NullValueHandling.Ignore
-                                          });
-                dynamic respObjJson = JObject.Parse(respObj);
-                return returnDynamicResult(respObjJson);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                //if(user==null)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed;
+                //}
+                //else
+                //{
+                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, coin, Request.IsDefaultWallet, Request.AllowTrnType, 1 /*Convert.ToInt64(user.Id)*/);
+                //}
+               
+                return Ok(Response);
             }
             catch (Exception ex)
             {

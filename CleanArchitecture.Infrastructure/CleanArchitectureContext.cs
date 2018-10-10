@@ -17,6 +17,7 @@ using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.ViewModels.Transaction;
+using CleanArchitecture.Core.Entities.Wallet;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -61,6 +62,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<DepositHistory> DepositHistorys { get; set; }
         public DbSet<TradeBitGoDelayAddresses> TradeBitGoDelayAddressess { get; set; }
         public DbSet<AddressMaster> AddressMasters { get; set; }
+        public DbSet<WalletAllowTrn> WalletAllowTrns { get; set; }
 
         //========Transaction Tables
         public DbSet <TradeTransactionQueue>TradeTransactionQueue { get; set; }
@@ -122,7 +124,7 @@ namespace CleanArchitecture.Infrastructure
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
-            modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
+            modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key          
         }
 
         /// <summary>

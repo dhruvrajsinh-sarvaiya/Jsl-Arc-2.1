@@ -10,6 +10,9 @@ using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using CleanArchitecture.Core.Entities.Wallet;
+using CleanArchitecture.Core.ViewModels.Wallet;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -30,6 +33,8 @@ namespace CleanArchitecture.Infrastructure.Services
 
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
+        //vsolanki 10-10-2018 
+        private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepository; 
         //readonly IBasePage _BaseObj;
         private static Random random = new Random((int)DateTime.Now.Ticks);
 
@@ -38,7 +43,7 @@ namespace CleanArchitecture.Infrastructure.Services
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
-            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository) : base(logger)
+            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -53,6 +58,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _getWebRequest = getWebRequest;
             _addressMstRepository = addressMaster;
             _WalletTypeMasterRepository = WalletTypeMasterRepository;
+            _WalletAllowTrnRepository = WalletAllowTrnRepository;
             //_walletLedgerRepository = walletledgerrepo;
         }
 
@@ -481,7 +487,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 long maxValue = 9999999999;
                 long minValue = 1000000000;
                 long x = (long)Math.Round(random.NextDouble() * (maxValue - minValue - 1)) + minValue;
-                string userIDStr = x.ToString() + userID.ToString().PadLeft(5) + isDefaultWallet.ToString();
+                string userIDStr = x.ToString() + userID.ToString().PadLeft(5,'0') + isDefaultWallet.ToString();
                 return userIDStr;
             }
             catch (Exception ex)
@@ -491,5 +497,64 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        //vsolanki 10-10-2018 Insert into WalletMaster table
+        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId)
+        {
+            bool IsValid = true;
+            decimal Balance = 0;
+            string PublicAddress = "";
+            WalletMaster walletMaster = new WalletMaster();
+            CreateWalletResponse createWalletResponse = new CreateWalletResponse();
+            try
+            {
+              
+                var walletMasters = _WalletTypeMasterRepository.GetSingle(item => item.WalletTypeName == CoinName);
+                if(walletMasters==null)
+                {
+                    createWalletResponse.ReturnCode =enResponseCode.Fail;
+                    createWalletResponse.ReturnMsg = "Invalid CoinName";
+                    return createWalletResponse;
+                }
+                //genrate address
+              //  PublicAddress = GenerateAddress(1);
+
+                //add data in walletmaster tbl
+                walletMaster.Walletname = Walletname;
+                walletMaster.IsValid = IsValid;
+                walletMaster.UserID = userId;
+                walletMaster.WalletTypeID = walletMasters.Id; 
+                walletMaster.Balance = Balance;
+                walletMaster.PublicAddress = PublicAddress;
+                walletMaster.IsDefaultWallet = IsDefaultWallet;
+                walletMaster.CreatedBy = userId;
+                walletMaster.CreatedDate = UTC_To_IST();
+                walletMaster.Status = Convert.ToInt16(ServiceStatus.Active);
+                walletMaster.AccWalletID = RandomGenerateAccWalletId(userId, IsDefaultWallet);
+                walletMaster = _commonRepository.Add(walletMaster);
+
+                //add data in WalletAllowTrn tbl
+                for (int i=0;i< AllowTrnType.Length;i++)
+                {
+                    WalletAllowTrn w = new WalletAllowTrn();
+                    w.CreatedDate = UTC_To_IST();
+                    w.CreatedBy = userId;
+                    w.Status = Convert.ToInt16(ServiceStatus.Active);
+                    w.WalletId = walletMaster.Id;
+                    w.TrnType =Convert.ToByte(AllowTrnType[i]);
+                    _WalletAllowTrnRepository.Add(w);
+                }
+
+                //set the response object value
+                createWalletResponse.AccWalletID = walletMaster.AccWalletID;
+                createWalletResponse.PublicAddress = walletMaster.PublicAddress;
+                createWalletResponse.ReturnCode = enResponseCode.Success;
+                return createWalletResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 }
