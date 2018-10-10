@@ -11,6 +11,8 @@ namespace CleanArchitecture.Core.Entities
 {
     public class WalletMaster : BizBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
 
         [Required]
         [StringLength(50)]

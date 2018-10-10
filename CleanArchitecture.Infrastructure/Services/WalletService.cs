@@ -464,7 +464,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 IEnumerable<WalletTypeMaster> coin = new List<WalletTypeMaster>();
-                coin = _WalletTypeMasterRepository.FindBy(item => item.Status == Convert.ToInt16(ServiceStatus.Active));
+                coin = _WalletTypeMasterRepository.FindBy(item => item.IsTransactionWallet == Convert.ToInt16(ServiceStatus.Active));
                 return coin;
             }
             catch (Exception ex)
