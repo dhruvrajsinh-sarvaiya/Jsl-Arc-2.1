@@ -27,6 +27,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Configuration;
+using CleanArchitecture.Core.Interfaces.Configuration;
+using CleanArchitecture.Infrastructure.Services.Configuration;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -326,6 +328,7 @@ namespace CleanArchitecture.Web.Extensions
             services.AddScoped<EncyptedDecrypted>();
             services.AddTransient<IFrontTrnService, FrontTrnService>();
             services.AddTransient<IFrontTrnRepository, FrontTrnRepository>();
+            services.AddTransient<ITransactionConfigService, TransactionConfigService>();
             return services;
         }
     }
