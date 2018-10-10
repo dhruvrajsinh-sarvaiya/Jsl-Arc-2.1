@@ -21,9 +21,11 @@ namespace CleanArchitecture.Web.API
         static int i = 1;
         private readonly IBasePage _basePage;
         private readonly ILogger<WalletOperationsController> _logger;
-        public WalletOperationsController(ILogger<WalletOperationsController> logger, IBasePage basePage)
+        private readonly IWalletService _walletService;
+        public WalletOperationsController(ILogger<WalletOperationsController> logger, IBasePage basePage, IWalletService walletService)
         {
             _logger = logger;
+            _walletService = walletService;
             _basePage = basePage;
         }
         //[Authorize]
@@ -129,18 +131,19 @@ namespace CleanArchitecture.Web.API
         }
 
 
-        [HttpPost("{coin}/{id}/{wallet}")]
+        [HttpPost("{coin}/{walletid}")]
         //[Authorize]
-        public async Task<IActionResult> CreateWalletAddress(string coin, string wallet, string id, [FromBody]CreateWalletAddressReq Request)
+        public async Task<IActionResult> CreateWalletAddress(string coin, long walletid, [FromBody]CreateWalletAddressReq Request)
         {
             try
             {
-                string responseString = "{'address':'2Mz7x1a5df8380e0e30yYc6e','coin':'tbtc','label':'My address','wallet':'585c51a5df8380e0e3082e46','coinSpecific':{'chain':0,'index':1,'redeemScript':'522101a5df8380e0e30453ae'}}";
-                CreateWalletAddressRes Response = new CreateWalletAddressRes();
-                Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
-                Response.ReturnCode = enResponseCode.Success;
-                var respObj = JsonConvert.SerializeObject(Response);
-                dynamic respObjJson = JObject.Parse(respObj);
+                dynamic respObjJson = _walletService.GenerateAddress(walletid);
+                //string responseString = "{'address':'2Mz7x1a5df8380e0e30yYc6e','coin':'tbtc','label':'My address','wallet':'585c51a5df8380e0e3082e46','coinSpecific':{'chain':0,'index':1,'redeemScript':'522101a5df8380e0e30453ae'}}";
+                //CreateWalletAddressRes Response = new CreateWalletAddressRes();
+                //Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
+                //Response.ReturnCode = enResponseCode.Success;
+                //var respObj = JsonConvert.SerializeObject(Response);
+                //dynamic respObjJson = JObject.Parse(respObj);
                 return returnDynamicResult(respObjJson);
             }
             catch (Exception ex)

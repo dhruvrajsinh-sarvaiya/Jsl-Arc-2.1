@@ -10,6 +10,9 @@ using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -277,7 +280,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BizResponse GenerateAddress(long walletID)
+        public string GenerateAddress(long walletID)
         {
             try
             {
@@ -293,28 +296,28 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (walletMaster == null)
                 {
                     //return false
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
+                    return EnResponseMessage.InvalidWallet;/*new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };*/
                 }
                 else if (walletMaster.Status != 1)
                 {
                     //return false
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
+                    return EnResponseMessage.InvalidWallet;//new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
 
                 transactionProviderResponses = _webApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { amount = 0,  APIType = enWebAPIRouteType.TransactionAPI, trnType = enTrnType.Generate_Address });
                 if (transactionProviderResponses == null)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                    return "Please try after sometime.";//new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
                 }
                 if (transactionProviderResponses[0].ThirPartyAPIID == 0)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
+                    return EnResponseMessage.ItemOrThirdprtyNotFound;//new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
 
                 ThirdPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
                 if (thirdPartyAPIConfiguration == null)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
+                    return EnResponseMessage.ItemOrThirdprtyNotFound;//new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
                 thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
                 string apiResponse = _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60, thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
@@ -337,11 +340,18 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
-                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg };
+                    string responseString = apiResponse;
+                    CreateWalletAddressRes Response = new CreateWalletAddressRes();
+                    Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
+                    Response.ReturnCode = enResponseCode.Success;
+                    var respObj = JsonConvert.SerializeObject(Response);
+                    dynamic respObjJson = JObject.Parse(respObj);
+                    //return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg };      
+                    return respObj;
                 }
                 else
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.CreateWalletFailMsg };
+                    return EnResponseMessage.CreateWalletFailMsg;//new BizResponse { ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.CreateWalletFailMsg };
                 }
 
                 // code need to be added

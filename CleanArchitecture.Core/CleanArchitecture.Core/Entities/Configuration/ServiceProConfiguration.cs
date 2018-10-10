@@ -10,8 +10,8 @@ namespace CleanArchitecture.Core.Entities.Configuration
 {
     public class ServiceProConfiguration : BizBase
     {
-        [Required]
-        public long ServiceProID { get; set; }
+        //[Required]
+        //public long ServiceProID { get; set; }
 
         [Required]
         [StringLength(50)]

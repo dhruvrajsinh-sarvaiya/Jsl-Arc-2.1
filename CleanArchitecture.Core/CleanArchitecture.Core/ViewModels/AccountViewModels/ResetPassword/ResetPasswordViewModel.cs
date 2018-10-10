@@ -1,3 +1,4 @@
+using CleanArchitecture.Core.ApiModels;
 using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels.ResetPassword
@@ -20,4 +21,10 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.ResetPassword
 
         public string Code { get; set; }
     }
+    public class   ResetPassWordResponse : BizResponseClass
+    {
+
+    }
+
+
 }

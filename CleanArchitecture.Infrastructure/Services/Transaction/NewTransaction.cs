@@ -62,10 +62,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 return _Resp;
             }
             //=========================PROCESS
-
-
-
-
+            //Check balance here
+            var Validation=ValidateTransaction(Req);
+          
+            if(await Validation) //validation and balance check success
+            {
+    
+            }
             //=========================UPDATE
 
 
@@ -296,10 +299,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        #endregion
+        #endregion        
 
         #region RegionProcessTransaction
-
+        private Task<Boolean> ValidateTransaction(NewTransactionRequestCls Req)
+        {
+            return Task.FromResult(true);
+        }
         #endregion
 
 

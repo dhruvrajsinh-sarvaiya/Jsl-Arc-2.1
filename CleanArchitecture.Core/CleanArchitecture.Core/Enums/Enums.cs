@@ -189,7 +189,7 @@ namespace CleanArchitecture.Core.Enums
         Login = 1,
     }
 
-    public enum enAppType
+    public enum enAppType //Use in SerProDetail table
     {
         WebSocket = 1,
         JsonRPC = 2,
