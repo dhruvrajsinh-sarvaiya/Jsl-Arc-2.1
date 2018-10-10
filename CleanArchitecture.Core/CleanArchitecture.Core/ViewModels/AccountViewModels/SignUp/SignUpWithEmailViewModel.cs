@@ -12,4 +12,9 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
         public string Email { get; set; }
 
     }
+
+    public class SignUpWithEmailResponse : BizResponseClass
+    {
+
+    }
 }

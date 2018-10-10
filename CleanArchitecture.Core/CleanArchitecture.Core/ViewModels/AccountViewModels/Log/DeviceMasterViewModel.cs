@@ -13,6 +13,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
         [Required]
         [StringLength(250)]
         public string DeviceId { get; set; }
+        public bool IsEnable { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

@@ -42,4 +42,10 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
 
     }
 
+    public class RegisterResponse : BizResponseClass
+    {
+
+    }
+
+
 }

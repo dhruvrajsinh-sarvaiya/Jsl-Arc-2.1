@@ -49,5 +49,22 @@ namespace CleanArchitecture.Core.Enums
         public static string SendMailBody = "use this code: ";
         public static string SendSMSSubject = "SMS for use this code ";
         public static string LoginEmailSubject = "Login With Email Otp ";
+        public static string StandardSignUp = "Your account has been created, please verify it by clicking the activation link that has been send to your email.";
+        public static string SignUpValidation = "This username or email is already registered.";
+        public static string SignUpUser = "This user data are null.";
+        public static string SignWithEmail = "Please verify it by clicking the otp that has been send to your email.";
+        public static string SignUpEmailValidation = "This email is already registered.";
+        public static string SignUpEmailConfirm= "Your account has been activated, you can now login.";
+        public static string SignUpEmailExpired = "Reset links immediately not valid or expired.";
+        public static string SignEmailLink = "This email code can't be balck.";
+        public static string SignEmailUser = "This email link using user not valid.";
+        public static string StandardResendSignUp = "Your account has been created, please verify it by clicking the activation link that has been send to your email.";
+        public static string StandardLoginSuccess = "User Login Successfull.";
+        public static string StandardLoginLockOut = "User account locked out for two hours.";
+        public static string StandardLoginfailed = "Login failed : Invalid username or password.";
+        public static string LoginWithOtpSuccessSend = "You have send OTP on email.";
+        public static string LoginWithOtpLoginFailed = "Login failed: Invalid email.";
+        public static string LoginWithOtpInvalidAttempt = "Invalid login attempt.";
+
     }
 }
