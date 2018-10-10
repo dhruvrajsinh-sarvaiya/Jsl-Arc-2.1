@@ -13,20 +13,20 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class WalletService : BasePage, IWalletService 
+    public class WalletService : BasePage, IWalletService
     {
-       private readonly ILogger<WalletService> _log;
-       private readonly ICommonRepository<WalletMaster> _commonRepository;
-       private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;      
-       private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
-       private readonly ICommonRepository<AddressMaster> _addressMstRepository;
-       private readonly ICommonRepository<TrnAcBatch> _trnBatch;
-       private readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
-       //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
-       private readonly IWalletRepository _walletRepository1;
-       private readonly IWebApiRepository _webApiRepository ;
-       private readonly IWebApiSendRequest _webApiSendRequest;
-       private readonly IGetWebRequest _getWebRequest;
+        private readonly ILogger<WalletService> _log;
+        private readonly ICommonRepository<WalletMaster> _commonRepository;
+        private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
+        private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
+        private readonly ICommonRepository<AddressMaster> _addressMstRepository;
+        private readonly ICommonRepository<TrnAcBatch> _trnBatch;
+        private readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
+        //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
+        private readonly IWalletRepository _walletRepository1;
+        private readonly IWebApiRepository _webApiRepository;
+        private readonly IWebApiSendRequest _webApiSendRequest;
+        private readonly IGetWebRequest _getWebRequest;
 
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
@@ -42,7 +42,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _commonRepository = commonRepository;
             _walletOrderRepository = walletOrderRepository;
             //_walletRepository = repository;
-            _bitgoDelayRepository = bitgoDelayRepository;           
+            _bitgoDelayRepository = bitgoDelayRepository;
             _trnBatch = BatchLogger;
             _walletRepository1 = walletRepository;
             _webApiRepository = webApiRepository;
@@ -53,13 +53,13 @@ namespace CleanArchitecture.Infrastructure.Services
             _WalletTypeMasterRepository = WalletTypeMasterRepository;
             //_walletLedgerRepository = walletledgerrepo;
         }
-        
+
         public decimal GetUserBalance(long walletId)
         {
             try
             {
                 var obj = _commonRepository.GetById(walletId);
-                return obj.Balance;                
+                return obj.Balance;
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 return _commonRepository.GetById(walletId).IsValid;
-                
+
             }
             catch (Exception ex)
             {
@@ -82,12 +82,12 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public bool WalletBalanceCheck(decimal amount,long walletid)
+        public bool WalletBalanceCheck(decimal amount, long walletid)
         {
             try
             {
                 var obj = _commonRepository.GetById(walletid);
-                if(obj.Balance < amount)
+                if (obj.Balance < amount)
                 {
                     return false;
                 }
@@ -100,7 +100,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public CreateOrderResponse CreateOrder (CreateOrderRequest Order)
+        public CreateOrderResponse CreateOrder(CreateOrderRequest Order)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (!IsValidWallet(Order.OWalletMasterID) == true)
                 {
                     response.OrderID = 0;
-                    response.ORemarks = "";                   
+                    response.ORemarks = "";
                     response.ReturnMsg = "Invalid Account";
                     response.ReturnCode = enResponseCodeService.Fail;
                     return response;
@@ -122,7 +122,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     DeliveryAmt = Order.OrderAmt,
                     OrderDate = UTC_To_IST(),
                     OrderType = Order.OrderType,
-                    OrderAmt= Order.OrderAmt,
+                    OrderAmt = Order.OrderAmt,
                     DWalletMasterID = Order.DWalletMasterID,
                     OWalletMasterID = Order.OWalletMasterID,
                     Status = 0,
@@ -144,7 +144,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BizResponse ProcessOrder(long RefNo,long DWalletID,long OWalletID,decimal amount,string remarks, enTrnType enTrnType,enServiceType serviceType)
+        public BizResponse ProcessOrder(long RefNo, long DWalletID, long OWalletID, decimal amount, string remarks, enTrnType enTrnType, enServiceType serviceType)
         {
             try
             {
@@ -153,11 +153,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 BizResponse bizResponse = new BizResponse();
 
 
-                decimal balance;                
-               
-                    balance = GetUserBalance(DWalletID);
-               if(amount <  0)
-               {
+                decimal balance;
+
+                balance = GetUserBalance(DWalletID);
+                if (amount < 0)
+                {
                     //return false;
                     bizResponse.ErrorCode = enErrorCode.InvalidAmount;
                     bizResponse.ReturnMsg = "Invalid Amount";
@@ -165,104 +165,104 @@ namespace CleanArchitecture.Infrastructure.Services
                     return bizResponse;
                 }
                 if (balance < amount)
-                    {
+                {
                     // return false;
                     bizResponse.ErrorCode = enErrorCode.InsufficientBalance;
                     bizResponse.ReturnMsg = "Insufficient Balance";
                     bizResponse.ReturnCode = enResponseCodeService.Fail;
                     return bizResponse;
                 }
-                    var dWalletobj = _commonRepository.GetById(DWalletID);
-                    if (dWalletobj == null || dWalletobj.Status != 1)
-                    {
+                var dWalletobj = _commonRepository.GetById(DWalletID);
+                if (dWalletobj == null || dWalletobj.Status != 1)
+                {
                     // return false;
                     bizResponse.ErrorCode = enErrorCode.InvalidWallet;
                     bizResponse.ReturnMsg = "Invalid Wallet";
                     bizResponse.ReturnCode = enResponseCodeService.Fail;
                     return bizResponse;
                 }
-                    var oWalletobj = _commonRepository.GetById(OWalletID);
-                    if (oWalletobj == null || oWalletobj.Status != 1)
-                    {
+                var oWalletobj = _commonRepository.GetById(OWalletID);
+                if (oWalletobj == null || oWalletobj.Status != 1)
+                {
                     bizResponse.ErrorCode = enErrorCode.InvalidWallet;
                     bizResponse.ReturnMsg = "Invalid Wallet";
                     bizResponse.ReturnCode = enResponseCodeService.Fail;
 
                     return bizResponse;
-                    }
-                    
-                    TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
-                    tansAccObj.BatchNo = batchObj.Id;
-                    tansAccObj.CrAmt = amount;
-                    tansAccObj.CreatedBy = DWalletID;
-                    tansAccObj.CreatedDate = UTC_To_IST();
-                    tansAccObj.DrAmt = 0;
-                    tansAccObj.IsSettled = 1;
-                    tansAccObj.RefNo = RefNo;
-                    tansAccObj.Remarks = remarks;
-                    tansAccObj.Status = 1;
-                    tansAccObj.TrnDate = UTC_To_IST();
-                    tansAccObj.UpdatedBy = DWalletID;
-                    tansAccObj.WalletID = OWalletID;
-                    //tansAccObj = _trnxAccount.Add(tansAccObj);
+                }
 
-                    tansAccObj1 = new TransactionAccount();
-                    tansAccObj1.BatchNo = batchObj.Id;
-                    tansAccObj1.CrAmt = 0;
-                    tansAccObj1.CreatedBy = DWalletID;
-                    tansAccObj1.CreatedDate = UTC_To_IST();
-                    tansAccObj1.DrAmt = amount;
-                    tansAccObj1.IsSettled = 1;
-                    tansAccObj1.RefNo = RefNo;
-                    tansAccObj1.Remarks = remarks;
-                    tansAccObj1.Status = 1;
-                    tansAccObj1.TrnDate = UTC_To_IST();
-                    tansAccObj1.UpdatedBy = DWalletID;
-                    tansAccObj1.WalletID = DWalletID;
-                    //tansAccObj = _trnxAccount.Add(tansAccObj);
+                TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
+                tansAccObj.BatchNo = batchObj.Id;
+                tansAccObj.CrAmt = amount;
+                tansAccObj.CreatedBy = DWalletID;
+                tansAccObj.CreatedDate = UTC_To_IST();
+                tansAccObj.DrAmt = 0;
+                tansAccObj.IsSettled = 1;
+                tansAccObj.RefNo = RefNo;
+                tansAccObj.Remarks = remarks;
+                tansAccObj.Status = 1;
+                tansAccObj.TrnDate = UTC_To_IST();
+                tansAccObj.UpdatedBy = DWalletID;
+                tansAccObj.WalletID = OWalletID;
+                //tansAccObj = _trnxAccount.Add(tansAccObj);
 
-                    dWalletobj.DebitBalance(amount);
-                    oWalletobj.CreditBalance(amount);
+                tansAccObj1 = new TransactionAccount();
+                tansAccObj1.BatchNo = batchObj.Id;
+                tansAccObj1.CrAmt = 0;
+                tansAccObj1.CreatedBy = DWalletID;
+                tansAccObj1.CreatedDate = UTC_To_IST();
+                tansAccObj1.DrAmt = amount;
+                tansAccObj1.IsSettled = 1;
+                tansAccObj1.RefNo = RefNo;
+                tansAccObj1.Remarks = remarks;
+                tansAccObj1.Status = 1;
+                tansAccObj1.TrnDate = UTC_To_IST();
+                tansAccObj1.UpdatedBy = DWalletID;
+                tansAccObj1.WalletID = DWalletID;
+                //tansAccObj = _trnxAccount.Add(tansAccObj);
 
-                    //_walletRepository.Update(dWalletobj);
-                    //_walletRepository.Update(oWalletobj);
+                dWalletobj.DebitBalance(amount);
+                oWalletobj.CreditBalance(amount);
 
-                    var walletLedger = new WalletLedger();
-                    walletLedger.ServiceTypeID = serviceType;
-                    walletLedger.TrnType = enTrnType.Deposit;
-                    walletLedger.CrAmt = 0;
-                    walletLedger.CreatedBy = DWalletID;
-                    walletLedger.CreatedDate = UTC_To_IST();
-                    walletLedger.DrAmt = amount;                   
-                    walletLedger.TrnNo = RefNo;
-                    walletLedger.Remarks = remarks;
-                    walletLedger.Status = 1;
-                    walletLedger.TrnDate = UTC_To_IST();
-                    walletLedger.UpdatedBy = DWalletID;
-                    walletLedger.WalletMasterId = DWalletID;
-                    walletLedger.ToWalletMasterId = OWalletID;
-                    walletLedger.PreBal = dWalletobj.Balance;
-                    walletLedger.PostBal = dWalletobj.Balance - amount;
-                    //walletLedger = _walletLedgerRepository.Add(walletLedger);
+                //_walletRepository.Update(dWalletobj);
+                //_walletRepository.Update(oWalletobj);
 
-                    var walletLedger2 = new WalletLedger();
-                    walletLedger2.ServiceTypeID = serviceType;
-                    walletLedger2.TrnType = enTrnType;
-                    walletLedger2.CrAmt = amount;
-                    walletLedger2.CreatedBy = DWalletID;
-                    walletLedger2.CreatedDate = UTC_To_IST();
-                    walletLedger2.DrAmt = 0;
-                    walletLedger2.TrnNo = RefNo;
-                    walletLedger2.Remarks = remarks;
-                    walletLedger2.Status = 1;
-                    walletLedger2.TrnDate = UTC_To_IST();
-                    walletLedger2.UpdatedBy = DWalletID;
-                    walletLedger2.WalletMasterId = OWalletID;
-                    walletLedger2.ToWalletMasterId = DWalletID;
-                    walletLedger2.PreBal = oWalletobj.Balance;                 
-                    walletLedger2.PostBal = oWalletobj.Balance - amount;
+                var walletLedger = new WalletLedger();
+                walletLedger.ServiceTypeID = serviceType;
+                walletLedger.TrnType = enTrnType.Deposit;
+                walletLedger.CrAmt = 0;
+                walletLedger.CreatedBy = DWalletID;
+                walletLedger.CreatedDate = UTC_To_IST();
+                walletLedger.DrAmt = amount;
+                walletLedger.TrnNo = RefNo;
+                walletLedger.Remarks = remarks;
+                walletLedger.Status = 1;
+                walletLedger.TrnDate = UTC_To_IST();
+                walletLedger.UpdatedBy = DWalletID;
+                walletLedger.WalletMasterId = DWalletID;
+                walletLedger.ToWalletMasterId = OWalletID;
+                walletLedger.PreBal = dWalletobj.Balance;
+                walletLedger.PostBal = dWalletobj.Balance - amount;
+                //walletLedger = _walletLedgerRepository.Add(walletLedger);
 
-                    _walletRepository1.WalletOperation(walletLedger,walletLedger2,tansAccObj,tansAccObj1, dWalletobj, oWalletobj);
+                var walletLedger2 = new WalletLedger();
+                walletLedger2.ServiceTypeID = serviceType;
+                walletLedger2.TrnType = enTrnType;
+                walletLedger2.CrAmt = amount;
+                walletLedger2.CreatedBy = DWalletID;
+                walletLedger2.CreatedDate = UTC_To_IST();
+                walletLedger2.DrAmt = 0;
+                walletLedger2.TrnNo = RefNo;
+                walletLedger2.Remarks = remarks;
+                walletLedger2.Status = 1;
+                walletLedger2.TrnDate = UTC_To_IST();
+                walletLedger2.UpdatedBy = DWalletID;
+                walletLedger2.WalletMasterId = OWalletID;
+                walletLedger2.ToWalletMasterId = DWalletID;
+                walletLedger2.PreBal = oWalletobj.Balance;
+                walletLedger2.PostBal = oWalletobj.Balance - amount;
+
+                _walletRepository1.WalletOperation(walletLedger, walletLedger2, tansAccObj, tansAccObj1, dWalletobj, oWalletobj);
                 bizResponse.ErrorCode = enErrorCode.Success;
                 bizResponse.ReturnMsg = "Success";
                 bizResponse.ReturnCode = enResponseCodeService.Success;
@@ -275,7 +275,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public  BizResponse GenerateAddress(long walletID)
+        public BizResponse GenerateAddress(long walletID)
         {
             try
             {
@@ -284,25 +284,25 @@ namespace CleanArchitecture.Infrastructure.Services
                 List<TransactionProviderResponse> transactionProviderResponses;
                 WalletMaster walletMaster = _commonRepository.GetById(walletID);
                 AddressMaster addressMaster;
-                string address="";
+                string address = "";
                 string CoinSpecific = null;
                 string TrnID = null;
-                               
+
                 if (walletMaster == null)
                 {
                     //return false
-                    return new BizResponse {ErrorCode = enErrorCode.InvalidWallet , ReturnCode =  enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
+                    return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
-                else if(walletMaster.Status != 1)
+                else if (walletMaster.Status != 1)
                 {
                     //return false
                     return new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
 
-                transactionProviderResponses = _webApiRepository.GetProviderDataList( new TransactionApiConfigurationRequest { amount = 0,SMSCode = walletMaster.CoinName , APIType = enWebAPIRouteType.TransactionAPI , trnType = enTrnType.Generate_Address });
-                if(transactionProviderResponses == null )
+                transactionProviderResponses = _webApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { amount = 0,  APIType = enWebAPIRouteType.TransactionAPI, trnType = enTrnType.Generate_Address });
+                if (transactionProviderResponses == null)
                 {
-                    return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };                    
+                    return new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
                 }
                 if (transactionProviderResponses[0].ThirPartyAPIID == 0)
                 {
@@ -314,15 +314,15 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     return new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
-                thirdPartyAPIRequest =_getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
-                string apiResponse =_webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60,thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
+                thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
+                string apiResponse = _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60, thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
                 // parse response logic need to be implemented
-                if(string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
+                if (string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
                 {
-                    delayAddressesObj = GetTradeBitGoDelayAddresses(walletID,walletMaster.WalletTypeID,TrnID,address, walletMaster.CoinName, thirdPartyAPIRequest.walletID ,walletMaster.CreatedBy,CoinSpecific,0,0);
+                    delayAddressesObj = GetTradeBitGoDelayAddresses(walletID, walletMaster.WalletTypeID, TrnID, address, thirdPartyAPIRequest.walletID, walletMaster.CreatedBy, CoinSpecific, 0, 0);
                     delayAddressesObj = _bitgoDelayRepository.Add(delayAddressesObj);
                     delayGeneratedAddressesObj = _walletRepository1.GetUnassignedETH();
-                    if(delayGeneratedAddressesObj != null)
+                    if (delayGeneratedAddressesObj != null)
                     {
                         address = delayGeneratedAddressesObj.Address;
                         delayGeneratedAddressesObj.WalletId = walletID;
@@ -331,11 +331,11 @@ namespace CleanArchitecture.Infrastructure.Services
                         _bitgoDelayRepository.Update(delayGeneratedAddressesObj);
                     }
                 }
-                if(!string.IsNullOrEmpty(address))
+                if (!string.IsNullOrEmpty(address))
                 {
-                    addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, walletMaster.CoinName, "Self Address", walletMaster.UserID, 0, 1);
+                    addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
-                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg};
+                    return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg };
                 }
                 else
                 {
@@ -346,18 +346,18 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: "+ UTC_To_IST() +",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
         }
 
-        public AddressMaster GetAddressObj(long walletID,long serproID, string address,string coinName,string addressName,long createdBy, byte isDefaultAdd,short status)
+        public AddressMaster GetAddressObj(long walletID, long serproID, string address, string addressName, long createdBy, byte isDefaultAdd, short status)
         {
             try
             {
                 AddressMaster addressMaster = new AddressMaster();
                 addressMaster.Address = address;
-                addressMaster.CoinName = coinName;
+               // addressMaster.CoinName = coinName;
                 addressMaster.CreatedBy = createdBy;
                 addressMaster.CreatedDate = UTC_To_IST();
                 addressMaster.IsDefaultAddress = isDefaultAdd;
@@ -373,7 +373,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public TradeBitGoDelayAddresses GetTradeBitGoDelayAddresses(long walletID, long WalletTypeId, string TrnID,string address, string coinName, string BitgoWalletId, long createdBy, string CoinSpecific, short status,byte generatebit)
+        public TradeBitGoDelayAddresses GetTradeBitGoDelayAddresses(long walletID, long WalletTypeId, string TrnID, string address, string BitgoWalletId, long createdBy, string CoinSpecific, short status, byte generatebit)
         {
             try
             {
@@ -382,7 +382,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     CoinSpecific = CoinSpecific,
                     Address = address,
                     BitgoWalletId = BitgoWalletId,
-                    CoinName = coinName,
+                    //oinName = coinName,
                     CreatedBy = createdBy,
                     CreatedDate = UTC_To_IST(),
                     GenerateBit = generatebit,
@@ -391,7 +391,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     WalletId = walletID,
                     WalletTypeId = WalletTypeId
                 };
-                 
+
                 return addressMaster;
             }
             catch (Exception ex)
@@ -401,20 +401,20 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public WalletMaster GetWalletMaster(long WalletTypeId, string walletName, bool isValid, short status , long createdBy,string coinname)
+        public WalletMaster GetWalletMaster(long WalletTypeId, string walletName, bool isValid, short status, long createdBy, string coinname)
         {
             try
             {
                 WalletMaster addressMaster = new WalletMaster
-                {                   
-                    CoinName = coinname,
+                {
+                    //CoinName = coinname,
                     CreatedBy = createdBy,
-                    CreatedDate = UTC_To_IST(),                   
+                    CreatedDate = UTC_To_IST(),
                     Status = status,
                     Balance = 0,
                     IsValid = isValid,
                     Walletname = walletName,
-                    WalletTypeID = WalletTypeId                   
+                    WalletTypeID = WalletTypeId
                 };
 
                 return addressMaster;
@@ -426,8 +426,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public DepositHistory GetDepositHistory (string fromAddress, string toAddress,string coinName, string  trnID, long confirmations, decimal amount,
-        short status, string statusMsg , string confirmedTime, string UnconfirmedTime, string epochtimePure , byte isProcessing ,long serproid,long createdby)
+        public DepositHistory GetDepositHistory(string fromAddress, string toAddress, string coinName, string trnID, long confirmations, decimal amount,
+        short status, string statusMsg, string confirmedTime, string UnconfirmedTime, string epochtimePure, byte isProcessing, long serproid, long createdby)
         {
             try
             {
@@ -445,11 +445,11 @@ namespace CleanArchitecture.Infrastructure.Services
                     EpochTimePure = epochtimePure,
                     Status = status,
                     StatusMsg = statusMsg
-                    
+
                 };
                 return dh;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
