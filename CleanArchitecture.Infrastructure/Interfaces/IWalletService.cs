@@ -15,6 +15,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         bool IsValidWallet(long walletId);
 
+        string GenerateAddress(long walletid);
+
         //vsolanki 8-10-2018
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();
 
