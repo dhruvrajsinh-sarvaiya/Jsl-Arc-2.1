@@ -17,21 +17,22 @@ using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.ViewModels.Transaction;
+using CleanArchitecture.Core.Entities.Configuration;
 
 namespace CleanArchitecture.Infrastructure
 {
     public partial class CleanArchitectureContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
         private readonly UserResolveService _userService;
-                         
+
         // Account Management
         public string CurrentUserId { get; internal set; }
         public virtual DbSet<ApplicationUser> Users { get; set; }
         public virtual DbSet<ApplicationUserPhotos> ApplicationUserPhotos { get; set; }
         public virtual DbSet<ApplicationRole> Roles { get; set; }
         public virtual DbSet<Cultures> Cultures { get; set; }
-        public virtual DbSet<Resources> Resources { get; set; }     
-        public virtual DbSet<Mode> Mode { get; set; }       
+        public virtual DbSet<Resources> Resources { get; set; }
+        public virtual DbSet<Mode> Mode { get; set; }
         public virtual DbSet<LoginLog> LoginLog { get; set; }
 
         public virtual DbSet<RegisterType> RegisterType { get; set; }
@@ -63,10 +64,10 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<AddressMaster> AddressMasters { get; set; }
 
         //========Transaction Tables
-        public DbSet <TradeTransactionQueue>TradeTransactionQueue { get; set; }
-        public DbSet <TradePairMaster> TradePairMaster { get; set; }
+        public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
+        public DbSet<TradePairMaster> TradePairMaster { get; set; }
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
-        public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }       
+        public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
         public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
         public DbSet<RouteConfiguration> RouteConfiguration { get; set; }
@@ -76,6 +77,12 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
         public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; }
+
+        //Add Tables for Service Master (Not Commited)
+        public DbSet<ServiceMaster> ServiceMaster { get; set; }
+        public DbSet<ServiceDetail> ServiceDetail { get; set; }
+        public DbSet<ServiceStastics> ServiceStastics { get; set; }
+        public DbSet<Limits> Limits { get; set; }
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
