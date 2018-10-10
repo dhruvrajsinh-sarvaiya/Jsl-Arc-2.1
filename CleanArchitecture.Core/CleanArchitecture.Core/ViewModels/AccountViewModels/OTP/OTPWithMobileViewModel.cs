@@ -20,4 +20,9 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
         [Range(10, Int64.MaxValue)]
         public string Mobile { get; set; }
     }
+
+    public class OTPWithMobileResponse : BizResponseClass
+    {
+
+    }
 }

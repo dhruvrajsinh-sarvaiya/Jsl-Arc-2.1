@@ -20,4 +20,8 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
         [Display(Name = "Email")]
         public string Email { get; set; }
     }
+    public class OTPWithEmailResponse:BizResponseClass
+    {
+
+    }
 }
