@@ -12,4 +12,9 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
         [Range(10, Int64.MaxValue)]
         public string Mobile { get; set; }
     }
+
+    public class SignUpWithMobileResponse : BizResponseClass
+    {
+
+    }
 }

@@ -65,6 +65,13 @@ namespace CleanArchitecture.Core.Enums
         public static string LoginWithOtpSuccessSend = "You have send OTP on email.";
         public static string LoginWithOtpLoginFailed = "Login failed: Invalid email.";
         public static string LoginWithOtpInvalidAttempt = "Invalid login attempt.";
+        public static string SignUPMobileValidation = "This mobile number is already registered.";
+        public static string SignUpWithMobile = "Please verify it by clicking the otp that has been send to your mobile.";
+        public static string SignUpWithMobileValid = "This mobile number is not valid.";
+        public static string SignUPVerification = "You have successfully verified.";
+        public static string SignUpOTP = "Invalid OTP or expired, resend OTP immediately.";
+        public static string SignUpResendOTP = "Resend OTP immediately not valid or expired.";
+        public static string SignUpRole = "This User roles not available.";
 
     }
 }
