@@ -13,18 +13,32 @@ namespace CleanArchitecture.Core.Entities.Configuration
         [Required]
         public long ServiceProID { get; set; }
 
+        [Required]
+        [StringLength(50)]
         public string AppKey { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string APIKey { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string SecretKey { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string UserName { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string Password { get; set; }
 
-        public void DisableProvider()
+        public void DisableProConfiguration()
         {
             Status = Convert.ToInt16(ServiceStatus.Disable);
             Events.Add(new ServiceStatusEvent<ServiceProConfiguration>(this));
         }
-        public void EnableProvider()
+        public void EnableProConfiguration()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);
             Events.Add(new ServiceStatusEvent<ServiceProConfiguration>(this));

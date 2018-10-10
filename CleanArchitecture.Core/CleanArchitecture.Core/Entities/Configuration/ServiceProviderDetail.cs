@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.Entities.Configuration
         public long AppTypeID { get; set; }
 
         [Required]
-        public long TrnID { get; set; }
+        public long TrnTypeID { get; set; }
 
         [Required]
         public long LimitID { get; set; }
@@ -96,34 +96,34 @@ namespace CleanArchitecture.Core.Entities.Configuration
             switch (trnType )
             {
                 case enTrnType.Buy_Trade:
-                    TrnID = Convert.ToInt64(enTrnType.Buy_Trade);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Buy_Trade);
                     break;
                 case enTrnType.Charge :
-                    TrnID = Convert.ToInt64(enTrnType.Charge);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Charge);
                     break;
                 case enTrnType.Commission :
-                    TrnID = Convert.ToInt64(enTrnType.Commission);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Commission);
                     break;
                 case enTrnType.Deposit :
-                    TrnID = Convert.ToInt64(enTrnType.Deposit);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Deposit);
                     break;
                 case enTrnType.Generate_Address :
-                    TrnID = Convert.ToInt64(enTrnType.Generate_Address);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Generate_Address);
                     break;
                 case enTrnType.Sell_Trade:
-                    TrnID = Convert.ToInt64(enTrnType.Sell_Trade);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Sell_Trade);
                     break;
                 case enTrnType.Shoping_Cart :
-                    TrnID = Convert.ToInt64(enTrnType.Shoping_Cart);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Shoping_Cart);
                     break;
                 case enTrnType.Topup:
-                    TrnID = Convert.ToInt64(enTrnType.Topup);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Topup);
                     break;
                 case enTrnType.Transaction :
-                    TrnID = Convert.ToInt64(enTrnType.Transaction);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Transaction);
                     break;
                 case enTrnType.Withdraw :
-                    TrnID = Convert.ToInt64(enTrnType.Withdraw);
+                    TrnTypeID = Convert.ToInt64(enTrnType.Withdraw);
                     break;
             }
             Events.Add(new ServiceProviderEvent<ServiceProviderDetail>(this));
