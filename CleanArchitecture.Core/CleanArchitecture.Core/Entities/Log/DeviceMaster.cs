@@ -14,6 +14,7 @@ namespace CleanArchitecture.Core.Entities.Log
         [Required]
         [StringLength(250)]
         public string DeviceId { get; set; }
+        public bool IsEnable { get; set; }
         public bool IsDeleted { get; set; }
 
         public void SetAsIpDeletetatus()
@@ -21,5 +22,13 @@ namespace CleanArchitecture.Core.Entities.Log
             IsDeleted = true;
             Events.Add(new ServiceStatusEvent<DeviceMaster>(this));
         }
+
+        public void SetAsIsEnabletatus()
+        {
+            IsEnable = false;
+            Events.Add(new ServiceStatusEvent<DeviceMaster>(this));
+        }
+
+    
     }
 }

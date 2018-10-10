@@ -89,79 +89,78 @@ namespace CleanArchitecture.Web.API
                     {
                         if (dmodel.Id == 0)
                         {
-                            ModelState.AddModelError(string.Empty, "Error.");
-                            return BadRequest(new ApiError(ModelState));
-                        }
-                        var user = await _tempUserRegisterService.FindById(dmodel.Id);
-                        if (user == null)
-                        {
-                            ModelState.AddModelError(string.Empty, "Error");
-                            return BadRequest(new ApiError(ModelState));
-                        }
-                        else if (!user.RegisterStatus)
-                        {
-                            var currentUser = new ApplicationUser
-                            {
-                                UserName = user.Email,
-                                Email = user.Email,
-                                FirstName = user.FirstName,
-                                LastName = user.LastName,
-                                Mobile = user.Mobile,
-                                PasswordHash = EncyptedDecrypted.Decrypt(user.PasswordHash, DecpasswordBytes)
-                            };
-
-                            var result = await _userManager.CreateAsync(currentUser, currentUser.PasswordHash);
-                            if (result.Succeeded)
-                            {
-                                if (currentUser.Mobile != null)
-                                {
-                                    var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
-                                    await _userManager.AddClaimAsync(currentUser, officeClaim);
-                                }
-                                // Add to roles
-                                var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-                                if (roleAddResult.Succeeded)
-                                {
-                                    currentUser.EmailConfirmed = true;
-                                    var resultupdate = await _userManager.UpdateAsync(currentUser);
-                                    _tempUserRegisterService.Update(user.Id);
-
-                                    //return Ok("Your account has been activated, you can now login.");
-                                    return AppUtils.StanderdSignUp("Your account has been activated, you can now login.");
-                                    //return View(resultupdate.Succeeded ? "ConfirmEmail" : "Error");
-                                }
-                            }
-                            else
-                            {
-                                ModelState.AddModelError(string.Empty, "This email is already registered.");
-                                return BadRequest(new ApiError(ModelState));
-                            }
-                            // return View(result.Succeeded ? "ConfirmEmail" : "Error");
+                            return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailUser, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "This email is already registered.");
-                            return BadRequest(new ApiError(ModelState));
+                            var user = await _tempUserRegisterService.FindById(dmodel.Id);
+                            if (user == null)
+                            {
+                                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailUser, ErrorCode = enErrorCode.Status400BadRequest });
+                            }
+                            else if (!user.RegisterStatus)
+                            {
+                                var currentUser = new ApplicationUser
+                                {
+                                    UserName = user.Email,
+                                    Email = user.Email,
+                                    FirstName = user.FirstName,
+                                    LastName = user.LastName,
+                                    Mobile = user.Mobile,
+                                    PasswordHash = EncyptedDecrypted.Decrypt(user.PasswordHash, DecpasswordBytes)
+                                };
+
+                                var result = await _userManager.CreateAsync(currentUser, currentUser.PasswordHash);
+                                if (result.Succeeded)
+                                {
+                                    if (currentUser.Mobile != null)
+                                    {
+                                        var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
+                                        await _userManager.AddClaimAsync(currentUser, officeClaim);
+                                    }
+                                    // Add to roles
+                                    var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                                    if (roleAddResult.Succeeded)
+                                    {
+                                        currentUser.EmailConfirmed = true;
+                                        var resultupdate = await _userManager.UpdateAsync(currentUser);
+                                        _tempUserRegisterService.Update(user.Id);
+
+                                        //return Ok("Your account has been activated, you can now login.");
+                                        //return AppUtils.StanderdSignUp("Your account has been activated, you can now login.");
+                                        return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpEmailConfirm });
+                                    }
+                                }
+                                else
+                                {
+                                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                                }
+                                // return View(result.Succeeded ? "ConfirmEmail" : "Error");
+                            }
+                            else
+                            {
+                                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                            }
                         }
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
-                        return BadRequest(new ApiError(ModelState));
+                        //ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
+                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailExpired, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Please fill link url.");
-                    return BadRequest(new ApiError(ModelState));
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailLink, ErrorCode = enErrorCode.Status400BadRequest });
                 }
-                ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
-                return BadRequest(new ApiError(ModelState));
+                //ModelState.AddModelError(string.Empty, "Reset links immediately not valid or expired.");
+                //return BadRequest(new ApiError(ModelState));
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailLink, ErrorCode = enErrorCode.Status400BadRequest });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         #endregion
@@ -225,30 +224,29 @@ namespace CleanArchitecture.Web.API
 
                             await _mediator.Send(request);
                             _logger.LogInformation(3, "User created a new account with password.");
-
                             //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
 
-                            //return Ok("Your account has been created, <br /> please verify it by clicking the activation link that has been send to your email.");
-                            return AppUtils.StanderdSignUp("Your account has been created, please verify it by clicking the activation link that has been send to your email.");
+                            return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardSignUp });
+                        }
+                        else
+                        {
+                            return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                        return BadRequest(new ApiError(ModelState));
+                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                    return BadRequest(new ApiError(ModelState));
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
                 }
-                return BadRequest(new ApiError(ModelState));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -291,27 +289,29 @@ namespace CleanArchitecture.Web.API
                             await _mediator.Send(request);
 
                             //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-                            return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been send to your email.");
+                            //return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been send to your email.");
+                            return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignWithEmail });
+                        }
+                        else
+                        {
+                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "This email is already registered.");
-                        return BadRequest(new ApiError(ModelState));
+                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "This email is already registered.");
-                    return BadRequest(new ApiError(ModelState));
+                    return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+
                 }
-                // If we got this far, something failed, redisplay form
-                return BadRequest(new ApiError(ModelState));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -765,24 +765,23 @@ namespace CleanArchitecture.Web.API
                         await _mediator.Send(request);
                         _logger.LogInformation(3, "Email sent successfully with your account");
 
-                        return AppUtils.StanderdSignUp("Please verify it by clicking the activation link that has been resend to your email.");
+                        //return AppUtils.StanderdSignUp("Please verify it by clicking the activation link that has been resend to your email.");
+                        return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardResendSignUp});
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "This email is already registered.");
-                        return BadRequest(new ApiError(ModelState));
+                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                    return BadRequest(new ApiError(ModelState));
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
