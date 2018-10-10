@@ -571,10 +571,8 @@ namespace CleanArchitecture.Web.API
                                 }
                             }
                             else
-                            {
-                                ModelState.AddModelError(string.Empty, "Invalid OTP or expired, resend OTP immediately.");
+                            {                               
                                 return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpOTP, ErrorCode = enErrorCode.Status400BadRequest });
-
                             }
                         }
                         else
@@ -693,15 +691,16 @@ namespace CleanArchitecture.Web.API
                         request.Body = EnResponseMessage.SendMailBody + resultdata.OTP;
 
                         await _mediator.Send(request);
-                        _logger.LogInformation(3, "Email sent successfully with your account");
-
-                        ///return Ok("Success");
-                        return AppUtils.StanderdSignUp("You have successfully send Otp in email.");
+                        _logger.LogInformation(3, "Email sent successfully with your account");                        
+                        //return AppUtils.StanderdSignUp("You have successfully send Otp in email.");
+                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithResendEmail });
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                        return BadRequest(new ApiError(ModelState));
+                        //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                        //return BadRequest(new ApiError(ModelState));
+                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+
                         //SendEmailRequest request = new SendEmailRequest();
                         //request.Recepient = model.Email;
                         //request.Subject = "Registration confirmation resend email";
@@ -715,14 +714,14 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                    return BadRequest(new ApiError(ModelState));
+                    //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 

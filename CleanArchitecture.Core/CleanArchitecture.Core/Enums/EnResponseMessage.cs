@@ -72,6 +72,6 @@ namespace CleanArchitecture.Core.Enums
         public static string SignUpOTP = "Invalid OTP or expired, resend OTP immediately.";
         public static string SignUpResendOTP = "Resend OTP immediately not valid or expired.";
         public static string SignUpRole = "This User roles not available.";
-
+        public static string SignUpWithResendEmail = "You have successfully resend Otp in email.";
     }
 }
