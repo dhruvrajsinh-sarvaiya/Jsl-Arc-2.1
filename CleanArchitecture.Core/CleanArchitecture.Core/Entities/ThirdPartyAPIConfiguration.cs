@@ -34,9 +34,11 @@ namespace CleanArchitecture.Core.Entities
 
         public string MerchantCode { get; set; }
 
-        public string UserID { get; set; }
+        //public string UserID { get; set; }
 
-        public string Password { get; set; }
+        //public string Password { get; set; }
+        
+        public long SerProConfigurationID { get; set; }
 
         public string ResponseSuccess { get; set; }
 

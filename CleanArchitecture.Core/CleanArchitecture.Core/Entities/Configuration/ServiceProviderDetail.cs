@@ -30,6 +30,8 @@ namespace CleanArchitecture.Core.Entities.Configuration
         [Required]
         public long ServiceProConfigID { get; set; }
 
+        public long ThirPartyAPIID { get; set; }
+
         public void DisableProvider()
         {
             Status = Convert.ToInt16(ServiceStatus.Disable);

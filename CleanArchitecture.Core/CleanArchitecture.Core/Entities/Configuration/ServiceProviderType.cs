@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.Entities.Configuration
     {
         [Required]
         [StringLength(20)]
-        public string ServiveProType { get; set; }
+        public string ServiveProTypeName { get; set; }
 
         public void DisableProviderType()
         {

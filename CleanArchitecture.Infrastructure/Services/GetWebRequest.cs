@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using System;
@@ -13,27 +14,38 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         readonly ICommonRepository<RouteConfiguration> _routeRepository;
         readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
+        readonly ICommonRepository<ServiceProviderDetail> _serviceProviderDetail;
+        readonly ICommonRepository<ServiceProConfiguration> _ServiceProConfiguration;
         readonly ICommonRepository<ProviderConfiguration> _providerRepository;
 
         public  GetWebRequest(ICommonRepository<RouteConfiguration> routeRepository, ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyCommonRepository,
-              ICommonRepository<ProviderConfiguration> providerRepository)
+              ICommonRepository<ProviderConfiguration> providerRepository, 
+              ICommonRepository<ServiceProConfiguration> ServiceProConfiguration,
+              ICommonRepository<ServiceProviderDetail> serviceProviderDetail)
         {
             _thirdPartyCommonRepository = thirdPartyCommonRepository;
             _routeRepository = routeRepository;
             _providerRepository = providerRepository;
+            _ServiceProConfiguration = ServiceProConfiguration;
+            _serviceProviderDetail = serviceProviderDetail;
         }
 
-        public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproID)
+        public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproDetailID)
         {
             RouteConfiguration routeConfiguration;
             ThirdPartyAPIConfiguration thirdPartyAPIConfiguration;
-            ProviderConfiguration providerConfiguration;
+            //ProviderConfiguration providerConfiguration;
+            //ServiceProviderDetail ServiceProviderDetail;
+            ServiceProConfiguration ServiceProConfiguration;
             ThirdPartyAPIRequest thirdPartyAPIRequest = new ThirdPartyAPIRequest ();
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
             WebHeaderCollection keyValuePairsHeader = new WebHeaderCollection();
 
 
             thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(thirdpartyID);
+            var SerProconfigID= _serviceProviderDetail.GetSingle(item => item.Id == serproDetailID).ServiceProConfigID;
+            ServiceProConfiguration = _ServiceProConfiguration.GetSingle(item=>item.Id== SerProconfigID);
+            
             routeConfiguration = _routeRepository.GetById(routeID);
 
             thirdPartyAPIRequest.RequestURL = thirdPartyAPIConfiguration.APISendURL;
@@ -55,7 +67,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             if(thirdPartyAPIConfiguration.AuthHeader == "RPC")
             {
-                string authInfo = thirdPartyAPIConfiguration.UserID + ":" + thirdPartyAPIConfiguration.Password;
+                string authInfo = ServiceProConfiguration.UserName + ":" + ServiceProConfiguration.Password;
                 authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
                 authInfo = "Basic " + authInfo;
                 keyValuePairsHeader.Add("Authorization", authInfo);                
