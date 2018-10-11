@@ -25,5 +25,8 @@ namespace CleanArchitecture.Core.ViewModels
         public decimal Currentrate { get; set; }
         public decimal Volume { get; set; }
         public decimal Fee { get; set; }
+        public string ChildCurrency { get; set; }
+        public string Abbrevation { get; set; }
+        public decimal ChangePer { get; set; }
     }
 }
