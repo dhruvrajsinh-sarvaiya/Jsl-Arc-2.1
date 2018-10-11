@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Core.Entities.Wallet;
+using System.Linq;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -27,6 +28,8 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<AddressMaster> _addressMstRepository;
         private readonly ICommonRepository<TrnAcBatch> _trnBatch;
         private readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
+        private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepo;
+
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         private readonly IWalletRepository _walletRepository1;
         private readonly IWebApiRepository _webApiRepository;
@@ -44,7 +47,8 @@ namespace CleanArchitecture.Infrastructure.Services
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
-            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository) : base(logger)
+            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -61,6 +65,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _WalletTypeMasterRepository = WalletTypeMasterRepository;
             _WalletAllowTrnRepository = WalletAllowTrnRepository;
             //_walletLedgerRepository = walletledgerrepo;
+            _WalletAllowTrnRepo = WalletAllowTrnRepo;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -153,7 +158,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BizResponse ProcessOrder(long RefNo, long DWalletID, long OWalletID, decimal amount, string remarks, enTrnType enTrnType, enServiceType serviceType)
+        public BizResponse ProcessOrder(long RefNo, long DWalletID, long OWalletID, decimal amount, string remarks, enWalletTrnType enTrnType, enServiceType serviceType)
         {
             try
             {
@@ -238,7 +243,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 var walletLedger = new WalletLedger();
                 walletLedger.ServiceTypeID = serviceType;
-                walletLedger.TrnType = enTrnType.Deposit;
+                walletLedger.TrnType = enTrnType;
                 walletLedger.CrAmt = 0;
                 walletLedger.CreatedBy = DWalletID;
                 walletLedger.CreatedDate = UTC_To_IST();
@@ -248,8 +253,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletLedger.Status = 1;
                 walletLedger.TrnDate = UTC_To_IST();
                 walletLedger.UpdatedBy = DWalletID;
-                walletLedger.WalletMasterId = DWalletID;
-                walletLedger.ToWalletMasterId = OWalletID;
+                walletLedger.WalletId = DWalletID;
+                walletLedger.ToWalletId = OWalletID;
                 walletLedger.PreBal = dWalletobj.Balance;
                 walletLedger.PostBal = dWalletobj.Balance - amount;
                 //walletLedger = _walletLedgerRepository.Add(walletLedger);
@@ -266,8 +271,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletLedger2.Status = 1;
                 walletLedger2.TrnDate = UTC_To_IST();
                 walletLedger2.UpdatedBy = DWalletID;
-                walletLedger2.WalletMasterId = OWalletID;
-                walletLedger2.ToWalletMasterId = DWalletID;
+                walletLedger2.WalletId = OWalletID;
+                walletLedger2.ToWalletId = DWalletID;
                 walletLedger2.PreBal = oWalletobj.Balance;
                 walletLedger2.PostBal = oWalletobj.Balance - amount;
 
@@ -568,5 +573,144 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        public BizResponseClass DebitBalance(long userID,long WalletID, decimal amount,int walletTypeID,enWalletTrnType wtrnType,enTrnType trnType,enServiceType serviceType,long trnNo,string smsCode)
+        {
+            WalletMaster dWalletobj;
+            string remarks = "";
+            try
+            {
+                if(WalletID == 0 && (walletTypeID == 0 || userID == 0))
+                {
+                    return new BizResponseClass { ReturnCode =  enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidAmount };
+                }
+                if(WalletID == 0)
+                {
+                   IEnumerable<WalletMaster> walletMasters = _commonRepository.FindBy(e => e.IsValid == true && e.UserID == userID && e.WalletTypeID == walletTypeID && e.IsDefaultWallet == 1);                   
+                    if(walletMasters == null)
+                    {
+                        return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DefaultWallet404, ErrorCode = enErrorCode.DefaultWalletNotFound };                        
+                    }
+                    List<WalletMaster> list = walletMasters.ToList();
+                    dWalletobj = list[0];
+                }
+                else
+                {
+                    dWalletobj = _commonRepository.GetById(WalletID);
+                    if (dWalletobj == null)
+                    {
+                        return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWalletId };
+                    }
+                    if(dWalletobj.Status != 1 || dWalletobj.IsValid == false)
+                    {
+                        return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
+                    }
+                }
+                if(wtrnType!=enWalletTrnType.Dr_Sell_Trade) // currently added code for only sell trade 
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTrnType, ErrorCode = enErrorCode.InvalidTrnType };
+                }
+                if (amount<=0)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidAmt, ErrorCode = enErrorCode.InvalidAmount };
+                }
+                if(dWalletobj.Balance < amount)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficientBal, ErrorCode = enErrorCode.InsufficientBalance };
+                }
+                 WalletAllowTrn walletAllowTrn = _WalletAllowTrnRepo.GetSingle(e => e.TrnType == (byte)trnType && e.WalletId == dWalletobj.Id && e.Status == 1);
+                if (walletAllowTrn == null)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotAllowedTrnType, ErrorCode = enErrorCode.TrnTypeNotAllowed };
+                }
+                TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
+                if (batchObj == null)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.BatchNoFailed, ErrorCode = enErrorCode.BatchNoGenerationFailed };
+                }
+                if (wtrnType == enWalletTrnType.Dr_Sell_Trade)
+                {
+                    remarks = "Sell Trade [" + smsCode + "] TrnNo:" + trnNo;
+                }
+                else
+                {
+                    remarks = "Debit of TrnNo:" + trnNo;
+                }
+
+                WalletLedger walletLedger = GetWalletLedger(WalletID, 0, amount, 0, wtrnType, serviceType, trnNo, remarks, dWalletobj.Balance, 1);
+                TransactionAccount tranxAccount = GetTransactionAccount(WalletID, 1,batchObj.Id, amount, 0, trnNo, remarks,1);
+                dWalletobj.DebitBalance(amount);
+                _walletRepository1.WalletDeduction(walletLedger, tranxAccount, dWalletobj);
+                return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CommSuccessMsgInternal };
+
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public WalletLedger GetWalletLedger(long WalletID,long toWalletID, decimal drAmount,decimal crAmount , enWalletTrnType trnType, enServiceType serviceType,long trnNo,string remarks,decimal currentBalance,byte status)
+        {
+            try
+            {
+                var walletLedger2 = new WalletLedger();
+                walletLedger2.ServiceTypeID = serviceType;
+                walletLedger2.TrnType = trnType;
+                walletLedger2.CrAmt = crAmount;
+                walletLedger2.CreatedBy = WalletID;
+                walletLedger2.CreatedDate = UTC_To_IST();
+                walletLedger2.DrAmt = drAmount;
+                walletLedger2.TrnNo = trnNo;
+                walletLedger2.Remarks = remarks;
+                walletLedger2.Status = status;
+                walletLedger2.TrnDate = UTC_To_IST();
+                walletLedger2.UpdatedBy = WalletID;
+                walletLedger2.WalletId = WalletID;
+                walletLedger2.ToWalletId = toWalletID;
+                if(drAmount>0)
+                {
+                    walletLedger2.PreBal = currentBalance;
+                    walletLedger2.PostBal = currentBalance - drAmount;
+                }
+                else
+                {
+                    walletLedger2.PreBal = currentBalance;
+                    walletLedger2.PostBal = currentBalance + drAmount;
+                }
+                return walletLedger2;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+}
+
+        public TransactionAccount GetTransactionAccount(long WalletID, short isSettled,long batchNo, decimal drAmount, decimal crAmount, long trnNo, string remarks, byte status)
+        {
+            try
+            {
+                var walletLedger2 = new TransactionAccount();                
+                walletLedger2.CreatedBy = WalletID;
+                walletLedger2.CreatedDate = UTC_To_IST();
+                walletLedger2.DrAmt = drAmount;
+                walletLedger2.CrAmt = crAmount;
+                walletLedger2.RefNo = trnNo;
+                walletLedger2.Remarks = remarks;
+                walletLedger2.Status = status;
+                walletLedger2.TrnDate = UTC_To_IST();
+                walletLedger2.UpdatedBy = WalletID;
+                walletLedger2.WalletID = WalletID;
+                walletLedger2.IsSettled = isSettled;
+                walletLedger2.BatchNo = batchNo;                  
+                return walletLedger2;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 }

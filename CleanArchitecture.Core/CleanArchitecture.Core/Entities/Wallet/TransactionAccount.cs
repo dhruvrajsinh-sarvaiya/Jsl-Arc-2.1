@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.Entities
         public DateTime TrnDate { get; set; }
 
         [Required]
-        public long WalletID { get; set; } // accountid fk of walletmaster
+        public long WalletID { get; set; } // accountid fk of walletmaster          
 
         [Required]
         [Column(TypeName = "decimal(18, 8)")]

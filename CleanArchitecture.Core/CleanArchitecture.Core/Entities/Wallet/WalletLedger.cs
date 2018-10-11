@@ -11,10 +11,10 @@ namespace CleanArchitecture.Core.Entities
     public class WalletLedger : BizBase
     {
         [Required]
-        public long WalletMasterId { get; set;} // fk of walletmaster table
+        public long WalletId { get; set;} // fk of walletmaster table
 
         [Required]
-        public long ToWalletMasterId { get; set; }
+        public long ToWalletId { get; set; }
 
         [Required]
         public DateTime TrnDate { get; set; }
@@ -23,7 +23,7 @@ namespace CleanArchitecture.Core.Entities
         public enServiceType ServiceTypeID { get; set; } // fk of ServiceTypeMaster table
 
         [Required]
-        public enTrnType TrnType { get; set; } // type of txn
+        public enWalletTrnType TrnType { get; set; } // type of txn
 
         [Required]
         public long TrnNo { get; set; }

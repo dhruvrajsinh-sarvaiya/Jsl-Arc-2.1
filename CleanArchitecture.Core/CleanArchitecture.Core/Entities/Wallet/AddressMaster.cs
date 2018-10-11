@@ -23,8 +23,8 @@ namespace CleanArchitecture.Core.Entities
         public long SerProID { get; set; }
         
         [Required]
-        [StringLength(5)]
-        public string CoinName { get; set; }
+        [StringLength(50)]
+        public string AddressLable { get; set; }
 
 
     }
