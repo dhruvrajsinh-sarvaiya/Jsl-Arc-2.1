@@ -78,11 +78,11 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             try
             {
                 IQueryable<TransactionProviderResponse> Result = _dbContext.TransactionProviderResponse.FromSql(
-                 @"select SC.ID as ServiceID,SC.ServiceName,Prc.ID as SerProID,Prc.SerProName,RC.ID as RouteID,PC.ID as ProductID,RC.RouteName,SC.ServiceType,
+                 @"select SC.ID as ServiceID,SC.ServiceName,Prc.ID as SerProDetailID,Prc.SerProID,Prc.SerProName,RC.ID as RouteID,PC.ID as ProductID,RC.RouteName,SC.ServiceType,
                   Prc.ThirPartyAPIID,Prc.AppType,RC.MinimumAmount as MinimumAmountItem,RC.MaximumAmount as MaximumAmountItem,SC.MinimumAmount as MinimumAmountService,SC.MaximumAmount as MaximumAmountService
              from ServiceConfiguration SC inner join  ProductConfiguration PC on
-			 PC.ServiceID = SC.Id inner join RouteConfiguration RC on RC.ProductID = PC.Id 
-			 inner join ProviderConfiguration PrC on Prc.Id = RC.SerProID 
+			 PC.ServiceID = SC.Id inner join RouteConfiguration RC on RC.ProductID = PC.Id  
+			 inner join ServiceProviderDetail PrC on Prc.ServiceProID = RC.SerProID AND Prc.TrnTypeID={1} 
 			 where SC.SMSCode = '{0}' and RC.TrnType={1} 
 			 and {2} between RC.MinimumAmount and RC.MaximumAmount
 			 and {2} between SC.MinimumAmount and SC.MaximumAmount

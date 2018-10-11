@@ -68,6 +68,7 @@ namespace CleanArchitecture.Infrastructure
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
         public DbSet<TradePairMaster> TradePairMaster { get; set; }
+        public DbSet<TradePairDetail> TradePairDetail { get; set; }
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
         public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
