@@ -13,6 +13,6 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [StringLength(60)]
         public string ProviderName { get; set; }
         
-        public short Status { get; set; }
+        //public short Status { get; set; }
     }
 }
