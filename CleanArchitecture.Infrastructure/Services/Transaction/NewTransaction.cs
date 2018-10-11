@@ -117,8 +117,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _TradeTransactionObj.BidPrice = Req.Price;
                         _TradeTransactionObj.DeliveryTotalQty = Req.Qty;
                         _TradeTransactionObj.OrderTotalQty = Helpers.DoRoundForTrading(Req.Qty * Req.Price, 8);//235.415001286,8 =  235.41500129                        
-                        _TradeTransactionObj.Order_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.WalletServiceID).SMSCode;
-                        _TradeTransactionObj.Delivery_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.Serviceid).SMSCode;
+                        _TradeTransactionObj.Order_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.BaseCurrencyId).SMSCode;
+                        _TradeTransactionObj.Delivery_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.SecondaryCurrencyId).SMSCode;
                     }
                     if (Req.TrnType == enTrnType.Sell_Trade)
                     {
@@ -126,8 +126,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _TradeTransactionObj.AskPrice = Req.Price;
                         _TradeTransactionObj.OrderTotalQty = Req.Qty;
                         _TradeTransactionObj.DeliveryTotalQty = Helpers.DoRoundForTrading(Req.Qty * Req.Price, 8);//235.415001286,8 =  235.41500129                        
-                        _TradeTransactionObj.Order_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.Serviceid).SMSCode;
-                        _TradeTransactionObj.Delivery_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.WalletServiceID).SMSCode;
+                        _TradeTransactionObj.Order_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.SecondaryCurrencyId).SMSCode;
+                        _TradeTransactionObj.Delivery_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.BaseCurrencyId).SMSCode;
                     }
                     if (_TradeTransactionObj.OrderTotalQty < (decimal)(0.00000001) || _TradeTransactionObj.DeliveryTotalQty < (decimal)(0.00000001))
                     {
