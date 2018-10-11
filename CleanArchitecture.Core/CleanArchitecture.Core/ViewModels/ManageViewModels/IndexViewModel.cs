@@ -16,5 +16,6 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels
         [Phone]
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; }
+        public string RedisDBKey { get; set; }
     }
 }
