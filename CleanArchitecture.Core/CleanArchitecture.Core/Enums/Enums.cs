@@ -161,7 +161,8 @@ namespace CleanArchitecture.Core.Enums
         InvalidWalletId = 247,
         InvalidTrnType = 248,
         TrnTypeNotAllowed = 249,
-            InvalidCoinName=4031
+            InvalidCoinName=4031,
+        RecordNotFound = 250
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
