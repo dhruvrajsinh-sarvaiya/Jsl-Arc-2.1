@@ -154,6 +154,7 @@ namespace CleanArchitecture.Core.Enums
         Status500InternalServerError = 500,
         Status400BadRequest = 400,
         Status423Locked = 423,
+        Status4013MobileInvalid = 4013,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

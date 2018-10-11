@@ -11,5 +11,6 @@ namespace CleanArchitecture.Core.Interfaces.User
         long GenerateRandomOTP();
         Task<TempUserRegister> FindByMobileNumber(string MobileNumber);
         Task<TempUserRegister> FindByEmail(string Email);
+        Task<bool> IsValidPhoneNumber(string Mobilenumber, string IpAddress);
     }
 }
