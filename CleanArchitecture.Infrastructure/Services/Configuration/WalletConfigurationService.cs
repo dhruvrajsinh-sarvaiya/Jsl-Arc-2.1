@@ -81,7 +81,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     _walletTypeMaster.IsWithdrawalAllow = updateWalletTypeMasterRequest.IsWithdrawalAllow;
                     _walletTypeMaster.WalletTypeName = updateWalletTypeMasterRequest.WalletTypeName;
                     _walletTypeMaster.Discription = updateWalletTypeMasterRequest.Discription;
-                 //   _walletTypeMaster.Status = updateWalletTypeMasterRequest.Status;
+                  _walletTypeMaster.Status = updateWalletTypeMasterRequest.Status;
 
                     _WalletTypeMasterRepository.Update(_walletTypeMaster);
                     return _walletTypeMaster;
