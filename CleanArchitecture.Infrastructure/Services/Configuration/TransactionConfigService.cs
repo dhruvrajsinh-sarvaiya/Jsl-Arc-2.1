@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Entities.Configuration;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Configuration;
 using CleanArchitecture.Core.ViewModels.Configuration;
@@ -284,121 +285,306 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-
-        public bool AddProviderService(ServiceProviderRequest request)
-        {
-            var model = new ServiceProviderMaster
-            {
-                Id = request.Id,
-                ProviderName = request.ProviderName,
-                Status = request.Status,
-                CreatedDate = DateTime.Now,
-                CreatedBy = 1,
-                UpdatedDate = DateTime.Now,
-                UpdatedBy = null
-            };
-            _ServiceProviderMaster.Add(model);
-            return true;
-        }
-
+        
+        //Provider
         public IEnumerable<ServiceProviderViewModel> GetAllProvider()
         {
-            var list = _ServiceProviderMaster.List();
-            List<ServiceProviderViewModel> providerList = new List<ServiceProviderViewModel>();
-            foreach (ServiceProviderMaster model in list)
+            try
             {
-                providerList.Add(new ServiceProviderViewModel
+                var list = _ServiceProviderMaster.List();
+                List<ServiceProviderViewModel> providerList = new List<ServiceProviderViewModel>();
+                foreach (ServiceProviderMaster model in list)
                 {
-                    Id = model.Id,
-                    ProviderName = model.ProviderName,
-                    Status = model.Status,
+                    providerList.Add(new ServiceProviderViewModel
+                    {
+                        Id = model.Id,
+                        ProviderName = model.ProviderName,
+                        //Status = model.Status,
 
-                });
+                    });
+                }
+                return providerList;
             }
-            return providerList;
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+                
         }
 
         public ServiceProviderViewModel GetPoviderByID(long ID)
         {
-            ServiceProviderMaster model = _ServiceProviderMaster.GetById(ID);
-            if (model == null)
+            try
             {
-                return null;
-            }
-            var viewmodel = new ServiceProviderViewModel
-            {
-                Id = model.Id,
-                ProviderName = model.ProviderName,
-                Status = model.Status,
-
-            };
-            return viewmodel;
-        }
-
-        public IEnumerable<AppTypeViewModel> GetAppType()
-        {
-            var list = _ApptypeRepository.List();
-            List<AppTypeViewModel> AppList = new List<AppTypeViewModel>();
-            foreach (AppType model in list)
-            {
-                AppList.Add(new AppTypeViewModel
+                ServiceProviderMaster model = _ServiceProviderMaster.GetById(ID);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewmodel = new ServiceProviderViewModel
                 {
                     Id = model.Id,
-                    AppTypeName = model.AppTypeName,
-                    Status = model.Status
-                });
+                    ProviderName = model.ProviderName,
+                    //Status = model.Status,
+
+                };
+                return viewmodel;
             }
-            return AppList;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
+        }
+
+        public long AddProviderService(ServiceProviderRequest request)
+        {
+            try
+            {
+                var model = new ServiceProviderMaster
+                {
+                    Id = request.Id,
+                    ProviderName = request.ProviderName,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedBy = null
+                };
+                var newModel=_ServiceProviderMaster.Add(model);
+                return newModel.Id ;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+           
+        }
+
+        public bool UpdateProviderService(ServiceProviderRequest request)
+        {
+            try
+            {
+                ServiceProviderMaster model = _ServiceProviderMaster.GetById(request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.ProviderName = request.ProviderName;
+                model.UpdatedDate = DateTime.Now;
+                model.UpdatedBy = 1;
+                
+                _ServiceProviderMaster.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //AppType
+        public IEnumerable<AppTypeViewModel> GetAppType()
+        {
+            try
+            {
+                var list = _ApptypeRepository.List();
+                List<AppTypeViewModel> AppList = new List<AppTypeViewModel>();
+                foreach (AppType model in list)
+                {
+                    AppList.Add(new AppTypeViewModel
+                    {
+                        Id = model.Id,
+                        AppTypeName = model.AppTypeName,
+                    });
+                }
+                return AppList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
         }
 
         public AppTypeViewModel GetAppTypeById(long id)
         {
-            AppType model = _ApptypeRepository.GetById(id);
-            if (model == null)
+            try
             {
-                return null;
-            }
-            var viewmodel = new AppTypeViewModel
-            {
-                Id = model.Id,
-                AppTypeName = model.AppTypeName,
-                Status = model.Status
-
-            };
-            return viewmodel;
-        }
-
-        public IEnumerable<ProviderTypeViewModel> GetProviderType()
-        {
-            var list = _ProviderTypeRepository.List();
-            List<ProviderTypeViewModel> ProTypeList = new List<ProviderTypeViewModel>();
-            foreach (ServiceProviderType model in list)
-            {
-                ProTypeList.Add(new ProviderTypeViewModel
+                AppType model = _ApptypeRepository.GetById(id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewmodel = new AppTypeViewModel
                 {
                     Id = model.Id,
-                    ServiveProType = model.ServiveProTypeName,
-                    Status = model.Status
-                });
+                    AppTypeName = model.AppTypeName
+                };
+                return viewmodel;
             }
-            return ProTypeList;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
+        }
+
+        public long AddAppType(AppTypeRequest request)
+        {
+            try
+            {
+
+                var model = new AppType
+                {
+                    Id = request.Id,
+                    AppTypeName = request.AppTypeName,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedBy = null
+                };
+                var newModel=_ApptypeRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
+        }
+
+        public bool UpdateAppType(AppTypeRequest request)
+        {
+            try
+            {
+                AppType model = _ApptypeRepository.GetById(request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.AppTypeName  = request.AppTypeName;
+                model.UpdatedDate = DateTime.Now;
+                model.UpdatedBy = 1;
+
+                _ApptypeRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+           
+        }
+
+        //ProviderType
+        public IEnumerable<ProviderTypeViewModel> GetProviderType()
+        {
+            try
+            {
+                var list = _ProviderTypeRepository.List();
+                List<ProviderTypeViewModel> ProTypeList = new List<ProviderTypeViewModel>();
+                foreach (ServiceProviderType model in list)
+                {
+                    ProTypeList.Add(new ProviderTypeViewModel
+                    {
+                        Id = model.Id,
+                        ServiveProTypeName = model.ServiveProTypeName
+                    });
+                }
+                return ProTypeList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
         }
 
         public ProviderTypeViewModel GetProviderTypeById(long id)
         {
-            ServiceProviderType model = _ProviderTypeRepository.GetById(id);
-            if (model == null)
+            try
             {
-                return null;
-            }
-            var viewmodel = new ProviderTypeViewModel
-            {
-                Id = model.Id,
-                ServiveProType = model.ServiveProTypeName,
-                Status = model.Status
+                ServiceProviderType model = _ProviderTypeRepository.GetById(id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewmodel = new ProviderTypeViewModel
+                {
+                    Id = model.Id,
+                    ServiveProTypeName = model.ServiveProTypeName,
+                    //Status = model.Status
 
-            };
-            return viewmodel;
+                };
+                return viewmodel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
         }
+
+        public long AddProviderType(ProviderTypeRequest request)
+        {
+            try
+            {
+                var model = new ServiceProviderType
+                {
+                    Id = request.Id,
+                    ServiveProTypeName = request.ServiveProTypeName,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedBy = null
+                };
+                var newModel=_ProviderTypeRepository.Add(model);
+                return newModel .Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
+        }
+
+        public bool UpdateProviderType(ProviderTypeRequest request)
+        {
+            try
+            {
+                var model = _ProviderTypeRepository.GetById(request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.ServiveProTypeName  = request.ServiveProTypeName;
+                model.UpdatedDate = DateTime.Now;
+                model.UpdatedBy = 1;
+                _ProviderTypeRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
+        }
+
+        
     }
 }

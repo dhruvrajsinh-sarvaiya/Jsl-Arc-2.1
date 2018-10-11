@@ -1,3 +1,4 @@
+using CleanArchitecture.Core.ApiModels;
 using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels
@@ -15,5 +16,9 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels
         public bool RememberMe { get; set; }
 
         //public  TrackerViewModel trackerViewModel { get; set; }
+    }
+    public class LoginResponse  : BizResponseClass
+    {
+
     }
 }

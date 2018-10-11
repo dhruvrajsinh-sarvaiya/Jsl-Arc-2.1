@@ -11,8 +11,6 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
 
         [Required]
         [StringLength(20)]
-        public string ServiveProType { get; set; }
-
-        public short Status { get; set; }
+        public string ServiveProTypeName { get; set; }
     }
 }
