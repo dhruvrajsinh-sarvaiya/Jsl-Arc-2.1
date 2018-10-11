@@ -1,15 +1,12 @@
-﻿using System;
+﻿using CleanArchitecture.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using CleanArchitecture.Core.Enums;
-using CleanArchitecture.Core.Events;
-using CleanArchitecture.Core.SharedKernel;
 
-namespace CleanArchitecture.Core.Entities
+namespace CleanArchitecture.Core.ViewModels.WalletConfiguration
 {
-    public class WalletTypeMaster : BizBase
+    public class WalletTypeMasterRequest 
     {
         [Required]
         [StringLength(50)]
@@ -28,11 +25,6 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public short IsTransactionWallet { get; set; }
 
-        public void DisableStatus()
-        {
-            Status  = Convert.ToInt16(ServiceStatus.Disable);
-            Events.Add(new WalletStatusDisable<WalletTypeMaster>(this));
-        }
-
+        public short Status { get; set; }
     }
 }

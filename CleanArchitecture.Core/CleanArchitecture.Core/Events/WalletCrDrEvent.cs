@@ -22,4 +22,12 @@ namespace CleanArchitecture.Core.Events
             WalletStatus = walletStatus;
         }
     }
+    class WalletStatusDisable<T> : BaseDomainEvent
+    {
+        public T WalletStatus;
+        public WalletStatusDisable(T walletStatus)
+        {
+            WalletStatus = walletStatus;
+        }
+    }
 }

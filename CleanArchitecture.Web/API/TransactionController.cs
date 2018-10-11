@@ -417,17 +417,37 @@ namespace CleanArchitecture.Web.API
             //For Testing Purpose
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            
+
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = (enTrnType)(Request.ordertype);
-            Req.TrnMode = Request.TrnMode;
-            Req.TrnMode = Request.TrnMode;
+            Req.MemberID = user.Id;
+            Req.MemberMobile = user.Mobile;
+            //Req.MemberID = 5;
+            //Req.MemberMobile = "1234567890";
+            Req.SMSCode = "";
+            Req.TransactionAccount = Request.CurrencyPairID.ToString();
+            Req.Amount = Request.Total;
+            Req.PairID = Request.CurrencyPairID;
+            Req.Price = Request.price;
+            Req.Qty = Request.Amount;
+            Req.DebitWalletID = Request.DebitWalletID;
+            Req.CreditWalletID = Request.CreditWalletID;
 
-
-            var dfds= _transactionProcess.ProcessNewTransactionAsync(Req);
+            Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
+            BizResponse MethodResp = await MethodRespTsk;
 
             CreateTransactionResponse Response = new CreateTransactionResponse();
+            if (MethodResp.ReturnCode == enResponseCodeService.Success)
+                Response.ReturnCode = enResponseCode.Success;
+            else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
+                Response.ReturnCode = enResponseCode.Fail;
+            else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
+                Response.ReturnCode = enResponseCode.InternalError;
+
+            Response.ReturnMsg = MethodResp.ReturnMsg;
+            Response.ErrorCode = MethodResp.ErrorCode;
+
             Response.response = new CreateOrderInfo()
             {
                 //order_id = 1000001,
@@ -438,7 +458,7 @@ namespace CleanArchitecture.Web.API
                 //volume = 10
             };
 
-            Response.ReturnCode = enResponseCode.Success;
+            //Response.ReturnCode = enResponseCode.Success;
             return returnDynamicResult(Response);
         }
 

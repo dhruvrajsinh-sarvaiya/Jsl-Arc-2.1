@@ -144,6 +144,27 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
-            
+
+        public bool WalletDeduction(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2)
+        {
+            try
+            { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
+
+                _dbContext.Database.BeginTransaction();
+                _dbContext.Set<WalletLedger>().Add(wl1);                
+                _dbContext.Set<TransactionAccount>().Add(ta1);
+                _dbContext.Entry(wm2).State = EntityState.Modified;
+                _dbContext.SaveChanges();
+                _dbContext.Database.CommitTransaction();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _dbContext.Database.RollbackTransaction();
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
     }
 }

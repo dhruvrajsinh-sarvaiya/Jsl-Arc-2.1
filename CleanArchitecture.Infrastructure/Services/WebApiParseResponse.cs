@@ -18,33 +18,32 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         //readonly ILogger _log;
         //readonly TransactionWebAPIConfiguration _txnWebAPIConf;
-        //GetDataForParsingAPI _txnWebAPIParsingData;
-        //private readonly WebApiDataRepository _webapiDataRepository;
+        GetDataForParsingAPI _txnWebAPIParsingData;
+        private readonly WebApiDataRepository _webapiDataRepository;
         public WebAPIParseResponseCls _webapiParseResponse;
-        public WebApiParseResponse(WebAPIParseResponseCls webapiParseResponse)
+        public WebApiParseResponse(WebAPIParseResponseCls webapiParseResponse, WebApiDataRepository webapiDataRepository)
         {
             //_log = log;
             //_txnWebAPIConf = txnWebAPIConf;
-            //_webapiDataRepository = webapiDataRepository;
+            _webapiDataRepository = webapiDataRepository;
             _webapiParseResponse = webapiParseResponse;
         }
-        //public WebAPIParseResponseCls TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
-        //{
-        //    try
-        //    {
-        //        //Take Regex for response parsing
-        //        _txnWebAPIParsingData = _webapiDataRepository.GetDataForParsingAPI(ThirPartyAPIID);
+        public WebAPIParseResponseCls TransactionParseResponse(string TransactionResponse, long ThirPartyAPIID)
+        {
+            try
+            {
+                //Take Regex for response parsing
+                _txnWebAPIParsingData = _webapiDataRepository.GetDataForParsingAPI(ThirPartyAPIID);
+                WebAPIParseResponseCls _webapiParseResponse = ParseResponseViaRegex(TransactionResponse, _txnWebAPIParsingData);
 
-        //        WebAPIParseResponseCls _webapiParseResponse = ParseResponseViaRegex(TransactionResponse, _txnWebAPIParsingData);
-
-        //        return _webapiParseResponse;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-        //        return null;
-        //    }
-        //}
+                return _webapiParseResponse;
+            }
+            catch (Exception ex)
+            {
+                //_log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return null;
+            }
+        }
         public string CheckArrayLengthAndReturnResponse(string StrResponse, string[] strArray)
         {
             string ResponseFromParsing = "";

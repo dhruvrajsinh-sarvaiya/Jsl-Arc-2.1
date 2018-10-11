@@ -19,6 +19,7 @@ using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Wallet;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -72,10 +73,11 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
         public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
-        public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
+        //public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
         public DbSet<RouteConfiguration> RouteConfiguration { get; set; }
         public DbSet<ThirdPartyAPIConfiguration> ThirdPartyAPIConfiguration { get; set; }
         public DbSet<ThirdPartyAPIResponseConfiguration> ThirdPartyAPIResponseConfiguration { get; set; }
+        public DbSet<TradePoolMaster > TradePoolMaster { get; set; }
 
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
@@ -140,6 +142,8 @@ namespace CleanArchitecture.Infrastructure
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
             modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
+            modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
+
         }
 
         /// <summary>
