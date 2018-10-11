@@ -43,7 +43,7 @@ namespace CleanArchitecture.Core.Enums
         public static string InvalidWallet = "Invalid Wallet or wallet is disabled.";
         public static string ItemOrThirdprtyNotFound = "Unable to Process your request please contact admin.";
         public static string FindRecored = "Successfully Find Recored";
-        public static string NotFound = "Not Found Recored";
+        public static string NotFound = "No Recored found.";
         public static string RecordAdded = "Recored Added Successfully!";
         public static string RecordUpdated = "Recored Updated Successfully!";
         public static string RecordDisable = "Recored Disable Successfully!";
