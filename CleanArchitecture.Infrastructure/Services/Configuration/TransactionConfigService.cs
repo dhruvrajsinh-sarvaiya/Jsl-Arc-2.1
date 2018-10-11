@@ -48,7 +48,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     Name = Request.Name,
                     SMSCode = Request.SMSCode,
-                    Type = Request.Type,
+                    ServiceType = Request.Type,
                 };
                 var newServiceMaster = _serviceMasterRepository.Add(serviceMaster);
 
@@ -102,7 +102,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     serviceMaster.Name = Request.Name;
                     serviceMaster.SMSCode = Request.SMSCode;
-                    serviceMaster.Type = Request.Type;
+                    serviceMaster.ServiceType = Request.Type;
 
                     _serviceMasterRepository.Update(serviceMaster);
 
@@ -161,7 +161,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         response.ServiceId = service.Id;
                         response.Name = service.Name;
                         response.SMSCode = service.SMSCode;
-                        response.Type = service.Type;
+                        response.Type = service.ServiceType;
 
                         var serviceDetail = _serviceDetailRepository.GetSingle(ser => ser.ServiceId == service.Id);
                         var serviceDetailJson = JsonConvert.DeserializeObject<ServiceDetailJsonData>(serviceDetail.ServiceDetailJson);
@@ -211,7 +211,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     responsedata.ServiceId = serviceMaster.Id;
                     responsedata.Name = serviceMaster.Name;
                     responsedata.SMSCode = serviceMaster.SMSCode;
-                    responsedata.Type = serviceMaster.Type;
+                    responsedata.Type = serviceMaster.ServiceType;
 
                     var serviceDetail = _serviceDetailRepository.GetSingle(service => service.ServiceId == ServiceId);
                     var serviceDetailJson = JsonConvert.DeserializeObject<ServiceDetailJsonData>(serviceDetail.ServiceDetailJson);
