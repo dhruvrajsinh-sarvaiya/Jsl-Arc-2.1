@@ -68,12 +68,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         {
                             TradePairRespose tradePair = new TradePairRespose();
                             var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
+                            var chidService = _serviceMasterRepository.GetSingle(x => x.Id == pmdata.SecondaryCurrencyId);
 
                             tradePair.PairId = pmdata.Id;
                             tradePair.Pairname = pmdata.PairName;
                             tradePair.Currentrate = pairDetailData.Currentrate;
                             tradePair.Volume = pairDetailData.Volume;
                             tradePair.Fee = pairDetailData.Fee;
+                            tradePair.ChildCurrency = chidService.Name;
+                            tradePair.Abbrevation = chidService.SMSCode;
+                            tradePair.ChangePer = 0;
 
                             pairList.Add(tradePair);
                         }
