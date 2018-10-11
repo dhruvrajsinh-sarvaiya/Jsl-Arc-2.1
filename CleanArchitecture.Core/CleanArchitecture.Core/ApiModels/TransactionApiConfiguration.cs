@@ -27,12 +27,15 @@ namespace CleanArchitecture.Core.ApiModels
         public string RouteName { get; set; }
         //public string SMSCode { get; set; }
         public short ServiceType { get; set; }
-        public long ThirPartyAPIID { get; set; }      
-        public short AppType { get; set; }
-        public short MinimumAmountItem { get; set; }
-        public short MaximumAmountItem { get; set; }
-        public short MinimumAmountService { get; set; }
-        public short MaximumAmountService { get; set; }
+        public long ThirPartyAPIID { get; set; }
+        public long AppTypeID { get; set; }
+        public long LimitID { get; set; }
+        public long DemonConfigID { get; set; }
+        public long ServiceProConfigID { get; set; }
+        //public short MinimumAmountItem { get; set; }
+        //public short MaximumAmountItem { get; set; }
+        //public short MinimumAmountService { get; set; }
+        //public short MaximumAmountService { get; set; }
 
     }
 
