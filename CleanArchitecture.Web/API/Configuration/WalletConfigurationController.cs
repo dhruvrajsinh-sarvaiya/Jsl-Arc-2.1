@@ -23,8 +23,8 @@ namespace CleanArchitecture.Web.API.Configuration
         public WalletConfigurationController(IWalletConfigurationService walletConfigurationService, UserManager<ApplicationUser> userManager)
         {
             _walletConfigurationService = walletConfigurationService;
-            _userManager=userManager;
-    }
+            _userManager = userManager;
+        }
         [HttpGet]
         public IActionResult ListAllWalletTypeMaster()
         {
@@ -33,12 +33,22 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddWalletTypeMasterAsync(AddWalletTypeMasterRequest addWalletTypeMasterRequest)
+        public async Task<IActionResult> AddWalletTypeMaster(WalletTypeMasterRequest addWalletTypeMasterRequest)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            long Userid= 8/*user.Id*/;
+            long Userid = 8/*user.Id*/;
             var items = _walletConfigurationService.AddWalletTypeMaster(addWalletTypeMasterRequest, Userid);
             return Ok(items);
         }
+
+        [HttpPut("{WalletTypeId}")]
+        public async Task<IActionResult> UpdateWalletTypeMaster(WalletTypeMasterRequest updateWalletTypeMasterRequest, long WalletTypeId)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            long Userid = 8/*user.Id*/;
+            var items = _walletConfigurationService.UpdateWalletTypeMaster(updateWalletTypeMasterRequest, Userid, WalletTypeId);
+            return Ok(items);
+        }
+
     }
 }

@@ -38,7 +38,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public WalletTypeMaster AddWalletTypeMaster(AddWalletTypeMasterRequest addWalletTypeMasterRequest, long Userid)
+        public WalletTypeMaster AddWalletTypeMaster(WalletTypeMasterRequest addWalletTypeMasterRequest, long Userid)
         {
             try
             {
@@ -53,6 +53,39 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _walletTypeMaster.Status = Convert.ToInt16(ServiceStatus.Active);
                 _WalletTypeMasterRepository.Add(_walletTypeMaster);
                 return _walletTypeMaster;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public WalletTypeMaster UpdateWalletTypeMaster(WalletTypeMasterRequest updateWalletTypeMasterRequest, long Userid,long WalletTypeId)
+        {
+            try
+            {
+               // WalletTypeMaster _walletTypeMaster = new WalletTypeMaster();
+                var _walletTypeMaster = _WalletTypeMasterRepository.GetById(WalletTypeId);
+                if(_walletTypeMaster == null)
+                {
+                    return _walletTypeMaster;
+                }
+                else
+                {
+                    _walletTypeMaster.UpdatedBy = Userid;
+                    _walletTypeMaster.UpdatedDate = UTC_To_IST();
+
+                    _walletTypeMaster.IsDepositionAllow = updateWalletTypeMasterRequest.IsDepositionAllow;
+                    _walletTypeMaster.IsTransactionWallet = updateWalletTypeMasterRequest.IsTransactionWallet;
+                    _walletTypeMaster.IsWithdrawalAllow = updateWalletTypeMasterRequest.IsWithdrawalAllow;
+                    _walletTypeMaster.WalletTypeName = updateWalletTypeMasterRequest.WalletTypeName;
+                    _walletTypeMaster.Discription = updateWalletTypeMasterRequest.Discription;
+                 //   _walletTypeMaster.Status = updateWalletTypeMasterRequest.Status;
+
+                    _WalletTypeMasterRepository.Update(_walletTypeMaster);
+                    return _walletTypeMaster;
+                }
             }
             catch (Exception ex)
             {

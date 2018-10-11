@@ -10,7 +10,9 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
     {
         List<WalletTypeMaster> ListAllWalletTypeMaster();
 
-        WalletTypeMaster AddWalletTypeMaster(AddWalletTypeMasterRequest addWalletTypeMasterRequest, long Userid);
+        WalletTypeMaster AddWalletTypeMaster(WalletTypeMasterRequest addWalletTypeMasterRequest, long Userid);
+
+        WalletTypeMaster UpdateWalletTypeMaster(WalletTypeMasterRequest updateWalletTypeMasterRequest, long Userid, long WalletTypeId);
 
     }
 }
