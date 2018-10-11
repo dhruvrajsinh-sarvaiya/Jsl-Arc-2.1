@@ -24,5 +24,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletConfiguration
 
         [Required]
         public short IsTransactionWallet { get; set; }
+
+        public short Status { get; set; }
     }
 }
