@@ -7,6 +7,7 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.DTOClasses;
+using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services.Transaction
 {
-    public class NewTransaction
+    public class NewTransaction : ITransactionProcess
     {
         private readonly ICommonRepository<TradePairMaster> _TradePairMaster;
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
