@@ -1,13 +1,12 @@
-﻿using System;
+﻿using CleanArchitecture.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using CleanArchitecture.Core.SharedKernel;
 
-namespace CleanArchitecture.Core.Entities
+namespace CleanArchitecture.Core.ViewModels.WalletConfiguration
 {
-    public class WalletTypeMaster : BizBase
+    public class AddWalletTypeMasterRequest 
     {
         [Required]
         [StringLength(50)]
@@ -25,8 +24,5 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public short IsTransactionWallet { get; set; }
-
-
-        
     }
 }
