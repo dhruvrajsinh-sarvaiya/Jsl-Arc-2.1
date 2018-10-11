@@ -80,7 +80,7 @@ namespace CleanArchitecture.Web.API
                 if (Userdata != null && !string.IsNullOrEmpty(Userdata.RedisDBKey) && !string.IsNullOrEmpty(Userdata.RedisSessionKey))
                 {
                     RedisDBKey = Userdata.RedisDBKey;
-                    user = _redisSessionStora.GetObjectFromJson<ApplicationUser>(Userdata.RedisSessionKey, Userdata.RedisDBKey);
+                    user = _redisSessionStorage.GetObjectFromJson<ApplicationUser>(Userdata.RedisSessionKey, Userdata.RedisDBKey);
                 }
 
             }
@@ -91,7 +91,7 @@ namespace CleanArchitecture.Web.API
                 Userdata.RedisSessionKey = Guid.NewGuid().ToString();
                 RedisDBKey = Userdata.RedisDBKey;
                 redis.Save(Userdata.RedisDBKey, Userdata);
-                _redisSessionStora.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
+                _redisSessionStorage.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
             }
 
 
