@@ -42,11 +42,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _ServiceConfi = ServiceConfi;
             _AddressMasterRepository = AddressMasterRepository;
         }
-        public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
+        public Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
         {
             //_Resp = new BizResponse();
-           CombineAllInitTransactionAsync(Req);
-            return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess});
+            //CombineAllInitTransactionAsync(Req);
+            return Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess});
             
         }
 
@@ -137,7 +137,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
                     Req.SMSCode = _TradeTransactionObj.Order_Currency;
                     //Balace check Here , take DeliveryWalletID output
-                    _TradeTransactionObj.DeliveryWalletID = Req.DeliveryWalletID;
+                    _TradeTransactionObj.DeliveryWalletID = Req.CreditWalletID;
 
                     Req.Amount = _TradeTransactionObj.OrderTotalQty;
                     if (_TradeTransactionObj.DeliveryWalletID == 0)
@@ -187,7 +187,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
                 if (Req.TrnType == enTrnType.Withdraw)
                 {
-                    var _AddressMasterObj = _AddressMasterRepository.GetSingle(item => item.WalletId == Req.WalletID && item.Address == Req.TransactionAccount && item.Status == Convert.ToInt16(ServiceStatus.Active));//in withdraw , TransactionAccount has address
+                    var _AddressMasterObj = _AddressMasterRepository.GetSingle(item => item.WalletId == Req.DebitWalletID && item.Address == Req.TransactionAccount && item.Status == Convert.ToInt16(ServiceStatus.Active));//in withdraw , TransactionAccount has address
                     if (_AddressMasterObj != null)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrn_NoSelfAddressWithdrawAllowMsg;

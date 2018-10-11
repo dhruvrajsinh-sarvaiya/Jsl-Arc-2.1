@@ -24,6 +24,8 @@ using CleanArchitecture.Infrastructure.Services;
 using CleanArchitecture.Core.Interfaces.Configuration;
 using CleanArchitecture.Infrastructure.Services.Configuration;
 using CleanArchitecture.Infrastructure.Services.Transaction;
+using CleanArchitecture.Core.Services.RadisDatabase;
+using CleanArchitecture.Core.Services.Session;
 
 namespace CleanArchitecture.Web
 {
@@ -53,6 +55,17 @@ namespace CleanArchitecture.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+                    //define Redis Configuration
+            services.Configure<RedisConfiguration>(Configuration.GetSection("redis"));
+            services.AddSession();
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetValue<string>("redis:host");
+                options.InstanceName = "master";
+            });
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddSingleton<RedisSessionStorage>();
             ////debugging environment
             services.AddPreRenderDebugging(HostingEnvironment);
 
