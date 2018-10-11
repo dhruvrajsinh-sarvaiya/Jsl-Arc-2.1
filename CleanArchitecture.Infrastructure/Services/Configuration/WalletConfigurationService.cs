@@ -44,8 +44,10 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 coin = _WalletTypeMasterRepository.FindBy(item => item.Status != Convert.ToInt16(ServiceStatus.Disable));
                 if(coin==null)
                 {
-                    listWalletTypeMasterResponse.ReturnCode = enResponseCode.Success;
+                    listWalletTypeMasterResponse.ReturnCode = enResponseCode.Fail;
                     listWalletTypeMasterResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    listWalletTypeMasterResponse.ErrorCode = enErrorCode.RecordNotFound;
+
                 }
                 else
                 {

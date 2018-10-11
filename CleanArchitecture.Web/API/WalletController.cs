@@ -116,18 +116,29 @@ namespace CleanArchitecture.Web.API
         [HttpPost("{coin}")]
         public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string coin)
         {
+            CreateWalletResponse Response = new CreateWalletResponse();
             try
-            {
-                CreateWalletResponse Response = new CreateWalletResponse();
+            {   
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 //if(user==null)
                 //{
                 //    Response.ReturnCode = enResponseCode.Fail;
                 //    Response.ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed;
+                  // Response.ErrorCode=enErrorCode.
                 //}
                 //else
                 //{
                 Response = _walletService.InsertIntoWalletMaster(Request.WalletName, coin, Request.IsDefaultWallet, Request.AllowTrnType, 1 /*Convert.ToInt64(user.Id)*/);
+                if(Response==null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.CreateWalletFailMsg;
+                }
+                else
+                { 
+                Response.ReturnCode = enResponseCode.Success;
+                Response.ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg;
+                }
                 //}
 
                 return Ok(Response);
@@ -135,7 +146,8 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
+                Response.ReturnCode = enResponseCode.InternalError;
+                return BadRequest(Response);
             }
         }
 
