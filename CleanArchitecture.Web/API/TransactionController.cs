@@ -26,18 +26,18 @@ namespace CleanArchitecture.Web.API
         private readonly IBasePage _basePage;
         private readonly ILogger<TransactionController> _logger;
         private readonly IFrontTrnService _frontTrnService;
-        //private readonly ITransactionProcess _transactionProcess;
-        //private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ITransactionProcess _transactionProcess;
+        private readonly UserManager<ApplicationUser> _userManager;
         string dummyResponce = "";
         static int i = 1;
 
-        public TransactionController(ILogger<TransactionController> logger, IBasePage basePage, IFrontTrnService frontTrnService/*, UserManager<ApplicationUser> userManager, ITransactionProcess transactionProcess*/)
+        public TransactionController(ILogger<TransactionController> logger, IBasePage basePage, IFrontTrnService frontTrnService, UserManager<ApplicationUser> userManager, ITransactionProcess transactionProcess)
         {
             _logger = logger;
             _basePage = basePage;
             _frontTrnService = frontTrnService;
-            //_transactionProcess = transactionProcess;
-            //_userManager = userManager;
+            _transactionProcess = transactionProcess;
+            _userManager = userManager;
         }
 
         private ActionResult returnDynamicResult(dynamic respObjJson)
@@ -413,52 +413,53 @@ namespace CleanArchitecture.Web.API
         [Authorize]
         public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request)
         {
-            //////Do Process for CreateOrder
-            //////For Testing Purpose
-            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            //Do Process for CreateOrder
+            //For Testing Purpose
+            var user = await _userManager.GetUserAsync(HttpContext.User);
 
 
-            //NewTransactionRequestCls Req = new NewTransactionRequestCls();
-            //Req.TrnMode = Request.TrnMode;
-            //Req.TrnType = (enTrnType)(Request.ordertype);
-            //Req.MemberID = user.Id;
-            //Req.MemberMobile = user.Mobile;
-            //Req.SMSCode = "";
-            //Req.TransactionAccount = Request.CurrencyPairID.ToString();
-            //Req.Amount = Request.Total;
-            //Req.PairID = Request.CurrencyPairID;
-            //Req.Price = Request.price;
-            //Req.Qty = Request.Amount;
-            //Req.DebitWalletID = Request.DebitWalletID;
-            //Req.CreditWalletID = Request.CreditWalletID;
+            NewTransactionRequestCls Req = new NewTransactionRequestCls();
+            Req.TrnMode = Request.TrnMode;
+            Req.TrnType = (enTrnType)(Request.ordertype);
+            Req.MemberID = user.Id;
+            Req.MemberMobile = user.Mobile;
+            //Req.MemberID = 5;
+            //Req.MemberMobile = "1234567890";
+            Req.SMSCode = "";
+            Req.TransactionAccount = Request.CurrencyPairID.ToString();
+            Req.Amount = Request.Total;
+            Req.PairID = Request.CurrencyPairID;
+            Req.Price = Request.price;
+            Req.Qty = Request.Amount;
+            Req.DebitWalletID = Request.DebitWalletID;
+            Req.CreditWalletID = Request.CreditWalletID;
 
-            //Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
-            //BizResponse MethodResp = await MethodRespTsk;
+            Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
+            BizResponse MethodResp = await MethodRespTsk;
 
-            //CreateTransactionResponse Response = new CreateTransactionResponse();
-            //if (MethodResp.ReturnCode == enResponseCodeService.Success)
-            //    Response.ReturnCode = enResponseCode.Success;
-            //else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
-            //    Response.ReturnCode = enResponseCode.Fail;
-            //else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
-            //    Response.ReturnCode = enResponseCode.InternalError;
+            CreateTransactionResponse Response = new CreateTransactionResponse();
+            if (MethodResp.ReturnCode == enResponseCodeService.Success)
+                Response.ReturnCode = enResponseCode.Success;
+            else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
+                Response.ReturnCode = enResponseCode.Fail;
+            else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
+                Response.ReturnCode = enResponseCode.InternalError;
 
-            //Response.ReturnMsg = MethodResp.ReturnMsg;
-            //Response.ErrorCode = MethodResp.ErrorCode;
+            Response.ReturnMsg = MethodResp.ReturnMsg;
+            Response.ErrorCode = MethodResp.ErrorCode;
 
-            //Response.response = new CreateOrderInfo()
-            //{
-            //    //order_id = 1000001,
-            //    //pair_name = "ltcusd",
-            //    //price = 10,
-            //    //side = "buy",
-            //    //type = "stop-loss",
-            //    //volume = 10
-            //};
+            Response.response = new CreateOrderInfo()
+            {
+                //order_id = 1000001,
+                //pair_name = "ltcusd",
+                //price = 10,
+                //side = "buy",
+                //type = "stop-loss",
+                //volume = 10
+            };
 
-            ////Response.ReturnCode = enResponseCode.Success;
-            //return returnDynamicResult(Response);
-            return Ok();
+            //Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
         }
 
         [HttpPost("CreateMultipleOrder")]
