@@ -18,15 +18,42 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         ServiceProviderViewModel GetPoviderByID(long ID);
         long AddProviderService(ServiceProviderRequest request);
         bool UpdateProviderService(ServiceProviderRequest request);
+        bool SetActiveProvider(long id);
+        bool SetInActiveProvider(long id);
 
         IEnumerable<AppTypeViewModel> GetAppType();
         AppTypeViewModel GetAppTypeById(long id);
         long AddAppType(AppTypeRequest request);
         bool UpdateAppType(AppTypeRequest request);
+        bool SetActiveAppType(long id);
+        bool SetInActiveAppType(long id);
 
         IEnumerable<ProviderTypeViewModel> GetProviderType();
         ProviderTypeViewModel GetProviderTypeById(long id);
         long AddProviderType(ProviderTypeRequest request);
         bool UpdateProviderType(ProviderTypeRequest request);
+        bool SetActiveProviderType(long id);
+        bool SetInActiveProviderType(long id);
+
+        ProviderConfigurationViewModel GetProviderConfiguration(long id);
+        long AddProviderConfiguration(ProviderConfigurationRequest request);
+        bool SetActiveProviderConfiguration(long id);
+        bool SetInActiveProviderConfiguration(long id);
+        bool UpdateProviderConfiguration(ProviderConfigurationRequest request);
+
+        DemonconfigurationViewModel GetDemonConfiguration(long id);
+        long AddDemonConfiguration(DemonConfigurationRequest request);
+        bool UpdateDemonConfiguration(DemonConfigurationRequest request);
+        bool SetActiveDemonConfig(long id);
+        bool SetInActiveDemonConfig(long id);
+
+        IEnumerable<ProviderDetailViewModel> GetProviderDetailList();
+        IEnumerable<ProviderDetailGetAllResponce> getProviderDetailsDataList(IEnumerable<ProviderDetailViewModel> dataList);
+        ProviderDetailGetAllResponce getProviderDetailDataById(ProviderDetailViewModel viewModel);
+        ProviderDetailViewModel GetProviderDetailById(long id);
+        long AddProviderDetail(ProviderDetailRequest request);
+        bool UpdateProviderDetail(ProviderDetailRequest request);
+        bool SetActiveProviderDetail(long id);
+        bool SetInActiveProviderDetail(long id);
     }
 }

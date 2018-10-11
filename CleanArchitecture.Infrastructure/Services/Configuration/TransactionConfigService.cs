@@ -20,16 +20,22 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<ServiceProviderMaster> _ServiceProviderMaster;
         private readonly ICommonRepository<AppType> _ApptypeRepository;
         private readonly ICommonRepository<ServiceProviderType> _ProviderTypeRepository;
+        private readonly ICommonRepository<ServiceProConfiguration> _ProviderConfiguration;
+        private readonly ICommonRepository<DemonConfiguration> _DemonRepository;
+        private readonly ICommonRepository<ServiceProviderDetail> _ProDetailRepository;
         private readonly ILogger<TransactionConfigService> _logger;
 
         public TransactionConfigService(
-            ICommonRepository<ServiceMaster> serviceMasterRepository, 
-            ICommonRepository<ServiceDetail> serviceDetailRepository, 
-            ICommonRepository<ServiceStastics> serviceStasticsRepository, 
+            ICommonRepository<ServiceMaster> serviceMasterRepository,
+            ICommonRepository<ServiceDetail> serviceDetailRepository,
+            ICommonRepository<ServiceStastics> serviceStasticsRepository,
             ILogger<TransactionConfigService> logger,
             ICommonRepository<ServiceProviderMaster> ServiceProviderMaster,
             ICommonRepository<AppType> ApptypeRepository,
-            ICommonRepository<ServiceProviderType> ProviderTypeRepository)
+            ICommonRepository<ServiceProviderType> ProviderTypeRepository,
+            ICommonRepository<ServiceProConfiguration> ProviderConfiguration,
+            ICommonRepository<DemonConfiguration> DemonRepository,
+            ICommonRepository<ServiceProviderDetail> ProDetailRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -37,9 +43,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _ServiceProviderMaster = ServiceProviderMaster;
             _ApptypeRepository = ApptypeRepository;
             _ProviderTypeRepository = ProviderTypeRepository;
+            _ProviderConfiguration = ProviderConfiguration;
+            _DemonRepository = DemonRepository;
+            _ProDetailRepository = ProDetailRepository;
             _logger = logger;
         }
 
+        #region Service
         public long AddServiceConfiguration(ServiceConfigurationRequest Request)
         {
             try
@@ -82,9 +92,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     CirculatingSupply = Request.CirculatingSupply
                 };
                 var newServiceStastics = _serviceStasticsRepository.Add(serviceStastics);
-                   
+
                 return newServiceMaster.Id;
-           
+
             }
             catch (Exception ex)
             {
@@ -206,7 +216,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new ServiceConfigurationRequest();
                 var serviceMaster = _serviceMasterRepository.GetById(ServiceId);
-                if(serviceMaster != null)
+                if (serviceMaster != null)
                 {
                     responsedata.ServiceId = serviceMaster.Id;
                     responsedata.Name = serviceMaster.Name;
@@ -251,7 +261,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 var servicedata = _serviceMasterRepository.GetById(ServiceId);
-                if(servicedata != null)
+                if (servicedata != null)
                 {
                     servicedata.SetActiveService();
                     _serviceMasterRepository.Update(servicedata);
@@ -285,8 +295,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        
-        //Provider
+        #endregion
+
+        #region ProviderMaster
         public IEnumerable<ServiceProviderViewModel> GetAllProvider()
         {
             try
@@ -305,12 +316,12 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 }
                 return providerList;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-                
+
         }
 
         public ServiceProviderViewModel GetPoviderByID(long ID)
@@ -336,7 +347,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
         public long AddProviderService(ServiceProviderRequest request)
@@ -353,15 +364,15 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     UpdatedDate = DateTime.Now,
                     UpdatedBy = null
                 };
-                var newModel=_ServiceProviderMaster.Add(model);
-                return newModel.Id ;
+                var newModel = _ServiceProviderMaster.Add(model);
+                return newModel.Id;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-           
+
         }
 
         public bool UpdateProviderService(ServiceProviderRequest request)
@@ -376,7 +387,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 model.ProviderName = request.ProviderName;
                 model.UpdatedDate = DateTime.Now;
                 model.UpdatedBy = 1;
-                
+
                 _ServiceProviderMaster.Update(model);
                 return true;
             }
@@ -387,7 +398,48 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        //AppType
+        public bool SetActiveProvider(long id)
+        {
+            try
+            {
+                ServiceProviderMaster model = _ServiceProviderMaster.GetById(id);
+                if (model != null)
+                {
+                    model.EnableProvider();
+                    _ServiceProviderMaster.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveProvider(long id)
+        {
+            try
+            {
+                ServiceProviderMaster model = _ServiceProviderMaster.GetById(id);
+                if (model != null)
+                {
+                    model.DisableProvider();
+                    _ServiceProviderMaster.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region AppType
         public IEnumerable<AppTypeViewModel> GetAppType()
         {
             try
@@ -409,7 +461,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
         public AppTypeViewModel GetAppTypeById(long id)
@@ -433,7 +485,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
         public long AddAppType(AppTypeRequest request)
@@ -451,7 +503,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     UpdatedDate = DateTime.Now,
                     UpdatedBy = null
                 };
-                var newModel=_ApptypeRepository.Add(model);
+                var newModel = _ApptypeRepository.Add(model);
                 return newModel.Id;
             }
             catch (Exception ex)
@@ -459,7 +511,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
         public bool UpdateAppType(AppTypeRequest request)
@@ -471,7 +523,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     return false;
                 }
-                model.AppTypeName  = request.AppTypeName;
+                model.AppTypeName = request.AppTypeName;
                 model.UpdatedDate = DateTime.Now;
                 model.UpdatedBy = 1;
 
@@ -483,10 +535,52 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-           
+
         }
 
-        //ProviderType
+        public bool SetActiveAppType(long id)
+        {
+            try
+            {
+                AppType model = _ApptypeRepository.GetById(id);
+                if (model != null)
+                {
+                    model.EnableAppType();
+                    _ApptypeRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveAppType(long id)
+        {
+            try
+            {
+                AppType model = _ApptypeRepository.GetById(id);
+                if (model != null)
+                {
+                    model.DisableAppType();
+                    _ApptypeRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ProviderType
+
         public IEnumerable<ProviderTypeViewModel> GetProviderType()
         {
             try
@@ -508,7 +602,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
         public ProviderTypeViewModel GetProviderTypeById(long id)
@@ -534,7 +628,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
         public long AddProviderType(ProviderTypeRequest request)
@@ -551,15 +645,15 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     UpdatedDate = DateTime.Now,
                     UpdatedBy = null
                 };
-                var newModel=_ProviderTypeRepository.Add(model);
-                return newModel .Id;
+                var newModel = _ProviderTypeRepository.Add(model);
+                return newModel.Id;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
         public bool UpdateProviderType(ProviderTypeRequest request)
@@ -571,7 +665,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     return false;
                 }
-                model.ServiveProTypeName  = request.ServiveProTypeName;
+                model.ServiveProTypeName = request.ServiveProTypeName;
                 model.UpdatedDate = DateTime.Now;
                 model.UpdatedBy = 1;
                 _ProviderTypeRepository.Update(model);
@@ -582,9 +676,506 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
+
         }
 
-        
+        public bool SetActiveProviderType(long id)
+        {
+            try
+            {
+                ServiceProviderType model = _ProviderTypeRepository.GetById(id);
+                if (model != null)
+                {
+                    model.EnableProviderType();
+                    _ProviderTypeRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveProviderType(long id)
+        {
+            try
+            {
+                ServiceProviderType model = _ProviderTypeRepository.GetById(id);
+                if (model != null)
+                {
+                    model.DisableProviderType();
+                    _ProviderTypeRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion 
+
+        #region provider Configuration
+
+        public ProviderConfigurationViewModel GetProviderConfiguration(long id)
+        {
+            try
+            {
+                ServiceProConfiguration model = _ProviderConfiguration.GetById(id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewmodel = new ProviderConfigurationViewModel
+                {
+                    Id = model.Id,
+                    APIKey = model.APIKey,
+                    AppKey = model.AppKey,
+                    SecretKey = model.SecretKey,
+                    Password = model.Password,
+                    UserName = model.UserName
+                };
+                return viewmodel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddProviderConfiguration(ProviderConfigurationRequest request)
+        {
+            try
+            {
+                ServiceProConfiguration model = new ServiceProConfiguration
+                {
+                    APIKey = request.APIKey,
+                    AppKey = request.AppKey,
+                    SecretKey = request.SecretKey,
+                    Password = request.Password,
+                    UserName = request.UserName,
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.Now,
+                    UpdatedBy = null,
+                    UpdatedDate = DateTime.Now,
+                    Status = Convert.ToInt16(ServiceStatus.Active)
+                };
+                var newModel = _ProviderConfiguration.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetActiveProviderConfiguration(long id)
+        {
+            try
+            {
+                ServiceProConfiguration model = _ProviderConfiguration.GetById(id);
+                if (model != null)
+                {
+                    model.EnableProConfiguration();
+                    _ProviderConfiguration.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveProviderConfiguration(long id)
+        {
+            try
+            {
+                ServiceProConfiguration model = _ProviderConfiguration.GetById(id);
+                if (model != null)
+                {
+                    model.DisableProConfiguration();
+                    _ProviderConfiguration.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateProviderConfiguration(ProviderConfigurationRequest request)
+        {
+            try
+            {
+                ServiceProConfiguration model = _ProviderConfiguration.GetById(request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.APIKey = request.APIKey;
+                model.AppKey = request.AppKey;
+                model.SecretKey = request.SecretKey;
+                model.UserName = request.UserName;
+                model.Password = request.Password;
+                model.UpdatedDate = DateTime.Now;
+                model.UpdatedBy = 1;
+
+                _ProviderConfiguration.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region "Demon Configuration"
+        public DemonconfigurationViewModel GetDemonConfiguration(long id)
+        {
+            try
+            {
+                var model = _DemonRepository.GetById(id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewmodel = new DemonconfigurationViewModel
+                {
+                    Id = model.Id,
+                    IPAdd = model.IPAdd,
+                    PortAdd = model.PortAdd,
+                    Url = model.Url
+                };
+                return viewmodel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddDemonConfiguration(DemonConfigurationRequest request)
+        {
+            try
+            {
+                var model = new DemonConfiguration
+                {
+                    IPAdd = request.IPAdd,
+                    PortAdd = request.PortAdd,
+                    Url = request.Url,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedBy = null
+                };
+
+                var newModel = _DemonRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateDemonConfiguration(DemonConfigurationRequest request)
+        {
+            try
+            {
+                DemonConfiguration model = _DemonRepository.GetById(request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.IPAdd = request.IPAdd;
+                model.PortAdd = request.PortAdd;
+                model.Url = request.Url;
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.Now;
+
+
+                _DemonRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetActiveDemonConfig(long id)
+        {
+            try
+            {
+                DemonConfiguration model = _DemonRepository.GetById(id);
+                if (model != null)
+                {
+                    model.EnableConfiguration();
+                    _DemonRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveDemonConfig(long id)
+        {
+            try
+            {
+                DemonConfiguration model = _DemonRepository.GetById(id);
+                if (model != null)
+                {
+                    model.DisableConfiguration();
+                    _DemonRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ProviderDetail
+        public IEnumerable<ProviderDetailViewModel> GetProviderDetailList()
+        {
+            try
+            {
+                var list = _ProDetailRepository.List();
+                List<ProviderDetailViewModel> providerList = new List<ProviderDetailViewModel>();
+                foreach (ServiceProviderDetail model in list)
+                {
+                    providerList.Add(new ProviderDetailViewModel
+                    {
+                        Id = model.Id,
+                        ServiceProID = model.ServiceProID,
+                        ProTypeID = model.ProTypeID,
+                        AppTypeID = model.AppTypeID,
+                        TrnTypeID = model.TrnTypeID,
+                        LimitID = model.LimitID,
+                        DemonConfigID = model.DemonConfigID,
+                        ServiceProConfigID = model.ServiceProConfigID,
+                        ThirPartyAPIID = model.ThirPartyAPIID
+                    });
+                }
+                return providerList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public ProviderDetailViewModel GetProviderDetailById(long id)
+        {
+            try
+            {
+                var model = _ProDetailRepository.GetById(id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewmodel = new ProviderDetailViewModel
+                {
+                    Id = model.Id,
+                    ServiceProID = model.ServiceProID,
+                    ProTypeID = model.ProTypeID,
+                    AppTypeID = model.AppTypeID,
+                    TrnTypeID = model.TrnTypeID,
+                    LimitID = model.LimitID,
+                    DemonConfigID = model.DemonConfigID,
+                    ServiceProConfigID = model.ServiceProConfigID,
+                    ThirPartyAPIID = model.ThirPartyAPIID,
+                };
+                return viewmodel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddProviderDetail(ProviderDetailRequest request)
+        {
+            try
+            {
+                ServiceProviderDetail model = new ServiceProviderDetail
+                {
+                    ServiceProID = request.ServiceProID,
+                    ProTypeID = request.ProTypeID,
+                    AppTypeID = request.AppTypeID,
+                    TrnTypeID = request.TrnTypeID,
+                    LimitID = request.LimitID,
+                    DemonConfigID = request.DemonConfigID,
+                    ServiceProConfigID = request.ServiceProConfigID,
+                    ThirPartyAPIID = request.ThirPartyAPIID,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedBy = null
+                };
+
+                var newModel = _ProDetailRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateProviderDetail(ProviderDetailRequest request)
+        {
+            try
+            {
+                ServiceProviderDetail model = _ProDetailRepository.GetById(request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.ServiceProID = request.ServiceProID;
+                model.ProTypeID = request.ProTypeID;
+                model.AppTypeID = request.AppTypeID;
+                model.TrnTypeID = request.TrnTypeID;
+                model.LimitID = request.LimitID;
+                model.DemonConfigID = request.DemonConfigID;
+                model.ServiceProConfigID = request.ServiceProConfigID;
+                model.ThirPartyAPIID = request.ThirPartyAPIID;
+
+                _ProDetailRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetActiveProviderDetail(long id)
+        {
+            try
+            {
+                ServiceProviderDetail model = _ProDetailRepository.GetById(id);
+                if (model != null)
+                {
+                    model.EnableProvider();
+                    _ProDetailRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveProviderDetail(long id)
+        {
+            try
+            {
+                ServiceProviderDetail model = _ProDetailRepository.GetById(id);
+                if (model != null)
+                {
+                    model.DisableProvider();
+                    _ProDetailRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public IEnumerable<ProviderDetailGetAllResponce> getProviderDetailsDataList(IEnumerable<ProviderDetailViewModel> dataList)
+        {
+            try
+            {
+                List<ProviderDetailGetAllResponce> responcesData = new List<ProviderDetailGetAllResponce>();
+                foreach (ProviderDetailViewModel viewmodel in dataList)
+                {
+                    responcesData.Add(new ProviderDetailGetAllResponce
+                    {
+                        Id = viewmodel.Id,
+                        Provider = GetPoviderByID(viewmodel.ServiceProID),
+                        ProviderType = GetProviderTypeById(viewmodel.ProTypeID),
+                        AppType = GetAppTypeById(viewmodel.AppTypeID),
+                        TrnType = null,
+                        Limit = null,
+                        DemonConfiguration = GetDemonConfiguration(viewmodel.DemonConfigID),
+                        ProviderConfiguration = GetProviderConfiguration(viewmodel.Id),
+                        thirdParty = null
+                    });
+                }
+                return responcesData;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public ProviderDetailGetAllResponce getProviderDetailDataById(ProviderDetailViewModel viewModel)
+        {
+            try
+            {
+                ProviderDetailGetAllResponce res = new ProviderDetailGetAllResponce();
+
+                res.Id = viewModel.Id;
+                res.Provider = GetPoviderByID(viewModel.ServiceProID);
+                res.ProviderType = GetProviderTypeById(viewModel.ProTypeID);
+                res.AppType = GetAppTypeById(viewModel.AppTypeID);
+                res.TrnType = null;
+                res.Limit = null;
+                res.DemonConfiguration = GetDemonConfiguration(viewModel.DemonConfigID);
+                res.ProviderConfiguration = GetProviderConfiguration(viewModel.Id);
+                res.thirdParty = null;
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
     }
 }
