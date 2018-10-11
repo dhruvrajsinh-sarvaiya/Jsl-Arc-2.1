@@ -37,7 +37,7 @@ namespace CleanArchitecture.Web.API
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
         private readonly IRedisConnectionFactory _fact;
-        private readonly RedisSessionStorage _redisSessionStora;
+        private readonly RedisSessionStorage _redisSessionStorage;
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace CleanArchitecture.Web.API
         SignInManager<ApplicationUser> signInManager,
         ILoggerFactory loggerFactory,
         UrlEncoder urlEncoder, IRedisConnectionFactory factory,
-        RedisSessionStorage redisSessionStora)
+        RedisSessionStorage redisSessionStorage)
         {
             _context = context;
             _userManager = userManager;
@@ -56,6 +56,8 @@ namespace CleanArchitecture.Web.API
             //_emailSender = emailSender;
             _logger = loggerFactory.CreateLogger<ManageController>();
             _urlEncoder = urlEncoder;
+            _fact = factory;
+            _redisSessionStorage = redisSessionStorage;
         }
         #endregion
 
