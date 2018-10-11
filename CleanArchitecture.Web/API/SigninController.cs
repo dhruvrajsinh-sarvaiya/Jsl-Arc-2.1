@@ -369,7 +369,7 @@ namespace CleanArchitecture.Web.API
                     {
 
                         _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
