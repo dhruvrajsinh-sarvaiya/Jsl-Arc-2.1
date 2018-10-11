@@ -22,6 +22,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _log = log;
             _WalletTypeMasterRepository = WalletTypeMasterRepository;
         }
+
         public List<WalletTypeMaster> ListAllWalletTypeMaster()
         {
             try
