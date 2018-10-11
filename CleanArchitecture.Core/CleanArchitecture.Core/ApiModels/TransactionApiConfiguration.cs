@@ -20,6 +20,7 @@ namespace CleanArchitecture.Core.ApiModels
         public long ServiceID { get; set; }
         public string ServiceName { get; set; }
         public long SerProID { get; set; }
+        public long SerProDetailID { get; set; }
         public string SerProName { get; set; }
         public long RouteID { get; set; }
         public long ProductID { get; set; } // ntrivedi added 03-11-2018
