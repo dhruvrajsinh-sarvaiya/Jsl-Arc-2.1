@@ -523,8 +523,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     createWalletResponse.ReturnMsg = "Invalid CoinName";
                     return createWalletResponse;
                 }
-                //genrate address
-                //  PublicAddress = GenerateAddress(1);
+            
 
                 //add data in walletmaster tbl
                 walletMaster.Walletname = Walletname;
@@ -551,6 +550,10 @@ namespace CleanArchitecture.Infrastructure.Services
                     w.TrnType = Convert.ToByte(AllowTrnType[i]);
                     _WalletAllowTrnRepository.Add(w);
                 }
+                //genrate address and update in walletmaster
+                  //PublicAddress = GenerateAddress(walletMaster.Id);
+                  //walletMaster.PublicAddress = PublicAddress;
+                  //_commonRepository.Update(walletMaster);
 
                 //set the response object value
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
