@@ -115,7 +115,7 @@ namespace CleanArchitecture.Web.API
                     return BadRequest("The username/password couple is invalid.");
                 }
                 // Create a new authentication ticket.
-                var ticket = await CreateTicketAsync(request, user, null, Authorization);
+                var ticket = await CreateTicketAsync(request, user, null, RedisDBKey);
 
                 return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
             }
