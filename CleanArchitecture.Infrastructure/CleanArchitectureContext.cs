@@ -72,7 +72,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
         public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
-        public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
+        //public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
         public DbSet<RouteConfiguration> RouteConfiguration { get; set; }
         public DbSet<ThirdPartyAPIConfiguration> ThirdPartyAPIConfiguration { get; set; }
         public DbSet<ThirdPartyAPIResponseConfiguration> ThirdPartyAPIResponseConfiguration { get; set; }
