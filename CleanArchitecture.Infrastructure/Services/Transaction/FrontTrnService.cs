@@ -96,6 +96,40 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+        public List<VolumeDataRespose> GetVolumeData()
+        {
+            List<VolumeDataRespose> responsedata;
+            try
+            {
+                responsedata = new List<VolumeDataRespose>();
+                var pairMasterData = _tradeMasterRepository.GetAll();
+
+                if(pairMasterData != null)
+                {
+                    foreach (var pmdata in pairMasterData)
+                    {
+                        VolumeDataRespose volumedata = new VolumeDataRespose();
+                        var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
+                        volumedata.PairId = pmdata.Id;
+                        volumedata.Currentrate = pairDetailData.Currentrate;
+                        volumedata.ChangePer = 0;
+                        volumedata.Volume24 = 0;
+
+                        responsedata.Add(volumedata);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return responsedata;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
             throw new NotImplementedException();
         }
     }
