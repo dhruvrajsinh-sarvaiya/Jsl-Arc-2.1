@@ -21,6 +21,8 @@ using CleanArchitecture.Infrastructure.Services.Repository;
 using CleanArchitecture.Infrastructure.Data.Transaction;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Infrastructure.Services;
+using CleanArchitecture.Core.Interfaces.Configuration;
+using CleanArchitecture.Infrastructure.Services.Configuration;
 
 namespace CleanArchitecture.Web
 {
@@ -145,6 +147,8 @@ namespace CleanArchitecture.Web
                 config.For(typeof(IWalletService)).Add(typeof(WalletService));
                 config.For(typeof(IWebApiSendRequest)).Add(typeof(WebAPISendRequest));
                 config.For(typeof(IGetWebRequest)).Add(typeof(GetWebRequest));
+                config.For(typeof(IWalletConfigurationService)).Add(typeof(WalletConfigurationService));
+                
                 //  config.For(typeof(ILogger));
 
                 // added by nirav savariya for common repository on 10-04-2018
