@@ -137,13 +137,13 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                dynamic respObjJson = _walletService.GenerateAddress(walletid);
+                CreateWalletAddressRes Response = _walletService.GenerateAddress(walletid,coin);
                 //string responseString = "{'address':'2Mz7x1a5df8380e0e30yYc6e','coin':'tbtc','label':'My address','wallet':'585c51a5df8380e0e3082e46','coinSpecific':{'chain':0,'index':1,'redeemScript':'522101a5df8380e0e30453ae'}}";
                 //CreateWalletAddressRes Response = new CreateWalletAddressRes();
                 //Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
                 //Response.ReturnCode = enResponseCode.Success;
-                //var respObj = JsonConvert.SerializeObject(Response);
-                //dynamic respObjJson = JObject.Parse(respObj);
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
                 return returnDynamicResult(respObjJson);
             }
             catch (Exception ex)

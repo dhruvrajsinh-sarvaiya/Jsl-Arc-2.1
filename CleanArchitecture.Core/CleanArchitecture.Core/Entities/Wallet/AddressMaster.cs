@@ -22,9 +22,10 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public long SerProID { get; set; }
         
-        [Required]
-        [StringLength(5)]
-        public string CoinName { get; set; }
+        // Removed as it is no longer required. By -Nishit Jani on B 2018-10-11 6:45.
+        //[Required]
+        //[StringLength(5)]
+        //public string CoinName { get; set; }
 
 
     }

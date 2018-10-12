@@ -57,13 +57,30 @@ namespace CleanArchitecture.Infrastructure.Services
             }
 
             keyValuePairs.Add("##SMSCODE##", routeConfiguration.OpCode);
-            keyValuePairs.Add("##WALLETID##", routeConfiguration.ProviderWalletID); 
+            keyValuePairs.Add("##WALLETID##", routeConfiguration.ProviderWalletID);
 
+            //Rushabh 11-10-2018 For Authorization Header
+            if (thirdPartyAPIConfiguration.AuthHeader != string.Empty)
+            {
+
+                foreach (string mainItem in thirdPartyAPIConfiguration.AuthHeader.Split("###"))
+                {
+
+                    string[] item = mainItem.Split(":");
+                    //thirdPartyAPIRequest.RequestURL = thirdPartyAPIRequest.RequestURL.Replace(item[0], item[1]);
+                    //thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item[0], item[1]);
+                    keyValuePairsHeader.Add(item[0], item[1]);
+
+                }
+            }
 
             foreach (KeyValuePair<string, string> item in keyValuePairs)
             {
                 thirdPartyAPIRequest.RequestURL = thirdPartyAPIRequest.RequestURL.Replace(item.Key, item.Value);
-                thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item.Key, item.Value);
+                if(thirdPartyAPIRequest.RequestBody != null)
+                {
+                    thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item.Key, item.Value);
+                }                
             }
             if(thirdPartyAPIConfiguration.AuthHeader == "RPC")
             {

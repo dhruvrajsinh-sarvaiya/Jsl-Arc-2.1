@@ -8,10 +8,10 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
     public class CreateWalletAddressRes : BizResponseClass
     {
         public string address { get; set; }
-        public string coin { get; set; }
-        public string label { get; set; }
-        public string wallet { get; set; }
-        public CoinSpecific coinSpecific { get; set; }
+        //public string coin { get; set; }
+        //public string label { get; set; }
+        //public string wallet { get; set; }
+        //public CoinSpecific coinSpecific { get; set; }
     }
     //public class CreateWalletAddressRootObject 
     //{

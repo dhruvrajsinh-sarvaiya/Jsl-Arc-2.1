@@ -23,12 +23,17 @@ namespace CleanArchitecture.Infrastructure.Services
             _log = log;
         }
 
-        public string  SendAPIRequestAsync(string Url, string Request, string ContentType,int Timeout, WebHeaderCollection   headerDictionary = null, string MethodType = "POST")
+        public string  SendAPIRequestAsync(string Url, string Request, string ContentType,int Timeout= 180000, WebHeaderCollection   headerDictionary = null, string MethodType = "POST")
         {
             string responseFromServer = "";
             try
             {               
                 object ResponseObj = new object();
+           //     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+           //| SecurityProtocolType.Tls11
+           //| SecurityProtocolType.Tls12
+           //| SecurityProtocolType.Ssl3;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(Url);
                 httpWebRequest.ContentType = ContentType;
                 
@@ -38,15 +43,17 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 httpWebRequest.Headers = headerDictionary;
 
-                _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, Request);              
-               
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write(Request);
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }           
+                _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, Request);
 
+                if (Request != null)
+                {
+                    using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                    {
+                        streamWriter.Write(Request);
+                        streamWriter.Flush();
+                        streamWriter.Close();
+                    }
+                }
                 HttpWebResponse httpWebResponse = httpWebRequest.GetResponse() as HttpWebResponse;
                 using (StreamReader sr = new StreamReader(httpWebResponse.GetResponseStream()))
                 {
