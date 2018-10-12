@@ -105,14 +105,14 @@ namespace CleanArchitecture.Infrastructure.Services.User
         }
 
 
-        public async Task<bool> IsValidPhoneNumber(string Mobilenumber, string IpAddress)
+        public async Task<bool> IsValidPhoneNumber(string Mobilenumber, string CountryCode)
         {
             try
             {
                 PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
                 //string countryCode = "IN";
-                string Code = GetCountryByIP(IpAddress);
-                PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(Mobilenumber, Code);
+                //string Code = GetCountryByIP(IpAddress);
+                PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(Mobilenumber, CountryCode);
 
                 return phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
             }
@@ -123,7 +123,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
         }
 
 
-        public static string GetCountryByIP(string ipAddress)
+        public async Task<string> GetCountryByIP(string ipAddress)
         {
             try
             {
@@ -145,6 +145,10 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
                     //strReturnVal = responseXML.Item(0).ChildNodes[1].InnerText.ToString(); // Contry
                     //strReturnVal += "(" +responseXML.Item(0).ChildNodes[2].InnerText.ToString() + ")";  // Contry Code 
+                    string Status = responseXML.Item(0).ChildNodes[0].InnerText.ToString();
+                    if (!string.IsNullOrEmpty(Status) && Status == "fail")
+                        return Status;
+
                     strReturnVal = responseXML.Item(0).ChildNodes[2].InnerText.ToString();  // Contry Code 
                     return strReturnVal;
 
