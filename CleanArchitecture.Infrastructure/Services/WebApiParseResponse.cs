@@ -14,17 +14,19 @@ using System.Text.RegularExpressions;
 namespace CleanArchitecture.Infrastructure.Services
 {
     //Common Parsing method Implement Here
-    public class WebApiParseResponse
+    public class WebApiParseResponse /*: IWebApiParseResponse<TResponse>*/
     {
-        //readonly ILogger _log;
-        //readonly TransactionWebAPIConfiguration _txnWebAPIConf;
+        readonly ILogger _log;
+        readonly TransactionWebAPIConfiguration _txnWebAPIConf;
         GetDataForParsingAPI _txnWebAPIParsingData;
         private readonly WebApiDataRepository _webapiDataRepository;
         public WebAPIParseResponseCls _webapiParseResponse;
-        public WebApiParseResponse(WebAPIParseResponseCls webapiParseResponse, WebApiDataRepository webapiDataRepository)
+            //_webapiParseResponse = webapiParseResponse;
+        public WebApiParseResponse(WebAPIParseResponseCls webapiParseResponse, ILogger<WebAPISendRequest> log, GetDataForParsingAPI txnWebAPIParsingData, 
+            WebApiDataRepository webapiDataRepository, TransactionWebAPIConfiguration txnWebAPIConf)
         {
-            //_log = log;
-            //_txnWebAPIConf = txnWebAPIConf;
+            _log = log;
+            _txnWebAPIConf = txnWebAPIConf;
             _webapiDataRepository = webapiDataRepository;
             _webapiParseResponse = webapiParseResponse;
         }
@@ -34,13 +36,16 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 //Take Regex for response parsing
                 _txnWebAPIParsingData = _webapiDataRepository.GetDataForParsingAPI(ThirPartyAPIID);
+                _txnWebAPIParsingData.ResponseSuccess = "";
+                _txnWebAPIParsingData.ResponseHold = "";
+                _txnWebAPIParsingData.ResponseFailure = "";
                 WebAPIParseResponseCls _webapiParseResponse = ParseResponseViaRegex(TransactionResponse, _txnWebAPIParsingData);
 
                 return _webapiParseResponse;
             }
             catch (Exception ex)
             {
-                //_log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 return null;
             }
         }

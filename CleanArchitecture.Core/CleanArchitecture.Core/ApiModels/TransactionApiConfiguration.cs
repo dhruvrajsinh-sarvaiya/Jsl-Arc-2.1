@@ -12,30 +12,27 @@ namespace CleanArchitecture.Core.ApiModels
         [Required]
         public string SMSCode { get; set; }
         public enWebAPIRouteType APIType { get; set; }
-        public enTrnType trnType { get; set; } // ntrivedi  added 03-11-2018
+        public int trnType { get; set; } // ntrivedi  added 03-11-2018
         public decimal amount { get; set; }// ntrivedi  added 03-11-2018
     }
     public class TransactionProviderResponse
     {
         public long ServiceID { get; set; }
         public string ServiceName { get; set; }
-        public long SerProID { get; set; }
+        public long ServiceProID { get; set; }
         public long SerProDetailID { get; set; }
-        public string SerProName { get; set; }
+        //public string SerProName { get; set; } Rushabh 11-10-2018 Removed because there is no column in database
         public long RouteID { get; set; }
         public long ProductID { get; set; } // ntrivedi added 03-11-2018
         public string RouteName { get; set; }
         //public string SMSCode { get; set; }
         public short ServiceType { get; set; }
-        public long ThirPartyAPIID { get; set; }
-        public long AppTypeID { get; set; }
-        public long LimitID { get; set; }
-        public long DemonConfigID { get; set; }
-        public long ServiceProConfigID { get; set; }
-        //public short MinimumAmountItem { get; set; }
-        //public short MaximumAmountItem { get; set; }
-        //public short MinimumAmountService { get; set; }
-        //public short MaximumAmountService { get; set; }
+        public long ThirPartyAPIID { get; set; }      
+        public long AppTypeID { get; set; } //Rushabh Updated 11-10-2018 oldName=AppType
+        public decimal MinimumAmountItem { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
+        public decimal MaximumAmountItem { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
+        public decimal MinimumAmountService { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
+        public decimal MaximumAmountService { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
 
     }
 

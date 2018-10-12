@@ -3,6 +3,7 @@ using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,7 +19,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         bool IsValidWallet(long walletId);
 
-        string GenerateAddress(long walletid);
+        CreateWalletAddressRes GenerateAddress(long walletid,string coin);
 
         //vsolanki 8-10-2018
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();

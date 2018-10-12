@@ -35,6 +35,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IWebApiRepository _webApiRepository;
         private readonly IWebApiSendRequest _webApiSendRequest;
         private readonly IGetWebRequest _getWebRequest;
+        private readonly WebApiParseResponse _WebApiParseResponse;
 
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
@@ -43,7 +44,7 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 10-10-2018 
         private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepository;
 
-        public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
+        public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository, WebApiParseResponse WebApiParseResponse,
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
@@ -64,6 +65,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _addressMstRepository = addressMaster;
             _WalletTypeMasterRepository = WalletTypeMasterRepository;
             _WalletAllowTrnRepository = WalletAllowTrnRepository;
+            _WebApiParseResponse = WebApiParseResponse;
             //_walletLedgerRepository = walletledgerrepo;
             _WalletAllowTrnRepo = WalletAllowTrnRepo;
         }
@@ -289,11 +291,12 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public string GenerateAddress(long walletID)
+        public CreateWalletAddressRes GenerateAddress(long walletID,string coin)
         {
             try
             {
                 ThirdPartyAPIRequest thirdPartyAPIRequest;
+                //WebApiParseResponse _WebApiParseResponse;
                 TradeBitGoDelayAddresses delayAddressesObj, delayGeneratedAddressesObj;
                 List<TransactionProviderResponse> transactionProviderResponses;
                 WalletMaster walletMaster = _commonRepository.GetById(walletID);
@@ -301,36 +304,37 @@ namespace CleanArchitecture.Infrastructure.Services
                 string address = "";
                 string CoinSpecific = null;
                 string TrnID = null;
+                string Respaddress = null;
 
                 if (walletMaster == null)
                 {
-                    //return false
-                    return EnResponseMessage.InvalidWallet;/*new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };*/
+                    //return false enResponseCodeService.Fail
+                    return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
                 else if (walletMaster.Status != 1)
                 {
                     //return false
-                    return EnResponseMessage.InvalidWallet;//new BizResponse { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
+                    return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
 
-                transactionProviderResponses = _webApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { amount = 0,  APIType = enWebAPIRouteType.TransactionAPI, trnType = enTrnType.Generate_Address });
+                transactionProviderResponses = _webApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { SMSCode = coin.ToLower(), amount = 0,  APIType = enWebAPIRouteType.TransactionAPI, trnType = Convert.ToInt32(enTrnType.Generate_Address) });
                 if (transactionProviderResponses == null)
                 {
-                    return "Please try after sometime.";//new BizResponse { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCodeService.Fail, ReturnMsg = "Please try after sometime." };
+                    return new CreateWalletAddressRes { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCode.Fail, ReturnMsg = "Please try after sometime." };
                 }
                 if (transactionProviderResponses[0].ThirPartyAPIID == 0)
                 {
-                    return EnResponseMessage.ItemOrThirdprtyNotFound;//new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
+                    return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
 
                 ThirdPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
                 if (thirdPartyAPIConfiguration == null)
                 {
-                    return EnResponseMessage.ItemOrThirdprtyNotFound;//new BizResponse { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
+                    return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
-                thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProID);
-                string apiResponse = _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 60, thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
-                // parse response logic need to be implemented
+                thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].ServiceProID);
+                string apiResponse = _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 180000, thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
+                // parse response logic 
                 if (string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
                 {
                     delayAddressesObj = GetTradeBitGoDelayAddresses(walletID, walletMaster.WalletTypeID, TrnID, address, thirdPartyAPIRequest.walletID, walletMaster.CreatedBy, CoinSpecific, 0, 0);
@@ -345,22 +349,28 @@ namespace CleanArchitecture.Infrastructure.Services
                         _bitgoDelayRepository.Update(delayGeneratedAddressesObj);
                     }
                 }
-                if (!string.IsNullOrEmpty(address))
+                if (!string.IsNullOrEmpty(apiResponse))
                 {
-                    addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].SerProID, address, "Self Address", walletMaster.UserID, 0, 1);
+                    WebAPIParseResponseCls ParsedResponse = _WebApiParseResponse.TransactionParseResponse(apiResponse, transactionProviderResponses[0].ThirPartyAPIID);
+                    Respaddress = ParsedResponse.TrnRefNo;
+                }
+                
+                if (!string.IsNullOrEmpty(Respaddress))
+                {
+                    addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].ServiceProID, Respaddress, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
-                    string responseString = apiResponse;
-                    CreateWalletAddressRes Response = new CreateWalletAddressRes();
-                    Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
-                    Response.ReturnCode = enResponseCode.Success;
-                    var respObj = JsonConvert.SerializeObject(Response);
-                    dynamic respObjJson = JObject.Parse(respObj);
-                    //return new BizResponse { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCodeService.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg };      
-                    return respObj;
+                    string responseString = Respaddress;
+                    //CreateWalletAddressRes Response = new CreateWalletAddressRes();
+                    //Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
+                    //Response.ReturnCode = enResponseCode.Success;
+                    //var respObj = JsonConvert.SerializeObject(Response);
+                    //dynamic respObjJson = JObject.Parse(respObj);
+                    return new CreateWalletAddressRes { address=Respaddress, ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg };      
+                    //return respObj;
                 }
                 else
                 {
-                    return EnResponseMessage.CreateWalletFailMsg;//new BizResponse { ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCodeService.Fail, ReturnMsg = EnResponseMessage.CreateWalletFailMsg };
+                    return new CreateWalletAddressRes { ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.CreateWalletFailMsg };
                 }
 
                 // code need to be added

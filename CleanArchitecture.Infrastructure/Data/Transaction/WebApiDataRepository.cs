@@ -80,16 +80,39 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 //and {2} between RC.MinimumAmount and RC.MaximumAmount
                 //and {2}  between SC.MinimumAmount and SC.MaximumAmount
                 IQueryable<TransactionProviderResponse> Result = _dbContext.TransactionProviderResponse.FromSql(
-                 @"select SC.ID as ServiceID,SC.ServiceName,Prc.ID as SerProDetailID,Prc.SerProID,PrM.ProviderName,RC.ID as RouteID,
-                 PC.ID as ProductID,RC.RouteName,SC.ServiceType,Prc.ThirPartyAPIID,Prc.AppTypeID             
-             from ServiceConfiguration SC inner join  ProductConfiguration PC on
-			 PC.ServiceID = SC.Id inner join RouteConfiguration RC on RC.ProductID = PC.Id  
-             inner join ServiceProviderMaster PrM on PrM.id = RC.SerProID 
-			 inner join ServiceProviderDetail PrC on Prc.ServiceProID = RC.SerProID AND Prc.TrnTypeID={1} 
-			 where SC.SMSCode = '{0}' and RC.TrnType={1} 			 
-			 and SC.Status = 1 and RC.Status = 1 and Prc.Status=1 
-			 order by RC.Priority", Request.SMSCode, Request.trnType, Request.amount);
-                return Result.ToList();
+                            @"select SC.ID as ServiceID,SC.ServiceName,Prc.ID as SerProDetailID,Prc.ServiceProID,RC.ID as RouteID,
+                            PC.ID as ProductID,RC.RouteName,SC.ServiceType,Prc.ThirPartyAPIID,Prc.AppTypeID,RC.MinimumAmount as MinimumAmountItem,
+                            RC.MaximumAmount as MaximumAmountItem,SC.MinimumAmount as MinimumAmountService,SC.MaximumAmount as MaximumAmountService
+                            from ServiceConfiguration SC inner join  ProductConfiguration PC on
+			                PC.ServiceID = SC.Id inner join RouteConfiguration RC on RC.ProductID = PC.Id  
+			                inner join ServiceProviderDetail PrC on Prc.ServiceProID = RC.SerProID AND Prc.TrnTypeID={1} 
+			                where SC.SMSCode = {0} and RC.TrnType={1} 
+			                and {2} between RC.MinimumAmount and RC.MaximumAmount
+			                and {3} between SC.MinimumAmount and SC.MaximumAmount
+			                and SC.Status = 1 and RC.Status = 1 and Prc.Status=1 
+			                order by RC.Priority", Request.SMSCode, Request.trnType, Request.amount,Request.amount);
+                //return Result.ToList();Prc.SerProName,
+
+
+                //IQueryable<TransactionProviderResponse> Result = _dbContext.TransactionProviderResponse.FromSql(
+                //        @"select SC.ID as ServiceID,SC.ServiceName,Prc.ID as SerProID,Prc.SerProName,RC.ID as RouteID,PC.ID as ProductID,RC.RouteName,SC.ServiceType,
+                //        Prc.ThirPartyAPIID,Prc.AppType,RC.MinimumAmount as MinimumAmountItem,RC.MaximumAmount as MaximumAmountItem,SC.MinimumAmount as MinimumAmountService,SC.MaximumAmount as MaximumAmountService
+                //        from ServiceConfiguration SC inner
+                //        join ProductConfiguration PC on
+                //        PC.ServiceID = SC.Id inner
+                //        join RouteConfiguration RC on RC.ProductID = PC.Id  inner
+                //        join ProviderConfiguration PrC on Prc.Id = RC.SerProID
+                //        where SC.SMSCode = {0} and RC.TrnType ={1}   and {2}
+                //        between RC.MinimumAmount and RC.MaximumAmount and {3}
+                //        between SC.MinimumAmount and SC.MaximumAmount
+                //        and SC.Status = 1 and RC.Status = 1 and Prc.Status = 1
+                //        order by RC.Priority ", Request.SMSCode,Request.trnType, Request.amount,Request.amount);
+
+
+
+                var list = new List<TransactionProviderResponse>(Result);
+                return list;
+                //return Result.ToList();
             }
             catch (Exception ex)
             {

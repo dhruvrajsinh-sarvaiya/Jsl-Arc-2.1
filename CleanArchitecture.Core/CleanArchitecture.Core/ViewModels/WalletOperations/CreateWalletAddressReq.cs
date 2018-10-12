@@ -7,8 +7,8 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
 {
     public class CreateWalletAddressReq
     {
-        [Required]
-        public string id { get; set; }
+        //[Required(ErrorMessage = "9,Please Enter Wallet ID,4003")]
+        //[StringLength(250, ErrorMessage = "9,Invalid Wallet ID,4004")]
         public bool allowMigrated { get; set; }
         public int chain{ get; set;}
         public int gasPrice { get; set; }
