@@ -77,35 +77,24 @@ namespace CleanArchitecture.Web.API
         }
 
         /// <summary>
-        /// vsolanki 12-10-2018 List Wallet
+        /// vsolanki 12-10-2018 List  All Wallet Of Particular User
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        //[HttpGet("{coin}")]      
-        //public async Task<IActionResult> ListWallet(string coin, int limit = 25, string prevId = null, bool allTokens = false)
-        //{
-        //    try
-        //    {
-        //        var user=await _userManager.GetUserAsync(HttpContext.User);
-        //        string requeststring = "{'wallets':[{'id':'585951a5df8380e0e3063e9f','users':[{'user':'55e8a1a5df8380e0e30e20c6','permissions':['admin','view','spend']}],'coin':'tbtc','label':'Alexs first wallet','m':2,'n':3,'keys':['585951a5df8380e0e304a553','585951a5df8380e0e30d645c','585951a5df8380e0e30b6147'],'tags':['585951a5df8380e0e30a198a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'coinSpecific':{}}]}";
-        //        ListWalletResponse Response = new ListWalletResponse();
-        //        Response = JsonConvert.DeserializeObject<ListWalletResponse>(requeststring);
-        //        Response.ReturnCode = enResponseCode.Success;
-        //        var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-        //                    new JsonSerializerSettings
-        //                    {
-        //                        NullValueHandling = NullValueHandling.Ignore
-        //                    });
-        //        // var respObj = JsonConvert.SerializeObject(Response);
-        //        dynamic respObjJson = JObject.Parse(respObj);
-        //        return returnDynamicResult(respObjJson);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-        //        return BadRequest();
-        //    }
-        //}
+        [HttpGet]
+        public async Task<IActionResult> ListWallet(string coin, int limit = 25, string prevId = null, bool allTokens = false)
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
 
         /// <summary>
         /// vsolanki 1-10-2018 Create Wallet
@@ -123,7 +112,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
-                    Response.ErrorCode = enErrorCode.
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
                 }
                 else
                 {
