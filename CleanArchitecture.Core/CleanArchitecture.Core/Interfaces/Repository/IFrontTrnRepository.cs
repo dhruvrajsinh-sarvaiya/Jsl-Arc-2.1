@@ -12,5 +12,7 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<TradeHistoryResponce> GetTradeHistory(long MemberID,long PairId,int IsAll);
         long GetPairIdByName(string pair);
         List<RecentOrderRespose> GetRecentOrder(long PairId);
+        List<GetBuySellBook> GetBuyerBook(long id);
+        List<GetBuySellBook> GetSellerBook(long id);
     }
 }

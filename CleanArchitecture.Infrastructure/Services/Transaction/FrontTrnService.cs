@@ -298,6 +298,42 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+        public List<GetBuySellBook> GetBuyerBook(long id)
+        {
+            try
+            {
+                var list = _frontTrnRepository.GetBuyerBook(id);
+                List<GetBuySellBook> responce = new List<GetBuySellBook>();
+                if (list != null)
+                {
+                    responce = list;
+                }
+                return responce;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<GetBuySellBook> GetSellerBook(long id)
+        {
+            try
+            {
+                var list = _frontTrnRepository.GetSellerBook(id);
+                List<GetBuySellBook> responce = new List<GetBuySellBook>();
+                if (list != null)
+                {
+                    responce = list;
+                }
+                return responce;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         public long GetPairIdByName(string pair)
         {
             try
@@ -314,7 +350,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
-                String Pattern = "^[A-Z]{6,9}$";
+                String Pattern = "^[A-Z_]{6,9}$";
                 if(Regex.IsMatch(Pair, Pattern, RegexOptions.IgnoreCase))
                       return true;
 

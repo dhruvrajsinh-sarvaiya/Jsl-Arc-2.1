@@ -84,7 +84,7 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
         public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; } //komal 12-10-2018
-
+        public DbQuery<GetBuySellBook> BuyerSellerInfo { get; set; } //uday 12-10-2018
         //Add Tables for Service Master (Not Commited)
 
         public DbSet<ServiceMaster> ServiceMaster { get; set; }

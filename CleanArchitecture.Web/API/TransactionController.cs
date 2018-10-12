@@ -225,19 +225,19 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return returnDynamicResult(Response);
+                    return Ok(Response);
                 }
                 long PairId = _frontTrnService.GetPairIdByName(Pair);
                 if (PairId == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return returnDynamicResult(Response);
+                    return Ok(Response);
                 }
                 long MemberID = 1;// user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId);
                 Response.ReturnCode = enResponseCode.Success;
-                return returnDynamicResult(Response);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -288,7 +288,71 @@ namespace CleanArchitecture.Web.API
             {
                 Response.response = _frontTrnService.GetTradeHistory(0, 0, 0);
                 Response.ReturnCode = enResponseCode.Success;
-                return returnDynamicResult(Response);
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+
+        }
+
+        [HttpPost("GetBuyerBook/{Pair}")]
+        public ActionResult GetBuyerBook(string Pair)
+        {
+            GetBuySellBookResponse Response = new GetBuySellBookResponse();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                Response.response = _frontTrnService.GetBuyerBook(id);
+                Response.ReturnCode = enResponseCode.Success;
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+
+        }
+
+        [HttpPost("GetSellerBook/{Pair}")]
+        public ActionResult GetSellerBook(string Pair)
+        {
+            GetBuySellBookResponse Response = new GetBuySellBookResponse();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                Response.response = _frontTrnService.GetSellerBook(id);
+                Response.ReturnCode = enResponseCode.Success;
+                return Ok(Response);
             }
             catch (Exception ex)
             {
