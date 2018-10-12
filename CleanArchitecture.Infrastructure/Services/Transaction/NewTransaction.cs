@@ -24,6 +24,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<TradePairMaster> _TradePairMaster;
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
+        private readonly EFCommonRepository<TradeStopLoss> _TradeStopLoss;
         private readonly ICommonRepository<ServiceConfiguration> _ServiceConfi;
         private readonly ICommonRepository<AddressMaster> _AddressMasterRepository;
        public BizResponse _Resp;
@@ -35,7 +36,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository,
-            ICommonRepository<ServiceConfiguration> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository)
+            ICommonRepository<ServiceConfiguration> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository,
+            EFCommonRepository<TradeStopLoss> tradeStopLoss)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -43,6 +45,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TradeTransactionRepository = TradeTransactionRepository;
             _ServiceConfi = ServiceConfi;
             _AddressMasterRepository = AddressMasterRepository;
+            _TradeStopLoss = tradeStopLoss;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
         {
@@ -203,7 +206,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _TradeTransactionObj.TrnNo = TrnNo;
                 Req.TrnNo = TrnNo;
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
+                {
                     InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
+                    InsertTradeStopLoss(Req);
+                }
+                   
                 return (new BizResponse { ReturnMsg = "", ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
@@ -223,7 +230,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _TradeTransactionObj.TrnNo = TrnNo;
                 Req.TrnNo = TrnNo;
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
+                {
                     InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
+                    InsertTradeStopLoss(Req);
+                }
                 //DI of SMS here
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.Fail, ErrorCode = ErrorCode });
             }
@@ -295,6 +305,26 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     StatusMsg = NewtransactionReq.StatusMsg
                 };
                 _TradeTransactionRepository.Add(Newtransaction);
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError });
+            }
+
+        }
+        public BizResponse InsertTradeStopLoss(NewTransactionRequestCls NewtransactionReq)
+        {
+            _Resp = new BizResponse();
+            try
+            {
+                var Newtransaction = new TradeStopLoss()
+                {
+                    TrnNo = NewtransactionReq.TrnNo,
+                    ordertype = Convert.ToInt16(NewtransactionReq.ordertype)                   
+                };
+                _TradeStopLoss.Add(Newtransaction);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)

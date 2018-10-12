@@ -43,7 +43,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public enTransactionMarketType ordertype { get; set; }
 
         [Required(ErrorMessage = "1,Required Parameter,4003")] 
-        [EnumDataType(typeof(enTrnType))]
+        [EnumDataType(typeof(enTrnType),ErrorMessage = "1,Required Parameter Enum,4003")]
         public enTrnType orderSide { get; set; }
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]

@@ -409,8 +409,8 @@ namespace CleanArchitecture.Web.API
         //    return returnDynamicResult(Response);
         //}
 
-        [HttpPost("CreateTransactionOrder/{PairName:string}")]
-        [Authorize]
+        [HttpPost("CreateTransactionOrder/{PairName}")]
+        //[Authorize]
         public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request, string PairName)
         {
             //Do Process for CreateOrder
