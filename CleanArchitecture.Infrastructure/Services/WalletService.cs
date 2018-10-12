@@ -388,7 +388,8 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 AddressMaster addressMaster = new AddressMaster();
                 addressMaster.Address = address;
-               // addressMaster.CoinName = coinName;
+                // addressMaster.CoinName = coinName;
+                addressMaster.AddressLable = addressName;
                 addressMaster.CreatedBy = createdBy;
                 addressMaster.CreatedDate = UTC_To_IST();
                 addressMaster.IsDefaultAddress = isDefaultAdd;
