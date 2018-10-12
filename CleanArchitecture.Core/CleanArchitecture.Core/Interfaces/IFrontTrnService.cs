@@ -12,5 +12,8 @@ namespace CleanArchitecture.Core.Interfaces
         List<BasePairResponse> GetTradePairAsset();
         List<VolumeDataRespose> GetVolumeData();
         List<GetTradeHistoryInfo> GetTradeHistory(long id);
+        long GetPairIdByName(string pair);
+        bool IsValidPairName(string Pair);
+        
     }
 }

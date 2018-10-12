@@ -10,5 +10,6 @@ namespace CleanArchitecture.Core.Interfaces.Repository
     {
         List<ActiveOrderDataResponse> GetActiveOrder(long MemberID);
         List<TradeHistoryResponce> GetTradeHistory(long id);
+        long GetPairIdByName(string pair);
     }
 }

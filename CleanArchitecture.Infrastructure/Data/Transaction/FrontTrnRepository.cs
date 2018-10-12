@@ -30,6 +30,17 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
             return Result.ToList();
         }
+
+        public long GetPairIdByName(string pair)
+        {
+            
+            var model = _dbContext.TradePairMaster.Where(p => p.PairName == pair).FirstOrDefault();
+            if (model == null)
+                return 0;
+
+            return model.Id;
+        }
+
         public List<TradeHistoryResponce> GetTradeHistory(long id)
         {
             IQueryable<TradeHistoryResponce> Result = _dbContext.TradeHistoryInfo.FromSql(

@@ -340,318 +340,6 @@ namespace CleanArchitecture.Web.API
                 return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
-        #endregion
-
-        #region Login With Mobile
-        /// <summary>
-        /// This method are used login with otp base verify 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("LoginWithMobile")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginWithMobile(LoginWithMobileViewModel model)
-        {
-            try
-            {
-                var userdt = await _userService.FindByMobileNumber(model.Mobile);
-                if (userdt != null)
-                {
-                    var otpData = _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
-                    if (otpData != null)
-                    {
-                        //var roles = await _userManager.GetRolesAsync(userdt.Result);
-                        _logger.LogWarning(1, "User Login with Mobile Send Success.");
-                        return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile });
-                        // return AppUtils.Standerdlogin("You have send OTP on mobile.");
-                    }
-                    else
-                    {
-
-                        _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status400BadRequest });
-                    }
-                }
-                else
-                {
-                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-        #endregion
-
-        #region Social Login
-
-        ///// <summary>
-        /////  This method are used social media using to login.
-        ///// </summary>  
-        //[HttpPost("SocialLogin")]
-        //[AllowAnonymous]
-        ////[ValidateAntiForgeryToken]
-        //public IActionResult Sociallogin([FromBody] SocialLoginWithEmailViewModel model, string returnUrl = null)
-        //{
-        //    var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-        //    var properties = _signInManager.ConfigureExternalAuthenticationProperties(model.ProviderName, redirectUrl);
-        //    return new ChallengeResult(model.ProviderName, properties);
-        //}
-
-        /// <summary>
-        ///  This method are used social media using to login.
-        /// </summary>  
-        [HttpPost("SocialLogin")]
-        [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
-        public IActionResult Sociallogin(string ProviderName, string returnUrl = null)
-        {
-            try
-            {
-                var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-                var properties = _signInManager.ConfigureExternalAuthenticationProperties(ProviderName, redirectUrl);
-                return new ChallengeResult(ProviderName, properties);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new SocialViewModel { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-
-
-        #endregion
-
-        #region Resend OTP With Email
-        /// <summary>
-        /// This method are used login with email resend otp base verify 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("ReSendOtpWithEmail")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithEmail(LoginWithEmailViewModel model)
-        {
-            try
-            {
-                var userdt = await _userManager.FindByEmailAsync(model.Email);
-                if (!string.IsNullOrEmpty(userdt?.Email))
-                {
-                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt?.Id));
-                    if (otpcheck != null)
-                    {
-                        //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus) // Remove expiretime as per discuss with nishit bhai 10-09-2018
-                        if (!otpcheck.EnableStatus)
-                        {
-                            _otpMasterService.UpdateOtp(otpcheck.Id);
-                            var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), userdt.Email, "");
-                            if (otpData != null)
-                            {
-                                _logger.LogWarning(1, "User Login with Email OTP Send Success.");
-
-                                return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP });
-
-                            }
-                            else
-                            {
-                                _logger.LogWarning(2, "User Otp Data Not Send.");
-                                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginEmailOTPNotsend, ErrorCode = enErrorCode.Status400BadRequest });
-
-                            }
-                        }
-                        else
-                        {
-                            return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status400BadRequest });
-                            //SendEmailRequest request = new SendEmailRequest();
-                            //request.Recepient = userdt.Email;
-                            //request.Subject = "Login With Email Otp";
-                            //request.Body = "use this code:" + otpcheck.OTP + "";
-
-                            //await _mediator.Send(request);
-                            //_logger.LogWarning(1, "User Login with Email OTP Send Success.");
-
-                            //return Ok("User Login with Email OTP Send Success.");
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                    }
-                }
-                else
-                {
-                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status400BadRequest });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-        #endregion
-
-
-        #region Resend OTP With Mobile
-        /// <summary>
-        /// This method are used login with mobile resend otp base verify 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("ReSendOtpWithMobile")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithMobile(LoginWithMobileViewModel model)
-        {
-            try
-            {
-                var userdt = await _userService.FindByMobileNumber(model.Mobile);
-                if (!string.IsNullOrEmpty(userdt?.Mobile))
-                {
-                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt?.Id));
-                    if (otpcheck != null)
-                    {
-
-                        //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
-                        if (!otpcheck.EnableStatus)
-                        {
-                            _otpMasterService.UpdateOtp(otpcheck.Id);
-                            var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
-                            if (otpData != null)
-                            {
-                                _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
-                                return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile });
-                            }
-                            else
-                            {
-                                _logger.LogWarning(2, "User Otp Data Not Send.");
-                                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status400BadRequest });
-                            }
-                        }
-                        else
-                        {
-                            return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
-
-                            //return BadRequest(new ApiError("Invalid Mobileno."));
-                            //SendSMSRequest request = new SendSMSRequest();
-                            //request.MobileNo = Convert.ToInt64(model.Mobile);
-                            //request.Message = "SMS for use this code " + otpcheck.OTP + "";
-
-                            //await _mediator.Send(request);
-
-                            //_logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
-
-                            //return Ok("User Login with Mobile OTP Send Success.");
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                    }
-                }
-                else
-                {
-                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-        #endregion
-
-        #region LoginOtpVerification
-
-        /// <summary>
-        /// This method are used login with Mobile otp base verification 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("MobileOtpVerification")]
-        [AllowAnonymous]
-        public async Task<IActionResult> MobileOtpVerification(OTPWithMobileViewModel model)
-        {
-            try
-            {
-                var logindata = await _userService.FindByMobileNumber(model.Mobile);
-                var result = await _userManager.FindByIdAsync(logindata?.Id.ToString());
-                if (!string.IsNullOrEmpty(result?.Mobile) && (result.LockoutEnd <= DateTime.UtcNow || result.LockoutEnd == null))
-                {
-                    if (logindata?.Id > 0)
-                    {
-                        var tempotp = await _otpMasterService.GetOtpData(Convert.ToInt16(logindata.Id));
-                        if (tempotp != null)
-                        {
-                            if (tempotp?.ExpirTime >= DateTime.UtcNow)
-                            {
-                                if (model.OTP == tempotp.OTP)
-                                {
-                                    _logger.LogWarning(1, "You are successfully login.");
-                                    _otpMasterService.UpdateOtp(tempotp.Id);
-                                    var roles = await _userManager.GetRolesAsync(result);
-                                    return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CommSuccessMsgInternal });
-                                }
-                                if (result?.AccessFailedCount < Convert.ToInt16(_configuration["MaxFailedAttempts"]))
-                                {
-                                    result.AccessFailedCount = result.AccessFailedCount + 1;
-                                    if (result.AccessFailedCount == Convert.ToInt16(_configuration["MaxFailedAttempts"]))
-                                    {
-                                        result.LockoutEnd = DateTime.UtcNow.AddHours(Convert.ToInt64(_configuration["DefaultLockoutTimeSpan"]));
-                                        result.AccessFailedCount = 0;
-                                        await _userManager.UpdateAsync(result);
-                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
-                                    }
-                                    else
-                                    {
-                                        await _userManager.UpdateAsync(result);
-                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
-                                    }
-                                }
-                                else
-                                {
-                                    return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
-                                }
-                            }
-                            else
-                            {
-                                ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Error.");
-                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
-                    }
-                }
-                else
-                {
-                    if (result?.LockoutEnd >= DateTime.UtcNow)
-                    {
-                        _logger.LogWarning(2, "User account locked out for two hours.");
-
-                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Invalid MobileNo.");
-                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status423Locked });
-                    }
-                }
-                ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status400BadRequest });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-
 
         /// <summary>
         /// This method are used login with email otp base verification 
@@ -749,6 +437,309 @@ namespace CleanArchitecture.Web.API
                 return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
+
+        /// <summary>
+        /// This method are used login with email resend otp base verify 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("ReSendOtpWithEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtpWithEmail(LoginWithEmailViewModel model)
+        {
+            try
+            {
+                var userdt = await _userManager.FindByEmailAsync(model.Email);
+                if (!string.IsNullOrEmpty(userdt?.Email))
+                {
+                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt?.Id));
+                    if (otpcheck != null)
+                    {
+                        //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus) // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                        if (!otpcheck.EnableStatus)
+                        {
+                            _otpMasterService.UpdateOtp(otpcheck.Id);
+                            var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), userdt.Email, "");
+                            if (otpData != null)
+                            {
+                                _logger.LogWarning(1, "User Login with Email OTP Send Success.");
+
+                                return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP });
+
+                            }
+                            else
+                            {
+                                _logger.LogWarning(2, "User Otp Data Not Send.");
+                                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginEmailOTPNotsend, ErrorCode = enErrorCode.Status400BadRequest });
+
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status400BadRequest });
+                            //SendEmailRequest request = new SendEmailRequest();
+                            //request.Recepient = userdt.Email;
+                            //request.Subject = "Login With Email Otp";
+                            //request.Body = "use this code:" + otpcheck.OTP + "";
+
+                            //await _mediator.Send(request);
+                            //_logger.LogWarning(1, "User Login with Email OTP Send Success.");
+
+                            //return Ok("User Login with Email OTP Send Success.");
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
+        #region Login With Mobile
+        /// <summary>
+        /// This method are used login with otp base verify 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("LoginWithMobile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithMobile(LoginWithMobileViewModel model)
+        {
+            try
+            {
+                var userdt = await _userService.FindByMobileNumber(model.Mobile);
+                if (userdt != null)
+                {
+                    var otpData = _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
+                    if (otpData != null)
+                    {
+                        //var roles = await _userManager.GetRolesAsync(userdt.Result);
+                        _logger.LogWarning(1, "User Login with Mobile Send Success.");
+                        return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile });
+                        // return AppUtils.Standerdlogin("You have send OTP on mobile.");
+                    }
+                    else
+                    {
+
+                        _logger.LogWarning(2, "User Otp Data Not Send.");
+                        return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        /// <summary>
+        /// This method are used login with Mobile otp base verification 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("MobileOtpVerification")]
+        [AllowAnonymous]
+        public async Task<IActionResult> MobileOtpVerification(OTPWithMobileViewModel model)
+        {
+            try
+            {
+                var logindata = await _userService.FindByMobileNumber(model.Mobile);
+                var result = await _userManager.FindByIdAsync(logindata?.Id.ToString());
+                if (!string.IsNullOrEmpty(result?.Mobile) && (result.LockoutEnd <= DateTime.UtcNow || result.LockoutEnd == null))
+                {
+                    if (logindata?.Id > 0)
+                    {
+                        var tempotp = await _otpMasterService.GetOtpData(Convert.ToInt16(logindata.Id));
+                        if (tempotp != null)
+                        {
+                            if (tempotp?.ExpirTime >= DateTime.UtcNow)
+                            {
+                                if (model.OTP == tempotp.OTP)
+                                {
+                                    _logger.LogWarning(1, "You are successfully login.");
+                                    _otpMasterService.UpdateOtp(tempotp.Id);
+                                    var roles = await _userManager.GetRolesAsync(result);
+                                    return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CommSuccessMsgInternal });
+                                }
+                                if (result?.AccessFailedCount < Convert.ToInt16(_configuration["MaxFailedAttempts"]))
+                                {
+                                    result.AccessFailedCount = result.AccessFailedCount + 1;
+                                    if (result.AccessFailedCount == Convert.ToInt16(_configuration["MaxFailedAttempts"]))
+                                    {
+                                        result.LockoutEnd = DateTime.UtcNow.AddHours(Convert.ToInt64(_configuration["DefaultLockoutTimeSpan"]));
+                                        result.AccessFailedCount = 0;
+                                        await _userManager.UpdateAsync(result);
+                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+                                    }
+                                    else
+                                    {
+                                        await _userManager.UpdateAsync(result);
+                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                                    }
+                                }
+                                else
+                                {
+                                    return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                                }
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Error.");
+                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                    }
+                }
+                else
+                {
+                    if (result?.LockoutEnd >= DateTime.UtcNow)
+                    {
+                        _logger.LogWarning(2, "User account locked out for two hours.");
+
+                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid MobileNo.");
+                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status423Locked });
+                    }
+                }
+                ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status400BadRequest });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        /// <summary>
+        /// This method are used login with mobile resend otp base verify 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("ReSendOtpWithMobile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtpWithMobile(LoginWithMobileViewModel model)
+        {
+            try
+            {
+                var userdt = await _userService.FindByMobileNumber(model.Mobile);
+                if (!string.IsNullOrEmpty(userdt?.Mobile))
+                {
+                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt?.Id));
+                    if (otpcheck != null)
+                    {
+
+                        //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                        if (!otpcheck.EnableStatus)
+                        {
+                            _otpMasterService.UpdateOtp(otpcheck.Id);
+                            var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
+                            if (otpData != null)
+                            {
+                                _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
+                                return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile });
+                            }
+                            else
+                            {
+                                _logger.LogWarning(2, "User Otp Data Not Send.");
+                                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status400BadRequest });
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+
+                            //return BadRequest(new ApiError("Invalid Mobileno."));
+                            //SendSMSRequest request = new SendSMSRequest();
+                            //request.MobileNo = Convert.ToInt64(model.Mobile);
+                            //request.Message = "SMS for use this code " + otpcheck.OTP + "";
+
+                            //await _mediator.Send(request);
+
+                            //_logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
+
+                            //return Ok("User Login with Mobile OTP Send Success.");
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+        #endregion
+
+        #region Social Login
+
+        ///// <summary>
+        /////  This method are used social media using to login.
+        ///// </summary>  
+        //[HttpPost("SocialLogin")]
+        //[AllowAnonymous]
+        ////[ValidateAntiForgeryToken]
+        //public IActionResult Sociallogin([FromBody] SocialLoginWithEmailViewModel model, string returnUrl = null)
+        //{
+        //    var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+        //    var properties = _signInManager.ConfigureExternalAuthenticationProperties(model.ProviderName, redirectUrl);
+        //    return new ChallengeResult(model.ProviderName, properties);
+        //}
+
+        /// <summary>
+        ///  This method are used social media using to login.
+        /// </summary>  
+        [HttpPost("SocialLogin")]
+        [AllowAnonymous]
+        //[ValidateAntiForgeryToken]
+        public IActionResult Sociallogin(string ProviderName, string returnUrl = null)
+        {
+            try
+            {
+                var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+                var properties = _signInManager.ConfigureExternalAuthenticationProperties(ProviderName, redirectUrl);
+                return new ChallengeResult(ProviderName, properties);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new SocialViewModel { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
 
         #endregion
 
