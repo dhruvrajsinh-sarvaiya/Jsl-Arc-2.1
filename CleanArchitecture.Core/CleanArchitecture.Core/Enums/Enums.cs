@@ -237,4 +237,12 @@ namespace CleanArchitecture.Core.Enums
         Dr_ESCROW = 15,
         Cr_Bonus = 16
     }
+
+    public enum enTransactionMarketType
+    {
+        LIMIT = 1,
+        MARKET = 2,
+        STOP_LOSS = 3,
+        SPOT = 4
+    }
 }

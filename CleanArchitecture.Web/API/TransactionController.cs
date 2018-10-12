@@ -147,7 +147,7 @@ namespace CleanArchitecture.Web.API
         //        return Ok(response);
         //    }
         //    dummyResponce = "{response : [{ 'type':'deposit', 'currency':'btc', 'amount':'0.0', 'available':'0.0' },{ 'type':'deposit', 'currency':'usd', 'amount':'1.0', 'available':'1.0' },{ 'type':'exchange', 'currency':'btc', 'amount':'1', 'available':'1' },{ 'type':'exchange', 'currency':'usd', 'amount':'1', 'available':'1' },{ 'type':'trading', 'currency':'btc', 'amount':'1', 'available':'1' },{ 'type':'trading', 'currency':'usd', 'amount':'1', 'available':'1' }]}";
-          
+
         //    response = JsonConvert.DeserializeObject<WalletBalanceResponce>(dummyResponce);
         //    return Ok(response);
         //}
@@ -252,7 +252,7 @@ namespace CleanArchitecture.Web.API
         //        return BadRequest(ModelState);
 
         //    dummyResponce = "{response : { 'id':13800719, 'currency':'USD', 'rate':'31.39', 'period':2, 'direction':'lend', 'timestamp':'1444280237.0', 'is_live':true, 'is_cancelled':false, 'original_amount':'50.0', 'remaining_amount':'50.0', 'executed_amount':'0.0' }}";
-            
+
         //    response = JsonConvert.DeserializeObject<ActiveCreditsResponce>(dummyResponce);
         //    response.ReturnCode = enResponseCode.Success;
         //    return Ok(response);
@@ -409,23 +409,22 @@ namespace CleanArchitecture.Web.API
         //    return returnDynamicResult(Response);
         //}
 
-        [HttpPost("CreateTransactionOrder")]
+        [HttpPost("CreateTransactionOrder/{PairName:string}")]
         [Authorize]
-        public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request)
+        public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request, string PairName)
         {
             //Do Process for CreateOrder
             //For Testing Purpose
             var user = await _userManager.GetUserAsync(HttpContext.User);
-
-
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
             Req.TrnMode = Request.TrnMode;
-            Req.TrnType = (enTrnType)(Request.ordertype);
+            Req.TrnType = Request.orderSide;
+            Req.ordertype = Request.ordertype;
             Req.MemberID = user.Id;
             Req.MemberMobile = user.Mobile;
             //Req.MemberID = 5;
             //Req.MemberMobile = "1234567890";
-            Req.SMSCode = "";
+            Req.SMSCode = PairName;
             Req.TransactionAccount = Request.CurrencyPairID.ToString();
             Req.Amount = Request.Total;
             Req.PairID = Request.CurrencyPairID;
@@ -434,19 +433,21 @@ namespace CleanArchitecture.Web.API
             Req.DebitWalletID = Request.DebitWalletID;
             Req.CreditWalletID = Request.CreditWalletID;
 
-            Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
-            BizResponse MethodResp = await MethodRespTsk;
-
+            _transactionProcess.ProcessNewTransactionAsync(Req);
             CreateTransactionResponse Response = new CreateTransactionResponse();
-            if (MethodResp.ReturnCode == enResponseCodeService.Success)
-                Response.ReturnCode = enResponseCode.Success;
-            else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
-                Response.ReturnCode = enResponseCode.Fail;
-            else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
-                Response.ReturnCode = enResponseCode.InternalError;
+            //Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
+            //BizResponse MethodResp = await MethodRespTsk;
 
-            Response.ReturnMsg = MethodResp.ReturnMsg;
-            Response.ErrorCode = MethodResp.ErrorCode;
+
+            //if (MethodResp.ReturnCode == enResponseCodeService.Success)
+            //    Response.ReturnCode = enResponseCode.Success;
+            //else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
+            //    Response.ReturnCode = enResponseCode.Fail;
+            //else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
+            //    Response.ReturnCode = enResponseCode.InternalError;
+
+            //Response.ReturnMsg = MethodResp.ReturnMsg;
+            //Response.ErrorCode = MethodResp.ErrorCode;
 
             Response.response = new CreateOrderInfo()
             {
@@ -458,7 +459,7 @@ namespace CleanArchitecture.Web.API
                 //volume = 10
             };
 
-            //Response.ReturnCode = enResponseCode.Success;
+            Response.ReturnCode = enResponseCode.Success;
             return returnDynamicResult(Response);
         }
 
@@ -670,7 +671,7 @@ namespace CleanArchitecture.Web.API
         //    return returnDynamicResult(Response);
         //}
         #endregion
-            
+
         [HttpGet("GetVolumeData")]
         public IActionResult GetVolumeData()
         {

@@ -12,11 +12,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services.Transaction
 {
+    //[Guid("9245fe4a-d402-451c-b9ed-9c1a04247482")]
     public class NewTransaction : ITransactionProcess
     {
         private readonly ICommonRepository<TradePairMaster> _TradePairMaster;
@@ -42,18 +44,20 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _ServiceConfi = ServiceConfi;
             _AddressMasterRepository = AddressMasterRepository;
         }
-        public Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
+        public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
         {
-            //_Resp = new BizResponse();
-          // var dfd = CombineAllInitTransactionAsync(Req);
-            return Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess});
-            
+            _Resp = new BizResponse();
+           Task<BizResponse> MethodRespTsk = CombineAllInitTransactionAsync(Req);
+            _Resp = await MethodRespTsk;
+            //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            return _Resp;
         }
 
         public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req)
         {
             _Resp = new BizResponse();
-
+            Guid obj = Guid.NewGuid();
+            
 
             //=========================INSERT
             //Take memberMobile for sms
