@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-  //  [Authorize]
+    [Authorize]
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
