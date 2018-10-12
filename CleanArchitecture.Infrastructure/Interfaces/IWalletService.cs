@@ -31,5 +31,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         BizResponseClass DebitBalance(long userID, long WalletID, decimal amount, int walletTypeID, enWalletTrnType wtrnType, enTrnType trnType, enServiceType serviceType, long trnNo, string smsCode);
 
         ListWalletResponse ListWallet(long userid);
+
+        ListWalletResponse GetWalletByCoin(long userid, string coin);
     }
 }
