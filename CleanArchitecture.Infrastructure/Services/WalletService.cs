@@ -569,7 +569,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 //genrate address and update in walletmaster
                 var addressClass = GenerateAddress(walletMaster.Id, CoinName);
-                walletMaster.PublicAddress = addressClass.address;
+                //walletMaster.PublicAddress = addressClass.address;
+                walletMaster.WalletPublicAddress(addressClass.address);              
                 _commonRepository.Update(walletMaster);
 
                 //set the response object value

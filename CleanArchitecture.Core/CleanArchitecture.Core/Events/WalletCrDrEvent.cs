@@ -30,4 +30,12 @@ namespace CleanArchitecture.Core.Events
             WalletStatus = walletStatus;
         }
     }
+    class WalletPublicAddress<T> : BaseDomainEvent
+    {
+        public T PublicAddress;
+        public WalletPublicAddress(T publicAddress)
+        {
+            PublicAddress = publicAddress;
+        }
+    }
 }

@@ -11,6 +11,7 @@ namespace CleanArchitecture.Core.Entities
 {
     public class WalletMaster : BizBase
     {
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new long Id { get; set; }
 
@@ -29,8 +30,7 @@ namespace CleanArchitecture.Core.Entities
         public bool IsValid { get; set; }
 
         [Required]
-        [StringLength(16)]
-        [Key]
+        [StringLength(16)]        
         public string AccWalletID { get; set; } // dynamically generated accountid 
 
         [Required]
@@ -54,7 +54,11 @@ namespace CleanArchitecture.Core.Entities
             Events.Add(new WalletDrEvent<WalletMaster>(this));
 
         }
-       
+        public void WalletPublicAddress(string publicAddress)
+        {
+            PublicAddress = publicAddress;
+            Events.Add(new WalletPublicAddress<WalletMaster>(this));
+        }
     }
 
 }
