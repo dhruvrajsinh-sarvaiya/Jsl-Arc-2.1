@@ -525,7 +525,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (walletMasters == null)
                 {
                     createWalletResponse.ReturnCode = enResponseCode.Fail;
-                    createWalletResponse.ReturnMsg = "Invalid CoinName";
+                    createWalletResponse.ReturnMsg = EnResponseMessage.InvalidCoin;
+                    createWalletResponse.ErrorCode = enErrorCode.InvalidCoinName;
                     return createWalletResponse;
                 }
             
@@ -556,14 +557,15 @@ namespace CleanArchitecture.Infrastructure.Services
                     _WalletAllowTrnRepository.Add(w);
                 }
                 //genrate address and update in walletmaster
-                  //PublicAddress = GenerateAddress(walletMaster.Id);
-                  //walletMaster.PublicAddress = PublicAddress;
-                  //_commonRepository.Update(walletMaster);
+                //PublicAddress = GenerateAddress(walletMaster.Id);
+                //walletMaster.PublicAddress = PublicAddress;
+                //_commonRepository.Update(walletMaster);
 
                 //set the response object value
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
                 createWalletResponse.ReturnCode = enResponseCode.Success;
+                createWalletResponse.ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg;
                 return createWalletResponse;
             }
             catch (Exception ex)
