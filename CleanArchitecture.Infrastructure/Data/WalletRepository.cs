@@ -170,9 +170,9 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
 
-        public IEnumerable<WalletMasterResponse> ListWalletMasterResponse(long UserId)
+        public List<WalletMasterResponse> ListWalletMasterResponse(long UserId)
         {
-            IEnumerable<WalletMasterResponse> items = (from u in _dbContext.WalletMasters
+            List<WalletMasterResponse> items = (from u in _dbContext.WalletMasters
                                                        join c in _dbContext.WalletTypeMasters
                                                               on u.WalletTypeID equals c.Id
                                                        where u.UserID == UserId
@@ -183,13 +183,13 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            CoinName = c.WalletTypeName,
                                                            PublicAddress=u.PublicAddress,
                                                            Balance=u.Balance
-                                                       }).AsEnumerable();
+                                                       }).AsEnumerable().ToList();
             return items;
         }
 
-        public IEnumerable<WalletMasterResponse> GetWalletMasterResponseByCoin(long UserId,string coin)
+        public List<WalletMasterResponse> GetWalletMasterResponseByCoin(long UserId,string coin)
         {
-            IEnumerable<WalletMasterResponse> items = (from u in _dbContext.WalletMasters
+            List<WalletMasterResponse> items = (from u in _dbContext.WalletMasters
                                                        join c in _dbContext.WalletTypeMasters
                                                               on u.WalletTypeID equals c.Id
                                                        where u.UserID == UserId && c.WalletTypeName==coin
@@ -200,7 +200,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            CoinName = c.WalletTypeName,
                                                            PublicAddress = u.PublicAddress,
                                                            Balance = u.Balance
-                                                       }).AsEnumerable();
+                                                       }).AsEnumerable().ToList();
             return items;
         }
         
