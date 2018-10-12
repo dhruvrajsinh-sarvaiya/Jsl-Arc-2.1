@@ -439,7 +439,7 @@ namespace CleanArchitecture.Web.API
                 var userdt = await _userManager.FindByEmailAsync(model.Email);
                 if (!string.IsNullOrEmpty(userdt?.Email))
                 {
-                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
+                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt?.Id));
                     if (otpcheck != null)
                     {
                         //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus) // Remove expiretime as per discuss with nishit bhai 10-09-2018
@@ -509,7 +509,7 @@ namespace CleanArchitecture.Web.API
                 var userdt = await _userService.FindByMobileNumber(model.Mobile);
                 if (!string.IsNullOrEmpty(userdt?.Mobile))
                 {
-                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt.Id));
+                    var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt?.Id));
                     if (otpcheck != null)
                     {
 
