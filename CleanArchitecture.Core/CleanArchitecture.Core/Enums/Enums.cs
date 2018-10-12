@@ -164,7 +164,8 @@ namespace CleanArchitecture.Core.Enums
         TrnTypeNotAllowed = 249,
         RecordNotFound = 250  ,
         InvalidCoinName=4031,
-        StandardLoginfailed=4032
+        StandardLoginfailed=4032,
+        NotFound=4033
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

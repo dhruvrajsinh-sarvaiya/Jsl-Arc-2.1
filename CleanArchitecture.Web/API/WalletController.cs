@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    //[Authorize]
+   // [Authorize]
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
@@ -84,10 +84,22 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> ListWallet(string coin, int limit = 25, string prevId = null, bool allTokens = false)
         {
+            ListWalletResponse Response = new ListWalletResponse();
             try
             {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-                return Ok();
+
+                //var user = await _userManager.GetUserAsync(HttpContext.User);
+                //if (user == null)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                //    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                //}
+                //else
+                //{
+               var items= _walletService.ListWallet(1);
+                //}
+                return Ok(items);
             }
             catch (Exception ex)
             {
