@@ -734,7 +734,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var walletResponse = _walletRepository1.ListWalletMasterResponse(userid);
-                if (walletResponse == null)
+                if (walletResponse.Count == 0)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
                     listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;
@@ -763,7 +763,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var walletResponse = _walletRepository1.GetWalletMasterResponseByCoin(userid, coin);
-                if (walletResponse == null)
+                if (walletResponse.Count == 0)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
                     listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;

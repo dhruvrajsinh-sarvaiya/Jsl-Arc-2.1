@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
     public class ListWalletResponse : BizResponseClass
     {
         // public List<Wallet> wallets { get; set; }
-         public IEnumerable<WalletMasterResponse> wallets { get; set; }
+         public List<WalletMasterResponse> wallets { get; set; }
     }
     //public class ListWalletResponse
     //{
