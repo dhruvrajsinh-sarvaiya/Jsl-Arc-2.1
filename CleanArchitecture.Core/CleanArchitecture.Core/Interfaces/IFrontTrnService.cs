@@ -15,5 +15,7 @@ namespace CleanArchitecture.Core.Interfaces
         long GetPairIdByName(string pair);
         bool IsValidPairName(string Pair);
         List<RecentOrderInfo> GetRecentOrder(long PairId);
+        List<GetBuySellBook> GetBuyerBook(long id);
+        List<GetBuySellBook> GetSellerBook(long id);
     }
 }
