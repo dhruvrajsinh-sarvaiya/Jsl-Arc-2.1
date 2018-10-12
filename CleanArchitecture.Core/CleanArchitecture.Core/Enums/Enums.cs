@@ -149,6 +149,7 @@ namespace CleanArchitecture.Core.Enums
         CreateTrnInvalidAmount = 1,
         CreateTrnDuplicateTrn=1,
         CreateTrn_NoSelfAddressWithdrawAllow=1,
+        InvalidPairName = 4500,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

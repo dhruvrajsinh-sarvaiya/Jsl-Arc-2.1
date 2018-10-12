@@ -8,8 +8,9 @@ namespace CleanArchitecture.Core.Interfaces.Repository
 {
     public interface IFrontTrnRepository
     {
-        List<ActiveOrderDataResponse> GetActiveOrder(long MemberID);
-        List<TradeHistoryResponce> GetTradeHistory(long id);
+        List<ActiveOrderDataResponse> GetActiveOrder(long MemberID,long PairId);
+        List<TradeHistoryResponce> GetTradeHistory(long MemberID,long PairId,int IsAll);
         long GetPairIdByName(string pair);
+        List<RecentOrderRespose> GetRecentOrder(long PairId);
     }
 }

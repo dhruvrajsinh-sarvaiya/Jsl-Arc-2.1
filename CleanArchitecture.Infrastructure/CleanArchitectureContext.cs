@@ -79,10 +79,11 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ThirdPartyAPIResponseConfiguration> ThirdPartyAPIResponseConfiguration { get; set; }
         public DbSet<TradePoolMaster > TradePoolMaster { get; set; }
 
-        public DbQuery<TradeHistoryResponce> TradeHistoryInfo { get; set; }
+        public DbQuery<TradeHistoryResponce> TradeHistoryInfo { get; set; } //komal 11-10-2018
+        public DbQuery<RecentOrderRespose> RecentOrderRespose { get; set; } //komal 12-10-2018
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
-        public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; }
+        public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; } //komal 12-10-2018
 
         //Add Tables for Service Master (Not Commited)
 

@@ -86,4 +86,13 @@ namespace CleanArchitecture.Core.ApiModels
         public long PairID { get; set; }
         public Decimal ChargeRs { get; set; }
     }
+    public class RecentOrderRespose
+    {
+        public long TrnNo { get; set; }
+        public string Type { get; set; }
+        public Decimal Price { get; set; }
+        public Decimal Qty { get; set; }
+        public DateTime DateTime { get; set; }
+        public short Status { get; set; }
+    }
 }

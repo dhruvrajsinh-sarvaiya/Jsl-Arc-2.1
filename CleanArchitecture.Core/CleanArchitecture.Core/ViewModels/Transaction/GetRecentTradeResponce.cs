@@ -7,16 +7,15 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 {
     public class GetRecentTradeResponce : BizResponseClass
     {
-        public List<RecentTrade> RecentTrades { get; set; }
+        public List<RecentOrderInfo> responce { get; set; }
     }
-    public class RecentTrade 
+    public class RecentOrderInfo
     {
-        public int id { get; set; }
-        public decimal price { get; set; }
-        public decimal qty { get; set; }
-        public long time { get; set; }
-        public bool isBuyerMaker { get; set; }
-        public bool isBestMatch { get; set; }
-        
+        public long TrnNo { get; set; }
+        public string Type { get; set; }
+        public Decimal Price { get; set; }
+        public Decimal Qty { get; set; }
+        public DateTime DateTime { get; set; }
+        public short Status { get; set; }
     }
 }

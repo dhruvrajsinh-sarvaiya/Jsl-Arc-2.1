@@ -33,21 +33,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _serviceMasterRepository = serviceMasterRepository;
             _tradeTransactionQueueRepository = tradeTransactionQueueRepository;
         }
-        public List<GetActiveOrderInfo> GetActiveOrder(long MemberID)
-        {
-            try
-            {
-                //List<ActiveOrderDataResponse> ActiveOrderList = _frontTrnRepository.GetActiveOrder(MemberID);
-                //var response = ActiveOrderList.ConvertAll(x => new GetActiveOrderInfo { order_id = x.Id, pair_name = x.Order_Currency, price = x.Price, side = x.Type });
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
+        
         public List<BasePairResponse> GetTradePairAsset()
         {
             decimal ChangePer = 0;
@@ -217,11 +203,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public List<GetTradeHistoryInfo> GetTradeHistory(long id)
+
+        public List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, long PairId, int IsAll)
         {
             try
             {
-                var list = _frontTrnRepository.GetTradeHistory(id);
+                var list = _frontTrnRepository.GetTradeHistory(MemberID, PairId, IsAll);
                 List<GetTradeHistoryInfo> responce = new List<GetTradeHistoryInfo>();
                 if (list != null)
                 {
@@ -249,9 +236,68 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            
-        }
 
+        }
+        public List<RecentOrderInfo> GetRecentOrder(long PairId)
+        {
+            try
+            {
+                var list = _frontTrnRepository.GetRecentOrder(PairId);
+                List<RecentOrderInfo> responce = new List<RecentOrderInfo>();
+                if (list != null)
+                {
+                    foreach (RecentOrderRespose model in list)
+                    {
+                        responce.Add(new RecentOrderInfo
+                        {
+                            Qty = model.Qty,
+                            DateTime = model.DateTime.Date,
+                            Price = model.Price,
+                            Status = model.Status,
+                            TrnNo = model.TrnNo,
+                            Type = model.Type,
+                        });
+                    }
+                }
+                return responce;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId)
+        {
+            try
+            {
+                List<ActiveOrderDataResponse> ActiveOrderList = _frontTrnRepository.GetActiveOrder(MemberID, PairId);
+                List<ActiveOrderInfo> responceData = new List<ActiveOrderInfo>();
+                if (ActiveOrderList != null)
+                {
+                    foreach (ActiveOrderDataResponse model in ActiveOrderList)
+                    {
+                        responceData.Add(new ActiveOrderInfo
+                        {
+                            Amount = model.Amount,
+                            Delivery_Currency = model.Delivery_Currency,
+                            Id = model.Id,
+                            IsCancelled = model.IsCancelled,
+                            Order_Currency = model.Order_Currency,
+                            Price = model.Price,
+                            TrnDate = model.TrnDate.Date,
+                            Type = model.Type
+                        });
+                    }
+                }
+                return responceData;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         public long GetPairIdByName(string pair)
         {
             try
@@ -264,7 +310,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-
         public bool IsValidPairName(string Pair)
         {
             try

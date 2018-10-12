@@ -70,7 +70,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        #region "Komal Methods"
+        #region "Methods"
 
         [HttpGet("GetTradePairAsset")]
         public IActionResult GetTradePairAsset()
@@ -97,6 +97,208 @@ namespace CleanArchitecture.Web.API
                 return Ok(Response);
             }
         }
+
+        [HttpPost("CreateTransactionOrder/{PairName}")]
+        //[Authorize]
+        public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request, string PairName)
+        {
+            //Do Process for CreateOrder
+            //For Testing Purpose
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            NewTransactionRequestCls Req = new NewTransactionRequestCls();
+            Req.TrnMode = Request.TrnMode;
+            Req.TrnType = Request.orderSide;
+            Req.ordertype = Request.ordertype;
+            Req.MemberID = user.Id;
+            Req.MemberMobile = user.Mobile;
+            //Req.MemberID = 5;
+            //Req.MemberMobile = "1234567890";
+            Req.SMSCode = PairName;
+            Req.TransactionAccount = Request.CurrencyPairID.ToString();
+            Req.Amount = Request.Total;
+            Req.PairID = Request.CurrencyPairID;
+            Req.Price = Request.price;
+            Req.Qty = Request.Amount;
+            Req.DebitWalletID = Request.DebitWalletID;
+            Req.CreditWalletID = Request.CreditWalletID;
+
+            _transactionProcess.ProcessNewTransactionAsync(Req);
+            CreateTransactionResponse Response = new CreateTransactionResponse();
+            //Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
+            //BizResponse MethodResp = await MethodRespTsk;
+
+
+            //if (MethodResp.ReturnCode == enResponseCodeService.Success)
+            //    Response.ReturnCode = enResponseCode.Success;
+            //else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
+            //    Response.ReturnCode = enResponseCode.Fail;
+            //else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
+            //    Response.ReturnCode = enResponseCode.InternalError;
+
+            //Response.ReturnMsg = MethodResp.ReturnMsg;
+            //Response.ErrorCode = MethodResp.ErrorCode;
+
+            Response.response = new CreateOrderInfo()
+            {
+                //order_id = 1000001,
+                //pair_name = "ltcusd",
+                //price = 10,
+                //side = "buy",
+                //type = "stop-loss",
+                //volume = 10
+            };
+
+            Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
+        }
+
+        [HttpGet("GetVolumeData")]
+        public IActionResult GetVolumeData()
+        {
+            GetVolumeDataResponse Response = new GetVolumeDataResponse();
+            try
+            {
+                var responsedata = _frontTrnService.GetVolumeData();
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [HttpPost("GetTradeHistory/{Pair}")]
+        //[Authorize]
+        public async Task<ActionResult> GetTradeHistory(string Pair)
+        {
+            GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return returnDynamicResult(Response);
+                }
+                long PairId = _frontTrnService.GetPairIdByName(Pair);
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return returnDynamicResult(Response);
+                }
+                long MemberID = 1;//user.Id;
+                Response.response = _frontTrnService.GetTradeHistory(MemberID, PairId, 1);
+                Response.ReturnCode = enResponseCode.Success;
+                return returnDynamicResult(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+
+        }
+
+        [HttpPost("GetActiveOrder/{Pair}")]  //GetActiveOrder
+        //[Authorize]
+        public async Task<ActionResult> GetActiveOrder(string Pair)
+        {
+            GetActiveOrderResponse Response = new GetActiveOrderResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return returnDynamicResult(Response);
+                }
+                long PairId = _frontTrnService.GetPairIdByName(Pair);
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return returnDynamicResult(Response);
+                }
+                long MemberID = 1;// user.Id;
+                Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId);
+                Response.ReturnCode = enResponseCode.Success;
+                return returnDynamicResult(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+
+        }
+
+        [HttpGet("GetRecentOrder/{Pair}")] //binance https://api.binance.com//api/v1/trades?symbol=LTCBTC
+        public IActionResult GetRecentOrder(string Pair)
+        {
+            GetRecentTradeResponce Response = new GetRecentTradeResponce();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long PairId = _frontTrnService.GetPairIdByName(Pair);
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+
+                Response.responce = _frontTrnService.GetRecentOrder(PairId);
+                Response.ReturnCode = enResponseCode.Success;
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [HttpPost("GetOrderhistory")]
+        public ActionResult GetOrderhistory()
+        {
+            GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
+            try
+            {
+                Response.response = _frontTrnService.GetTradeHistory(0, 0, 0);
+                Response.ReturnCode = enResponseCode.Success;
+                return returnDynamicResult(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+
+        }
+        #endregion
 
         //[HttpGet("GetTickerInformation")] //get Trade Pair Binnance https://api.binance.com/api/v3/ticker/bookTicker //https://api.binance.com/api/v3/ticker/bookTicker?symbol=LTCBTC
         //public IActionResult GetTickerInformation(TradePairAssetRequest request)
@@ -408,61 +610,6 @@ namespace CleanArchitecture.Web.API
         //    Response.ReturnCode = enResponseCode.Success;
         //    return returnDynamicResult(Response);
         //}
-
-        [HttpPost("CreateTransactionOrder/{PairName}")]
-        //[Authorize]
-        public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request, string PairName)
-        {
-            //Do Process for CreateOrder
-            //For Testing Purpose
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            NewTransactionRequestCls Req = new NewTransactionRequestCls();
-            Req.TrnMode = Request.TrnMode;
-            Req.TrnType = Request.orderSide;
-            Req.ordertype = Request.ordertype;
-            Req.MemberID = user.Id;
-            Req.MemberMobile = user.Mobile;
-            //Req.MemberID = 5;
-            //Req.MemberMobile = "1234567890";
-            Req.SMSCode = PairName;
-            Req.TransactionAccount = Request.CurrencyPairID.ToString();
-            Req.Amount = Request.Total;
-            Req.PairID = Request.CurrencyPairID;
-            Req.Price = Request.price;
-            Req.Qty = Request.Amount;
-            Req.DebitWalletID = Request.DebitWalletID;
-            Req.CreditWalletID = Request.CreditWalletID;
-
-            _transactionProcess.ProcessNewTransactionAsync(Req);
-            CreateTransactionResponse Response = new CreateTransactionResponse();
-            //Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
-            //BizResponse MethodResp = await MethodRespTsk;
-
-
-            //if (MethodResp.ReturnCode == enResponseCodeService.Success)
-            //    Response.ReturnCode = enResponseCode.Success;
-            //else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
-            //    Response.ReturnCode = enResponseCode.Fail;
-            //else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
-            //    Response.ReturnCode = enResponseCode.InternalError;
-
-            //Response.ReturnMsg = MethodResp.ReturnMsg;
-            //Response.ErrorCode = MethodResp.ErrorCode;
-
-            Response.response = new CreateOrderInfo()
-            {
-                //order_id = 1000001,
-                //pair_name = "ltcusd",
-                //price = 10,
-                //side = "buy",
-                //type = "stop-loss",
-                //volume = 10
-            };
-
-            Response.ReturnCode = enResponseCode.Success;
-            return returnDynamicResult(Response);
-        }
-
         //[HttpPost("CreateMultipleOrder")]
         //public ActionResult CreateMultipleOrder([FromBody]List<CreateOrderRequest> Request)
         //{
@@ -670,64 +817,5 @@ namespace CleanArchitecture.Web.API
         //    Response.ReturnCode = enResponseCode.Success;
         //    return returnDynamicResult(Response);
         //}
-        #endregion
-
-        [HttpGet("GetVolumeData")]
-        public IActionResult GetVolumeData()
-        {
-            GetVolumeDataResponse Response = new GetVolumeDataResponse();
-            try
-            {
-                var responsedata = _frontTrnService.GetVolumeData();
-                if (responsedata != null)
-                {
-                    Response.ReturnCode = enResponseCode.Success;
-                    Response.response = responsedata;
-                }
-                else
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                }
-                return Ok(Response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
-            }
-        }
-
-        [HttpPost("GetTradeHistory/{Pair}")]
-        public ActionResult GetTradeHistory(string Pair)
-        {
-            GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
-            try
-            {
-                if(!_frontTrnService.IsValidPairName(Pair))
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return returnDynamicResult(Response);
-                }
-                long id = _frontTrnService.GetPairIdByName(Pair);
-                if (id == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return returnDynamicResult(Response);
-                }
-                Response.response = _frontTrnService.GetTradeHistory(id);
-                Response.ReturnCode = enResponseCode.Success;
-                return returnDynamicResult(Response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
-            }
-
-        }
     }
 }

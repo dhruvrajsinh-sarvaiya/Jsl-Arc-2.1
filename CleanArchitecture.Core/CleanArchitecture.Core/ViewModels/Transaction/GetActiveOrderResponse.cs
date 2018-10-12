@@ -7,19 +7,18 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 {
     public class GetActiveOrderResponse : BizResponseClass
     {
-       public List<GetActiveOrderInfo> response { get; set; }
+        public List<ActiveOrderInfo> response { get; set; }
     }
-
-    public class GetActiveOrderInfo
+    public class  ActiveOrderInfo
     {
-        public long OrderId { get; set; }
-        public string PairName { get; set; }
-        public string BaseCurrency { get; set; }
-        public string ChildCurrency { get; set; }
-        public int Type { get; set; }
+        public long Id { get; set; }
+        public DateTime  TrnDate { get; set; }
+        public short Type { get; set; }
+        public string Order_Currency { get; set; }
+        public string Delivery_Currency { get; set; }
         public decimal Amount { get; set; }
         public decimal Price { get; set; }
-        public DateTime TrnDate { get; set; }
-        public bool IsCancel { get; set; }
+        public short IsCancelled { get; set; }
     }
+    
 }

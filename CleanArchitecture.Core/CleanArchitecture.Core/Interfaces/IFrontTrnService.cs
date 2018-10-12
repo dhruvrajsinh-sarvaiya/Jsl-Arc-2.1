@@ -8,12 +8,12 @@ namespace CleanArchitecture.Core.Interfaces
 {
     public interface IFrontTrnService
     {
-        List<GetActiveOrderInfo> GetActiveOrder(long MemberID);
+        List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId);
         List<BasePairResponse> GetTradePairAsset();
         List<VolumeDataRespose> GetVolumeData();
-        List<GetTradeHistoryInfo> GetTradeHistory(long id);
+        List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, long PairId, int IsAll);
         long GetPairIdByName(string pair);
         bool IsValidPairName(string Pair);
-        
+        List<RecentOrderInfo> GetRecentOrder(long PairId);
     }
 }
