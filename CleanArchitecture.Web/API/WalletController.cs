@@ -77,12 +77,11 @@ namespace CleanArchitecture.Web.API
         }
 
         /// <summary>
-        /// vsolanki 1-10-2018 Create Wallet
+        /// vsolanki 12-10-2018 List Wallet
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        //[HttpGet("{coin}")]
-        //// [Route("{coin}")]
+        //[HttpGet("{coin}")]      
         //public async Task<IActionResult> ListWallet(string coin, int limit = 25, string prevId = null, bool allTokens = false)
         //{
         //    try
@@ -120,16 +119,16 @@ namespace CleanArchitecture.Web.API
             try
             {   
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                //if (user == null)
-                //{
-                //    Response.ReturnCode = enResponseCode.Fail;
-                //    Response.ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed;
-                //   // Response.ErrorCode = enErrorCode.
-                //}
-                //else
-                //{
-                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, coin, Request.IsDefaultWallet, Request.AllowTrnType, 1 /*Convert.ToInt64(user.Id)*/);            
-                //}
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.
+                }
+                else
+                {
+                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, coin, Request.IsDefaultWallet, Request.AllowTrnType,Convert.ToInt64(user.Id));            
+                }
 
                 return Ok(Response);
             }
