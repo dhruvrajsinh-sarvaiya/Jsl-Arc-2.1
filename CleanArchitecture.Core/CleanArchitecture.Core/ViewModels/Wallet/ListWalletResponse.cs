@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Entities.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,8 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
 {
     public class ListWalletResponse : BizResponseClass
     {
-        public List<Wallet> wallets { get; set; }
+        // public List<Wallet> wallets { get; set; }
+         public IEnumerable<WalletMasterResponse> wallets { get; set; }
     }
     //public class ListWalletResponse
     //{

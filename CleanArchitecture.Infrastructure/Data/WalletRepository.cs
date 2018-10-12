@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
+using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,11 +18,12 @@ namespace CleanArchitecture.Infrastructure.Data
     {
         private readonly CleanArchitectureContext _dbContext;
 
-        readonly ILogger<WalletRepository> _log;
+        private readonly ILogger<WalletRepository> _log;
 
-        public WalletRepository(ILogger<WalletRepository> log)
+        public WalletRepository(ILogger<WalletRepository> log, CleanArchitectureContext dbContext)
         {
             _log = log;
+            _dbContext = dbContext;
         }
 
         //public T GetById(long id)
@@ -113,7 +116,7 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             try
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
-                return _dbContext.Set<TradeBitGoDelayAddresses>().Where(e => e.GenerateBit == 1 && e.WalletId == 0).OrderBy(e => e.Id).FirstOrDefault();                
+                return _dbContext.Set<TradeBitGoDelayAddresses>().Where(e => e.GenerateBit == 1 && e.WalletId == 0).OrderBy(e => e.Id).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -151,7 +154,7 @@ namespace CleanArchitecture.Infrastructure.Data
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
 
                 _dbContext.Database.BeginTransaction();
-                _dbContext.Set<WalletLedger>().Add(wl1);                
+                _dbContext.Set<WalletLedger>().Add(wl1);
                 _dbContext.Set<TransactionAccount>().Add(ta1);
                 _dbContext.Entry(wm2).State = EntityState.Modified;
                 _dbContext.SaveChanges();
@@ -165,6 +168,23 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
+
+
+        public IEnumerable<WalletMasterResponse> ListWalletMasterResponse(long UserId)
+        {
+            IEnumerable<WalletMasterResponse> items = (from u in _dbContext.WalletMasters
+                                                       join c in _dbContext.WalletTypeMasters
+                                                              on u.WalletTypeID equals c.Id
+                                                       where u.UserID == UserId
+                                                       select new WalletMasterResponse
+                                                       {
+                                                           AccWalletID = u.AccWalletID,
+                                                           Walletname = u.Walletname,
+                                                           CoinName = c.WalletTypeName
+                                                       }).AsEnumerable();
+            return items;
+        }
+
 
     }
 }
