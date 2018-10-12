@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.Entities;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Interfaces;
@@ -152,6 +153,31 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+        public List<GetTradeHistoryInfo> GetTradeHistory(long id)
+        {
+            var list = _frontTrnRepository.GetTradeHistory(id);
+            List<GetTradeHistoryInfo> responce = new List<GetTradeHistoryInfo>();
+            if(list != null)
+            {
+                foreach (TradeHistoryResponce model in list)
+                {
+                    responce.Add(new GetTradeHistoryInfo
+                    {
+                        Amount = model.Amount,
+                        ChargeRs = model.ChargeRs,
+                        DateTime = model.DateTime.Date,
+                        PairID = model.PairID,
+                        Price = model.Price,
+                        Status = model.Status,
+                        StatusText = model.StatusText,
+                        TrnNo = model.TrnNo,
+                        Type = model.Type,
+                        Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount))
+                    });
+                }
+            }
+            return responce;
         }
     }
 }

@@ -12,12 +12,14 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 
     public class GetActiveOrderInfo
     {
-        public long order_id { get; set; }
-        public string pair_name { get; set; }
-        public string side { get; set; }
-        public string type { get; set; }
-        public decimal price { get; set; }
-        public long timestamp { get; set; }
-        public decimal volume { get; set; }
+        public long OrderId { get; set; }
+        public string PairName { get; set; }
+        public string BaseCurrency { get; set; }
+        public string ChildCurrency { get; set; }
+        public int Type { get; set; }
+        public decimal Amount { get; set; }
+        public decimal Price { get; set; }
+        public DateTime TrnDate { get; set; }
+        public bool IsCancel { get; set; }
     }
 }
