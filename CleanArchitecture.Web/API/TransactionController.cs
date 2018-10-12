@@ -670,7 +670,7 @@ namespace CleanArchitecture.Web.API
         //    return returnDynamicResult(Response);
         //}
         #endregion
-
+            
         [HttpGet("GetVolumeData")]
         public IActionResult GetVolumeData()
         {
@@ -697,13 +697,26 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost("GetTradeHistory/{PairId:long}")]
-        public ActionResult GetTradeHistory(long PairId)
+        [HttpPost("GetTradeHistory/{Pair}")]
+        public ActionResult GetTradeHistory(string Pair)
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
             try
             {
-                Response.response = _frontTrnService.GetTradeHistory(PairId);
+                if(!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return returnDynamicResult(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return returnDynamicResult(Response);
+                }
+                Response.response = _frontTrnService.GetTradeHistory(id);
                 Response.ReturnCode = enResponseCode.Success;
                 return returnDynamicResult(Response);
             }

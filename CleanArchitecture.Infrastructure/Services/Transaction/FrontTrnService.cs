@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CleanArchitecture.Infrastructure.Services.Transaction
 {
@@ -156,28 +157,67 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public List<GetTradeHistoryInfo> GetTradeHistory(long id)
         {
-            var list = _frontTrnRepository.GetTradeHistory(id);
-            List<GetTradeHistoryInfo> responce = new List<GetTradeHistoryInfo>();
-            if(list != null)
+            try
             {
-                foreach (TradeHistoryResponce model in list)
+                var list = _frontTrnRepository.GetTradeHistory(id);
+                List<GetTradeHistoryInfo> responce = new List<GetTradeHistoryInfo>();
+                if (list != null)
                 {
-                    responce.Add(new GetTradeHistoryInfo
+                    foreach (TradeHistoryResponce model in list)
                     {
-                        Amount = model.Amount,
-                        ChargeRs = model.ChargeRs,
-                        DateTime = model.DateTime.Date,
-                        PairID = model.PairID,
-                        Price = model.Price,
-                        Status = model.Status,
-                        StatusText = model.StatusText,
-                        TrnNo = model.TrnNo,
-                        Type = model.Type,
-                        Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount))
-                    });
+                        responce.Add(new GetTradeHistoryInfo
+                        {
+                            Amount = model.Amount,
+                            ChargeRs = model.ChargeRs,
+                            DateTime = model.DateTime.Date,
+                            PairID = model.PairID,
+                            Price = model.Price,
+                            Status = model.Status,
+                            StatusText = model.StatusText,
+                            TrnNo = model.TrnNo,
+                            Type = model.Type,
+                            Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount))
+                        });
+                    }
                 }
+                return responce;
             }
-            return responce;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+            
+        }
+
+        public long GetPairIdByName(string pair)
+        {
+            try
+            {
+                return _frontTrnRepository.GetPairIdByName(pair);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool IsValidPairName(string Pair)
+        {
+            try
+            {
+                String Pattern = "^[A-Z]{6,9}$";
+                if(Regex.IsMatch(Pair, Pattern, RegexOptions.IgnoreCase))
+                      return true;
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
 }
