@@ -144,7 +144,7 @@ namespace CleanArchitecture.Web.API
                 //Response.ReturnCode = enResponseCode.Success;
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
-                return returnDynamicResult(respObjJson);
+                return Ok(respObjJson);
             }
             catch (Exception ex)
             {
