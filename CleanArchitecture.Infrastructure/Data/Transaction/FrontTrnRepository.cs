@@ -31,7 +31,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                    CASE WHEN TTQ.BuyQty=0 THEN TTQ.SellQty WHEN TTQ.SellQty=0 THEN TTQ.BuyQty END as Amount,
                    CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice WHEN TTQ.AskPrice=0 THEN TTQ.BidPrice END as Price,
                    TTQ.IsCancelled from TransactionQueue TQ INNER JOIN TradeTransactionQueue TTQ ON TQ.Id=TTQ.TrnNo 
-                   Where TQ.Status=4 AND TQ.TrnType IN({2}) And TQ.MemberID={0} AND TTQ.PairID={1}", MemberID, PairId, Convert.ToInt16(enTransactionStatus.Hold));
+                   Where TQ.Status={2} AND TQ.TrnType IN(4,5) And TQ.MemberID={0} AND TTQ.PairID={1}", MemberID, PairId, Convert.ToInt16(enTransactionStatus.Hold));
 
                 return Result.ToList();
             }
@@ -66,7 +66,6 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         {
             try
             {
-                
                 IQueryable<RecentOrderRespose> Result = _dbContext.RecentOrderRespose.FromSql(
                    @"Select top 100 TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,
                         CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,

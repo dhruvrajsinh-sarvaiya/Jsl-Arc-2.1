@@ -70,7 +70,7 @@ namespace CleanArchitecture.Web.API
             var redis = new RadisServices<RedisUserdata>(this._fact);
 
             ApplicationUser user = null;
-        
+
             //// Perform Get Or set the redis Process operation
 
             if (!string.IsNullOrEmpty(RedisDBKey))
@@ -84,7 +84,7 @@ namespace CleanArchitecture.Web.API
                 }
 
             }
-            else if (user == null)
+            if (user == null)
             {
                 user = await GetCurrentUserAsync();
                 Userdata.RedisDBKey = Guid.NewGuid().ToString();
@@ -95,7 +95,7 @@ namespace CleanArchitecture.Web.API
             }
 
 
-           
+
 
             return Ok(new IndexViewModel
             {
