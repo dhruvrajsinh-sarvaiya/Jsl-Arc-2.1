@@ -74,4 +74,16 @@ namespace CleanArchitecture.Core.ApiModels
         public string Param2Regex { get; set; } = "";
         public string Param3Regex { get; set; } = "";
     }
+    public class TradeHistoryResponce
+    {
+        public long TrnNo { get; set; }
+        public string Type { get; set; }
+        public Decimal Price { get; set; }
+        public Decimal Amount { get; set; }
+        public DateTime DateTime { get; set; }
+        public short Status { get; set; }
+        public string StatusText { get; set; }
+        public long PairID { get; set; }
+        public Decimal ChargeRs { get; set; }
+    }
 }

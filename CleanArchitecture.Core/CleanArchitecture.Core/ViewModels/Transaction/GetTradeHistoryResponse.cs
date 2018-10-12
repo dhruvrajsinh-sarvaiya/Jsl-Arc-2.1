@@ -11,13 +11,17 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     }
     public class GetTradeHistoryInfo
     {
-        public long order_id { get; set; }
-        public decimal price { get; set; }
-        public decimal amount { get; set; }
-        public long timestamp { get; set; }
-        public string type { get; set; }
-        public long tid { get; set; }
-        public string fee_currency { get; set; }
-        public decimal fee_amount { get; set; }
+        public long TrnNo { get; set; }
+        public string Type { get; set; }
+        public Decimal Price { get; set; }
+        public Decimal Amount { get; set; }
+        public Decimal Total { get; set; }
+        public DateTime DateTime { get; set; }
+        public short Status { get; set; }
+        public string StatusText { get; set; }
+        public long PairID { get; set; }
+        public Decimal ChargeRs { get; set; }
+        
+        //public short  IsCancel { get; set; }
     }
 }
