@@ -508,7 +508,7 @@ namespace CleanArchitecture.Web.API
                 if (string.IsNullOrEmpty(result?.Email))
                 {
                     var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
-                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata?.Id));
                     //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
                     if (tempotp != null && tempdata != null)
                     {
@@ -634,29 +634,6 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        #endregion
-
-        #region BlockChainSignUp
-
-        [HttpPost("BlockChainSignUp")]
-        [AllowAnonymous]
-        public async Task<IActionResult> BlockChainSignUp(BlockChainViewModel model)
-        {
-            try
-            {
-                return AppUtils.StanderdSignUp("Success");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
-            }
-        }
-
-        #endregion
-
-        #region SignUpOtpVerification
-
         /// <summary>
         ///  This method are Direct signUp with mobile sms using verified opt.
         /// </summary> 
@@ -749,7 +726,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        
+
         /// <summary>
         ///  This method are Auto generate resend otp in Mobile
         /// </summary>   
@@ -770,7 +747,7 @@ namespace CleanArchitecture.Web.API
                     if (IsSignMobile)
                     {
                         var tempdata = await _tempUserRegisterService.GetMobileNo(model.Mobile);
-                        var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                        var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata?.Id));
                         //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow) // Remove expiretime as per discuss with nishit bhai 10-09-2018
                         if (tempdata != null && tempotp != null)
                         {
@@ -822,10 +799,26 @@ namespace CleanArchitecture.Web.API
                 return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
-
-     
         #endregion
 
+        #region BlockChainSignUp
+
+        [HttpPost("BlockChainSignUp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BlockChainSignUp(BlockChainViewModel model)
+        {
+            try
+            {
+                return AppUtils.StanderdSignUp("Success");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        #endregion
 
         #endregion
     }
