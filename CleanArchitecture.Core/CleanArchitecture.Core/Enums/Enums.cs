@@ -153,7 +153,17 @@ namespace CleanArchitecture.Core.Enums
         //=====================MyAccount
         Status500InternalServerError = 500,
         Status400BadRequest = 400,
-        Status423Locked = 423
+        Status423Locked = 423,
+        Status4013MobileInvalid = 4013,
+        // wallet
+        DeductWalletNullWalletIDorCoinType = 424,
+        DefaultWalletNotFound = 425,
+        BatchNoGenerationFailed = 246,
+        InvalidWalletId = 247,
+        InvalidTrnType = 248,
+        TrnTypeNotAllowed = 249,
+        RecordNotFound = 250  ,
+        InvalidCoinName=4031
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -206,4 +216,23 @@ namespace CleanArchitecture.Core.Enums
         Token = 2
     }
 
+    public enum enWalletTrnType
+    {
+        Cr_Topup = 1,
+        cr_Deposit = 2,
+        Cr_Buy_Trade = 3,
+        Cr_Refund = 4,        
+        Cr_Commission = 5,
+        Cr_Partial_Cancel = 6,
+        Cr_Trans_IN = 7,
+        Dr_Sell_Trade = 8,
+        Dr_Withdrawal = 9,
+        Dr_Ecommerce = 10,
+        Dr_Charges = 11,
+        Dr_Trans_OUT = 12,
+        Dr_Freeze = 13,
+        Dr_Stacking = 14,
+        Dr_ESCROW = 15,
+        Cr_Bonus = 16
+    }
 }

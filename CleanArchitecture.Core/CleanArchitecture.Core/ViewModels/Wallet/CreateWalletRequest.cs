@@ -8,10 +8,12 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
     public class CreateWalletRequest
     {
         //vsolanki 10-10-2018 
-        [Required]
+        [Required(ErrorMessage = "1,Please Enter WalletName,4029")]
+        [StringLength(250, ErrorMessage = "1,Please enter a valid WalletName,4030")]
         public string WalletName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "1,Please Enter OTP,4025")]
+        //[StringLength(6, MinimumLength = 6,ErrorMessage = "1,Please Enter Valid OTP,4026")]
         public long OTP { get; set; }
 
         public byte IsDefaultWallet { get; set; }

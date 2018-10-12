@@ -25,6 +25,7 @@ namespace CleanArchitecture.Web.API.Configuration
             _transactionConfigService = transactionConfigService;
         }
 
+        #region Service
         [HttpPost("AddServiceConfiguration")]
         public IActionResult AddServiceConfiguration([FromBody]ServiceConfigurationRequest Request)
         {
@@ -140,7 +141,7 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 var responsedata = _transactionConfigService.SetActiveService(ServiceId);
-                if(responsedata==1)
+                if(responsedata == 1)
                 {
                     Response.ReturnCode = enResponseCode.Success;
                 }
@@ -183,7 +184,9 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
-        //providermaster
+        #endregion
+
+        #region providermaster
         [HttpGet("GetProviderList")]
         public IActionResult GetProviderList()
         {
@@ -209,8 +212,8 @@ namespace CleanArchitecture.Web.API.Configuration
             
         }
 
-        [HttpGet("GetProviderListById/{id:long}")]
-        public IActionResult GetProviderListById(long id)
+        [HttpGet("GetProviderById/{id:long}")]
+        public IActionResult GetProviderById(long id)
         {
             ServiceProviderResponceData res = new ServiceProviderResponceData();
             try
@@ -265,6 +268,11 @@ namespace CleanArchitecture.Web.API.Configuration
             bool state = false;
             try
             {
+                if(request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
                 state = _transactionConfigService .UpdateProviderService(request);
                 if (state == false)
                 {
@@ -288,7 +296,50 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
-        //Apptype
+        [HttpPost("SetActiveProvider/{id:long}")]
+        public IActionResult SetActiveProvider(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveProvider(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveProvider/{id:long}")]
+        public IActionResult SetInActiveProvider(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveProvider (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+        #endregion
+
+        #region Apptype
         [HttpGet("GetAppType")]
         public IActionResult GetAppType()
         {
@@ -348,10 +399,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if(id !=0)
                 {
                     res.responce = _transactionConfigService.GetAppTypeById(id);
-                    res.ReturnCode = enResponseCode.Fail ;
+                    res.ReturnCode = enResponseCode.Success;
                     return Ok(res);
                 }
-                res.ReturnCode = enResponseCode.Success;
+                res.ReturnCode = enResponseCode.Fail;
                 return Ok(res);
             }
             catch (Exception ex)
@@ -370,8 +421,12 @@ namespace CleanArchitecture.Web.API.Configuration
             bool state = false;
             try
             {
-
-                state=_transactionConfigService.UpdateAppType(request);
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                state =_transactionConfigService.UpdateAppType(request);
                 if(state == false )
                 {
                     res.ReturnCode = enResponseCode.Fail;
@@ -395,7 +450,51 @@ namespace CleanArchitecture.Web.API.Configuration
             
         }
 
-        //providerType
+        [HttpPost("SetActiveAppType/{id:long}")]
+        public IActionResult SetActiveAppType(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveAppType(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveAppType/{id:long}")]
+        public IActionResult SetInActiveAppType(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveAppType (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        #endregion
+
+        #region providerType
         [HttpGet("GetServiceProviderType")]
         public IActionResult GetServiceProviderType()
         {
@@ -456,10 +555,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (id != 0)
                 {
                     res.responce = _transactionConfigService.GetProviderTypeById(id);
-                    res.ReturnCode = enResponseCode.Fail;
+                    res.ReturnCode = enResponseCode.Success;
                     return Ok(res);
                 }
-                res.ReturnCode = enResponseCode.Success;
+                res.ReturnCode = enResponseCode.Fail;
                 return Ok(res);
             }
             catch (Exception ex)
@@ -478,7 +577,12 @@ namespace CleanArchitecture.Web.API.Configuration
             bool state = false;
             try
             {
-                state=_transactionConfigService.UpdateProviderType(request);
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                state =_transactionConfigService.UpdateProviderType(request);
                 if (state == false)
                 {
                     res.ReturnCode = enResponseCode.Fail;
@@ -502,5 +606,487 @@ namespace CleanArchitecture.Web.API.Configuration
            
         }
 
+        [HttpPost("SetActiveProviderType/{id:long}")]
+        public IActionResult SetActiveProviderType(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveProviderType(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveProviderType/{id:long}")]
+        public IActionResult SetInActiveProviderType(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveProviderType(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        #endregion
+
+        #region  providerConfiguration
+
+        [HttpGet("GetProviderConfigurationById/{id:long}")]
+        public IActionResult GetProviderConfigurationById(long id)
+        {
+            ProviderConfigurationResponce  res = new ProviderConfigurationResponce();
+            try
+            {
+                res.responce = _transactionConfigService.GetProviderConfiguration(id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("AddProviderConfiguration")]
+        public IActionResult AddProviderConfiguration([FromBody]ProviderConfigurationRequest request)
+        {
+            ProviderConfigurationResponce res = new ProviderConfigurationResponce();
+            //BizResponseClass res = new BizResponseClass();
+            try
+            {
+                long id = _transactionConfigService.AddProviderConfiguration(request);
+                if (id != 0)
+                {
+                    res.responce = _transactionConfigService.GetProviderConfiguration(id);
+                    res.ReturnCode = enResponseCode.Success ;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Fail ;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("UpdateProviderConfiguration")]
+        public IActionResult UpdateProviderConfiguration([FromBody]ProviderConfigurationRequest request)
+        {
+            ProviderConfigurationResponce  res = new ProviderConfigurationResponce();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateProviderConfiguration(request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.responce = _transactionConfigService.GetProviderConfiguration(request.Id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("SetActiveProviderConfiguration/{id:long}")]
+        public IActionResult SetActiveProviderConfiguration(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveProviderConfiguration(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveProviderConfiguration/{id:long}")]
+        public IActionResult SetInActiveProviderConfiguration(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveProviderConfiguration (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+        #endregion
+
+        #region DemonConfiguration
+
+        [HttpGet("GetDemonConfigurationById/{id:long}")]
+        public IActionResult GetDemonConfigurationById(long id)
+        {
+            DemonConfigurationResponce  res = new DemonConfigurationResponce();
+            try
+            {
+                res.responce = _transactionConfigService.GetDemonConfiguration(id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("AddDemonConfiguration")]
+        public IActionResult AddDemonConfiguration([FromBody]DemonConfigurationRequest  request)
+        {
+            DemonConfigurationResponce res = new DemonConfigurationResponce();
+            //BizResponseClass res = new BizResponseClass();
+            try
+            {
+                long id = _transactionConfigService.AddDemonConfiguration (request);
+                if (id != 0)
+                {
+                    res.responce = _transactionConfigService.GetDemonConfiguration(id);
+                    res.ReturnCode = enResponseCode.Success;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("UpdateDemonConfiguration")]
+        public IActionResult UpdateDemonConfiguration([FromBody]DemonConfigurationRequest request)
+        {
+            DemonConfigurationResponce res = new DemonConfigurationResponce();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateDemonConfiguration (request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.responce = _transactionConfigService.GetDemonConfiguration(request.Id);
+                if (res.responce == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("SetActiveDemonConfiguration/{id:long}")]
+        public IActionResult SetActiveDemonConfiguration(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveDemonConfig(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveDemonConfiguration/{id:long}")]
+        public IActionResult SetInActiveDemonConfiguration(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveDemonConfig (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+        #endregion
+
+        #region Provider Details
+
+        [HttpGet("GetProviderDetailList")]
+        public IActionResult GetProviderDetailList()
+        {
+            ProviderDetailResponceList res = new ProviderDetailResponceList();
+            try
+            {
+                IEnumerable<ProviderDetailViewModel> list = _transactionConfigService.GetProviderDetailList();
+                if (list == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    return Ok(res);
+                }
+                res.responce = _transactionConfigService.getProviderDetailsDataList(list);
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpGet("GetProviderDetailById/{id:long}")]
+        public IActionResult GetProviderDetailById(long id)
+        {
+            ProviderDetailResponce  res = new ProviderDetailResponce();
+            try
+            {
+                ProviderDetailViewModel  obj = _transactionConfigService.GetProviderDetailById(id);
+                if (obj == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    return Ok(res);
+                }
+                res.responce = _transactionConfigService.getProviderDetailDataById(obj);
+                //res.responce.Id = obj.Id;
+                //res.responce.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
+                //res.responce.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
+                //res.responce.AppType = _transactionConfigService.GetAppTypeById(obj.AppTypeID);
+                //res.responce.TrnType = null;
+                //res.responce.Limit = null;
+                //res.responce.DemonConfiguration = _transactionConfigService.GetDemonConfiguration(obj.DemonConfigID);
+                //res.responce.ProviderConfiguration = _transactionConfigService.GetProviderConfiguration(obj.ServiceProConfigID);
+                //res.responce.thirdParty = null;
+
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("AddProviderDetail")]
+        public IActionResult AddProviderDetail([FromBody]ProviderDetailRequest request)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                long Id = _transactionConfigService.AddProviderDetail(request);
+                if (Id != 0)
+                {
+                    //res.responce = new ServiceProviderViewModel { Id = Id };
+                    res.ReturnCode = enResponseCode.Success;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("UpdateProviderDetail")]
+        public IActionResult UpdateProviderDetail([FromBody]ProviderDetailRequest  request)
+        {
+            ProviderDetailResponce  res = new ProviderDetailResponce();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateProviderDetail(request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                ProviderDetailViewModel obj = _transactionConfigService.GetProviderDetailById(request.Id);
+                if (obj == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    return Ok(res);
+                }
+
+                res.responce.Id = obj.Id;
+                res.responce.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
+                res.responce.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
+                res.responce.AppType = _transactionConfigService.GetAppTypeById(obj.AppTypeID);
+                res.responce.TrnType = null;
+                res.responce.Limit = null;
+                res.responce.DemonConfiguration = _transactionConfigService.GetDemonConfiguration(obj.DemonConfigID);
+                res.responce.ProviderConfiguration = _transactionConfigService.GetProviderConfiguration(obj.ServiceProConfigID);
+                res.responce.thirdParty = null;
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetActiveProviderDetail/{id:long}")]
+        public IActionResult SetActiveProviderDetail(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveProviderDetail(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveProviderDetail/{id:long}")]
+        public IActionResult SetInActiveProviderDetail(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveProviderDetail (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                    res.ReturnCode = enResponseCode.Fail;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        #endregion
     }
 }

@@ -16,16 +16,16 @@ namespace CleanArchitecture.Infrastructure.Services
         readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         readonly ICommonRepository<ServiceProviderDetail> _serviceProviderDetail;
         readonly ICommonRepository<ServiceProConfiguration> _ServiceProConfiguration;
-        readonly ICommonRepository<ProviderConfiguration> _providerRepository;
+        //readonly ICommonRepository<ProviderConfiguration> _providerRepository;
 
         public  GetWebRequest(ICommonRepository<RouteConfiguration> routeRepository, ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyCommonRepository,
-              ICommonRepository<ProviderConfiguration> providerRepository, 
+              //ICommonRepository<ProviderConfiguration> providerRepository, 
               ICommonRepository<ServiceProConfiguration> ServiceProConfiguration,
               ICommonRepository<ServiceProviderDetail> serviceProviderDetail)
         {
             _thirdPartyCommonRepository = thirdPartyCommonRepository;
             _routeRepository = routeRepository;
-            _providerRepository = providerRepository;
+            //_providerRepository = providerRepository;
             _ServiceProConfiguration = ServiceProConfiguration;
             _serviceProviderDetail = serviceProviderDetail;
         }

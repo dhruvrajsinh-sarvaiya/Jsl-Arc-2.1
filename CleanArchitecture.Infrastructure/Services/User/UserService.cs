@@ -3,9 +3,14 @@ using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using Microsoft.Extensions.Logging;
+using PhoneNumbers;
 using System;
+using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace CleanArchitecture.Infrastructure.Services.User
 {
@@ -97,6 +102,59 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+
+
+        public async Task<bool> IsValidPhoneNumber(string Mobilenumber, string IpAddress)
+        {
+            try
+            {
+                PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
+                //string countryCode = "IN";
+                string Code = GetCountryByIP(IpAddress);
+                PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(Mobilenumber, Code);
+
+                return phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+
+
+        public static string GetCountryByIP(string ipAddress)
+        {
+            try
+            {
+                var url = "http://ip-api.com/xml/" + ipAddress;
+                var request = System.Net.WebRequest.Create(url);
+                string strReturnVal;
+                using (WebResponse wrs = request.GetResponse())
+                using (Stream stream = wrs.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    string response = reader.ReadToEnd();
+
+                    XmlDocument ipInfoXML = new XmlDocument();
+                    ipInfoXML.LoadXml(response);
+                    XmlNodeList responseXML = ipInfoXML.GetElementsByTagName("query");
+                    NameValueCollection dataXML = new NameValueCollection();
+
+                    dataXML.Add(responseXML.Item(0).ChildNodes[2].InnerText, responseXML.Item(0).ChildNodes[2].Value);
+
+                    //strReturnVal = responseXML.Item(0).ChildNodes[1].InnerText.ToString(); // Contry
+                    //strReturnVal += "(" +responseXML.Item(0).ChildNodes[2].InnerText.ToString() + ")";  // Contry Code 
+                    strReturnVal = responseXML.Item(0).ChildNodes[2].InnerText.ToString();  // Contry Code 
+                    return strReturnVal;
+
+                }
+            }
+            catch(Exception ex)
+            {
+                return ex.ToString();
+            }
+
         }
     }
 }

@@ -20,6 +20,8 @@ using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using CleanArchitecture.Core.Entities.User;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using CleanArchitecture.Core.Services.RadisDatabase;
+using CleanArchitecture.Core.Services.Session;
 
 namespace CleanArchitecture.Web.API
 {
@@ -34,6 +36,8 @@ namespace CleanArchitecture.Web.API
         //private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
+        private readonly IRedisConnectionFactory _fact;
+        private readonly RedisSessionStorage _redisSessionStorage;
 
         #endregion
 
@@ -43,7 +47,8 @@ namespace CleanArchitecture.Web.API
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         ILoggerFactory loggerFactory,
-        UrlEncoder urlEncoder)
+        UrlEncoder urlEncoder, IRedisConnectionFactory factory,
+        RedisSessionStorage redisSessionStorage)
         {
             _context = context;
             _userManager = userManager;
@@ -51,15 +56,46 @@ namespace CleanArchitecture.Web.API
             //_emailSender = emailSender;
             _logger = loggerFactory.CreateLogger<ManageController>();
             _urlEncoder = urlEncoder;
+            _fact = factory;
+            _redisSessionStorage = redisSessionStorage;
         }
         #endregion
 
         #region Method
 
         [HttpGet("userinfo")]
-        public async Task<IActionResult> UserInfo()
+        public async Task<IActionResult> UserInfo([FromHeader] string RedisDBKey)
         {
-            var user = await GetCurrentUserAsync();
+            var Userdata = new RedisUserdata(); ///  If not find the RadisDbKey then we Set key 
+            var redis = new RadisServices<RedisUserdata>(this._fact);
+
+            ApplicationUser user = null;
+        
+            //// Perform Get Or set the redis Process operation
+
+            if (!string.IsNullOrEmpty(RedisDBKey))
+            {
+                Userdata = redis.Get(RedisDBKey);
+
+                if (Userdata != null && !string.IsNullOrEmpty(Userdata.RedisDBKey) && !string.IsNullOrEmpty(Userdata.RedisSessionKey))
+                {
+                    RedisDBKey = Userdata.RedisDBKey;
+                    user = _redisSessionStorage.GetObjectFromJson<ApplicationUser>(Userdata.RedisSessionKey, Userdata.RedisDBKey);
+                }
+
+            }
+            else if (user == null)
+            {
+                user = await GetCurrentUserAsync();
+                Userdata.RedisDBKey = Guid.NewGuid().ToString();
+                Userdata.RedisSessionKey = Guid.NewGuid().ToString();
+                RedisDBKey = Userdata.RedisDBKey;
+                redis.Save(Userdata.RedisDBKey, Userdata);
+                _redisSessionStorage.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
+            }
+
+
+           
 
             return Ok(new IndexViewModel
             {
@@ -68,7 +104,8 @@ namespace CleanArchitecture.Web.API
                 Username = user.UserName,
                 IsEmailConfirmed = user.EmailConfirmed,
                 Email = user.Email,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                RedisDBKey = RedisDBKey
             });
         }
 

@@ -1,4 +1,6 @@
-﻿using CleanArchitecture.Core.Entities;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Core.ViewModels.WalletOperations;
@@ -24,5 +26,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 10-10-2018
         CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId);
+
+        //ntrivedi 11-10-2018
+        BizResponseClass DebitBalance(long userID, long WalletID, decimal amount, int walletTypeID, enWalletTrnType wtrnType, enTrnType trnType, enServiceType serviceType, long trnNo, string smsCode);
     }
 }

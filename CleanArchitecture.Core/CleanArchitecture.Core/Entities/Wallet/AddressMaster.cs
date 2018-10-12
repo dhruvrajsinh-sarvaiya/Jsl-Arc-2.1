@@ -26,6 +26,9 @@ namespace CleanArchitecture.Core.Entities
         //[Required]
         //[StringLength(5)]
         //public string CoinName { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string AddressLable { get; set; }
 
 
     }

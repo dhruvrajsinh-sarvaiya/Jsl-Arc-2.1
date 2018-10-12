@@ -77,6 +77,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         {
             try
             {
+                //and {2} between RC.MinimumAmount and RC.MaximumAmount
+                //and {2}  between SC.MinimumAmount and SC.MaximumAmount
                 IQueryable<TransactionProviderResponse> Result = _dbContext.TransactionProviderResponse.FromSql(
                             @"select SC.ID as ServiceID,SC.ServiceName,Prc.ID as SerProDetailID,Prc.ServiceProID,RC.ID as RouteID,
                             PC.ID as ProductID,RC.RouteName,SC.ServiceType,Prc.ThirPartyAPIID,Prc.AppTypeID,RC.MinimumAmount as MinimumAmountItem,

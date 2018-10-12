@@ -54,7 +54,7 @@ namespace CleanArchitecture.Core.Entities
             Events.Add(new WalletDrEvent<WalletMaster>(this));
 
         }
-
+       
     }
 
 }

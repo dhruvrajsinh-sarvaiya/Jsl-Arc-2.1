@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,8 @@ using AspNet.Security.OpenIdConnect.Server;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces.Session;
+using CleanArchitecture.Core.Services.RadisDatabase;
+using CleanArchitecture.Core.Services.Session;
 using CleanArchitecture.Web.Filters;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -24,38 +27,82 @@ namespace CleanArchitecture.Web.API
     [ApiController]
     public class AuthorizationController : ControllerBase
     {
-        
+
         private readonly IOptions<IdentityOptions> _identityOptions;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
         private readonly IUserSessionService _userSessionService;
+        private readonly IRedisConnectionFactory _fact;
+        private readonly RedisSessionStorage _redisSessionStora;
 
         public AuthorizationController(IOptions<IdentityOptions> identityOptions,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             ILoggerFactory loggerFactory,
-            IUserSessionService userSessionService)
+            IUserSessionService userSessionService, RedisSessionStorage redisSessionStora,
+            IRedisConnectionFactory factory)
         {
             _identityOptions = identityOptions;
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<AuthorizationController>();
             _userSessionService = userSessionService;
+            _redisSessionStora = redisSessionStora;
+            _fact = factory;
         }
-       
+
         [AllowAnonymous]
         //[ServiceFilter(typeof(ApiResultFilter))]
         [HttpPost("~/connect/token"), Produces("application/x-www-form-urlencoded")]
-        public async Task<IActionResult> Exchange(OpenIdConnectRequest request)
+        public async Task<IActionResult> Exchange(OpenIdConnectRequest request, [FromHeader]string Authorization)
         {
             Debug.Assert(request.IsTokenRequest(),
                 "The OpenIddict binder for ASP.NET Core MVC is not registered. " +
                 "Make sure services.AddOpenIddict().AddMvcBinders() is correctly called.");
 
+            ApplicationUser user;  /// Create Application user Instance For set the user using Redis session Or using Database
+            string RedisDBKey = string.Empty;
+
+
             if (request.IsPasswordGrantType())
             {
-                var user = await _userManager.FindByNameAsync(request.Username);                 
+
+                var Userdata = new RedisUserdata(); ///  If not find the RadisDbKey then we Set key 
+                var redis = new RadisServices<RedisUserdata>(this._fact);
+
+                if (string.IsNullOrEmpty(Authorization))
+                {
+                    user = await _userManager.FindByNameAsync(request.Username);
+                    Userdata.RedisDBKey = Guid.NewGuid().ToString();
+                    Userdata.RedisSessionKey = Guid.NewGuid().ToString();
+                    RedisDBKey = Userdata.RedisDBKey;
+                    redis.Save(Userdata.RedisDBKey, Userdata);
+                    _redisSessionStora.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
+                }
+                else
+                {
+                    Userdata = redis.Get(Authorization);
+                    if (string.IsNullOrEmpty(Userdata.RedisDBKey) && string.IsNullOrEmpty(Userdata.RedisSessionKey))
+                    {
+                        user = await _userManager.FindByNameAsync(request.Username);
+                        Userdata.RedisDBKey = Guid.NewGuid().ToString();
+                        Userdata.RedisSessionKey = Guid.NewGuid().ToString();
+                        RedisDBKey = Userdata.RedisDBKey;
+                        redis.Save(Userdata.RedisDBKey, Userdata);
+                        _redisSessionStora.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
+                    }
+                    else
+                    {
+                        user = _redisSessionStora.GetObjectFromJson<ApplicationUser>(Userdata.RedisSessionKey, Userdata.RedisDBKey);
+                        RedisDBKey = Userdata.RedisDBKey;
+                        if (user == null)
+                        {
+                            user = await _userManager.FindByNameAsync(request.Username);
+                            _redisSessionStora.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
+                        }
+                    }
+                }
                 if (user == null)
                 {
                     return BadRequest("The username/password couple is invalid.");
@@ -67,25 +114,10 @@ namespace CleanArchitecture.Web.API
                 {
                     return BadRequest("The username/password couple is invalid.");
                 }
-
-                ///// Redis / Session Storeg                
-                //_userSessionService.SetSessionValue(user.UserName, user);
-
                 // Create a new authentication ticket.
-                var ticket = await CreateTicketAsync(request, user);
+                var ticket = await CreateTicketAsync(request, user, null, RedisDBKey);
 
                 return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
-
-
-                //   //HttpContext.Session.Set("ticket", ticket);
-                //   //HttpContext.Session.Set("Principal", ticket.Principal);
-                //   //HttpContext.Session.SetString("Properties", ticket.Properties);
-                //   //HttpContext.Session.SetString("AuthenticationScheme", ticket.AuthenticationScheme);
-                //   var obj = SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
-                // //  HttpContext.Session.Set("Token", Json(obj));
-                ////   var myComplexTestObject = HttpContext.Session.GetObjectFromJson<object>("Token");
-                //   //var l = Json(obj);
-                //   return obj;
             }
 
             else if (request.IsRefreshTokenGrantType())
@@ -97,7 +129,7 @@ namespace CleanArchitecture.Web.API
                 // Note: if you want to automatically invalidate the refresh token
                 // when the user password/roles change, use the following line instead:
                 // var user = _signInManager.ValidateSecurityStampAsync(info.Principal);
-                var user = await _userManager.GetUserAsync(info.Principal);
+                user = await _userManager.GetUserAsync(info.Principal);
                 if (user == null)
                 {
                     return BadRequest(new OpenIdConnectResponse
@@ -133,7 +165,7 @@ namespace CleanArchitecture.Web.API
         }
 
 
-        [AllowAnonymous]     
+        [AllowAnonymous]
         [HttpGet("~/connect/authorize")]
         public async Task<IActionResult> Authorize(OpenIdConnectRequest request)
         {
@@ -212,7 +244,8 @@ namespace CleanArchitecture.Web.API
         }
 
 
-        private async Task<AuthenticationTicket> CreateTicketAsync(OpenIdConnectRequest request, ApplicationUser user, AuthenticationProperties properties = null)
+        private async Task<AuthenticationTicket> CreateTicketAsync(OpenIdConnectRequest request, ApplicationUser user,
+            AuthenticationProperties properties = null, string token = "")
         {
             // Create a new ClaimsPrincipal containing the claims that
             // will be used to create an id_token, a token or a code.
@@ -244,8 +277,12 @@ namespace CleanArchitecture.Web.API
                 }.Intersect(request.GetScopes()));
             }
 
-            ticket.SetResources("resource_server");
-
+            if (!string.IsNullOrEmpty(token))///send the redisstorage token to frant using Resources parameter.
+            {
+                ticket.SetResources(token);
+            }
+            else
+                ticket.SetResources("resource_server");
             // Note: by default, claims are NOT automatically included in the access and identity tokens.
             // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
             // whether they should be included in access tokens, in identity tokens or in both.

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
@@ -25,6 +27,12 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         public short IsTransactionWallet { get; set; }
-        
+
+        public void DisableStatus()
+        {
+            Status  = Convert.ToInt16(ServiceStatus.Disable);
+            Events.Add(new WalletStatusDisable<WalletTypeMaster>(this));
+        }
+
     }
 }

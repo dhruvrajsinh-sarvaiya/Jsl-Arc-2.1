@@ -16,8 +16,9 @@ namespace CleanArchitecture.Core.Entities.Configuration
         [StringLength(5)]
         [Required]
         public string SMSCode { get; set; }
-        public short Type { get; set; }
+        public short ServiceType { get; set; }
         public long LimitId { get; set; }
+        public long WalletTypeID { get; set; }
         public void SetActiveService()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);
