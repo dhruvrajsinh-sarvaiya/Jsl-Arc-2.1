@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.Entities.Configuration;
+﻿using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
@@ -19,14 +20,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<TradePairDetail> _tradeDetailRepository;
         private readonly ICommonRepository<ServiceMaster> _serviceMasterRepository;
         private readonly ILogger<FrontTrnService> _logger;
+        private readonly ICommonRepository<TradeTransactionQueue> _tradeTransactionQueueRepository;
 
-        public FrontTrnService(IFrontTrnRepository frontTrnRepository, ICommonRepository<TradePairMaster> tradeMasterRepository, ICommonRepository<TradePairDetail> tradeDetailRepository, ILogger<FrontTrnService> logger, ICommonRepository<ServiceMaster> serviceMasterRepository)
+        public FrontTrnService(IFrontTrnRepository frontTrnRepository, ICommonRepository<TradePairMaster> tradeMasterRepository, ICommonRepository<TradePairDetail> tradeDetailRepository, ILogger<FrontTrnService> logger, ICommonRepository<ServiceMaster> serviceMasterRepository, ICommonRepository<TradeTransactionQueue> tradeTransactionQueueRepository)
         {
             _frontTrnRepository = frontTrnRepository;
             _tradeMasterRepository = tradeMasterRepository;
             _tradeDetailRepository = tradeDetailRepository;
             _logger = logger;
             _serviceMasterRepository = serviceMasterRepository;
+            _tradeTransactionQueueRepository = tradeTransactionQueueRepository;
         }
         public List<GetActiveOrderInfo> GetActiveOrder(long MemberID)
         {
@@ -45,6 +48,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public List<BasePairResponse> GetTradePairAsset()
         {
+            decimal ChangePer = 0;
+            decimal Volume24 = 0;
+            GetPairAdditionalVal(10,ref Volume24,ref ChangePer);
             List<BasePairResponse> responsedata;
             try
             {
@@ -130,7 +136,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            throw new NotImplementedException();
+        }
+        public void GetPairAdditionalVal(long PairId,ref decimal Volume24,ref decimal ChangePer)
+        {
+            try
+            {
+                var Date24Hrs = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                var Date48Hrs = DateTime.Now.AddDays(-2).ToString("yyyy-MM-dd HH:mm:ss");
+
+               // var data24 = _tradeTransactionQueueRepository.GetSingle();
+              
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
 }
