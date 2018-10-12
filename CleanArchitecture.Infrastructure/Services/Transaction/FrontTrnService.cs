@@ -37,10 +37,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
-                List<ActiveOrderDataResponse> ActiveOrderList = _frontTrnRepository.GetActiveOrder(MemberID);
-                var response = ActiveOrderList.ConvertAll(x => new GetActiveOrderInfo { order_id = x.Id, pair_name = x.Order_Currency, price = x.Price, side = x.Type });
+                //List<ActiveOrderDataResponse> ActiveOrderList = _frontTrnRepository.GetActiveOrder(MemberID);
+                //var response = ActiveOrderList.ConvertAll(x => new GetActiveOrderInfo { order_id = x.Id, pair_name = x.Order_Currency, price = x.Price, side = x.Type });
 
-                return response;
+                return null;
             }
             catch (Exception ex)
             {
@@ -143,11 +143,27 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
+                decimal tradeprice;
                 var Date24Hrs = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
-                var Date48Hrs = DateTime.Now.AddDays(-2).ToString("yyyy-MM-dd HH:mm:ss");
 
-               // var data24 = _tradeTransactionQueueRepository.GetSingle();
-              
+                var tradedata = _tradeTransactionQueueRepository.GetSingle(x => x.TrnDate > DateTime.ParseExact(Date24Hrs, "yyyy-MM-dd HH:mm tt", null) && x.PairID == PairId);
+                if(tradedata != null)
+                {
+                    if (tradedata.TrnType == 4)
+                    {
+                        tradeprice = tradedata.BidPrice;
+                    }
+                    else if(tradedata.TrnType == 5)
+                    {
+                        tradeprice = tradedata.AskPrice;
+                    }
+                    
+                }
+                else
+                {
+                    ChangePer = 0;
+                }
+               
             }
             catch (Exception ex)
             {
