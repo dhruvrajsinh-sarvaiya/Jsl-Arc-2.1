@@ -171,7 +171,7 @@ namespace CleanArchitecture.Web.API
         //}
 
         /// <summary>
-        /// vsolanki 1-10-2018 Get Wallet by coin name
+        /// vsolanki 12-10-2018 Get Wallet by coin name
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
