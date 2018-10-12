@@ -696,5 +696,24 @@ namespace CleanArchitecture.Web.API
                 return Ok(Response);
             }
         }
+
+        [HttpPost("GetTradeHistory/{PairId:long}")]
+        public ActionResult GetTradeHistory(long PairId)
+        {
+            GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
+            try
+            {
+                Response.response = _frontTrnService.GetTradeHistory(PairId);
+                Response.ReturnCode = enResponseCode.Success;
+                return returnDynamicResult(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+
+        }
     }
 }

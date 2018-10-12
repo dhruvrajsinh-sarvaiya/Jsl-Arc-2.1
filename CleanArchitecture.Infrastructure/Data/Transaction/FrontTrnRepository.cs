@@ -1,4 +1,6 @@
-﻿using CleanArchitecture.Core.Interfaces.Repository;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -28,6 +30,18 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
             return Result.ToList();
         }
+        public List<TradeHistoryResponce> GetTradeHistory(long id)
+        {
+            IQueryable<TradeHistoryResponce> Result = _dbContext.TradeHistoryInfo.FromSql(
+                             @"Select top 100 TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,
+                                CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,
+                                CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Amount,
+                                 TTQ.SettledDate as DateTime, TTQ.Status, TTQ.StatusMsg as StatusText, TTQ.PairID, TQ.ChargeRs from
+                                 TradeTransactionQueue TTQ inner join TransactionQueue TQ on TQ.Id  = TTQ.TrnNo
+                                 WHERE TTQ.PairID = {0} AND TTQ.Status in ({1}, {2})   and  (TTQ.SettledSellQty>0 or TTQ.SettledBuyQty>0) 
+                                 Order By TTQ.SettledDate DESC", id, Convert.ToInt16(enTransactionStatus.Success), Convert.ToInt16(enTransactionStatus.Hold));
 
+            return Result.ToList();
+        }
     }
 }
