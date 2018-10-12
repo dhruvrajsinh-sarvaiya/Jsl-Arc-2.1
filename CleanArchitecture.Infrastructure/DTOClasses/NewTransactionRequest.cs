@@ -10,24 +10,26 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
     public class NewTransactionRequestCls
     {
         public long TrnNo { get; set; }
-        [Required]
+       
         public short TrnMode { get; set; }
-        [Required]
+        
         public enTrnType TrnType { get; set; }
-        [Required]
+
+        public enTransactionMarketType ordertype { get; set; } // market type
+        
         public long MemberID { get; set; }
-        [Required]
+        
         public string MemberMobile { get; set; }
 
-        [Required]
+       
         [StringLength(10)]
         public string SMSCode { get; set; }
 
-        [Required]
+      
         [StringLength(200)]
         public string TransactionAccount { get; set; }//Mob for txn , address for crypto
 
-        [Required]
+       
         [Range(0, 9999999999.99999999)]
         public decimal Amount { get; set; }
 
@@ -46,10 +48,9 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public string StatusMsg { get; set; }
         //public long WalletID { get; set; }
         //public long DeliveryWalletID { get; set; } //use only in case of Trading
-        [Required]
+       
         public long DebitWalletID { get; set; }
-
-        [Required]
+       
         public long CreditWalletID { get; set; }
 
     }

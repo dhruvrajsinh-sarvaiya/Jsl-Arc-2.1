@@ -83,7 +83,14 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, model.IPAddress);
+                string CountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                {
+
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                }
+
+                bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, CountryCode);
 
                 if (!isValidNumber)
                 {
@@ -100,7 +107,7 @@ namespace CleanArchitecture.Web.API
 
                         var tempcurrentUser = new TempUserRegisterViewModel
                         {
-                            UserName = model.Email,
+                            UserName = model.Username,
                             Email = model.Email,
                             FirstName = model.Firstname,
                             LastName = model.Lastname,
@@ -113,7 +120,7 @@ namespace CleanArchitecture.Web.API
                         {
                             LinkTokenViewModel linkToken = new LinkTokenViewModel();
                             linkToken.Id = resultdata.Id;
-                            linkToken.Username = model.Email;
+                            linkToken.Username = model.Username;
                             linkToken.Email = model.Email;
                             linkToken.Firstname = model.Firstname;
                             linkToken.Lastname = model.Lastname;
@@ -197,7 +204,7 @@ namespace CleanArchitecture.Web.API
                             {
                                 var currentUser = new ApplicationUser
                                 {
-                                    UserName = user.Email,
+                                    UserName = user.UserName,
                                     Email = user.Email,
                                     FirstName = user.FirstName,
                                     LastName = user.LastName,
@@ -277,14 +284,13 @@ namespace CleanArchitecture.Web.API
                     if (tempdata != null)
                     {
 
-
                         if (!tempdata.RegisterStatus)
                         {
                             byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
                             LinkTokenViewModel linkToken = new LinkTokenViewModel();
                             linkToken.Id = tempdata.Id;
-                            linkToken.Username = model.Email;
+                            linkToken.Username = tempdata.UserName;
                             linkToken.Email = model.Email;
                             linkToken.CurrentTime = DateTime.UtcNow;
                             linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
@@ -575,7 +581,14 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, model.IPAddress);
+                string CountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                {
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                }
+
+
+                bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, CountryCode);
 
                 if (!isValidNumber)
                 {
@@ -737,61 +750,66 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
-                string countryCode = "IN";
-                PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
-                bool isValidNumber = phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
-                if (isValidNumber)
-                {
-                    bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
-                    if (IsSignMobile)
-                    {
-                        var tempdata = await _tempUserRegisterService.GetMobileNo(model.Mobile);
-                        var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata?.Id));
-                        //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow) // Remove expiretime as per discuss with nishit bhai 10-09-2018
-                        if (tempdata != null && tempotp != null)
-                        {
-                            if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
-                            {
-                                _tempOtpService.Update(tempotp.Id);
-                                var result = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Mobile));
 
-                                SendSMSRequest request = new SendSMSRequest();
-                                request.MobileNo = Convert.ToInt64(model.Mobile);
-                                request.Message = EnResponseMessage.SendSMSSubject + result.OTP;
-                                await _mediator.Send(request);
-                                //return AppUtils.StanderdSignUp("You have successfully send Otp in mobile.");
-                                return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithResendMobile });
-                            }
-                            else
-                            {
-                                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
-                            }
-                            //else
-                            //{
-                            //    SendSMSRequest request = new SendSMSRequest();
-                            //    request.MobileNo = Convert.ToInt64(model.Mobile);
-                            //    request.Message = "SMS for use this code " + tempotp.OTP + "";
-                            //    await _mediator.Send(request);
-                            //    return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your mobile.");
-                            //}
+                string CountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                {
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                }
+
+
+                bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, CountryCode);
+
+                if (!isValidNumber)
+                {
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardSignUpPhonevelid, ErrorCode = enErrorCode.Status4013MobileInvalid });
+                }
+
+                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                if (IsSignMobile)
+                {
+                    var tempdata = await _tempUserRegisterService.GetMobileNo(model.Mobile);
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata?.Id));
+                    //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow) // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                    if (tempdata != null && tempotp != null)
+                    {
+                        if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
+                        {
+                            _tempOtpService.Update(tempotp.Id);
+                            var result = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Mobile));
+
+                            SendSMSRequest request = new SendSMSRequest();
+                            request.MobileNo = Convert.ToInt64(model.Mobile);
+                            request.Message = EnResponseMessage.SendSMSSubject + result.OTP;
+                            await _mediator.Send(request);
+                            //return AppUtils.StanderdSignUp("You have successfully send Otp in mobile.");
+                            return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithResendMobile });
                         }
                         else
                         {
-                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                         }
+                        //else
+                        //{
+                        //    SendSMSRequest request = new SendSMSRequest();
+                        //    request.MobileNo = Convert.ToInt64(model.Mobile);
+                        //    request.Message = "SMS for use this code " + tempotp.OTP + "";
+                        //    await _mediator.Send(request);
+                        //    return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your mobile.");
+                        //}
                     }
                     else
                     {
-                        //ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
-                        return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
                 {
-                    //ModelState.AddModelError(string.Empty, "This mobile number is not valid.");
-                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpWithMobileValid, ErrorCode = enErrorCode.Status400BadRequest });
+                    //ModelState.AddModelError(string.Empty, "This mobile number is already registered.");
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                 }
+
+
             }
             catch (Exception ex)
             {

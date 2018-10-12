@@ -52,14 +52,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             decimal ChangePer = 0;
             decimal Volume24 = 0;
-            GetPairAdditionalVal(10,ref Volume24,ref ChangePer);
+
             List<BasePairResponse> responsedata;
             try
             {
                 responsedata = new List<BasePairResponse>();
                 var basePairData = _tradeMasterRepository.GetAll().GroupBy(x => x.BaseCurrencyId).Select(x => x.FirstOrDefault());
 
-                if(basePairData != null)
+                if (basePairData != null)
                 {
                     foreach (var bpair in basePairData)
                     {
@@ -78,14 +78,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
                             var chidService = _serviceMasterRepository.GetSingle(x => x.Id == pmdata.SecondaryCurrencyId);
 
+                            GetPairAdditionalVal(pmdata.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+
                             tradePair.PairId = pmdata.Id;
                             tradePair.Pairname = pmdata.PairName;
                             tradePair.Currentrate = pairDetailData.Currentrate;
-                            tradePair.Volume = pairDetailData.Volume;
+                            tradePair.Volume = System.Math.Round(Volume24, 2);
                             tradePair.Fee = pairDetailData.Fee;
                             tradePair.ChildCurrency = chidService.Name;
                             tradePair.Abbrevation = chidService.SMSCode;
-                            tradePair.ChangePer = 0;
+                            tradePair.ChangePer = System.Math.Round(ChangePer, 2);
 
                             pairList.Add(tradePair);
                         }
@@ -107,6 +109,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public List<VolumeDataRespose> GetVolumeData()
         {
+            decimal ChangePer = 0;
+            decimal Volume24 = 0;
+
             List<VolumeDataRespose> responsedata;
             try
             {
@@ -119,10 +124,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     {
                         VolumeDataRespose volumedata = new VolumeDataRespose();
                         var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
+                        GetPairAdditionalVal(pmdata.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+
                         volumedata.PairId = pmdata.Id;
                         volumedata.Currentrate = pairDetailData.Currentrate;
-                        volumedata.ChangePer = 0;
-                        volumedata.Volume24 = 0;
+                        volumedata.ChangePer = System.Math.Round(Volume24, 2);
+                        volumedata.Volume24 = System.Math.Round(ChangePer, 2);
 
                         responsedata.Add(volumedata);
                     }
@@ -139,31 +146,70 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public void GetPairAdditionalVal(long PairId,ref decimal Volume24,ref decimal ChangePer)
+        public void GetPairAdditionalVal(long PairId, decimal CurrentRate, ref decimal Volume24, ref decimal ChangePer)
         {
             try
             {
-                decimal tradeprice;
-                var Date24Hrs = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                //Calucalte ChangePer
 
-                var tradedata = _tradeTransactionQueueRepository.GetSingle(x => x.TrnDate > DateTime.ParseExact(Date24Hrs, "yyyy-MM-dd HH:mm tt", null) && x.PairID == PairId);
-                if(tradedata != null)
+                decimal tradeprice = 0;
+                var tradedata = _tradeTransactionQueueRepository.GetSingle(x => x.TrnDate > DateTime.Now.AddDays(-1) && x.PairID == PairId && x.Status == 1);
+                if (tradedata != null)
                 {
                     if (tradedata.TrnType == 4)
                     {
                         tradeprice = tradedata.BidPrice;
                     }
-                    else if(tradedata.TrnType == 5)
+                    else if (tradedata.TrnType == 5)
                     {
                         tradeprice = tradedata.AskPrice;
                     }
-                    
+                    if (CurrentRate > 0 && tradeprice > 0)
+                        ChangePer = ((CurrentRate * 100) / tradeprice) - 100;
+                    else if (CurrentRate > 0 && tradeprice == 0)
+                    {
+                        ChangePer = 100;
+                    }
+                    else
+                        ChangePer = 0;
                 }
                 else
                 {
                     ChangePer = 0;
                 }
-               
+
+                //Calculate Volume24
+                tradeprice = 0;
+                decimal tradeqty = 0, sum = 0;
+                var tradedata1 = _tradeTransactionQueueRepository.FindBy(x => x.TrnDate >= DateTime.Now.AddDays(-1) && x.TrnDate <= DateTime.Now && x.PairID == PairId && x.Status == 1 && (x.TrnType == 4 || x.TrnType == 5));
+                if (tradedata1 != null)
+                {
+                    foreach (var trade in tradedata1)
+                    {
+                        if (trade.TrnType == 4)
+                        {
+                            tradeprice = trade.BidPrice;
+                            tradeqty = trade.BuyQty;
+                        }
+                        else if (trade.TrnType == 5)
+                        {
+                            tradeprice = trade.AskPrice;
+                            tradeqty = trade.SellQty;
+                        }
+                        else
+                        {
+                            tradeprice = 0;
+                            tradeqty = 0;
+                        }
+                        sum += (tradeprice * tradeqty);
+                    }
+                    Volume24 = sum;
+                }
+                else
+                {
+                    Volume24 = 0;
+                }
+
             }
             catch (Exception ex)
             {

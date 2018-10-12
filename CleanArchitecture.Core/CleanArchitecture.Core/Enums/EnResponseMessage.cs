@@ -101,5 +101,6 @@ namespace CleanArchitecture.Core.Enums
         public static string EmailFail = "Email Address Invalid";
         public static string ResetConfirmed = "Reset confirmed";
         public static string LoginMobileNumberInvalid = "Invalid mobileno.";
+        public static string IpAddressInvalid = "Invalid IPAddress."; 
     }
 }

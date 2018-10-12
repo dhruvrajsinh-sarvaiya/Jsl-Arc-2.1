@@ -180,11 +180,29 @@ namespace CleanArchitecture.Infrastructure.Data
                                                        {
                                                            AccWalletID = u.AccWalletID,
                                                            Walletname = u.Walletname,
-                                                           CoinName = c.WalletTypeName
+                                                           CoinName = c.WalletTypeName,
+                                                           PublicAddress=u.PublicAddress,
+                                                           Balance=u.Balance
                                                        }).AsEnumerable();
             return items;
         }
 
-
+        public IEnumerable<WalletMasterResponse> GetWalletMasterResponseByCoin(long UserId,string coin)
+        {
+            IEnumerable<WalletMasterResponse> items = (from u in _dbContext.WalletMasters
+                                                       join c in _dbContext.WalletTypeMasters
+                                                              on u.WalletTypeID equals c.Id
+                                                       where u.UserID == UserId && c.WalletTypeName==coin
+                                                       select new WalletMasterResponse
+                                                       {
+                                                           AccWalletID = u.AccWalletID,
+                                                           Walletname = u.Walletname,
+                                                           CoinName = c.WalletTypeName,
+                                                           PublicAddress = u.PublicAddress,
+                                                           Balance = u.Balance
+                                                       }).AsEnumerable();
+            return items;
+        }
+        
     }
 }

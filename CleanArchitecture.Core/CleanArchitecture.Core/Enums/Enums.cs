@@ -155,6 +155,7 @@ namespace CleanArchitecture.Core.Enums
         Status400BadRequest = 400,
         Status423Locked = 423,
         Status4013MobileInvalid = 4013,
+        Status4020MobileInvalid = 4020,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -236,5 +237,13 @@ namespace CleanArchitecture.Core.Enums
         Dr_Stacking = 14,
         Dr_ESCROW = 15,
         Cr_Bonus = 16
+    }
+
+    public enum enTransactionMarketType
+    {
+        LIMIT = 1,
+        MARKET = 2,
+        STOP_LOSS = 3,
+        SPOT = 4
     }
 }

@@ -171,12 +171,12 @@ namespace CleanArchitecture.Web.API
         //}
 
         /// <summary>
-        /// vsolanki 1-10-2018 Get Wallet by coin name
+        /// vsolanki 12-10-2018 Get Wallet by coin name
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{coin}")]
-        public async Task<IActionResult> GetWallet(string coin)
+        public async Task<IActionResult> GetWalletByCoin(string coin)
         {
             ListWalletResponse Response = new ListWalletResponse();
             try
@@ -190,7 +190,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.ListWallet(user.Id);
+                    Response = _walletService.GetWalletByCoin(user.Id, coin);
                 }
                 return Ok(Response);
             }

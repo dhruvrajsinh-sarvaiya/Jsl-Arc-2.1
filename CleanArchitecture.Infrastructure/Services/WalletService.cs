@@ -727,13 +727,42 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        //vsolanki 10-10-2018 Select WalletMaster table
+        //vsolanki 12-10-2018 Select WalletMaster table 
         public ListWalletResponse ListWallet(long userid)
         {
             ListWalletResponse listWalletResponse = new ListWalletResponse();
             try
             {
                 var walletResponse = _walletRepository1.ListWalletMasterResponse(userid);
+                if (walletResponse == null)
+                {
+                    listWalletResponse.ReturnCode = enResponseCode.Fail;
+                    listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    listWalletResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    listWalletResponse.wallets = walletResponse;
+                    listWalletResponse.ReturnCode = enResponseCode.Success;
+                    listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                return listWalletResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                listWalletResponse.ReturnCode = enResponseCode.InternalError;
+                return listWalletResponse;
+            }
+        }
+
+        //vsolanki 12-10-2018 Select WalletMaster table ByCoin
+        public ListWalletResponse GetWalletByCoin(long userid, string coin)
+        {
+            ListWalletResponse listWalletResponse = new ListWalletResponse();
+            try
+            {
+                var walletResponse = _walletRepository1.GetWalletMasterResponseByCoin(userid, coin);
                 if (walletResponse == null)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
