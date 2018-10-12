@@ -72,7 +72,7 @@ namespace CleanArchitecture.Web.API
 
         #region "Komal Methods"
 
-        [HttpGet("GetTradePairAsset")] //GetAllPair
+        [HttpGet("GetTradePairAsset")]
         public IActionResult GetTradePairAsset()
         {
             TradePairAssetResponce Response = new TradePairAssetResponce();
@@ -409,7 +409,7 @@ namespace CleanArchitecture.Web.API
         //    return returnDynamicResult(Response);
         //}
 
-        [HttpPost("CreateOrder")]
+        [HttpPost("CreateTransactionOrder")]
         [Authorize]
         public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request)
         {
@@ -671,5 +671,30 @@ namespace CleanArchitecture.Web.API
         //}
         #endregion
 
+        [HttpGet("GetVolumeData")]
+        public IActionResult GetVolumeData()
+        {
+            GetVolumeDataResponse Response = new GetVolumeDataResponse();
+            try
+            {
+                var responsedata = _frontTrnService.GetVolumeData();
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
     }
 }

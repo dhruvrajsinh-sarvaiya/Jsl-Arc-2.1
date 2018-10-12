@@ -70,6 +70,101 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+       
+        #endregion
+
+        #region Methods
+
+        #region Default register
+
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        {
+            try
+            {
+               bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, model.IPAddress);
+
+                if (!isValidNumber)
+                {
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardSignUpPhonevelid, ErrorCode = enErrorCode.Status4013MobileInvalid });
+                }              
+
+                    var result = await _userManager.FindByEmailAsync(model.Email);
+                if (string.IsNullOrEmpty(result?.Email))
+                {
+                    bool IsSignEmail = await _tempUserRegisterService.GetEmail(model.Email);
+                    if (IsSignEmail)
+                    {
+                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
+
+                        var tempcurrentUser = new TempUserRegisterViewModel
+                        {
+                            UserName = model.Email,
+                            Email = model.Email,
+                            FirstName = model.Firstname,
+                            LastName = model.Lastname,
+                            Mobile = model.Mobile,
+                            PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes),
+                            RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Standerd)
+                        };
+                        var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                        if (resultdata != null)
+                        {
+                            LinkTokenViewModel linkToken = new LinkTokenViewModel();
+                            linkToken.Id = resultdata.Id;
+                            linkToken.Username = model.Email;
+                            linkToken.Email = model.Email;
+                            linkToken.Firstname = model.Firstname;
+                            linkToken.Lastname = model.Lastname;
+                            linkToken.Mobile = model.Mobile;
+                            linkToken.CurrentTime = DateTime.UtcNow;
+                            linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
+                            //linkToken.Password = tempcurrentUser.PasswordHash;
+
+                            string UserDetails = JsonConvert.SerializeObject(linkToken);
+                            string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
+                            string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
+                            {
+                                //userId = currentUser.Id,
+                                emailConfirmCode = SubScriptionKey
+                            }, protocol: HttpContext.Request.Scheme);
+
+                            var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
+
+                            SendEmailRequest request = new SendEmailRequest();
+                            request.Recepient = model.Email;
+                            request.Subject = EnResponseMessage.SendMailSubject;
+                            request.Body = confirmationLink;
+
+                            await _mediator.Send(request);
+                            _logger.LogInformation(3, "User created a new account with password.");
+                            //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+
+                            return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardSignUp });
+                        }
+                        else
+                        {
+                            return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
         //[ApiExplorerSettings(IgnoreApi = true)]
         // Email Link to direct call this method
         [HttpGet("ConfirmEmail")]
@@ -163,55 +258,42 @@ namespace CleanArchitecture.Web.API
                 return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
-        #endregion
 
-        #region Methods
 
-        #region Default register
+        /// <summary>
+        ///  This method are resend Email Link to direct call this method
+        /// </summary>
 
-        [HttpPost("register")]
+        [HttpPost("ReSendRegisterlink")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        public async Task<IActionResult> ReSendRegisterlink(SignUpWithEmailViewModel model)
         {
             try
             {
                 var result = await _userManager.FindByEmailAsync(model.Email);
                 if (string.IsNullOrEmpty(result?.Email))
                 {
-                    bool IsSignEmail = await _tempUserRegisterService.GetEmail(model.Email);
-                    if (IsSignEmail)
+                    var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
+                    if (tempdata != null)
                     {
-                        byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
-                        var tempcurrentUser = new TempUserRegisterViewModel
+
+                        if (!tempdata.RegisterStatus)
                         {
-                            UserName = model.Email,
-                            Email = model.Email,
-                            FirstName = model.Firstname,
-                            LastName = model.Lastname,
-                            Mobile = model.Mobile,
-                            PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes),
-                            RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Standerd)
-                        };
-                        var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
-                        if (resultdata != null)
-                        {
+                            byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
+
                             LinkTokenViewModel linkToken = new LinkTokenViewModel();
-                            linkToken.Id = resultdata.Id;
+                            linkToken.Id = tempdata.Id;
                             linkToken.Username = model.Email;
                             linkToken.Email = model.Email;
-                            linkToken.Firstname = model.Firstname;
-                            linkToken.Lastname = model.Lastname;
-                            linkToken.Mobile = model.Mobile;
                             linkToken.CurrentTime = DateTime.UtcNow;
                             linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                            //linkToken.Password = tempcurrentUser.PasswordHash;
+                            linkToken.Password = tempdata.PasswordHash;
 
                             string UserDetails = JsonConvert.SerializeObject(linkToken);
                             string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
                             string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
                             {
-                                //userId = currentUser.Id,
                                 emailConfirmCode = SubScriptionKey
                             }, protocol: HttpContext.Request.Scheme);
 
@@ -219,23 +301,23 @@ namespace CleanArchitecture.Web.API
 
                             SendEmailRequest request = new SendEmailRequest();
                             request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.SendMailSubject;
+                            request.Subject = EnResponseMessage.ReSendMailSubject;
                             request.Body = confirmationLink;
 
                             await _mediator.Send(request);
-                            _logger.LogInformation(3, "User created a new account with password.");
-                            //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+                            _logger.LogInformation(3, "Email sent successfully with your account");
 
-                            return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardSignUp });
+                            //return AppUtils.StanderdSignUp("Please verify it by clicking the activation link that has been resend to your email.");
+                            return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardResendSignUp });
                         }
                         else
                         {
-                            return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                     }
                     else
                     {
-                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else
@@ -314,6 +396,171 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+
+        /// <summary>
+        ///  This method are Direct signUp with email otp using verified.
+        /// </summary>
+
+        [HttpPost("EmailOtpVerification")]
+        [AllowAnonymous]
+        public async Task<IActionResult> EmailOtpVerification(OTPWithEmailViewModel model)
+        {
+            try
+            {
+                var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
+                if (tempdata?.Id > 0)
+                {
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                    if (tempotp != null)
+                    {
+                        if (tempotp?.ExpirTime >= DateTime.UtcNow)
+                        {
+                            if (tempdata.Id == 0 && tempotp.Id == 0)
+                            {
+                                //ModelState.AddModelError(string.Empty, "Error.");
+                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                            }
+                            else if (model.OTP == tempotp.OTP)
+                            {
+                                if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
+                                {
+                                    var currentUser = new ApplicationUser
+                                    {
+                                        UserName = tempdata.Email,
+                                        Email = tempdata.Email,
+                                    };
+                                    var result = await _userManager.CreateAsync(currentUser);
+                                    if (result.Succeeded)
+                                    {
+                                        if (currentUser.Mobile != null)
+                                        {
+                                            var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
+                                            await _userManager.AddClaimAsync(currentUser, officeClaim);
+                                        }
+                                        // Add to roles
+                                        var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
+                                        if (roleAddResult.Succeeded)
+                                        {
+                                            _tempUserRegisterService.Update(tempdata.Id);
+                                            _tempOtpService.Update(tempotp.Id);
+                                            var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
+                                            //return Ok("Your account has been activated, you can now login.");
+                                            //return AppUtils.StanderdSignUp("You have successfully verified.");
+                                            return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUPVerification });
+                                        }
+                                        else
+                                        {
+                                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpRole, ErrorCode = enErrorCode.Status400BadRequest });
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //ModelState.AddModelError(string.Empty, "This Email is already registered.");
+                                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                                    }
+                                }
+                                else
+                                {
+                                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                                    //return BadRequest(new ApiError(ModelState));
+                                }
+                            }
+                            else
+                            {
+                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpOTP, ErrorCode = enErrorCode.Status400BadRequest });
+                            }
+                        }
+                        else
+                        {
+                            //ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
+                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status400BadRequest });
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+
+        /// <summary>
+        ///  This method are Auto generate resend otp in Email
+        /// </summary>  
+
+        [HttpPost("ReSendOtpWithEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReSendOtpWithEmail(SignUpWithEmailViewModel model)
+        {
+            try
+            {
+                var result = await _userManager.FindByEmailAsync(model.Email);
+                if (string.IsNullOrEmpty(result?.Email))
+                {
+                    var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
+                    //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
+                    if (tempotp != null && tempdata != null)
+                    {
+                        if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
+                        {
+                            _tempOtpService.Update(tempotp.Id);
+                            var resultdata = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Email));
+
+                            SendEmailRequest request = new SendEmailRequest();
+                            request.Recepient = model.Email;
+                            request.Subject = EnResponseMessage.ReSendMailSubject;
+                            request.Body = EnResponseMessage.SendMailBody + resultdata.OTP;
+
+                            await _mediator.Send(request);
+                            _logger.LogInformation(3, "Email sent successfully with your account");
+                            //return AppUtils.StanderdSignUp("You have successfully send Otp in email.");
+                            return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithResendEmail });
+                        }
+                        else
+                        {
+                            //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                            //return BadRequest(new ApiError(ModelState));
+                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+
+                            //SendEmailRequest request = new SendEmailRequest();
+                            //request.Recepient = model.Email;
+                            //request.Subject = "Registration confirmation resend email";
+                            //request.Body = "use this code:" + tempotp.OTP + "";
+
+                            //await _mediator.Send(request);
+                            //_logger.LogInformation(3, "Email sent successfully with your account");
+
+                            //return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your email.");
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
 
         #endregion
 
@@ -502,102 +749,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        /// <summary>
-        ///  This method are Direct signUp with email otp using verified.
-        /// </summary>
-
-        [HttpPost("EmailOtpVerification")]
-        [AllowAnonymous]
-        public async Task<IActionResult> EmailOtpVerification(OTPWithEmailViewModel model)
-        {
-            try
-            {
-                var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
-                if (tempdata?.Id > 0)
-                {
-                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
-                    if (tempotp != null)
-                    {
-                        if (tempotp?.ExpirTime >= DateTime.UtcNow)
-                        {
-                            if (tempdata.Id == 0 && tempotp.Id == 0)
-                            {
-                                //ModelState.AddModelError(string.Empty, "Error.");
-                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                            }
-                            else if (model.OTP == tempotp.OTP)
-                            {
-                                if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
-                                {
-                                    var currentUser = new ApplicationUser
-                                    {
-                                        UserName = tempdata.Email,
-                                        Email = tempdata.Email,
-                                    };
-                                    var result = await _userManager.CreateAsync(currentUser);
-                                    if (result.Succeeded)
-                                    {
-                                        if (currentUser.Mobile != null)
-                                        {
-                                            var officeClaim = new Claim(OpenIdConnectConstants.Claims.PhoneNumber, currentUser.Mobile.ToString(), ClaimValueTypes.Integer);
-                                            await _userManager.AddClaimAsync(currentUser, officeClaim);
-                                        }
-                                        // Add to roles
-                                        var roleAddResult = await _userManager.AddToRoleAsync(currentUser, "User");
-                                        if (roleAddResult.Succeeded)
-                                        {
-                                            _tempUserRegisterService.Update(tempdata.Id);
-                                            _tempOtpService.Update(tempotp.Id);
-                                            var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
-                                            //return Ok("Your account has been activated, you can now login.");
-                                            //return AppUtils.StanderdSignUp("You have successfully verified.");
-                                            return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUPVerification });
-                                        }
-                                        else
-                                        {
-                                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpRole, ErrorCode = enErrorCode.Status400BadRequest });
-                                        }
-                                    }
-                                    else
-                                    {
-                                        //ModelState.AddModelError(string.Empty, "This Email is already registered.");
-                                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
-                                    }
-                                }
-                                else
-                                {
-                                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
-                                    //return BadRequest(new ApiError(ModelState));
-                                }
-                            }
-                            else
-                            {
-                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpOTP, ErrorCode = enErrorCode.Status400BadRequest });
-                            }
-                        }
-                        else
-                        {
-                            //ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status400BadRequest });
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                    }
-                }
-                else
-                {
-                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-
+        
         /// <summary>
         ///  This method are Auto generate resend otp in Mobile
         /// </summary>   
@@ -671,146 +823,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        /// <summary>
-        ///  This method are Auto generate resend otp in Email
-        /// </summary>  
-
-        [HttpPost("ReSendOtpWithEmail")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ReSendOtpWithEmail(SignUpWithEmailViewModel model)
-        {
-            try
-            {
-                var result = await _userManager.FindByEmailAsync(model.Email);
-                if (string.IsNullOrEmpty(result?.Email))
-                {
-                    var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
-                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt16(tempdata.Id));
-                    //if (!tempdata.RegisterStatus && !tempotp.EnableStatus && tempotp.ExpirTime <= DateTime.UtcNow)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
-                    if (tempotp != null && tempdata != null)
-                    {
-                        if (!tempdata.RegisterStatus && !tempotp.EnableStatus)
-                        {
-                            _tempOtpService.Update(tempotp.Id);
-                            var resultdata = await _tempOtpService.AddTempOtp(Convert.ToInt16(tempdata.Id), Convert.ToInt16(enRegisterType.Email));
-
-                            SendEmailRequest request = new SendEmailRequest();
-                            request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.ReSendMailSubject;
-                            request.Body = EnResponseMessage.SendMailBody + resultdata.OTP;
-
-                            await _mediator.Send(request);
-                            _logger.LogInformation(3, "Email sent successfully with your account");
-                            //return AppUtils.StanderdSignUp("You have successfully send Otp in email.");
-                            return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithResendEmail });
-                        }
-                        else
-                        {
-                            //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                            //return BadRequest(new ApiError(ModelState));
-                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
-
-                            //SendEmailRequest request = new SendEmailRequest();
-                            //request.Recepient = model.Email;
-                            //request.Subject = "Registration confirmation resend email";
-                            //request.Body = "use this code:" + tempotp.OTP + "";
-
-                            //await _mediator.Send(request);
-                            //_logger.LogInformation(3, "Email sent successfully with your account");
-
-                            //return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been resend to your email.");
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                    }
-                }
-                else
-                {
-                    //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-
-        /// <summary>
-        ///  This method are resend Email Link to direct call this method
-        /// </summary>
-
-        [HttpPost("ReSendRegisterlink")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ReSendRegisterlink(SignUpWithEmailViewModel model)
-        {
-            try
-            {
-                var result = await _userManager.FindByEmailAsync(model.Email);
-                if (string.IsNullOrEmpty(result?.Email))
-                {
-                    var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
-                    if (tempdata != null)
-                    {
-
-
-                        if (!tempdata.RegisterStatus)
-                        {
-                            byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
-
-                            LinkTokenViewModel linkToken = new LinkTokenViewModel();
-                            linkToken.Id = tempdata.Id;
-                            linkToken.Username = model.Email;
-                            linkToken.Email = model.Email;
-                            linkToken.CurrentTime = DateTime.UtcNow;
-                            linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                            linkToken.Password = tempdata.PasswordHash;
-
-                            string UserDetails = JsonConvert.SerializeObject(linkToken);
-                            string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
-                            string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
-                            {
-                                emailConfirmCode = SubScriptionKey
-                            }, protocol: HttpContext.Request.Scheme);
-
-                            var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
-
-                            SendEmailRequest request = new SendEmailRequest();
-                            request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.ReSendMailSubject;
-                            request.Body = confirmationLink;
-
-                            await _mediator.Send(request);
-                            _logger.LogInformation(3, "Email sent successfully with your account");
-
-                            //return AppUtils.StanderdSignUp("Please verify it by clicking the activation link that has been resend to your email.");
-                            return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardResendSignUp });
-                        }
-                        else
-                        {
-                            return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                    }
-                }
-                else
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpValidation, ErrorCode = enErrorCode.Status400BadRequest });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-        }
-
+     
         #endregion
 
 

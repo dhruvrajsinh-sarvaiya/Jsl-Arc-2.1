@@ -10,5 +10,6 @@ namespace CleanArchitecture.Core.Interfaces
     {
         List<GetActiveOrderInfo> GetActiveOrder(long MemberID);
         List<BasePairResponse> GetTradePairAsset();
+        List<VolumeDataRespose> GetVolumeData();
     }
 }

@@ -35,7 +35,8 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrn_NoSelfAddressWithdrawAllowMsg = "Invalid Amount";
         //============================
 
-        //============================walelt=================================//
+        //============================walelt=================================//       
+
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
@@ -48,7 +49,7 @@ namespace CleanArchitecture.Core.Enums
         public static string RecordUpdated = "Recored Updated Successfully!";
         public static string RecordDisable = "Recored Disable Successfully!";
 
-        
+
         public static string InvalidAmt = "Invalid Amount.";
         public static string InsufficientBal = "Insufficient Balance.";
         public static string BatchNoFailed = "Batch No Generation Failed.";
@@ -59,21 +60,19 @@ namespace CleanArchitecture.Core.Enums
 
         public static string InvalidCoin = "Invalid CoinName.";
 
-
-
-
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";
         public static string ReSendMailSubject = "Registration confirmation resend email";
         public static string SendMailBody = "use this code: ";
         public static string SendSMSSubject = "SMS for use this code ";
         public static string LoginEmailSubject = "Login With Email Otp ";
+        public static string StandardSignUpPhonevelid = "Please Enter Valid Mobile Number";
         public static string StandardSignUp = "Your account has been created, please verify it by clicking the activation link that has been send to your email.";
         public static string SignUpValidation = "This username or email is already registered.";
         public static string SignUpUser = "This user data not available.";
         public static string SignWithEmail = "Please verify it by clicking the otp that has been send to your email.";
         public static string SignUpEmailValidation = "This email is already registered.";
-        public static string SignUpEmailConfirm= "Your account has been activated, you can now login.";
+        public static string SignUpEmailConfirm = "Your account has been activated, you can now login.";
         public static string SignUpEmailExpired = "Reset links immediately not valid or expired.";
         public static string SignEmailLink = "This email code can't be balck.";
         public static string SignEmailUser = "This email link using user not valid.";

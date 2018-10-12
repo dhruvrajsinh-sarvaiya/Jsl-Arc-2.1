@@ -154,6 +154,7 @@ namespace CleanArchitecture.Core.Enums
         Status500InternalServerError = 500,
         Status400BadRequest = 400,
         Status423Locked = 423,
+        Status4013MobileInvalid = 4013,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -161,8 +162,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidWalletId = 247,
         InvalidTrnType = 248,
         TrnTypeNotAllowed = 249,
-            InvalidCoinName=4031,
-        RecordNotFound = 250
+        RecordNotFound = 250    
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

@@ -11,8 +11,14 @@ namespace CleanArchitecture.Web.Filters
         public override void OnResultExecuting(ResultExecutingContext context)
         {
             //_logger.LogWarning("ClassFilter OnResultExecuting");
-           // _logger.LogWarning(((string[])((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)[0]);
+            // _logger.LogWarning(((string[])((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)[0]);
             //base.OnResultExecuting(context);
+
+            if (!context.ModelState.IsValid)
+            {
+                //context.Result = new ValidationFailedResult(context.ModelState);
+                context.Result = new MyResponse(context.ModelState);
+            }
         }
 
         public override void OnResultExecuted(ResultExecutedContext filterContext)
