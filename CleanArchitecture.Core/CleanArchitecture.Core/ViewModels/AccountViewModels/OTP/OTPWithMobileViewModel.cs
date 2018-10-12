@@ -9,8 +9,8 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
 {
     public class OTPWithMobileViewModel : TrackerViewModel
     {
-        [Required(ErrorMessage = "0,Please enter a OTP number,400")]
-        [StringLength(6, ErrorMessage = "0,The OTP must be between 6 digits,400", MinimumLength = 6)]
+        [Required(ErrorMessage = "1,Please enter a OTP number,400")]
+        [StringLength(6, ErrorMessage = "1,The OTP must be between 6 digits,400", MinimumLength = 6)]
         [Range(6, Int64.MaxValue)]
         public string OTP { get; set; }
 
