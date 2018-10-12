@@ -70,7 +70,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-       
+
         #endregion
 
         #region Methods
@@ -83,14 +83,14 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-               bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, model.IPAddress);
+                bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, model.IPAddress);
 
                 if (!isValidNumber)
                 {
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardSignUpPhonevelid, ErrorCode = enErrorCode.Status4013MobileInvalid });
-                }              
+                }
 
-                    var result = await _userManager.FindByEmailAsync(model.Email);
+                var result = await _userManager.FindByEmailAsync(model.Email);
                 if (string.IsNullOrEmpty(result?.Email))
                 {
                     bool IsSignEmail = await _tempUserRegisterService.GetEmail(model.Email);
@@ -575,46 +575,40 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
-                string countryCode = "IN";
-                PhoneNumbers.PhoneNumber phoneNumber = phoneUtil.Parse(model.Mobile, countryCode);
+                bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, model.IPAddress);
 
-                bool isValidNumber = phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
-
-                if (isValidNumber)
+                if (!isValidNumber)
                 {
-                    var tempcurrentUser = new TempUserRegisterViewModel
-                    {
-                        UserName = model.Mobile,
-                        Mobile = model.Mobile,
-                        RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Mobile),
-                    };
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardSignUpPhonevelid, ErrorCode = enErrorCode.Status4013MobileInvalid });
+                }
 
-                    bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
-                    if (IsSignMobile)
+                var tempcurrentUser = new TempUserRegisterViewModel
+                {
+                    UserName = model.Mobile,
+                    Mobile = model.Mobile,
+                    RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Mobile),
+                };
+
+                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                if (IsSignMobile)
+                {
+                    bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
+                    if (IsSignTempMobile)
                     {
-                        bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
-                        if (IsSignTempMobile)
+                        var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                        if (result != null)
                         {
-                            var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
-                            if (result != null)
-                            {
-                                var tempotp = await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
+                            var tempotp = await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
 
-                                SendSMSRequest request = new SendSMSRequest();
-                                request.MobileNo = Convert.ToInt64(model.Mobile);
-                                request.Message = EnResponseMessage.SendMailBody + tempotp.OTP;
-                                await _mediator.Send(request);
-                                return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithMobile });
-                            }
-                            else
-                            {
-                                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
-                            }
+                            SendSMSRequest request = new SendSMSRequest();
+                            request.MobileNo = Convert.ToInt64(model.Mobile);
+                            request.Message = EnResponseMessage.SendMailBody + tempotp.OTP;
+                            await _mediator.Send(request);
+                            return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithMobile });
                         }
                         else
                         {
-                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                         }
                     }
                     else
@@ -624,13 +618,19 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpWithMobileValid, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status400BadRequest });
                 }
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new SignUpWithMobileResponse
+                {
+                    ReturnCode = enResponseCode.InternalError,
+                    ReturnMsg = ex.ToString(),
+                    ErrorCode = enErrorCode.Status500InternalServerError
+                });
             }
         }
 
