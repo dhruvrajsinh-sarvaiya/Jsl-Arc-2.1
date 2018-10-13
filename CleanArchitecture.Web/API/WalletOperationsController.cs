@@ -131,13 +131,13 @@ namespace CleanArchitecture.Web.API
         //}
 
 
-        [HttpPost("{coin}/{walletid}")]
-        //[Authorize]
-        public async Task<IActionResult> CreateWalletAddress(string coin, long walletid)/*[FromBody]CreateWalletAddressReq Request*/ /*Removed Temporarily as Not in use*/
+        [HttpPost("{Coin}/{AccWalletID}")]
+        [Authorize]
+        public async Task<IActionResult> CreateWalletAddress(string Coin, string AccWalletID)/*[FromBody]CreateWalletAddressReq Request*/ /*Removed Temporarily as Not in use*/
         {
             try
             {
-                CreateWalletAddressRes Response = _walletService.GenerateAddress(walletid,coin);
+                CreateWalletAddressRes Response = _walletService.GenerateAddress(AccWalletID, Coin);
                 //string responseString = "{'address':'2Mz7x1a5df8380e0e30yYc6e','coin':'tbtc','label':'My address','wallet':'585c51a5df8380e0e3082e46','coinSpecific':{'chain':0,'index':1,'redeemScript':'522101a5df8380e0e30453ae'}}";
                 //CreateWalletAddressRes Response = new CreateWalletAddressRes();
                 //Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);

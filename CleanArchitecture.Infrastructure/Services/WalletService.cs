@@ -294,7 +294,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public CreateWalletAddressRes GenerateAddress(long walletID, string coin)
+        public CreateWalletAddressRes GenerateAddress(string walletID, string coin)
         {
             try
             {
@@ -302,7 +302,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 //WebApiParseResponse _WebApiParseResponse;
                 TradeBitGoDelayAddresses delayAddressesObj, delayGeneratedAddressesObj;
                 List<TransactionProviderResponse> transactionProviderResponses;
-                WalletMaster walletMaster = _commonRepository.GetById(walletID);
+                //WalletMaster walletMaster = _commonRepository.GetById(walletID);
+                WalletMaster walletMaster = _commonRepository.GetSingle(item => item.AccWalletID == walletID && item.Status != Convert.ToInt16(ServiceStatus.Disable));
                 AddressMaster addressMaster;
                 string address = "";
                 string CoinSpecific = null;
@@ -340,13 +341,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 // parse response logic 
                 if (string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
                 {
-                    delayAddressesObj = GetTradeBitGoDelayAddresses(walletID, walletMaster.WalletTypeID, TrnID, address, thirdPartyAPIRequest.walletID, walletMaster.CreatedBy, CoinSpecific, 0, 0);
+                    delayAddressesObj = GetTradeBitGoDelayAddresses(walletMaster.Id, walletMaster.WalletTypeID, TrnID, address, thirdPartyAPIRequest.walletID, walletMaster.CreatedBy, CoinSpecific, 0, 0);
                     delayAddressesObj = _bitgoDelayRepository.Add(delayAddressesObj);
                     delayGeneratedAddressesObj = _walletRepository1.GetUnassignedETH();
                     if (delayGeneratedAddressesObj != null)
                     {
                         address = delayGeneratedAddressesObj.Address;
-                        delayGeneratedAddressesObj.WalletId = walletID;
+                        delayGeneratedAddressesObj.WalletId = walletMaster.Id;
                         delayGeneratedAddressesObj.UpdatedBy = walletMaster.UserID;
                         delayGeneratedAddressesObj.UpdatedDate = UTC_To_IST();
                         _bitgoDelayRepository.Update(delayGeneratedAddressesObj);
@@ -360,7 +361,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 if (!string.IsNullOrEmpty(Respaddress))
                 {
-                    addressMaster = GetAddressObj(walletID, transactionProviderResponses[0].ServiceProID, Respaddress, "Self Address", walletMaster.UserID, 0, 1);
+                    addressMaster = GetAddressObj(walletMaster.Id, transactionProviderResponses[0].ServiceProID, Respaddress, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
                     string responseString = Respaddress;
                     //CreateWalletAddressRes Response = new CreateWalletAddressRes();
@@ -368,7 +369,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     //Response.ReturnCode = enResponseCode.Success;
                     //var respObj = JsonConvert.SerializeObject(Response);
                     //dynamic respObjJson = JObject.Parse(respObj);
-                    return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg };
+                    return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CreateAddressSuccessMsg };
                     //return respObj;
                 }
                 else
@@ -571,7 +572,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     _WalletAllowTrnRepository.Add(w);
                 }
                 //genrate address and update in walletmaster
-                var addressClass = GenerateAddress(walletMaster.Id, CoinName);
+                var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
                 //walletMaster.PublicAddress = addressClass.address;
                 walletMaster.WalletPublicAddress(addressClass.address);
                 _commonRepository.Update(walletMaster);
