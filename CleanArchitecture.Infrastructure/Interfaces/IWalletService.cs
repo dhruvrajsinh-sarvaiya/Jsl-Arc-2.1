@@ -19,7 +19,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         bool IsValidWallet(long walletId);
 
-        CreateWalletAddressRes GenerateAddress(long walletid,string coin);
+        CreateWalletAddressRes GenerateAddress(string walletid,string coin);
 
         //vsolanki 8-10-2018
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();
@@ -33,5 +33,6 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListWalletResponse ListWallet(long userid);
 
         ListWalletResponse GetWalletByCoin(long userid, string coin);
+        
     }
 }
