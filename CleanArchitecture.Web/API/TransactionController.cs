@@ -199,7 +199,7 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return returnDynamicResult(Response);
                 }
-                long MemberID = 1;//user.Id;
+                long MemberID = 2;//user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, PairId, 1);
                 Response.ReturnCode = enResponseCode.Success;
                 return returnDynamicResult(Response);
@@ -234,7 +234,7 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return Ok(Response);
                 }
-                long MemberID = 1;// user.Id;
+                long MemberID = 2;// user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId);
                 Response.ReturnCode = enResponseCode.Success;
                 return Ok(Response);
