@@ -59,6 +59,8 @@ namespace CleanArchitecture.Core.Enums
         public static string NotAllowedTrnType = "TrnType Not Allowed to wallet.";
         public static string InvalidCoin = "Invalid CoinName.";
         public static string InvalidTradeRefNo = "Invalid Trade RefNo.";
+        public static string AlredyExist = "Duplicate Request for same Ref No.";
+        public static string InsufficantBal = "Insufficeint Balance";
 
 
         //========================My Account===============================//

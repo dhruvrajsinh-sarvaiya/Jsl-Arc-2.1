@@ -170,7 +170,9 @@ namespace CleanArchitecture.Core.Enums
         NotFound=4033,
         InvalidWalletOrUserIDorCoinName = 4034,
         InvalidWallet = 4035,
-        InvalidTradeRefNo = 4036
+        InvalidTradeRefNo = 4036,
+        AlredyExist=4037,
+        InsufficantBal=4038
 
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
