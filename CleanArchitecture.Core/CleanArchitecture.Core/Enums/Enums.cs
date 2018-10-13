@@ -149,7 +149,13 @@ namespace CleanArchitecture.Core.Enums
         CreateTrnDuplicateTrn=1,
         CreateTrn_NoSelfAddressWithdrawAllow=1,
         InvalidPairName = 4500,
-        NoDataFound=4501,
+        NoDataFound = 4501,
+        InvalidStatusType = 4502,
+        InValidTrnType = 4503,
+        InvalidFromDateFormate = 4504,
+        InvalidToDateFormate = 4505,
+        InvalidMarketType = 4506,
+
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

@@ -85,6 +85,7 @@ namespace CleanArchitecture.Core.ApiModels
         public string StatusText { get; set; }
         public long PairID { get; set; }
         public Decimal ChargeRs { get; set; }
+        public short IsCancelled { get; set; }
     }
     public class RecentOrderRespose
     {

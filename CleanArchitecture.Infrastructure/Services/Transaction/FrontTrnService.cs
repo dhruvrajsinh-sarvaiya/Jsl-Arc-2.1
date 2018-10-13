@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels;
@@ -9,6 +10,7 @@ using CleanArchitecture.Core.ViewModels.Transaction;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,7 +35,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _serviceMasterRepository = serviceMasterRepository;
             _tradeTransactionQueueRepository = tradeTransactionQueueRepository;
         }
-        
+
+        #region method
+
         public List<BasePairResponse> GetTradePairAsset()
         {
             decimal ChangePer = 0;
@@ -204,11 +208,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
         }
 
-        public List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, long PairId, int IsAll)
+        public List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, long PairId, short TrnType, short Status, int PageSize, int MarketType, DateTime fromDate, DateTime Todate, int IsAll)
         {
             try
             {
-                var list = _frontTrnRepository.GetTradeHistory(MemberID, PairId, IsAll);
+                var list = _frontTrnRepository.GetTradeHistory(MemberID, PairId, TrnType,Status ,PageSize ,MarketType ,fromDate ,Todate, IsAll);
                 List<GetTradeHistoryInfo> responce = new List<GetTradeHistoryInfo>();
                 if (list != null)
                 {
@@ -346,6 +350,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+        #endregion
+
+        #region parameterValidation
         public bool IsValidPairName(string Pair)
         {
             try
@@ -362,5 +369,80 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+
+        public Int16  IsValidTradeType(string Type)
+        {
+            //enTrnType
+            try
+            {
+                if (Type.ToUpper().Equals("BUY"))
+                    return Convert.ToInt16(enTrnType.Buy_Trade);
+                else if (Type.ToUpper().Equals("SELL"))
+                    return Convert.ToInt16(enTrnType.Sell_Trade);
+                else
+                    return 999;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public Int16  IsValidMarketType(string Type)
+        {
+            //enTransactionMarketType
+            try
+            {
+                if (Type.ToUpper().Equals("LIMIT"))
+                    return Convert.ToInt16(enTransactionMarketType.LIMIT);
+                else if (Type.ToUpper().Equals("MARKET"))
+                    return Convert.ToInt16(enTransactionMarketType.MARKET);
+                else if (Type.ToUpper().Equals("STOP_LOSS"))
+                    return Convert.ToInt16(enTransactionMarketType.STOP_LOSS);
+                else if (Type.ToUpper().Equals("SPOT"))
+                    return Convert.ToInt16(enTransactionMarketType.SPOT);
+                else
+                    return 999;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public short IsValidStatus(string status)
+        {
+            try
+            {
+                if (status.ToUpper().Equals("SETTLED"))
+                    return Convert.ToInt16(enTransactionStatus.Success);
+                if (status.ToUpper().Equals("CURRENT"))
+                    return Convert.ToInt16(enTransactionStatus.Hold);
+                else
+                    return 999;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool IsValidDateFormate(string date)
+        {
+            try
+            {
+                DateTime dt = DateTime.ParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return false;
+            }
+        }
+        #endregion
     }
 }

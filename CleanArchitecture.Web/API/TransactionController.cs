@@ -179,11 +179,13 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost("GetTradeHistory/{Pair}")]
-        [Authorize]
-        public async Task<ActionResult> GetTradeHistory(string Pair)
+        [HttpPost("GetTradeHistory/{Pair}/{Trade}/{FromDate}/{ToDate}/{Status}/{PageSize}/{MarketType}")]
+        //[Authorize]
+        public async Task<ActionResult> GetTradeHistory(string Pair, string Trade, string FromDate, string ToDate, int Status, int PageSize, string MarketType)
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
+            Int16 trnType, marketType;
+            DateTime fDate, tDate;
             try
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -191,17 +193,56 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return Ok(Response);
+                    return BadRequest(Response);
                 }
+
                 long PairId = _frontTrnService.GetPairIdByName(Pair);
                 if (PairId == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return BadRequest(Response);
+                }
+
+                trnType = _frontTrnService.IsValidTradeType(Trade);
+                if (trnType == 999)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InValidTrnType;
+                    return BadRequest(Response);
+                }
+
+                marketType = _frontTrnService.IsValidMarketType(MarketType);
+                if (marketType == 999)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidMarketType;
+                    return BadRequest(Response);
+                }
+
+                if (!_frontTrnService.IsValidDateFormate(FromDate))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidFromDateFormate;
+                    return BadRequest(Response);
+                }
+                if (!_frontTrnService.IsValidDateFormate(ToDate))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidToDateFormate;
+                    return BadRequest(Response);
+                }
+                if (Status != 1 && Status != 2 && Status != 9)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidStatusType;
                     return Ok(Response);
                 }
-                long MemberID = user.Id;
-                Response.response = _frontTrnService.GetTradeHistory(MemberID, PairId, 1);
+
+                fDate = DateTime.ParseExact(FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                tDate = DateTime.ParseExact(ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                long MemberID = 2;// user.Id;
+                Response.response = _frontTrnService.GetTradeHistory(MemberID, PairId, trnType, Convert.ToInt16(Status), PageSize, marketType, fDate, tDate, 1);
                 if (Response.response.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;
@@ -318,7 +359,7 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return Ok(Response);
                 }
-                Response.response = _frontTrnService.GetTradeHistory(0, PairId, 0);
+                Response.response = _frontTrnService.GetTradeHistory(0, PairId, 99, 99, 99, 99, DateTime.Now, DateTime.Now, 0);
                 Response.ReturnCode = enResponseCode.Success;
                 return Ok(Response);
             }

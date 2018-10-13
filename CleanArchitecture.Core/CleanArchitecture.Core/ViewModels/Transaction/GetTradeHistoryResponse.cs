@@ -21,7 +21,6 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public string StatusText { get; set; }
         public long PairID { get; set; }
         public Decimal ChargeRs { get; set; }
-        
-        //public short  IsCancel { get; set; }
+        public short  IsCancel { get; set; }
     }
 }
