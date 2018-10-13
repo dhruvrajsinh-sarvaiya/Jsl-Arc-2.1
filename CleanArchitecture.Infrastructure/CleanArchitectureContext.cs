@@ -99,6 +99,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceProviderDetail> ServiceProviderDetail { get; set; }
         public DbSet<ServiceProviderType> ServiceProviderType { get; set; }
         public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
+        public DbSet<TradeStopLoss> TradeStopLoss { get; set; }
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
