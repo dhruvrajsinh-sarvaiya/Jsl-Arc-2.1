@@ -168,6 +168,8 @@ namespace CleanArchitecture.Web
                 // added by nirav savariya for common repository on 10-04-2018
                 config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
                 config.For(typeof(ITransactionProcess)).Add(typeof(NewTransaction));
+                               
+                
                 //Populate the container using the service collection
                 config.Populate(services);
                
@@ -192,7 +194,7 @@ namespace CleanArchitecture.Web
             }
 
             // NOTE: For SPA swagger needs adding before MVC
-            app.UseCustomSwaggerApi();
+            app.UseCustomSwaggerApi(Configuration);
             app.UseHttpsRedirection();
 
             // https://github.com/openiddict/openiddict-core/issues/518
@@ -217,6 +219,8 @@ namespace CleanArchitecture.Web
                 await next.Invoke();
                 // Do logging or other work that doesn't write to the Response.
             });
+
+            app.UseSession();
 
             /*
 
