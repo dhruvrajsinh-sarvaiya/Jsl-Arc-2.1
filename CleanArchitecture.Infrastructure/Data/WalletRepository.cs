@@ -182,7 +182,8 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            Walletname = u.Walletname,
                                                            CoinName = c.WalletTypeName,
                                                            PublicAddress=u.PublicAddress,
-                                                           Balance=u.Balance
+                                                           Balance=u.Balance,
+                                                           IsDefaultWallet=u.IsDefaultWallet
                                                        }).AsEnumerable().ToList();
             return items;
         }
@@ -199,10 +200,29 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            Walletname = u.Walletname,
                                                            CoinName = c.WalletTypeName,
                                                            PublicAddress = u.PublicAddress,
-                                                           Balance = u.Balance
+                                                           Balance = u.Balance,
+                                                           IsDefaultWallet = u.IsDefaultWallet
                                                        }).AsEnumerable().ToList();
             return items;
         }
-        
+
+        public List<WalletMasterResponse> GetWalletMasterResponseById(long UserId, string coin,string walletId)
+        {
+            List<WalletMasterResponse> items = (from u in _dbContext.WalletMasters
+                                                join c in _dbContext.WalletTypeMasters
+                                                       on u.WalletTypeID equals c.Id
+                                                where u.UserID == UserId && c.WalletTypeName == coin && u.AccWalletID==walletId
+                                                select new WalletMasterResponse
+                                                {
+                                                    AccWalletID = u.AccWalletID,
+                                                    Walletname = u.Walletname,
+                                                    CoinName = c.WalletTypeName,
+                                                    PublicAddress = u.PublicAddress,
+                                                    Balance = u.Balance,
+                                                    IsDefaultWallet = u.IsDefaultWallet
+                                                }).AsEnumerable().ToList();
+            return items;
+        }
+
     }
 }

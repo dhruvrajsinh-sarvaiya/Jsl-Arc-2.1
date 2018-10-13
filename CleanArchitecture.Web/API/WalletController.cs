@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    //[Authorize]
+    [Authorize]
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
@@ -33,9 +33,7 @@ namespace CleanArchitecture.Web.API
             _userManager = userManager;
             _walletService = walletService;
         }
-
-
-
+    
         #region"Methods"
 
         /// <summary>
@@ -57,13 +55,13 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> ListWallet()
         {
-            ApplicationUser user = new ApplicationUser();
+            //ApplicationUser user = new ApplicationUser();
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
-                user.Id = 1;
+                //user.Id = 1;
                 // var items;
-                /// var user = await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -94,9 +92,9 @@ namespace CleanArchitecture.Web.API
             CreateWalletResponse Response = new CreateWalletResponse();
             try
             {
-                ApplicationUser user = new ApplicationUser();
-                user.Id = 1;
-                //var user = await _userManager.GetUserAsync(HttpContext.User);
+               // ApplicationUser user = new ApplicationUser();
+              //  user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -115,6 +113,72 @@ namespace CleanArchitecture.Web.API
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
                 Response.ReturnCode = enResponseCode.InternalError;
                 return BadRequest(Response);
+            }
+        }
+
+        /// <summary>
+        /// vsolanki 12-10-2018 Get Wallet by coin name
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        [HttpGet("{coin}")]
+        public async Task<IActionResult> GetWalletByCoin(string coin)
+        {
+            ListWalletResponse Response = new ListWalletResponse();
+            try
+            {
+                //ApplicationUser user = new ApplicationUser();
+                //user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetWalletByCoin(user.Id, coin);
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        /// <summary>
+        /// vsolanki 13-10-2018 Get Wallet by coin name
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        [HttpGet("{coin}/{walletId}")]
+        public async Task<IActionResult> GetWalletByWalletId(string coin,string walletId)
+        {
+            ListWalletResponse Response = new ListWalletResponse();
+            try
+            {
+                //ApplicationUser user = new ApplicationUser();
+                //user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetWalletById(user.Id, coin,walletId);
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
         }
 
@@ -146,39 +210,6 @@ namespace CleanArchitecture.Web.API
         //        return BadRequest();
         //    }
         //}
-
-        /// <summary>
-        /// vsolanki 12-10-2018 Get Wallet by coin name
-        /// </summary>
-        /// <param name="Request"></param>
-        /// <returns></returns>
-        [HttpGet("{coin}")]
-        public async Task<IActionResult> GetWalletByCoin(string coin)
-        {
-            ListWalletResponse Response = new ListWalletResponse();
-            try
-            {
-                ApplicationUser user = new ApplicationUser();
-                user.Id = 1;
-                //  var user = await _userManager.GetUserAsync(HttpContext.User);
-                if (user == null)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
-                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
-                }
-                else
-                {
-                    Response = _walletService.GetWalletByCoin(user.Id, coin);
-                }
-                return Ok(Response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest();
-            }
-        }
 
         ///// <summary>
         ///// vsolanki 1-10-2018 Update Wallet

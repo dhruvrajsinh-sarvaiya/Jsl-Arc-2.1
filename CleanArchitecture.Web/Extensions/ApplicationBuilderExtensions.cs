@@ -135,14 +135,14 @@ namespace CleanArchitecture.Web.Extensions
             return app;
         }
 
-        public static IApplicationBuilder UseCustomSwaggerApi(this IApplicationBuilder app)
+        public static IApplicationBuilder UseCustomSwaggerApi(this IApplicationBuilder app, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             // Enable middleware to serve generated Swagger as a JSON endpoint
             app.UseSwagger();
             // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
             app.UseSwaggerUI(c =>
-            {                
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Clean Architecture Api V1");
+            {
+                c.SwaggerEndpoint(configuration["SwaggerPath"], "Clean Architecture Api V1");               
                 // add search options in swagger ui by nirav savariya 9-29-2018  
                 c.EnableFilter("");
             });
@@ -161,7 +161,7 @@ namespace CleanArchitecture.Web.Extensions
             // NOTE: For SPA swagger needs adding before MVC
             //app.UseCustomSwaggerApi();
 
-            app.UseSession();
+            //app.UseSession();
 
             ////// app.ApiTokenRespons();
 

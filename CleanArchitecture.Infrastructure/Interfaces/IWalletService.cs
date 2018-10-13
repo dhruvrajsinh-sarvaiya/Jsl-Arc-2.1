@@ -33,6 +33,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListWalletResponse ListWallet(long userid);
 
         ListWalletResponse GetWalletByCoin(long userid, string coin);
+
+        ListWalletResponse GetWalletById(long userid, string coin,string walletId);
         
     }
 }

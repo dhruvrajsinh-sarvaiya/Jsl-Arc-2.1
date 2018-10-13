@@ -29,6 +29,9 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Configuration;
 using CleanArchitecture.Core.Interfaces.Configuration;
 using CleanArchitecture.Infrastructure.Services.Configuration;
+using CleanArchitecture.Core.Services.RadisDatabase;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -329,6 +332,10 @@ namespace CleanArchitecture.Web.Extensions
             services.AddTransient<IFrontTrnService, FrontTrnService>();
             services.AddTransient<IFrontTrnRepository, FrontTrnRepository>();
             services.AddTransient<ITransactionConfigService, TransactionConfigService>();
+
+            //REDIS RELETED CLASS                  
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IRedisConnectionFactory, RedisConnectionFactory>();
             return services;
         }
     }
