@@ -8,6 +8,7 @@ using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.User;
+using CleanArchitecture.Core.Services;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.ForgotPassword;
@@ -26,7 +27,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-
+using Newtonsoft.Json;
 
 namespace CleanArchitecture.Web.API
 {
@@ -43,10 +44,12 @@ namespace CleanArchitecture.Web.API
         private readonly IOtpMasterService _otpMasterService;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private readonly IBasePage _basePage;
+        private readonly EncyptedDecrypted _encdecAEC;
         #endregion
 
         #region Ctore
-        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage)
+        public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage,
+            EncyptedDecrypted encypted)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -56,6 +59,7 @@ namespace CleanArchitecture.Web.API
             _otpMasterService = otpMasterService;
             _configuration = configuration;
             _basePage = basePage;
+            _encdecAEC = encypted;
         }
         #endregion
 
@@ -749,6 +753,46 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
+                var currentUser = await _userManager.FindByNameAsync(model.Email);
+
+                if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return NoContent();
+                }
+                string ctoken = _userManager.GeneratePasswordResetTokenAsync(currentUser).Result;
+                Random generator = new Random();
+                String random = generator.Next(0, 999999).ToString("D6");
+                var ResetPassword = new ResetPasswordViewModel
+                {
+                    Email = currentUser.Email,
+                    Code = ctoken,
+                    Password = ctoken,
+                    ConfirmPassword = ctoken,
+                    Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2)
+                };
+                byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
+
+                string UserDetails = JsonConvert.SerializeObject(ResetPassword);
+                string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
+
+
+
+                string ctokenlink = Url.Action("resetpassword", "Signin", new
+
+                {
+                    emailConfirmCode = SubScriptionKey
+                }, protocol: HttpContext.Request.Scheme);
+
+                var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Please reset your password by clicking here:</a>";
+
+                SendEmailRequest request = new SendEmailRequest();
+                request.Recepient = model.Email;
+                request.Subject = EnResponseMessage.SendMailSubject;
+                request.Body = confirmationLink + " " +EnResponseMessage.SendMailBody + random;
+
+                await _mediator.Send(request);
+
                 return Ok(new ForgotpassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetConfirmed });
                 // return AppUtils.Standerdlogin("Success");
             }
@@ -785,30 +829,54 @@ namespace CleanArchitecture.Web.API
             */
         }
 
-        [HttpPost("resetpassword")]
+        [HttpGet("resetpassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword(string emailConfirmCode)  //ResetPasswordViewModel model)
         {
             try
             {
-
-
-                var user = await _userManager.FindByNameAsync(model.Email);
-
-                if (user == null)
+                if (!string.IsNullOrEmpty(emailConfirmCode))
                 {
-                    // Don't reveal that the user does not exist
-                    //return Ok("Reset confirmed");
-                    return Ok(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmed, ErrorCode = enErrorCode.Status400BadRequest });
-                    //return AppUtils.Standerdlogin("Reset confirmed");
+                    byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
+
+                    string DecryptToken = EncyptedDecrypted.Decrypt(emailConfirmCode, DecpasswordBytes);
+
+                    ResetPasswordViewModel model = JsonConvert.DeserializeObject<ResetPasswordViewModel>(DecryptToken);
+
+
+                    if (model?.Expirytime >= DateTime.UtcNow)
+                    {
+                        var user = await _userManager.FindByNameAsync(model.Email);
+
+                        if (user == null)
+                        {
+                            // Don't reveal that the user does not exist
+                            //return Ok("Reset confirmed");
+                            return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmed, ErrorCode = enErrorCode.Status400BadRequest });
+                            //return AppUtils.Standerdlogin("Reset confirmed");
+                        }
+                        var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+                        if (result.Succeeded)
+                        {
+                            //return Ok("Reset confirmed");
+                            return Ok(new ResetPassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetConfirmed });
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailLink, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+
+
+
+
+
                 }
-                var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-                if (result.Succeeded)
+                else
                 {
-                    //return Ok("Reset confirmed");
-                    return Ok(new ResetPassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetConfirmed });
+                    return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailLink, ErrorCode = enErrorCode.Status400BadRequest });
                 }
-                return Ok(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmed, ErrorCode = enErrorCode.Status400BadRequest });
+                return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmed, ErrorCode = enErrorCode.Status400BadRequest });
             }
             catch (Exception ex)
             {
