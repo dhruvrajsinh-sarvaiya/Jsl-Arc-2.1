@@ -854,5 +854,11 @@ namespace CleanArchitecture.Infrastructure.Services
             walletTransactionQueue.StatusMsg = StatusMsg;
             return walletTransactionQueue;
         }
+
+        public int CheckTrnRefNo(long TrnRefNo, byte TrnType)
+        {
+            var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType);
+            return count;
+        }
     }
 }

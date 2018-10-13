@@ -222,6 +222,15 @@ namespace CleanArchitecture.Infrastructure.Data
                                                     IsDefaultWallet = u.IsDefaultWallet
                                                 }).AsEnumerable().ToList();
             return items;
-        }       
+        }
+
+
+        public int  CheckTrnRefNo(long TrnRefNo, byte TrnType)
+        {
+            int response = (from u in _dbContext.WalletTransactionQueues
+                                             where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
+                                             select u).Count();
+            return response;
+        }
     }
 }
