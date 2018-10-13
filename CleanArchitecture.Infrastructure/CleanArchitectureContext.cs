@@ -65,6 +65,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<TradeBitGoDelayAddresses> TradeBitGoDelayAddressess { get; set; }
         public DbSet<AddressMaster> AddressMasters { get; set; }
         public DbSet<WalletAllowTrn> WalletAllowTrns { get; set; }
+        public DbSet<WalletTransactionOrder> WalletTransactionOrders { get; set; }
+        public DbSet<WalletTransactionQueue> WalletTransactionQueues { get; set; }
 
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }

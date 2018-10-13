@@ -44,6 +44,9 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 10-10-2018 
         private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepository;
 
+        //private readonly IRepository<WalletTransactionOrder> _WalletAllowTrnRepository;
+        //  private readonly ICommonRepository<WalletTransactionQueue> t;
+
         public WalletService(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository, WebApiParseResponse WebApiParseResponse,
             ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
@@ -570,7 +573,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //genrate address and update in walletmaster
                 var addressClass = GenerateAddress(walletMaster.Id, CoinName);
                 //walletMaster.PublicAddress = addressClass.address;
-                walletMaster.WalletPublicAddress(addressClass.address);              
+                walletMaster.WalletPublicAddress(addressClass.address);
                 _commonRepository.Update(walletMaster);
 
                 //set the response object value
@@ -813,6 +816,42 @@ namespace CleanArchitecture.Infrastructure.Services
                 return listWalletResponse;
             }
         }
-      
+
+        public WalletTransactionOrder InsertIntoWalletTransactionOrder(long OrderID, DateTime UpdatedDate, DateTime TrnDate, long OWalletID, long DWalletID, decimal Amount, string WalletType, long OTrnNo, long DTrnNo, byte Status, string StatusMsg)
+        {
+            WalletTransactionOrder walletTransactionOrder = new WalletTransactionOrder();
+            walletTransactionOrder.OrderID = OrderID;
+            walletTransactionOrder.UpdatedDate = UpdatedDate;
+            walletTransactionOrder.TrnDate = TrnDate;
+            walletTransactionOrder.OWalletID = OWalletID;
+            walletTransactionOrder.DWalletID = DWalletID;
+            walletTransactionOrder.Amount = Amount;
+            walletTransactionOrder.WalletType = WalletType;
+            walletTransactionOrder.OTrnNo = OTrnNo;
+            walletTransactionOrder.DTrnNo = DTrnNo;
+            walletTransactionOrder.Status = Status;
+            walletTransactionOrder.StatusMsg = StatusMsg;
+            return walletTransactionOrder;
+        }
+
+        public WalletTransactionQueue InsertIntoWalletTransactionQueue(long TrnNo, string Guid, byte TrnType, decimal Amount, long TrnRefNo, DateTime TrnDate, DateTime UpdatedDate,
+            long WalletID, string WalletType, long MemberID, string TimeStamp, byte Status, string StatusMsg)
+        {
+            WalletTransactionQueue walletTransactionQueue = new WalletTransactionQueue();
+            walletTransactionQueue.TrnNo = TrnNo;
+            walletTransactionQueue.Guid = Guid;
+            walletTransactionQueue.TrnType = TrnType;
+            walletTransactionQueue.Amount = Amount;
+            walletTransactionQueue.TrnRefNo = TrnRefNo;
+            walletTransactionQueue.TrnDate = TrnDate;
+            walletTransactionQueue.UpdatedDate = UpdatedDate;
+            walletTransactionQueue.WalletID = WalletID;
+            walletTransactionQueue.WalletType = WalletType;
+            walletTransactionQueue.MemberID = MemberID;
+            walletTransactionQueue.TimeStamp = TimeStamp;
+            walletTransactionQueue.Status = Status;
+            walletTransactionQueue.StatusMsg = StatusMsg;
+            return walletTransactionQueue;
+        }
     }
 }

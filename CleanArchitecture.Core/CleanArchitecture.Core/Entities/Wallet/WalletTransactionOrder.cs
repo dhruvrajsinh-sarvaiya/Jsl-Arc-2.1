@@ -38,7 +38,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Required]
         public long DTrnNo { get; set; }
 
-        public string Status { get; set; }
+        public byte Status { get; set; }
 
         [Required]
         public string StatusMsg { get; set; }
