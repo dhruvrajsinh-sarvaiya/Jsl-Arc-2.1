@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services.Transaction
@@ -47,21 +48,25 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _AddressMasterRepository = AddressMasterRepository;
             _TradeStopLoss = tradeStopLoss;
         }
-        public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
+        public Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
+        //public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
         {
             _Resp = new BizResponse();
            Task<BizResponse> MethodRespTsk = CombineAllInitTransactionAsync(Req);
-            _Resp = await MethodRespTsk;
+            //_Resp = await MethodRespTsk;
             //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
-            return _Resp;
+            return Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //return _Resp;
         }
 
         public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req)
         {
+            Thread.Sleep(10000);
             _Resp = new BizResponse();
             Guid obj = Guid.NewGuid();
             
-
+            if (Req.ordertype== enTransactionMarketType.LIMIT)
+                return null;
             //=========================INSERT
             //Take memberMobile for sms
             _Resp = CreateTransaction(Req);
