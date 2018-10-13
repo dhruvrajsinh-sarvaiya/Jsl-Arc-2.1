@@ -784,5 +784,35 @@ namespace CleanArchitecture.Infrastructure.Services
                 return listWalletResponse;
             }
         }
+
+        //vsolanki 12-10-2018 Select WalletMaster table ByCoin
+        public ListWalletResponse GetWalletById(long userid, string coin, string walletId)
+        {
+            ListWalletResponse listWalletResponse = new ListWalletResponse();
+            try
+            {
+                var walletResponse = _walletRepository1.GetWalletMasterResponseById(userid, coin, walletId);
+                if (walletResponse.Count == 0)
+                {
+                    listWalletResponse.ReturnCode = enResponseCode.Fail;
+                    listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    listWalletResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    listWalletResponse.wallets = walletResponse;
+                    listWalletResponse.ReturnCode = enResponseCode.Success;
+                    listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                return listWalletResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                listWalletResponse.ReturnCode = enResponseCode.InternalError;
+                return listWalletResponse;
+            }
+        }
+      
     }
 }

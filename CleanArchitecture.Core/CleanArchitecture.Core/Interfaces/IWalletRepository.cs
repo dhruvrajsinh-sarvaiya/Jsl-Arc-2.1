@@ -23,6 +23,8 @@ namespace CleanArchitecture.Core.Interfaces
         List<WalletMasterResponse> ListWalletMasterResponse(long UserId);
 
         List<WalletMasterResponse> GetWalletMasterResponseByCoin(long UserId, string coin);
+
+        List<WalletMasterResponse> GetWalletMasterResponseById(long UserId, string coin,string walletId);
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
 

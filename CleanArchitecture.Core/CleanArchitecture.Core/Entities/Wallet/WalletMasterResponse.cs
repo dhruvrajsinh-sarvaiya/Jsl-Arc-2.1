@@ -12,5 +12,6 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public string CoinName { get; set; }
         public string AccWalletID { get; set; }  
         public string PublicAddress { get; set; }
+        public byte IsDefaultWallet { get; set; }
     }
 }

@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    //[Authorize]
+  //  [Authorize]
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
@@ -118,35 +118,6 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        ///// <summary>
-        ///// vsolanki 1-10-2018 Add Wallet
-        ///// </summary>
-        ///// <param name="Request"></param>
-        ///// <returns></returns>
-        //[HttpPost("{coin}")]
-        //public async Task<IActionResult> AddWallet([FromBody]AddWalletRequest Request)
-        //{
-        //    try
-        //    {
-        //        string requeststring = "{'wallet':{'_wallet':{'id':'591a40dd9fdde805252f0d8aefed79b3','users':[{'user':'55cce42633dc60ca06db38e643622a86','permissions':['admin','view','spend']}],'coin':'teth','label':'My Wallet','m':2,'n':3,'keys':['591a40dc422326ff248919e62a02b2be','591a40dd422326ff248919e91caa8b6a','591a40dc9fdde805252f0d87f76577f8'],'tags':['591a40dd9fdde805252f0d8a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'isCold':false,'coinSpecific':{'deployedInBlock':false,'deployTxHash':'0x37b4092509254d60a4c29464f6979dcdaa3b10bd7fa5e388380f30b94efa43bf','lastChainIndex':{'0':-1,'1':-1},'baseAddress':'0x10c208fa7afe710eb47272c0827f58d3d524932a','feeAddress':'0xb0e3a0f647300a1656c1a46c21bbb9ed93bf19ab','pendingChainInitialization':true,'creationFailure':[]},'balance':0,'confirmedBalance':0,'spendableBalance':0,'balanceString':'0','confirmedBalanceString':'0','spendableBalanceString':'0','pendingApprovals':[]}}}";
-        //        AddWalletResponse Response = new AddWalletResponse();
-        //        Response = JsonConvert.DeserializeObject<AddWalletResponse>(requeststring);
-        //        Response.ReturnCode = enResponseCode.Success;
-        //        var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-        //                                                  new JsonSerializerSettings
-        //                                                  {
-        //                                                      NullValueHandling = NullValueHandling.Ignore
-        //                                                  });
-        //        dynamic respObjJson = JObject.Parse(respObj);
-        //        return returnDynamicResult(respObjJson);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-        //        return BadRequest();
-        //    }
-        //}
-
         /// <summary>
         /// vsolanki 12-10-2018 Get Wallet by coin name
         /// </summary>
@@ -179,6 +150,68 @@ namespace CleanArchitecture.Web.API
                 return BadRequest();
             }
         }
+
+        /// <summary>
+        /// vsolanki 13-10-2018 Get Wallet by coin name
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        [HttpGet("{coin}/{walletId}")]
+        public async Task<IActionResult> GetWalletByWalletId(string coin,string walletId)
+        {
+            ListWalletResponse Response = new ListWalletResponse();
+            try
+            {
+                ApplicationUser user = new ApplicationUser();
+                user.Id = 1;
+                //var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetWalletById(user.Id, coin,walletId);
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        ///// <summary>
+        ///// vsolanki 1-10-2018 Add Wallet
+        ///// </summary>
+        ///// <param name="Request"></param>
+        ///// <returns></returns>
+        //[HttpPost("{coin}")]
+        //public async Task<IActionResult> AddWallet([FromBody]AddWalletRequest Request)
+        //{
+        //    try
+        //    {
+        //        string requeststring = "{'wallet':{'_wallet':{'id':'591a40dd9fdde805252f0d8aefed79b3','users':[{'user':'55cce42633dc60ca06db38e643622a86','permissions':['admin','view','spend']}],'coin':'teth','label':'My Wallet','m':2,'n':3,'keys':['591a40dc422326ff248919e62a02b2be','591a40dd422326ff248919e91caa8b6a','591a40dc9fdde805252f0d87f76577f8'],'tags':['591a40dd9fdde805252f0d8a'],'disableTransactionNotifications':false,'freeze':{},'deleted':false,'approvalsRequired':1,'isCold':false,'coinSpecific':{'deployedInBlock':false,'deployTxHash':'0x37b4092509254d60a4c29464f6979dcdaa3b10bd7fa5e388380f30b94efa43bf','lastChainIndex':{'0':-1,'1':-1},'baseAddress':'0x10c208fa7afe710eb47272c0827f58d3d524932a','feeAddress':'0xb0e3a0f647300a1656c1a46c21bbb9ed93bf19ab','pendingChainInitialization':true,'creationFailure':[]},'balance':0,'confirmedBalance':0,'spendableBalance':0,'balanceString':'0','confirmedBalanceString':'0','spendableBalanceString':'0','pendingApprovals':[]}}}";
+        //        AddWalletResponse Response = new AddWalletResponse();
+        //        Response = JsonConvert.DeserializeObject<AddWalletResponse>(requeststring);
+        //        Response.ReturnCode = enResponseCode.Success;
+        //        var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
+        //                                                  new JsonSerializerSettings
+        //                                                  {
+        //                                                      NullValueHandling = NullValueHandling.Ignore
+        //                                                  });
+        //        dynamic respObjJson = JObject.Parse(respObj);
+        //        return returnDynamicResult(respObjJson);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+        //        return BadRequest();
+        //    }
+        //}
 
         ///// <summary>
         ///// vsolanki 1-10-2018 Update Wallet
