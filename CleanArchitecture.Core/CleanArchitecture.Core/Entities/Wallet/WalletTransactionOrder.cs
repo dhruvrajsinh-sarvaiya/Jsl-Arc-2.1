@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Wallet
 {
-    public class WalletTransactionOrder: SharedKernel.BizBase
+    public class WalletTransactionOrder
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
         public long OrderID { get; set; }
+
+        [Required]
+        public DateTime UpdatedDate { get; set; }
 
         [Required]
         public DateTime TrnDate { get; set; }
@@ -23,6 +29,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal Amount { get; set; }
 
         [Required]
+        [StringLength(5)]
         public string WalletType { get; set; }
 
         [Required]
@@ -30,7 +37,10 @@ namespace CleanArchitecture.Core.Entities.Wallet
 
         [Required]
         public long DTrnNo { get; set; }
-       // public string Status { get; set; }
+
+        public string Status { get; set; }
+
+        [Required]
         public string StatusMsg { get; set; }
     }
 }
