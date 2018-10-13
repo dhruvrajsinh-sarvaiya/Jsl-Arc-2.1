@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-  //  [Authorize]
+    [Authorize]
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
@@ -33,9 +33,7 @@ namespace CleanArchitecture.Web.API
             _userManager = userManager;
             _walletService = walletService;
         }
-
-
-
+    
         #region"Methods"
 
         /// <summary>
@@ -57,13 +55,13 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> ListWallet()
         {
-            ApplicationUser user = new ApplicationUser();
+            //ApplicationUser user = new ApplicationUser();
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
-                user.Id = 1;
+                //user.Id = 1;
                 // var items;
-                /// var user = await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -94,9 +92,9 @@ namespace CleanArchitecture.Web.API
             CreateWalletResponse Response = new CreateWalletResponse();
             try
             {
-                ApplicationUser user = new ApplicationUser();
-                user.Id = 1;
-                //var user = await _userManager.GetUserAsync(HttpContext.User);
+               // ApplicationUser user = new ApplicationUser();
+              //  user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -129,9 +127,9 @@ namespace CleanArchitecture.Web.API
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
-                ApplicationUser user = new ApplicationUser();
-                user.Id = 1;
-                //  var user = await _userManager.GetUserAsync(HttpContext.User);
+                //ApplicationUser user = new ApplicationUser();
+                //user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -162,9 +160,9 @@ namespace CleanArchitecture.Web.API
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
-                ApplicationUser user = new ApplicationUser();
-                user.Id = 1;
-                //var user = await _userManager.GetUserAsync(HttpContext.User);
+                //ApplicationUser user = new ApplicationUser();
+                //user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
