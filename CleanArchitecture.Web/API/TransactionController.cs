@@ -190,19 +190,25 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return returnDynamicResult(Response);
+                    return Ok(Response);
                 }
                 long PairId = _frontTrnService.GetPairIdByName(Pair);
                 if (PairId == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return returnDynamicResult(Response);
+                    return Ok(Response);
                 }
                 long MemberID = 2;//user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, PairId, 1);
+                if (Response.response.Count == 0)
+                {
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    Response.ReturnCode = enResponseCode.Success;
+                    return Ok(Response);
+                }
                 Response.ReturnCode = enResponseCode.Success;
-                return returnDynamicResult(Response);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -236,6 +242,12 @@ namespace CleanArchitecture.Web.API
                 }
                 long MemberID = 2;// user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId);
+                if (Response.response.Count == 0)
+                {
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    Response.ReturnCode = enResponseCode.Success;
+                    return Ok(Response);
+                }
                 Response.ReturnCode = enResponseCode.Success;
                 return Ok(Response);
             }
@@ -267,8 +279,13 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return Ok(Response);
                 }
-
                 Response.responce = _frontTrnService.GetRecentOrder(PairId);
+                if (Response.responce.Count  == 0)
+                {
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    Response.ReturnCode = enResponseCode.Success;
+                    return Ok(Response);
+                }
                 Response.ReturnCode = enResponseCode.Success;
                 return Ok(Response);
             }
@@ -280,7 +297,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost("GetOrderhistory")]
+        [HttpGet("GetOrderhistory")]
         public ActionResult GetOrderhistory()
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
