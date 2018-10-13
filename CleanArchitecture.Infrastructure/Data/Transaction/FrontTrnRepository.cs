@@ -71,7 +71,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,
                         CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Qty,
                         TTQ.SettledDate as DateTime, TTQ.Status from TradeTransactionQueue TTQ inner join TransactionQueue TQ on TQ.Id  = TTQ.TrnNo
-                        WHERE TTQ.PairID ={0} AND TTQ.Status in (1, 4)  and  (TTQ.SettledSellQty>0 or TTQ.SettledBuyQty>0) and 
+                        WHERE TTQ.PairID ={0} AND  (TTQ.SettledSellQty>0 or TTQ.SettledBuyQty>0) and 
                         TQ.TrnDate > DATEADD(HOUR , -24,getdate()) Order By TTQ.SettledDate DESC", PairId, Convert.ToInt16(enTransactionStatus.Hold));
 
                 return Result.ToList();
@@ -97,8 +97,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                 CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Amount,
                                  TTQ.SettledDate as DateTime, TTQ.Status, TTQ.StatusMsg as StatusText, TTQ.PairID, TQ.ChargeRs from
                                  TradeTransactionQueue TTQ inner join TransactionQueue TQ on TQ.Id  = TTQ.TrnNo
-                                 WHERE TTQ.Status in ({0},{1}) and (TTQ.SettledSellQty>0 or TTQ.SettledBuyQty>0) 
-                                 Order By TTQ.SettledDate DESC", Convert.ToInt16(enTransactionStatus.Success), Convert.ToInt16(enTransactionStatus.Hold));
+                                 WHERE TTQ.Status in ({0},{1}) and (TTQ.SettledSellQty>0 or TTQ.SettledBuyQty>0) and TTQ.PairID = {2}
+                                 Order By TTQ.SettledDate DESC", Convert.ToInt16(enTransactionStatus.Success), Convert.ToInt16(enTransactionStatus.Hold),PairId);
                 }
                 else
                 {

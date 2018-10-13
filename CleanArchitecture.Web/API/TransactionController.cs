@@ -180,7 +180,7 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("GetTradeHistory/{Pair}")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> GetTradeHistory(string Pair)
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
@@ -200,7 +200,7 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return Ok(Response);
                 }
-                long MemberID = 2;//user.Id;
+                long MemberID = user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, PairId, 1);
                 if (Response.response.Count == 0)
                 {
@@ -221,7 +221,7 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("GetActiveOrder/{Pair}")]  //GetActiveOrder
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> GetActiveOrder(string Pair)
         {
             GetActiveOrderResponse Response = new GetActiveOrderResponse();
@@ -241,7 +241,7 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return Ok(Response);
                 }
-                long MemberID = 2;// user.Id;
+                long MemberID = user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId);
                 if (Response.response.Count == 0)
                 {
@@ -281,7 +281,7 @@ namespace CleanArchitecture.Web.API
                     return Ok(Response);
                 }
                 Response.responce = _frontTrnService.GetRecentOrder(PairId);
-                if (Response.responce.Count  == 0)
+                if (Response.responce.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;
                     Response.ReturnCode = enResponseCode.Success;
@@ -298,13 +298,27 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("GetOrderhistory")]
-        public ActionResult GetOrderhistory()
+        [HttpGet("GetOrderhistory/{Pair}")]
+        public ActionResult GetOrderhistory(string Pair)
+
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
             try
             {
-                Response.response = _frontTrnService.GetTradeHistory(0, 0, 0);
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long PairId = _frontTrnService.GetPairIdByName(Pair);
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                Response.response = _frontTrnService.GetTradeHistory(0, PairId, 0);
                 Response.ReturnCode = enResponseCode.Success;
                 return Ok(Response);
             }
