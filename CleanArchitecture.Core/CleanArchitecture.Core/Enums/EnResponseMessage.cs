@@ -57,8 +57,9 @@ namespace CleanArchitecture.Core.Enums
         public static string InvalidReq = "Invalid Request Detail.";
         public static string InvalidTrnType = "Invalid TrnType.";
         public static string NotAllowedTrnType = "TrnType Not Allowed to wallet.";
-
         public static string InvalidCoin = "Invalid CoinName.";
+        public static string InvalidTradeRefNo = "Invalid Trade RefNo.";
+
 
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";

@@ -130,8 +130,7 @@ namespace CleanArchitecture.Core.Enums
     public enum enErrorCode
     {
         InvalidAmount = 2251,
-        InsufficientBalance = 2252,
-        InvalidWallet = 2253,
+        InsufficientBalance = 2252,        
         Success = 2253,
         ItemNotFoundForGenerateAddress = 2254,
         InvalidThirdpartyID = 2255,
@@ -168,7 +167,11 @@ namespace CleanArchitecture.Core.Enums
         RecordNotFound = 250  ,
         InvalidCoinName=4031,
         StandardLoginfailed=4032,
-        NotFound=4033
+        NotFound=4033,
+        InvalidWalletOrUserIDorCoinName = 4034,
+        InvalidWallet = 4035,
+        InvalidTradeRefNo = 4036
+
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

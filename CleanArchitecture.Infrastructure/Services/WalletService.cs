@@ -855,6 +855,53 @@ namespace CleanArchitecture.Infrastructure.Services
             return walletTransactionQueue;
         }
 
+        public BizResponseClass GetWalletDeductionNew(string coinName, string timestamp, byte trnType, decimal amount, long userID, string accWalletID, long OPRefNo)
+        {
+            try
+            {
+                WalletMaster dWalletobj;
+                string remarks = "";
+                WalletTypeMaster walletTypeMaster;
+                //long walletTypeID;
+                BizResponseClass resp = new BizResponseClass();
+                if (string.IsNullOrEmpty(accWalletID) || coinName == string.Empty || userID == 0)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidWalletOrUserIDorCoinName };
+                }
+                walletTypeMaster = _WalletTypeMasterRepository.GetSingle(e => e.WalletTypeName == coinName);
+                if (walletTypeMaster == null)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidCoinName };
+                }
+                dWalletobj = _commonRepository.GetSingle(e => e.UserID == userID && e.WalletTypeID == walletTypeMaster.Id && e.AccWalletID == accWalletID);
+                if (dWalletobj == null)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DefaultWallet404, ErrorCode = enErrorCode.DefaultWalletNotFound };
+                }
+                if (dWalletobj.Status != 1 || dWalletobj.IsValid == false)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
+                }
+                if (trnType != 1) // sell 13-10-2018
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTrnType, ErrorCode = enErrorCode.InvalidTrnType };
+                }
+                if (OPRefNo == 0) // sell 13-10-2018
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo };
+                }
+
+                return resp;
+
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
         public int CheckTrnRefNo(long TrnRefNo, byte TrnType)
         {
             var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType);
