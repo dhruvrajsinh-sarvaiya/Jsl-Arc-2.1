@@ -122,22 +122,22 @@ namespace CleanArchitecture.Web.API
             Req.DebitWalletID = Request.DebitWalletID;
             Req.CreditWalletID = Request.CreditWalletID;
 
-            //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);
-            _transactionProcess.ProcessNewTransactionAsync(Req);
+            //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
+           // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
+
             CreateTransactionResponse Response = new CreateTransactionResponse();
-            //Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
-            //BizResponse MethodResp = await MethodRespTsk;
+            Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
+            BizResponse MethodResp = await MethodRespTsk;
 
+            if (MethodResp.ReturnCode == enResponseCodeService.Success)
+                Response.ReturnCode = enResponseCode.Success;
+            else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
+                Response.ReturnCode = enResponseCode.Fail;
+            else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
+                Response.ReturnCode = enResponseCode.InternalError;
 
-            //if (MethodResp.ReturnCode == enResponseCodeService.Success)
-            //    Response.ReturnCode = enResponseCode.Success;
-            //else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
-            //    Response.ReturnCode = enResponseCode.Fail;
-            //else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
-            //    Response.ReturnCode = enResponseCode.InternalError;
-
-            //Response.ReturnMsg = MethodResp.ReturnMsg;
-            //Response.ErrorCode = MethodResp.ErrorCode;
+            Response.ReturnMsg = MethodResp.ReturnMsg;
+            Response.ErrorCode = MethodResp.ErrorCode;
 
             Response.response = new CreateOrderInfo()
             {
@@ -149,7 +149,7 @@ namespace CleanArchitecture.Web.API
                 //volume = 10
             };
 
-            Response.ReturnCode = enResponseCode.Success;
+            //Response.ReturnCode = enResponseCode.Success;
             return returnDynamicResult(Response);
         }
 

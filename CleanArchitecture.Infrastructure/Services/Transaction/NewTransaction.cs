@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
@@ -26,7 +27,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly EFCommonRepository<TradeStopLoss> _TradeStopLoss;
-        private readonly ICommonRepository<ServiceConfiguration> _ServiceConfi;
+        private readonly ICommonRepository<ServiceMaster> _ServiceConfi;
         private readonly ICommonRepository<AddressMaster> _AddressMasterRepository;
        public BizResponse _Resp;
         private readonly ILogger<NewTransaction> _log;
@@ -37,7 +38,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository,
-            ICommonRepository<ServiceConfiguration> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository,
+            ICommonRepository<ServiceMaster> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository,
             EFCommonRepository<TradeStopLoss> tradeStopLoss)
         {
             _log = log;
@@ -48,32 +49,38 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _AddressMasterRepository = AddressMasterRepository;
             _TradeStopLoss = tradeStopLoss;
         }
-        public Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
-        //public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
+        public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
         {
             _Resp = new BizResponse();
-           Task<BizResponse> MethodRespTsk = CombineAllInitTransactionAsync(Req);
-            //_Resp = await MethodRespTsk;
-            //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
-            return Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
-            //return _Resp;
-        }
+           //Task<BizResponse> MethodRespTsk = CombineAllInitTransactionAsync(Req);
 
-        public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req)
-        {
-            Thread.Sleep(10000);
-            _Resp = new BizResponse();
-            Guid obj = Guid.NewGuid();
-            
-            if (Req.ordertype== enTransactionMarketType.LIMIT)
-                return null;
-            //=========================INSERT
-            //Take memberMobile for sms
             _Resp = CreateTransaction(Req);
             if (_Resp.ReturnCode != enResponseCodeService.Success)
             {
                 return _Resp;
             }
+            var myResp = new Task(async () => CombineAllInitTransactionAsync(Req));
+
+            return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //_Resp = await MethodRespTsk;
+            // return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //return Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //return _Resp;
+        }
+
+        public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req)
+        {
+           // Thread.Sleep(10000);
+            _Resp = new BizResponse();            
+            //if (Req.ordertype== enTransactionMarketType.LIMIT)
+            //    return null;
+            //=========================INSERT
+            //Take memberMobile for sms
+            //_Resp = CreateTransaction(Req);
+            //if (_Resp.ReturnCode != enResponseCodeService.Success)
+            //{
+            //    return _Resp;
+            //}
             //=========================PROCESS
             //Check balance here
             var Validation=ValidateTransaction(Req);
@@ -83,9 +90,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
     
             }
             //=========================UPDATE
-
-
-
             return null;
         }
 
@@ -129,8 +133,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _TradeTransactionObj.BuyQty = Req.Qty;
                         _TradeTransactionObj.BidPrice = Req.Price;
                         _TradeTransactionObj.DeliveryTotalQty = Req.Qty;
-                        _TradeTransactionObj.OrderTotalQty = Helpers.DoRoundForTrading(Req.Qty * Req.Price, 8);//235.415001286,8 =  235.41500129                        
-                        _TradeTransactionObj.Order_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.BaseCurrencyId).SMSCode;
+                        _TradeTransactionObj.OrderTotalQty = Helpers.DoRoundForTrading(Req.Qty * Req.Price, 8);//235.415001286,8 =  235.41500129 
+                        var ServiceConfi = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.BaseCurrencyId);
+                        _TradeTransactionObj.Order_Currency = ServiceConfi.SMSCode;
                         _TradeTransactionObj.Delivery_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.SecondaryCurrencyId).SMSCode;
                     }
                     if (Req.TrnType == enTrnType.Sell_Trade)
@@ -221,7 +226,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             catch (Exception ex)
             {
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
 
         }
@@ -245,7 +250,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             catch (Exception ex)
             {
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
         }
         public BizResponse InsertTransactionInQueue(NewTransactionRequestCls NewtransactionReq, ref long TrnNo)
@@ -255,6 +260,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 var Newtransaction = new TransactionQueue()
                 {
+                    GUID= Guid.NewGuid(),
                     TrnMode = NewtransactionReq.TrnMode,
                     TrnType = Convert.ToInt16(NewtransactionReq.TrnType),
                     MemberID = NewtransactionReq.MemberID,
@@ -269,6 +275,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     AdditionalInfo = NewtransactionReq.AdditionalInfo
                 };
                 _TransactionRepository.Add(Newtransaction);
+                NewtransactionReq.TrnNo = Newtransaction.Id;
                 TrnNo = Newtransaction.Id;
 
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
@@ -276,7 +283,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             catch (Exception ex)
             {
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError });
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
             }
 
         }
@@ -315,7 +322,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             catch (Exception ex)
             {
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError });
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
             }
 
         }
@@ -335,7 +342,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             catch (Exception ex)
             {
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                return (new BizResponse { ReturnMsg = ex.Message, ReturnCode = enResponseCodeService.InternalError });
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
             }
 
         }

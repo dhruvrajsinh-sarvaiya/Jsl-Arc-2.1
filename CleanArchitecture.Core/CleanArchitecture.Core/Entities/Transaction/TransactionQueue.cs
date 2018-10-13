@@ -15,7 +15,7 @@ namespace CleanArchitecture.Core.Entities
         //[Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         //public long TrnNo { get; set; }
-
+        public Guid GUID { get; set; }
         [Required]
         [DataType(DataType.DateTime)]
         [DefaultValue("dbo.GetISTdate()")]

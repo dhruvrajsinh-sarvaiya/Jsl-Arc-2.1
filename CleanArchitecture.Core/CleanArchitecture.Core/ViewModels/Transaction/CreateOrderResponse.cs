@@ -12,7 +12,8 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     }
     public class CreateOrderInfo
     {
-        public long TrnNo { get; set; }      
+        //public long TrnNo { get; set; }      
+        public Guid TrnID { get; set; }
         [DataMember]
         public RateInfo RateInfo { get; set; }
     }

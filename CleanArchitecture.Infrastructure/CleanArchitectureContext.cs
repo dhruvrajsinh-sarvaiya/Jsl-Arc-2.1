@@ -73,7 +73,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<TradePairMaster> TradePairMaster { get; set; }
         public DbSet<TradePairDetail> TradePairDetail { get; set; }
         public DbSet<TransactionQueue> TransactionQueue { get; set; }
-        public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }
+        //public DbSet<ServiceConfiguration> ServiceConfiguration { get; set; }
         public DbSet<ProductConfiguration> ProductConfiguration { get; set; }
         //public DbSet<ProviderConfiguration> ProviderConfiguration { get; set; }
         public DbSet<RouteConfiguration> RouteConfiguration { get; set; }

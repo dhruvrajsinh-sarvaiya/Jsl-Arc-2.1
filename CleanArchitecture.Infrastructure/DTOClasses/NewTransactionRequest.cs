@@ -10,7 +10,9 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
     public class NewTransactionRequestCls
     {
         public long TrnNo { get; set; }
-       
+
+        public Guid GUID { get; set; }
+
         public short TrnMode { get; set; }
         
         public enTrnType TrnType { get; set; }
