@@ -32,7 +32,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
         public bool GetMobileNumber(string MobileNumber)
         {
-            var userdata = _dbContext.TempUserRegister.Where(i => i.Mobile == MobileNumber).FirstOrDefault();
+            var userdata = _dbContext.TempUserRegister.Where(i => i.Mobile == MobileNumber && i.RegisterStatus == false).FirstOrDefault();
             if (userdata?.Mobile == MobileNumber)
                 return false;
             else
@@ -120,7 +120,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
         public async Task<bool> GetEmail(string Email)
         {
-            var userdata = _dbContext.TempUserRegister.Where(i => i.Email == Email).FirstOrDefault();
+            var userdata = _dbContext.TempUserRegister.Where(i => i.Email == Email && i.RegisterStatus == false).FirstOrDefault();
             if (userdata?.Email == Email)
                 return false;
             else

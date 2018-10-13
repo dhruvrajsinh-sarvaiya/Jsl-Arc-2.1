@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using CleanArchitecture.Core.ApiModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace CleanArchitecture.Core.ViewModels.ManageViewModels
@@ -16,6 +17,11 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels
         [Phone]
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; }
-        public string RedisDBKey { get; set; }
+        //public string RedisDBKey { get; set; }
+    }
+
+    public class UserInfoResponse : BizResponseClass
+    {
+        public IndexViewModel UserData { get; set; }
     }
 }

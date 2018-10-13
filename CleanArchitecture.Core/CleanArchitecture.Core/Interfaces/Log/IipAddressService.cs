@@ -9,5 +9,10 @@ namespace CleanArchitecture.Core.Interfaces.Log
     public interface IipAddressService
     {
         Task<long> AddIpAddress(IpMasterViewModel model);
+        Task<IpMasterViewModel> GetIpAddressById(long Id);
+        Task<List<IpMasterViewModel>> GetIpAddressListByUserId(long UserId);
+        void UpdateIpAddress(IpMasterViewModel model);
+        void DeleteIpAddress(IpMasterViewModel model);
+
     }
 }

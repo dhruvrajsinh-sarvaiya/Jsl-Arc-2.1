@@ -104,6 +104,13 @@ namespace CleanArchitecture.Core.Enums
         public static string EmailFail = "Email Address Invalid";
         public static string ResetConfirmed = "Reset confirmed";
         public static string LoginMobileNumberInvalid = "Invalid mobileno.";
-        public static string IpAddressInvalid = "Invalid IPAddress."; 
+        public static string IpAddressInvalid = "Invalid IPAddress.";
+        public static string SuccessfullGetUserData = "Success full get user data.";
+        public static string SuccessfullUpdateUserData = "Success full update user data.";
+        public static string Unableupdateuserinfo = "Unable to update user info";
+
+        public static string SuccessAddIpData = "Success full add Ip Address.";
+        public static string IpAddressInsertError = "Ip address not inserted.";
+        public static string Verificationpending = "User register verification pending.";
     }
 }

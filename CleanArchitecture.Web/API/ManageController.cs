@@ -22,6 +22,11 @@ using CleanArchitecture.Core.Entities.User;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.Services.Session;
+using CleanArchitecture.Core.Interfaces.Log;
+using CleanArchitecture.Core.Interfaces.User;
+using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Infrastructure.Interfaces;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.Log;
 
 namespace CleanArchitecture.Web.API
 {
@@ -38,7 +43,9 @@ namespace CleanArchitecture.Web.API
         private readonly UrlEncoder _urlEncoder;
         private readonly IRedisConnectionFactory _fact;
         private readonly RedisSessionStorage _redisSessionStorage;
-
+        private readonly IUserService _userdata;
+        private readonly IipAddressService _ipAddressService;
+        private readonly IBasePage _basePage;
         #endregion
 
         #region Ctore
@@ -48,7 +55,10 @@ namespace CleanArchitecture.Web.API
         SignInManager<ApplicationUser> signInManager,
         ILoggerFactory loggerFactory,
         UrlEncoder urlEncoder, IRedisConnectionFactory factory,
-        RedisSessionStorage redisSessionStorage)
+        RedisSessionStorage redisSessionStorage,
+        IUserService userdata,
+        IipAddressService ipAddressService,
+         IBasePage basePage)
         {
             _context = context;
             _userManager = userManager;
@@ -58,18 +68,24 @@ namespace CleanArchitecture.Web.API
             _urlEncoder = urlEncoder;
             _fact = factory;
             _redisSessionStorage = redisSessionStorage;
+            _userdata = userdata;
+            _ipAddressService = ipAddressService;
+            _basePage = basePage;
         }
         #endregion
 
         #region Method
 
         [HttpGet("userinfo")]
-        public async Task<IActionResult> UserInfo([FromHeader] string RedisDBKey)
+        public async Task<IActionResult> UserInfo() //[FromHeader] string RedisDBKey)
         {
+
+
+            /*
             var Userdata = new RedisUserdata(); ///  If not find the RadisDbKey then we Set key 
             var redis = new RadisServices<RedisUserdata>(this._fact);
 
-            ApplicationUser user = null;
+             ApplicationUser user = null;
 
             //// Perform Get Or set the redis Process operation
 
@@ -94,37 +110,12 @@ namespace CleanArchitecture.Web.API
                 _redisSessionStorage.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
             }
 
+            */
 
-
-
-            return Ok(new IndexViewModel
+            try
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Username = user.UserName,
-                IsEmailConfirmed = user.EmailConfirmed,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                RedisDBKey = RedisDBKey
-            });
-        }
-
-        [HttpPost("userinfo")]
-        public async Task<IActionResult> UserInfo([FromBody]IndexViewModel model)
-        {
-
-            var user = await GetCurrentUserAsync();
-
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
-            user.UserName = string.IsNullOrEmpty(model.Username) ? user.UserName : model.Username;
-            user.Email = string.IsNullOrEmpty(model.Email) ? user.Email : model.Email;
-            user.PhoneNumber = model.PhoneNumber;
-
-            var result = await _userManager.UpdateAsync(user);
-            if (result == IdentityResult.Success)
-            {
-                return Ok(new IndexViewModel
+                var user = await GetCurrentUserAsync();
+                var UserData = new IndexViewModel
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,
@@ -132,11 +123,105 @@ namespace CleanArchitecture.Web.API
                     IsEmailConfirmed = user.EmailConfirmed,
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber
-                });
+                    // RedisDBKey = RedisDBKey
+                };
+                //string json = JsonConvert.SerializeObject(UserData);
+                return Ok(new UserInfoResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessfullGetUserData, UserData = UserData });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
-            return BadRequest(new ApiError("Unable to update user info"));
+
         }
+
+        [HttpPost("userinfo")]
+        public async Task<IActionResult> UserInfo([FromBody]IndexViewModel model)
+        {
+            try
+            {
+
+                var user = await GetCurrentUserAsync();
+                if (!string.IsNullOrEmpty(model.FirstName))
+                    user.FirstName = model.FirstName;
+                if (!string.IsNullOrEmpty(model.LastName))
+                    user.LastName = model.LastName;
+                user.UserName = string.IsNullOrEmpty(model.Username) ? user.UserName : model.Username;
+                user.Email = string.IsNullOrEmpty(model.Email) ? user.Email : model.Email;
+                if (!string.IsNullOrEmpty(model.PhoneNumber))
+                    user.PhoneNumber = model.PhoneNumber;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result == IdentityResult.Success)
+                {
+                    var UserData = new IndexViewModel
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Username = user.UserName,
+                        IsEmailConfirmed = user.EmailConfirmed,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber
+                    };
+                    return Ok(new UserInfoResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessfullUpdateUserData, UserData = UserData });
+                }
+                return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Unableupdateuserinfo, ErrorCode = enErrorCode.Status4034UnableUpdateUser });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+
+        #region IpAddress
+        [HttpPost("IpAddress")]
+        public async Task<IActionResult> AddIpAddress([FromBody]IpAddressReqViewModel model)
+        {
+            try
+            {
+                string CountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                }
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    IpMasterViewModel imodel = new IpMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.IpAddress = model.IPAddress;
+
+                    long id = await _ipAddressService.AddIpAddress(imodel);
+
+                    if (id > 0)
+                    {
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddIpData });
+                    }
+                    else
+                    {
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+        #endregion 
 
         [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordViewModel model)

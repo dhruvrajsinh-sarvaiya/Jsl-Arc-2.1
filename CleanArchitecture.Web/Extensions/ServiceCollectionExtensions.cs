@@ -32,6 +32,8 @@ using CleanArchitecture.Infrastructure.Services.Configuration;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using CleanArchitecture.Infrastructure.Services.Log;
+using CleanArchitecture.Core.Interfaces.Log;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -336,6 +338,10 @@ namespace CleanArchitecture.Web.Extensions
             //REDIS RELETED CLASS                  
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IRedisConnectionFactory, RedisConnectionFactory>();
+
+            //Ipaddress Service
+            services.AddScoped<IipAddressService, IpAddressService>();
+            
             return services;
         }
     }
