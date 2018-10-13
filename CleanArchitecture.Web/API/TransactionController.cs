@@ -98,22 +98,22 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost("CreateTransactionOrder/{PairName}")]
+        [HttpPost("CreateTransactionOrder/{Pair}")]
         //[Authorize]
-        public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request, string PairName)
+        public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request, string Pair)
         {
             //Do Process for CreateOrder
             //For Testing Purpose
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = Request.orderSide;
             Req.ordertype = Request.ordertype;
-            Req.MemberID = user.Id;
-            Req.MemberMobile = user.Mobile;
-            //Req.MemberID = 5;
-            //Req.MemberMobile = "1234567890";
-            Req.SMSCode = PairName;
+            //Req.MemberID = user.Id;
+            //Req.MemberMobile = user.Mobile;
+            Req.MemberID = 5;
+            Req.MemberMobile = "1234567890";
+            Req.SMSCode = Pair;
             Req.TransactionAccount = Request.CurrencyPairID.ToString();
             Req.Amount = Request.Total;
             Req.PairID = Request.CurrencyPairID;
@@ -122,6 +122,7 @@ namespace CleanArchitecture.Web.API
             Req.DebitWalletID = Request.DebitWalletID;
             Req.CreditWalletID = Request.CreditWalletID;
 
+            //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);
             _transactionProcess.ProcessNewTransactionAsync(Req);
             CreateTransactionResponse Response = new CreateTransactionResponse();
             //Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
