@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.Interfaces
     {
         List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId);
         List<BasePairResponse> GetTradePairAsset();
-        List<VolumeDataRespose> GetVolumeData();
+        List<VolumeDataRespose> GetVolumeData(long BasePairId);
         List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, long PairId,short TrnType,short Status,int PageSize,int MarketType,DateTime  fromDate, DateTime Todate, int IsAll);
         long GetPairIdByName(string pair);
         bool IsValidPairName(string Pair);
@@ -21,6 +21,8 @@ namespace CleanArchitecture.Core.Interfaces
         Int16  IsValidTradeType(string Type);
         Int16 IsValidMarketType(string type);
         Int16 IsValidStatus(string status);
+        long GetBasePairIdByName(string BasePair);
+        GetTradePairByName GetTradePairByName(long id);
 
     }
 }

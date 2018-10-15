@@ -97,7 +97,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public List<VolumeDataRespose> GetVolumeData()
+        public List<VolumeDataRespose> GetVolumeData(long BasePairId)
         {
             decimal ChangePer = 0;
             decimal Volume24 = 0;
@@ -106,9 +106,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             try
             {
                 responsedata = new List<VolumeDataRespose>();
-                var pairMasterData = _tradeMasterRepository.GetAll();
+                var pairMasterData = _tradeMasterRepository.FindBy(x => x.BaseCurrencyId == BasePairId);
 
-                if(pairMasterData != null)
+                if (pairMasterData != null)
                 {
                     foreach (var pmdata in pairMasterData)
                     {
@@ -338,11 +338,65 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+        public GetTradePairByName GetTradePairByName(long id)
+        {
+            decimal ChangePer = 0;
+            decimal Volume24 = 0;
+            GetTradePairByName responsedata = new GetTradePairByName();
+            try
+            {
+                var pairMasterData = _tradeMasterRepository.GetById(id);
+                if (pairMasterData != null)
+                {
+
+                    var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pairMasterData.Id);
+
+                    var baseService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.BaseCurrencyId);
+                    var chidService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.SecondaryCurrencyId);
+
+                    GetPairAdditionalVal(pairMasterData.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+
+                    responsedata.PairId = pairMasterData.Id;
+                    responsedata.Pairname = pairMasterData.PairName;
+                    responsedata.Currentrate = pairDetailData.Currentrate;
+                    responsedata.Volume = System.Math.Round(Volume24, 2);
+                    responsedata.Fee = pairDetailData.Fee;
+                    responsedata.ChildCurrency = chidService.Name;
+                    responsedata.Abbrevation = chidService.SMSCode;
+                    responsedata.ChangePer = System.Math.Round(ChangePer, 2);
+                    responsedata.BaseCurrencyId = baseService.Id;
+                    responsedata.BaseCurrencyName = baseService.Name;
+                    responsedata.BaseAbbrevation = baseService.SMSCode;
+                }
+                return responsedata;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         public long GetPairIdByName(string pair)
         {
             try
             {
                 return _frontTrnRepository.GetPairIdByName(pair);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public long GetBasePairIdByName(string BasePair)
+        {
+            try
+            {
+                var model = _serviceMasterRepository.GetSingle(x => x.SMSCode == BasePair);
+                if (model == null)
+                    return 0;
+
+                return model.Id;
             }
             catch (Exception ex)
             {

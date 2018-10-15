@@ -13,6 +13,5 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     {
         public Decimal Amount { get; set; }
         public Decimal Price { get; set; }
-        public Decimal Count { get; set; }
     }
 }

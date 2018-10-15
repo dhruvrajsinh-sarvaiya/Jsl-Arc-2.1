@@ -168,7 +168,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetBuySellBook> GetBuyerBook(long id)
         {
             IQueryable<GetBuySellBook> Result = _dbContext.BuyerSellerInfo.FromSql(
-                            @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount, TTQ.BidPrice * (Sum(TTQ.DeliveryTotalQty) - sum(TTQ.SettledBuyQty)) as Count
+                            @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount
                             From TradeTransactionQueue TTQ  where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group By TTQ.BidPrice Order By TTQ.BidPrice", id);
 
             return Result.ToList();
@@ -177,7 +177,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetBuySellBook> GetSellerBook(long id)
         {
             IQueryable<GetBuySellBook> Result = _dbContext.BuyerSellerInfo.FromSql(
-                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,TTQ.AskPrice* (sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty)) as Count from
+                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount from
                               TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
                               TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice order by TTQ.AskPrice ", id);
 
