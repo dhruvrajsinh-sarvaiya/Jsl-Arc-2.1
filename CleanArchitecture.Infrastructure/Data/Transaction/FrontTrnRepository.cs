@@ -131,16 +131,16 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         Result = _dbContext.TradeHistoryInfo.FromSql(
                             @"Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice 
                                 WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,TTQ.StatusMsg as StatusText,
-                                TTQ.PairID,TQ.ChargeRs,0 As IsCancelled from  TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo
-                                WHERE TTQ.PairID ={0} AND TTQ.MemberID = {1} AND TTQ.TrnDate Between  {2} and {3} and TTQ.Status = {4}
+                                TTQ.PairID,TQ.ChargeRs,CAST(0 as smallint) As IsCancelled from  TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo
+                                WHERE TTQ.PairID ={0} AND TTQ.MemberID = {1} AND TTQ.TrnDate Between  {2} and {3} and TTQ.Status = {4} AND TTQ.TrnType={6}
                                 UNION ALL Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN 
                                 TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,CASE WHEN TTQ.TrnType = 4 THEN TCQ.PendingBuyQty else TCQ.DeliverQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,
-                                TCQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,1 as 'IsCancelled' from TradeCancelQueue TCQ INNER JOIN TradeTransactionQueue TTQ ON TTQ.TrnNo = TCQ.TrnNo
-                                INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo WHERE TTQ.PairID = {0} AND TTQ.MemberID = {1} AND TTQ.TrnDate Between {2} and {3} and TCQ.Status = {4}
+                                TCQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,CAST(1 as smallint) as 'IsCancelled' from TradeCancelQueue TCQ INNER JOIN TradeTransactionQueue TTQ ON TTQ.TrnNo = TCQ.TrnNo
+                                INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo WHERE TTQ.PairID = {0} AND TTQ.MemberID = {1} AND TTQ.TrnDate Between {2} and {3} and TCQ.Status = {4} AND TTQ.TrnType={6}
                                 UNION ALL Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice WHEN TTQ.AskPrice=0 THEN TTQ.BidPrice END as Price,
                                 CASE WHEN TTQ.TrnType = 4  THEN TTQ.BuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SellQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,TTQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,TTQ.IsCancelled 
-                                from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id=TTQ.TrnNo WHERE TTQ.PairID={0} AND TTQ.MemberID={1} AND TTQ.TrnDate Between {2} and {3} AND TTQ.Status={5}
-                                Order By TTQ.TrnNo Desc",PairId ,MemberID ,fromDate ,Todate , Convert.ToInt16(enTransactionStatus.Success), Convert.ToInt16(enTransactionStatus.SystemFail));
+                                from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id=TTQ.TrnNo WHERE TTQ.PairID={0} AND TTQ.MemberID={1} AND TTQ.TrnDate Between {2} and {3} AND TTQ.Status={5} AND TTQ.TrnType={6}
+                                Order By TTQ.TrnNo Desc", PairId ,MemberID ,fromDate ,Todate , Convert.ToInt16(enTransactionStatus.Success), Convert.ToInt16(enTransactionStatus.SystemFail),TrnType);
                     }
                     else
                     {
