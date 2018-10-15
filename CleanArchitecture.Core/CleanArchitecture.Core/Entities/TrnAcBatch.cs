@@ -8,6 +8,10 @@ namespace CleanArchitecture.Core.Entities
 {
     public class TrnAcBatch : BizBase
     {
+        public TrnAcBatch()
+        {
+
+        }
         public TrnAcBatch(DateTime d1)
         {
             CreatedBy = 900;
