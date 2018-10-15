@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CleanArchitecture.Web.API.Configuration
 {
     [Route("api/[controller]/[action]")]
+    [ApiController]
     public class WalletConfigurationController : Controller
     {
         //vsolanki 11-10-2018
