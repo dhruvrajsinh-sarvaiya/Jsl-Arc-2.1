@@ -183,10 +183,16 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                string CountryCode = await _userdata.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {                    
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+                string UserCountryCode = await _userdata.GetCountryByIP(model.SelectedIPAddress);
+                if (!string.IsNullOrEmpty(UserCountryCode) && UserCountryCode == "fail")
                 {
-                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUserSelectedIp, ErrorCode = enErrorCode.Status4045InvalidUserSelectedIp });
                 }
 
                 var user = await GetCurrentUserAsync();
@@ -205,7 +211,7 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
                     }
                 }
                 else

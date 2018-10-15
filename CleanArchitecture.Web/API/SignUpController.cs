@@ -87,7 +87,7 @@ namespace CleanArchitecture.Web.API
                 if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
                 {
 
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
                 }
 
                 bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, CountryCode);
@@ -584,7 +584,7 @@ namespace CleanArchitecture.Web.API
                 string CountryCode = await _userdata.GetCountryByIP(model.IPAddress);
                 if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
                 {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
                 }
 
 
@@ -754,7 +754,7 @@ namespace CleanArchitecture.Web.API
                 string CountryCode = await _userdata.GetCountryByIP(model.IPAddress);
                 if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
                 {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020MobileInvalid });
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
                 }
 
 
