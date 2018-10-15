@@ -66,6 +66,8 @@ namespace CleanArchitecture.Core.Enums
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";
         public static string ReSendMailSubject = "Registration confirmation resend email";
+        public static string ForgotPasswordMail = "Forgot password email";
+        public static string ResetPasswordMail = "Reset password conformation email";
         public static string SendMailBody = "use this code: ";
         public static string SendSMSSubject = "SMS for use this code ";
         public static string LoginEmailSubject = "Login With Email Otp ";
@@ -112,5 +114,21 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessAddIpData = "Success full add Ip Address.";
         public static string IpAddressInsertError = "Ip address not inserted.";
         public static string Verificationpending = "User register verification pending.";
+
+       
+        public static string ResetConfirmedLink = "Reset password link send on your email, please click that link and confirmed.";
+        public static string ResetResendEmail = "You have successfully resend New password in email.";
+        public static string ChangePassword = "User changed their password successfully.";
+        public static string UnableChangePassword = "Unable to change password";
+        public static string EmailNewPassword = "Use this New Password to Login. Your New Password is";
+        public static string ForgotPassLink = "Please verify it by clicking for regenerated password .";
+        public static string ResetUserNotAvailable = "Don't reveal that the user does not exist or is not confirmed.";
+        public static string ResetEmailMessage = "Please reset your password by clicking here.";
+        public static string ResetPasswordUseNotexist = "Don't reveal that the user does not exist.";
+        public static string ResetPasswordEmailExpire = "This email link was expired.";
+        public static string ResetPasswordEmailLinkBlank = "Reset password email link should not be empty.";
+        public static string ResetConfirm = "You have already confirm reset password link, please check in your mail if was not received mail then perform to forgot opration.";
+        public static string ResetConfirmPassMatch = "New password and confirmation password do not match.";
+        public static string ResetConfirmOldNotMatch = "Old password does not match";
     }
 }

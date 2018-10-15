@@ -166,6 +166,13 @@ namespace CleanArchitecture.Core.Enums
         Status4034UnableUpdateUser = 4034,
         Status4035UnableToAddIpAddress = 4035,
         Status4036VerifyPending = 4036,
+        Status4037UserNotAvailable = 4037,
+        Status4038ResetUserNotAvailable = 4038,
+        Status4039ResetPasswordLinkExpired = 4039,
+        Status4040ResetPasswordLinkempty = 4040,
+        Status4041ResetPasswordConfirm = 4041,
+        Status4042ResetConfirmPassMatch=4042,
+        Status4043ResetConfirmOldNotMatch=4043,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -181,7 +188,8 @@ namespace CleanArchitecture.Core.Enums
         InvalidWallet = 4035,
         InvalidTradeRefNo = 4036,
         AlredyExist=4037,
-        InsufficantBal=4038
+        InsufficantBal=4038,
+        
 
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail

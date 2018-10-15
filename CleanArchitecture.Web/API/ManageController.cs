@@ -226,15 +226,37 @@ namespace CleanArchitecture.Web.API
         [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordViewModel model)
         {
-            var user = await GetCurrentUserAsync();
-            var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            if (result.Succeeded)
+
+            try
             {
-                _logger.LogInformation(3, "User changed their password successfully.");
-                return NoContent();
+                if (!model.NewPassword.Equals(model.ConfirmPassword))
+                {
+                    return BadRequest(new ChangePasswordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmPassMatch, ErrorCode = enErrorCode.Status4042ResetConfirmPassMatch });
+                }
+                var user = await GetCurrentUserAsync();
+
+                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation(3, "User changed their password successfully.");
+                    return Ok(new ChangePasswordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ChangePassword });
+
+                }
+
+                return BadRequest(new ChangePasswordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmOldNotMatch, ErrorCode = enErrorCode.Status4043ResetConfirmOldNotMatch });
+
             }
-            return BadRequest(new ApiError("Unable to change password"));
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new ChangePasswordResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+
+            //return BadRequest(new ApiError("Unable to change password"));
         }
+
 
         [HttpPost("setpassword")]
         public async Task<IActionResult> SetPassword([FromBody]SetPasswordViewModel model)
