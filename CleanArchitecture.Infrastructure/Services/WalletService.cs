@@ -968,7 +968,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (TotalAmount <= 0)
                 {
                     tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid().ToString(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 2, EnResponseMessage.InvalidAmt);
-                    tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj);
+                    tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj,1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
                 }
