@@ -176,12 +176,12 @@ namespace CleanArchitecture.Infrastructure.Data
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
 
                 _dbContext.Database.BeginTransaction();
-                _dbContext.Set<WalletTransactionQueue>().Add(wtq);
-                wl1.TrnNo = wtq.TrnNo;
+                //_dbContext.Set<WalletTransactionQueue>().Add(wtq);
+                //wl1.TrnNo = wtq.TrnNo;
                 _dbContext.Set<WalletLedger>().Add(wl1);
-                _dbContext.Set<TransactionAccount>().Add(ta1);
-                
+                _dbContext.Set<TransactionAccount>().Add(ta1);                
                 _dbContext.Entry(wm2).State = EntityState.Modified;
+                _dbContext.Entry(wtq).State = EntityState.Modified;
                 _dbContext.SaveChanges();
                 _dbContext.Database.CommitTransaction();
                 return true;
@@ -269,7 +269,9 @@ namespace CleanArchitecture.Infrastructure.Data
         public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq)
         {
             WalletTransactionQueue w = new WalletTransactionQueue();
-             _dbContext.WalletTransactionQueues.Add(wtq);           
+
+             _dbContext.WalletTransactionQueues.Add(wtq);
+            _dbContext.SaveChanges();
             return wtq;
         }
 
