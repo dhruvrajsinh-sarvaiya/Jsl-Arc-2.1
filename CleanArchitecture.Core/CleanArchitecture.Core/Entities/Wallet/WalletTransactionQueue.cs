@@ -16,7 +16,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
 
         [Required]
         [StringLength(50)]
-        public string Guid { get; set; }
+        public Guid Guid { get; set; }
 
         [Required]
         public byte TrnType { get; set; }

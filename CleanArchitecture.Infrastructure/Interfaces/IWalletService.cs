@@ -35,6 +35,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListWalletResponse GetWalletByCoin(long userid, string coin);
 
         ListWalletResponse GetWalletById(long userid, string coin,string walletId);
+
+        BizResponseClass GetWalletDeductionNew(string coinName, string timestamp, byte orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType);
+        
         
     }
 }
