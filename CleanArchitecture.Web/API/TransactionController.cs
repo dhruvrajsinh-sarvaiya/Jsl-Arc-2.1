@@ -181,7 +181,7 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("GetTradeHistory/{Pair}/{Trade}/{FromDate}/{ToDate}/{Status}/{PageSize}/{MarketType}")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> GetTradeHistory(string Pair, string Trade, string FromDate, string ToDate, int Status, int PageSize, string MarketType)
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
@@ -242,7 +242,7 @@ namespace CleanArchitecture.Web.API
 
                 fDate = DateTime.ParseExact(FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 tDate = DateTime.ParseExact(ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                long MemberID = 2;// user.Id;
+                long MemberID =user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, PairId, trnType, Convert.ToInt16(Status), PageSize, marketType, fDate, tDate, 1);
                 if (Response.response.Count == 0)
                 {
@@ -342,7 +342,6 @@ namespace CleanArchitecture.Web.API
 
         [HttpGet("GetOrderhistory/{Pair}")]
         public ActionResult GetOrderhistory(string Pair)
-
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
             try
