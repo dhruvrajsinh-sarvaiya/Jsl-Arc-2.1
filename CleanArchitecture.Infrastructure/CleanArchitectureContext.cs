@@ -67,6 +67,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletAllowTrn> WalletAllowTrns { get; set; }
         public DbSet<WalletTransactionOrder> WalletTransactionOrders { get; set; }
         public DbSet<WalletTransactionQueue> WalletTransactionQueues { get; set; }
+        public DbSet<TrnAcBatch> TrnAcBatch { get; set; }
+
 
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
@@ -101,6 +103,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceProviderType> ServiceProviderType { get; set; }
         public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
         public DbSet<TradeStopLoss> TradeStopLoss { get; set; }
+
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
