@@ -925,8 +925,9 @@ namespace CleanArchitecture.Infrastructure.Services
             return count;
         }
 
-        public BizResponseClass GetWalletCreditNew(string coinName, string timestamp, byte trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long OPRefNo, long isFullSettled)
+        public BizResponseClass GetWalletCreditNew(string coinName, string timestamp, byte trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, long isFullSettled, byte orderType)
         {
+            WalletTransactionQueue tqObj = new WalletTransactionQueue();
             try
             {
                 WalletMaster dWalletobj;
@@ -935,6 +936,51 @@ namespace CleanArchitecture.Infrastructure.Services
                 //long walletTypeID;
                 BizResponseClass resp = new BizResponseClass();
 
+                if (string.IsNullOrEmpty(crAccWalletID) || coinName == string.Empty || userID == 0)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidWalletOrUserIDorCoinName };
+                }
+                walletTypeMaster = _WalletTypeMasterRepository.GetSingle(e => e.WalletTypeName == coinName);
+                if (walletTypeMaster == null)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidCoinName };
+                }
+                dWalletobj = _commonRepository.GetSingle(e => e.UserID == userID && e.WalletTypeID == walletTypeMaster.Id && e.AccWalletID == crAccWalletID);
+                if (dWalletobj == null)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DefaultWallet404, ErrorCode = enErrorCode.DefaultWalletNotFound };
+                }
+                if (dWalletobj.Status != 1 || dWalletobj.IsValid == false)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
+                }
+                if (orderType != 2) // buy 
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTrnType, ErrorCode = enErrorCode.InvalidTrnType };
+                }
+               
+                //WalletTransactionQueue
+                if (TrnRefNo == 0) // buy
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo };
+                }
+                if (TotalAmount<=0)
+                {
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid().ToString(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 2, EnResponseMessage.InvalidAmt);
+                }
+                int count = CheckTrnRefNoForCredit(TrnRefNo, orderType);
+                if (count == 0)
+                {
+                    return new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist };
+                }
+                //var objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid().ToString(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 0, "Inserted");
+
+                //TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
+
+                //WalletLedger walletLedger = GetWalletLedger(dWalletobj.Id, 0, amount, 0, trnType, serviceType, 0, remarks, dWalletobj.Balance, 1);
+                //TransactionAccount tranxAccount = GetTransactionAccount(dWalletobj.Id, 1, batchObj.Id, amount, 0, 0, remarks, 1);
+                //dWalletobj.DebitBalance(amount);
+                //_walletRepository1.WalletDeductionwithTQ(walletLedger, tranxAccount, dWalletobj, objTQ);
 
                 return resp;
 
@@ -944,6 +990,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+
+        public int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType)
+        {
+            var count = _walletRepository1.CheckTrnRefNoForCredit(TrnRefNo, TrnType);
+            return count;
         }
 
     }

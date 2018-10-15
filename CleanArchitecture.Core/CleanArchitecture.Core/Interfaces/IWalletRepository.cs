@@ -27,6 +27,8 @@ namespace CleanArchitecture.Core.Interfaces
         List<WalletMasterResponse> GetWalletMasterResponseById(long UserId, string coin,string walletId);
 
         int CheckTrnRefNo(long TrnRefNo, byte TrnType);
+
+        int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType);
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
 
