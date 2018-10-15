@@ -80,6 +80,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ThirdPartyAPIConfiguration> ThirdPartyAPIConfiguration { get; set; }
         public DbSet<ThirdPartyAPIResponseConfiguration> ThirdPartyAPIResponseConfiguration { get; set; }
         public DbSet<TradePoolMaster > TradePoolMaster { get; set; }
+        public DbSet <TradeCancelQueue> TradeCancelQueue { get; set; }
 
         public DbQuery<TradeHistoryResponce> TradeHistoryInfo { get; set; } //komal 11-10-2018
         public DbQuery<RecentOrderRespose> RecentOrderRespose { get; set; } //komal 12-10-2018
