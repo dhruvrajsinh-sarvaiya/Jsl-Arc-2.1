@@ -132,5 +132,6 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirm = "You have already confirm reset password link, please check in your mail if was not received mail then perform to forgot opration.";
         public static string ResetConfirmPassMatch = "New password and confirmation password do not match.";
         public static string ResetConfirmOldNotMatch = "Old password does not match";
+        public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
     }
 }
