@@ -387,7 +387,7 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Verificationpending, ErrorCode = enErrorCode.Status4036VerifyPending });
+                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Verificationpending, ErrorCode = enErrorCode.Status4036VerifyPending });
                     }
                 }
                 else
@@ -626,7 +626,7 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Verificationpending, ErrorCode = enErrorCode.Status4036VerifyPending });                        
+                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Verificationpending, ErrorCode = enErrorCode.Status4036VerifyPending });                        
                     }
                 }
                 else
