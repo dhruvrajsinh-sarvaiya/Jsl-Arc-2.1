@@ -33,9 +33,11 @@ namespace CleanArchitecture.Core.Interfaces
 
         int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType);
 
-        WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq);
+        WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq, byte AddorUpdate);
 
-        void CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID);
+        WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate);
+
+        bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID);
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
 

@@ -170,18 +170,18 @@ namespace CleanArchitecture.Infrastructure.Data
             }
         }
 
-        public bool WalletDeductionwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2,WalletTransactionQueue wtq)
+        public bool WalletDeductionwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq)
         {
             try
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
 
                 _dbContext.Database.BeginTransaction();
-                _dbContext.Set<WalletTransactionQueue>().Add(wtq);
-                wl1.TrnNo = wtq.TrnNo;
+                //_dbContext.Set<WalletTransactionQueue>().Add(wtq);
+                //wl1.TrnNo = wtq.TrnNo;
                 _dbContext.Set<WalletLedger>().Add(wl1);
                 _dbContext.Set<TransactionAccount>().Add(ta1);
-                
                 _dbContext.Entry(wm2).State = EntityState.Modified;
+                _dbContext.Entry(wtq).State = EntityState.Modified;
                 _dbContext.SaveChanges();
                 _dbContext.Database.CommitTransaction();
                 return true;
@@ -250,11 +250,11 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
 
-        public int  CheckTrnRefNo(long TrnRefNo, byte TrnType)
+        public int CheckTrnRefNo(long TrnRefNo, byte TrnType)
         {
             int response = (from u in _dbContext.WalletTransactionQueues
-                                             where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
-                                             select u).Count();
+                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
+                            select u).Count();
             return response;
         }
 
@@ -266,21 +266,48 @@ namespace CleanArchitecture.Infrastructure.Data
             return response;
         }
 
-        public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq)
+        public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq,byte AddorUpdate)//1=add,2=update
         {
-            WalletTransactionQueue w = new WalletTransactionQueue();
-             _dbContext.WalletTransactionQueues.Add(wtq);           
+            //WalletTransactionQueue w = new WalletTransactionQueue();
+            if(AddorUpdate==1)
+            {
+                _dbContext.WalletTransactionQueues.Add(wtq);
+            }
+            else
+            {
+                _dbContext.Entry(wtq).State = EntityState.Modified;
+            }      
             return wtq;
         }
-
-        public void CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+       public  WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate)//1=add,2=update)
         {
-            //for (int t=0;t<=arryTrnID.Length;t++)
-            //{ 
-            //(from u in _dbContext.WalletTransactionQueues
-            // where u.TrnRefNo == arryTrnID[0]  && u.Status == 4
-            // select u).Count();
-            //}
+            if (AddorUpdate == 1)
+            {
+                _dbContext.WalletTransactionOrders.Add(wo);
+            }
+            else
+            {
+                _dbContext.Entry(wo).State = EntityState.Modified;
+            }
+            return wo;
+        }
+
+        public bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+        {
+            bool i = false;
+            for (int t = 0; t <= arryTrnID.Length-1; t++)
+            {
+              var response = (from u in _dbContext.WalletTransactionQueues
+                                where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.Status == 4 && u.TrnType==1
+                                select u);
+                if (response.Count()!=1)
+                {
+                    i = false;
+                    return i;
+                }
+                i = true;
+            }
+            return i;
         }
 
         public List<AddressMasterResponse> ListAddressMasterResponse(string AccWalletID)

@@ -758,11 +758,12 @@ namespace CleanArchitecture.Web.API
                 if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return NoContent();
+                    return BadRequest(new ForgotpassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetUserNotAvailable, ErrorCode = enErrorCode.Status4037UserNotAvailable });
                 }
-                string ctoken = _userManager.GeneratePasswordResetTokenAsync(currentUser).Result;
-                Random generator = new Random();
-                String random = generator.Next(0, 999999).ToString("D6");
+
+                string ctoken = GenerateRandomPassword();
+                //    _userManager.GeneratePasswordResetTokenAsync(currentUser).Result;
+
                 var ResetPassword = new ResetPasswordViewModel
                 {
                     Email = currentUser.Email,
@@ -784,16 +785,29 @@ namespace CleanArchitecture.Web.API
                     emailConfirmCode = SubScriptionKey
                 }, protocol: HttpContext.Request.Scheme);
 
-                var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Please reset your password by clicking here:</a>";
+                var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">" + EnResponseMessage.ResetEmailMessage + "</a>";
 
                 SendEmailRequest request = new SendEmailRequest();
                 request.Recepient = model.Email;
-                request.Subject = EnResponseMessage.SendMailSubject;
-                request.Body = confirmationLink + " " +EnResponseMessage.SendMailBody + random;
+                request.Subject = EnResponseMessage.ForgotPasswordMail;
+                request.Body = confirmationLink;
 
                 await _mediator.Send(request);
 
-                return Ok(new ForgotpassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetConfirmed });
+                var result = await _userManager.FindByNameAsync(model.Email);
+                if (result != null)
+                {
+                    result.EmailConfirmed = false;
+                    await _userManager.UpdateAsync(result);
+                }
+                else
+                {
+                    return BadRequest(new ForgotpassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser });
+                }
+
+
+
+                return Ok(new ForgotpassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetConfirmedLink });
                 // return AppUtils.Standerdlogin("Success");
             }
             catch (Exception ex)
@@ -801,33 +815,65 @@ namespace CleanArchitecture.Web.API
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
                 return BadRequest(new ForgotpassWordResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
-            /*
-            var currentUser = await _userManager.FindByNameAsync(model.Email);
-            if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
-            {
-                // Don't reveal that the user does not exist or is not confirmed
-                return NoContent();
-            }
-            // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=532713
-            // Send an email with this link
-            var code = await _userManager.GeneratePasswordResetTokenAsync(currentUser);
 
-            //string ctoken = _userManager.GeneratePasswordResetTokenAsync(currentUser).Result;
-            //string ctokenlink = Url.Action("ResetPassword", "Account", new
-            //{
-            //    Email = currentUser.Email,
-            //    emailConfirmCode = ctoken
-            //}, protocol: HttpContext.Request.Scheme);
-
-
-            var host = Request.Scheme + "://" + Request.Host;
-            var callbackUrl = host + "?userId=" + currentUser.Id + "&passwordResetCode=" + code;
-            var confirmationLink = "<a class='btn-primary' href=\"" + callbackUrl + "\">Reset your password</a>";
-            //var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Reset your password</a>";
-            await _emailSender.SendEmailAsync(model.Email, "Forgotten password email", confirmationLink);
-            return NoContent(); // sends 204
-            */
         }
+
+
+        /// <summary>
+        ///  This method are use to create the Random Password
+        /// </summary>
+        /// <param name="opts"></param>
+        /// <returns></returns>
+        public static string GenerateRandomPassword(PasswordOptions opts = null)
+        {
+            if (opts == null) opts = new PasswordOptions()
+            {
+                RequiredLength = 6,
+                RequiredUniqueChars = 4,
+                RequireDigit = true,
+                RequireLowercase = true,
+                RequireNonAlphanumeric = true,
+                RequireUppercase = true,
+
+            };
+
+            string[] randomChars = new[] {
+        "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
+        "abcdefghijkmnopqrstuvwxyz",    // lowercase
+        "0123456789",                   // digits
+        "!@#$%^&*"                        // non-alphanumeric
+    };
+            Random rand = new Random(Environment.TickCount);
+            List<char> chars = new List<char>();
+
+            if (opts.RequireUppercase)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[0][rand.Next(0, randomChars[0].Length)]);
+
+            if (opts.RequireLowercase)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[1][rand.Next(0, randomChars[1].Length)]);
+
+            if (opts.RequireDigit)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[2][rand.Next(0, randomChars[2].Length)]);
+
+            if (opts.RequireNonAlphanumeric)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[3][rand.Next(0, randomChars[3].Length)]);
+
+            for (int i = chars.Count; i < opts.RequiredLength
+                || chars.Distinct().Count() < opts.RequiredUniqueChars; i++)
+            {
+                string rcs = randomChars[rand.Next(0, randomChars.Length)];
+                chars.Insert(rand.Next(0, chars.Count),
+                    rcs[rand.Next(0, rcs.Length)]);
+            }
+
+            return new string(chars.ToArray());
+        }
+
+
 
         [HttpGet("resetpassword")]
         [AllowAnonymous]
@@ -842,8 +888,6 @@ namespace CleanArchitecture.Web.API
                     string DecryptToken = EncyptedDecrypted.Decrypt(emailConfirmCode, DecpasswordBytes);
 
                     ResetPasswordViewModel model = JsonConvert.DeserializeObject<ResetPasswordViewModel>(DecryptToken);
-
-
                     if (model?.Expirytime >= DateTime.UtcNow)
                     {
                         var user = await _userManager.FindByNameAsync(model.Email);
@@ -852,37 +896,51 @@ namespace CleanArchitecture.Web.API
                         {
                             // Don't reveal that the user does not exist
                             //return Ok("Reset confirmed");
-                            return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmed, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetPasswordUseNotexist, ErrorCode = enErrorCode.Status4038ResetUserNotAvailable });
                             //return AppUtils.Standerdlogin("Reset confirmed");
                         }
-                        var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+
+                        if (user.EmailConfirmed)
+                        {
+                            return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirm, ErrorCode = enErrorCode.Status4041ResetPasswordConfirm });
+                        }
+
+                        string hashedNewPassword = string.Empty;
+
+                        hashedNewPassword = _userManager.PasswordHasher.HashPassword(user, model?.Password);
+
+                        user.PasswordHash = hashedNewPassword;
+                        user.EmailConfirmed = true;
+                        var result = await _userManager.UpdateAsync(user);
+
                         if (result.Succeeded)
                         {
-                            //return Ok("Reset confirmed");
-                            return Ok(new ResetPassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetConfirmed });
+                            SendEmailRequest request = new SendEmailRequest();
+                            request.Recepient = model.Email;
+                            request.Subject = EnResponseMessage.ResetPasswordMail;
+                            request.Body = EnResponseMessage.EmailNewPassword + " : " + model.Password;
+
+                            await _mediator.Send(request);
+                            return Ok(new ResetPassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetResendEmail });
                         }
                     }
                     else
                     {
-                        return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailLink, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetPasswordEmailExpire, ErrorCode = enErrorCode.Status4039ResetPasswordLinkExpired });
                     }
-
-
-
-
-
                 }
                 else
                 {
-                    return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignEmailLink, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetPasswordEmailLinkBlank, ErrorCode = enErrorCode.Status4040ResetPasswordLinkempty });
                 }
-                return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetConfirmed, ErrorCode = enErrorCode.Status400BadRequest });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
                 return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
+
+            return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = "null", ErrorCode = enErrorCode.Status400BadRequest });
         }
 
         #region Logout        

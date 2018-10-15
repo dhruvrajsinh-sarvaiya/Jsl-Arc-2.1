@@ -16,12 +16,13 @@ namespace CleanArchitecture.Core.Entities.Wallet
 
         [Required]
         [StringLength(50)]
-        public string Guid { get; set; }
+        public Guid Guid { get; set; }
 
         [Required]
         public byte TrnType { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
         [Required]
@@ -44,14 +45,13 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public long MemberID { get; set; }
 
         [Required]
-        [StringLength(5)]
-
+        [StringLength(50)]
         public string TimeStamp { get; set; }
 
         public byte Status { get; set; }
 
         [Required]
-        [StringLength(5)]
+        [StringLength(50)]
         public string StatusMsg { get; set; }
     }
 }
