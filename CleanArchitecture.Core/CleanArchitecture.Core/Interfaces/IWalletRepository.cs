@@ -23,6 +23,8 @@ namespace CleanArchitecture.Core.Interfaces
         bool WalletDeductionwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq);
         List<WalletMasterResponse> ListWalletMasterResponse(long UserId);
 
+        List<AddressMasterResponse> ListAddressMasterResponse(string AccWaletID); //Rushabh 15-10-2018
+
         List<WalletMasterResponse> GetWalletMasterResponseByCoin(long UserId, string coin);
 
         List<WalletMasterResponse> GetWalletMasterResponseById(long UserId, string coin,string walletId);
@@ -36,6 +38,8 @@ namespace CleanArchitecture.Core.Interfaces
         void CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID);
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
+
+
 
     }
 }
