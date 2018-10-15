@@ -31,8 +31,9 @@ namespace CleanArchitecture.Core.ApiModels
         public long AppTypeID { get; set; } //Rushabh Updated 11-10-2018 oldName=AppType
         public decimal MinimumAmountItem { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
         public decimal MaximumAmountItem { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
-        public decimal MinimumAmountService { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
-        public decimal MaximumAmountService { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
+        //Rushabh Updated 15-10-2018 As query doesn't return these parameters anymore
+        //public decimal MinimumAmountService { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
+        //public decimal MaximumAmountService { get; set; } //Rushabh Updated 11-10-2018 old datatype=long
 
     }
 

@@ -88,6 +88,7 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -154,14 +155,20 @@ namespace CleanArchitecture.Web.API
             //Response.ReturnCode = enResponseCode.Success;
             return returnDynamicResult(Response);
         }
-
-        [HttpGet("GetVolumeData")]
-        public IActionResult GetVolumeData()
+        [HttpGet("GetVolumeData/{BasePair}")]
+        public IActionResult GetVolumeData(string BasePair)
         {
             GetVolumeDataResponse Response = new GetVolumeDataResponse();
             try
             {
-                var responsedata = _frontTrnService.GetVolumeData();
+                long BasePairId = _frontTrnService.GetBasePairIdByName(BasePair);
+                if (BasePairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                var responsedata = _frontTrnService.GetVolumeData(BasePairId);
                 if (responsedata != null)
                 {
                     Response.ReturnCode = enResponseCode.Success;
@@ -170,6 +177,7 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -180,6 +188,7 @@ namespace CleanArchitecture.Web.API
                 return Ok(Response);
             }
         }
+
 
         [HttpPost("GetTradeHistory/{Pair}/{Trade}/{FromDate}/{ToDate}/{Status}/{PageSize}/{MarketType}")]
         [Authorize]
@@ -373,7 +382,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("GetBuyerBook/{Pair}")]
+        [HttpGet("GetBuyerBook/{Pair}")]
         public ActionResult GetBuyerBook(string Pair)
         {
             GetBuySellBookResponse Response = new GetBuySellBookResponse();
@@ -382,14 +391,14 @@ namespace CleanArchitecture.Web.API
                 if (!_frontTrnService.IsValidPairName(Pair))
                 {
                     Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
                     return Ok(Response);
                 }
                 long id = _frontTrnService.GetPairIdByName(Pair);
                 if (id == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(Response);
                 }
                 Response.response = _frontTrnService.GetBuyerBook(id);
@@ -405,7 +414,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("GetSellerBook/{Pair}")]
+        [HttpGet("GetSellerBook/{Pair}")]
         public ActionResult GetSellerBook(string Pair)
         {
             GetBuySellBookResponse Response = new GetBuySellBookResponse();
@@ -414,17 +423,49 @@ namespace CleanArchitecture.Web.API
                 if (!_frontTrnService.IsValidPairName(Pair))
                 {
                     Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
                     return Ok(Response);
                 }
                 long id = _frontTrnService.GetPairIdByName(Pair);
                 if (id == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode = enErrorCode.InvalidPairName;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(Response);
                 }
                 Response.response = _frontTrnService.GetSellerBook(id);
+                Response.ReturnCode = enResponseCode.Success;
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+
+        }
+
+        [HttpGet("GetTradePairByName{Pair}")]
+        public ActionResult GetTradePairByName(string Pair)
+        {
+            TradePairByNameResponse Response = new TradePairByNameResponse();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(Response);
+                }
+                Response.response = _frontTrnService.GetTradePairByName(id);
                 Response.ReturnCode = enResponseCode.Success;
                 return Ok(Response);
             }
