@@ -924,5 +924,27 @@ namespace CleanArchitecture.Infrastructure.Services
             var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType);
             return count;
         }
+
+        public BizResponseClass GetWalletCreditNew(string coinName, string timestamp, byte trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long OPRefNo, long isFullSettled)
+        {
+            try
+            {
+                WalletMaster dWalletobj;
+                string remarks = "";
+                WalletTypeMaster walletTypeMaster;
+                //long walletTypeID;
+                BizResponseClass resp = new BizResponseClass();
+
+
+                return resp;
+
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
     }
 }
