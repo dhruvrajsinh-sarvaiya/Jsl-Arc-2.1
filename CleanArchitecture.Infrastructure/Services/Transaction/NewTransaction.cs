@@ -101,7 +101,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             decimal Amount2 = 0;
             //string MemberMobile1 = "";            
             NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
-            long TrnNo = 0;
+            //long TrnNo = 0;
             try
             {
                 if (Req.TrnType == enTrnType.Buy_Trade)
@@ -212,9 +212,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
                 }
                 Req.Status = enTransactionStatus.Initialize;
-                InsertTransactionInQueue(Req, ref TrnNo);
-                _TradeTransactionObj.TrnNo = TrnNo;
-                Req.TrnNo = TrnNo;
+                InsertTransactionInQueue(Req);//ref TrnNo
+                //_TradeTransactionObj.TrnNo = TrnNo;                
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
                     InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
@@ -232,13 +231,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public BizResponse MarkSystemFailTransaction(NewTransactionRequestCls Req, NewTradeTransactionRequestCls _TradeTransactionObj, enErrorCode ErrorCode)
         {
-            long TrnNo = 0;
+            //long TrnNo = 0;
             try
             {
                 Req.Status = enTransactionStatus.SystemFail;
-                InsertTransactionInQueue(Req, ref TrnNo);
-                _TradeTransactionObj.TrnNo = TrnNo;
-                Req.TrnNo = TrnNo;
+                InsertTransactionInQueue(Req);//ref TrnNo
+                //_TradeTransactionObj.TrnNo = Req.TrnNo;                
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
                     InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
@@ -253,7 +251,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
         }
-        public BizResponse InsertTransactionInQueue(NewTransactionRequestCls NewtransactionReq, ref long TrnNo)
+        public BizResponse InsertTransactionInQueue(NewTransactionRequestCls NewtransactionReq)//ref long TrnNo
         {
             _Resp = new BizResponse();
             try
@@ -276,7 +274,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 };
                 _TransactionRepository.Add(Newtransaction);
                 NewtransactionReq.TrnNo = Newtransaction.Id;
-                TrnNo = Newtransaction.Id;
+                NewtransactionReq.GUID = Newtransaction.GUID;
+                //TrnNo = Newtransaction.Id;
 
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
@@ -295,7 +294,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 var Newtransaction = new TradeTransactionQueue()
                 {
-                    TrnNo = NewTradetransactionReq.TrnNo,
+                    TrnNo = NewtransactionReq.TrnNo,//NewTradetransactionReq.TrnNo,
                     TrnType = Convert.ToInt16(NewtransactionReq.TrnType),
                     TrnTypeName = NewTradetransactionReq.TrnTypeName,
                     MemberID = NewtransactionReq.MemberID,
