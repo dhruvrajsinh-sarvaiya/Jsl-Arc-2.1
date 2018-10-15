@@ -22,6 +22,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public byte TrnType { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
         [Required]
@@ -51,7 +52,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public byte Status { get; set; }
 
         [Required]
-        [StringLength(5)]
+        [StringLength(50)]
         public string StatusMsg { get; set; }
     }
 }
