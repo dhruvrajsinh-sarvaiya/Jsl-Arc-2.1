@@ -13,8 +13,8 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Required]
         public long OrderID { get; set; }
 
-        [Required]
-        public DateTime UpdatedDate { get; set; }
+        //[Required]
+        public DateTime? UpdatedDate { get; set; }
 
         [Required]
         public DateTime TrnDate { get; set; }
@@ -26,6 +26,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public long DWalletID { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
         [Required]
@@ -40,7 +41,9 @@ namespace CleanArchitecture.Core.Entities.Wallet
 
         public byte Status { get; set; }
 
+
         [Required]
+        [StringLength(50)]
         public string StatusMsg { get; set; }
     }
 }

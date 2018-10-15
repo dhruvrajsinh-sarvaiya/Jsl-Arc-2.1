@@ -29,35 +29,35 @@ namespace CleanArchitecture.Web.API
             _basePage = basePage;
         }
         //[Authorize]
-        private ActionResult returnDynamicResult(dynamic respObjJson)
-        {
-            i++;
-            if (i % 2 == 0)
-            {
-                return Ok(respObjJson);
-            }
-            else if (i % 3 == 0)
-            {
-                return BadRequest();
-            }
-            else if (i % 5 == 0)
-            {
-                return Unauthorized();
-            }
-            else if (i % 7 == 0)
-            {
-                return NotFound();
-            }
-            else if (i % 9 == 0)
-            {
-                return NoContent();
-            }
-            else
-            {
-                return Ok(respObjJson);
-            }
+        //private ActionResult returnDynamicResult(dynamic respObjJson)
+        //{
+        //    i++;
+        //    if (i % 2 == 0)
+        //    {
+        //        return Ok(respObjJson);
+        //    }
+        //    else if (i % 3 == 0)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    else if (i % 5 == 0)
+        //    {
+        //        return Unauthorized();
+        //    }
+        //    else if (i % 7 == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    else if (i % 9 == 0)
+        //    {
+        //        return NoContent();
+        //    }
+        //    else
+        //    {
+        //        return Ok(respObjJson);
+        //    }
 
-        } 
+        //} 
 
 
         //[HttpGet("{coin}/{id}")]

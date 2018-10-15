@@ -87,7 +87,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _walletTypeMaster.IsTransactionWallet = addWalletTypeMasterRequest.IsTransactionWallet;
                 _walletTypeMaster.IsWithdrawalAllow = addWalletTypeMasterRequest.IsWithdrawalAllow;
                 _walletTypeMaster.WalletTypeName = addWalletTypeMasterRequest.WalletTypeName;
-                _walletTypeMaster.Discription = addWalletTypeMasterRequest.Discription;
+                _walletTypeMaster.Discription = addWalletTypeMasterRequest.Description;
                 _walletTypeMaster.Status = Convert.ToInt16(ServiceStatus.Active);
                 _WalletTypeMasterRepository.Add(_walletTypeMaster);
                     walletTypeMasterResponse.walletTypeMaster = _walletTypeMaster;
@@ -128,7 +128,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     _walletTypeMaster.IsTransactionWallet = updateWalletTypeMasterRequest.IsTransactionWallet;
                     _walletTypeMaster.IsWithdrawalAllow = updateWalletTypeMasterRequest.IsWithdrawalAllow;
                     _walletTypeMaster.WalletTypeName = updateWalletTypeMasterRequest.WalletTypeName;
-                    _walletTypeMaster.Discription = updateWalletTypeMasterRequest.Discription;
+                    _walletTypeMaster.Discription = updateWalletTypeMasterRequest.Description;
                     _walletTypeMaster.Status = updateWalletTypeMasterRequest.Status;
 
                     _WalletTypeMasterRepository.Update(_walletTypeMaster);

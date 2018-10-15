@@ -112,7 +112,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                 {
                     Id = IpAddress.Id,
                     UserId = IpAddress.UserId,
-                    IpAddress = IpAddress.IpAddress,
+                    IpAddress = model.IpAddress,
                     IsEnable = IpAddress.IsEnable,
                     //IsDeleted = IpAddress.IsDeleted,                    
                     UpdatedDate = DateTime.UtcNow,
@@ -130,18 +130,18 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && !i.IsDeleted);
             if (IpAddress != null)
             {
-                var currentIpAddress = new IpMaster
-                {
-                    Id = IpAddress.Id,
-                    UserId = IpAddress.UserId,
-                    //IpAddress = IpAddress.IpAddress,
-                    //IsEnable = IpAddress.IsEnable,
-                    IsDeleted = true,
-                    UpdatedDate = DateTime.UtcNow,
-                    UpdatedBy = IpAddress.UserId
-                };
-
-                _ipMasterRepository.Update(currentIpAddress);
+                //var currentIpAddress = new IpMaster
+                //{
+                //    Id = IpAddress.Id,
+                //    UserId = IpAddress.UserId,
+                //    //IpAddress = IpAddress.IpAddress,
+                //    //IsEnable = IpAddress.IsEnable,
+                //    IsDeleted = true,
+                //    UpdatedDate = DateTime.UtcNow,
+                //    UpdatedBy = IpAddress.UserId
+                //};
+                IpAddress.SetAsIpDeletetatus();
+                _ipMasterRepository.Update(IpAddress);
                 //_dbContext.SaveChanges();
 
             }

@@ -6,7 +6,8 @@ namespace CleanArchitecture.Core.ApiModels
 {
     public class CreditWalletDrArryTrnID
     {
-        public string DrTrnRefNo { get; set; }
+        public long DrTrnRefNo { get; set; }
         public decimal Amount { get; set; }
+        public long dWalletId { get; set; }
     }
 }

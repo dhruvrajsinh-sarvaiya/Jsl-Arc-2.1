@@ -44,9 +44,9 @@ namespace CleanArchitecture.Infrastructure.Services
 
             thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(thirdpartyID);
             var SerProconfigID= _serviceProviderDetail.GetSingle(item => item.Id == serproDetailID).ServiceProConfigID;
-            ServiceProConfiguration = _ServiceProConfiguration.GetSingle(item=>item.Id== SerProconfigID);
-            
+            ServiceProConfiguration = _ServiceProConfiguration.GetSingle(item=>item.Id== SerProconfigID);            
             routeConfiguration = _routeRepository.GetById(routeID);
+
 
             thirdPartyAPIRequest.RequestURL = thirdPartyAPIConfiguration.APISendURL;
             thirdPartyAPIRequest.RequestBody = thirdPartyAPIConfiguration.APIRequestBody;

@@ -14,7 +14,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletConfiguration
 
         [Required(ErrorMessage = "1,Please Enter Required parameters,4202")]
         [StringLength(100, ErrorMessage = "1,Please enter a valid parameters,4203")]
-        public string Discription { get; set; }
+        public string Description { get; set; }
 
         [Required(ErrorMessage = "1,Please Enter Required parameters,4204")]
         public short IsDepositionAllow { get; set; }
