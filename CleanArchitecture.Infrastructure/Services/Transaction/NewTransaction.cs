@@ -33,13 +33,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ILogger<NewTransaction> _log;
        public BizResponse _CreateTransactionResp;
        public TradePairMaster _TradePairObj;
-
+        private readonly IWalletService _WalletService;
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository,
             ICommonRepository<ServiceMaster> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository,
-            EFCommonRepository<TradeStopLoss> tradeStopLoss)
+            EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -48,18 +48,19 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _ServiceConfi = ServiceConfi;
             _AddressMasterRepository = AddressMasterRepository;
             _TradeStopLoss = tradeStopLoss;
+            _WalletService = WalletService;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
         {
             _Resp = new BizResponse();
-           //Task<BizResponse> MethodRespTsk = CombineAllInitTransactionAsync(Req);
+            NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
 
-            _Resp = CreateTransaction(Req);
+            _Resp = CreateTransaction(Req, _TradeTransactionObj);
             if (_Resp.ReturnCode != enResponseCodeService.Success)
             {
                 return _Resp;
             }
-            var myResp = new Task(async () => CombineAllInitTransactionAsync(Req));
+            var myResp = new Task(async () => CombineAllInitTransactionAsync(Req, _TradeTransactionObj));
 
             return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
             //_Resp = await MethodRespTsk;
@@ -68,24 +69,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             //return _Resp;
         }
 
-        public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req)
+        public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req, NewTradeTransactionRequestCls _TradeTransactionObj)
         {
-           // Thread.Sleep(10000);
-            _Resp = new BizResponse();            
-            //if (Req.ordertype== enTransactionMarketType.LIMIT)
-            //    return null;
-            //=========================INSERT
-            //Take memberMobile for sms
-            //_Resp = CreateTransaction(Req);
-            //if (_Resp.ReturnCode != enResponseCodeService.Success)
-            //{
-            //    return _Resp;
-            //}
+          
+            _Resp = new BizResponse();
             //=========================PROCESS
             //Check balance here
             var Validation=ValidateTransaction(Req);
-          
-            if(await Validation) //validation and balance check success
+            var BalResult = _WalletService.WalletBalanceCheck(0, 0);
+
+            if (await Validation && BalResult) //validation and balance check success
             {
     
             }
@@ -94,13 +87,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
 
         #region RegionInitTransaction    
-        public BizResponse CreateTransaction(NewTransactionRequestCls Req)
+        public BizResponse CreateTransaction(NewTransactionRequestCls Req, NewTradeTransactionRequestCls _TradeTransactionObj)
         {
             //long DeliveryWalletID = 0;           
             //string INRSMSCode = "INR";
             decimal Amount2 = 0;
             //string MemberMobile1 = "";            
-            NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
+            //NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
             //long TrnNo = 0;
             try
             {
@@ -182,12 +175,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 //    Req.StatusMsg = EnResponseMessage.CreateTrn_NoDebitAccountFoundMsg;
                 //    return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrn_NoDebitAccountFound);
                 //}
-                var DuplicateTxn=_TransactionRepository.GetSingle(item => item.MemberMobile == Req.MemberMobile && item.TransactionAccount == Req.TransactionAccount && item.Amount==Req.Amount && item.TrnDate.AddMinutes(10) > Helpers.UTC_To_IST());
-                if(DuplicateTxn != null)
+                if (Req.TrnType != enTrnType.Buy_Trade && Req.TrnType != enTrnType.Sell_Trade && Req.SMSCode != "IMP") //not for trade and MNTR txn
                 {
-                    Req.StatusMsg = EnResponseMessage.CreateTrnDuplicateTrnMsg;
-                    return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnDuplicateTrn);
+                    var DuplicateTxn = _TransactionRepository.GetSingle(item => item.MemberMobile == Req.MemberMobile && item.TransactionAccount == Req.TransactionAccount && item.Amount == Req.Amount && item.TrnDate.AddMinutes(10) > Helpers.UTC_To_IST());
+                    if (DuplicateTxn != null)
+                    {
+                        Req.StatusMsg = EnResponseMessage.CreateTrnDuplicateTrnMsg;
+                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnDuplicateTrn);
+                    }
                 }
+                 
                 if(Req.Amount<0)
                 {
                     Req.StatusMsg = EnResponseMessage.CreateTrnInvalidAmountMsg;
@@ -353,6 +350,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         #region RegionProcessTransaction
         public Task<Boolean> ValidateTransaction(NewTransactionRequestCls Req)
         {
+            //Member Service Disable check here for regular txn
+
+
             return Task.FromResult(true);
         }
         #endregion
