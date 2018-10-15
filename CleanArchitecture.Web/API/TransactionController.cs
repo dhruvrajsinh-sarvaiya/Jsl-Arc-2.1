@@ -142,6 +142,7 @@ namespace CleanArchitecture.Web.API
 
             Response.response = new CreateOrderInfo()
             {
+                TrnID=Req.GUID
                 //order_id = 1000001,
                 //pair_name = "ltcusd",
                 //price = 10,
