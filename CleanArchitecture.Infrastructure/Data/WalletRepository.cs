@@ -266,23 +266,48 @@ namespace CleanArchitecture.Infrastructure.Data
             return response;
         }
 
-        public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq)
+        public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq,byte AddorUpdate)//1=add,2=update
         {
-            WalletTransactionQueue w = new WalletTransactionQueue();
-
-            _dbContext.WalletTransactionQueues.Add(wtq);
-            _dbContext.SaveChanges();
+            //WalletTransactionQueue w = new WalletTransactionQueue();
+            if(AddorUpdate==1)
+            {
+                _dbContext.WalletTransactionQueues.Add(wtq);
+            }
+            else
+            {
+                _dbContext.Entry(wtq).State = EntityState.Modified;
+            }      
             return wtq;
         }
-
-        public void CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+       public  WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate)//1=add,2=update)
         {
-            //for (int t=0;t<=arryTrnID.Length;t++)
-            //{ 
-            //(from u in _dbContext.WalletTransactionQueues
-            // where u.TrnRefNo == arryTrnID[0]  && u.Status == 4
-            // select u).Count();
-            //}
+            if (AddorUpdate == 1)
+            {
+                _dbContext.WalletTransactionOrders.Add(wo);
+            }
+            else
+            {
+                _dbContext.Entry(wo).State = EntityState.Modified;
+            }
+            return wo;
+        }
+
+        public bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+        {
+            bool i = false;
+            for (int t = 0; t <= arryTrnID.Length-1; t++)
+            {
+              var response = (from u in _dbContext.WalletTransactionQueues
+                                where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.Status == 4 && u.TrnType==1
+                                select u);
+                if (response.Count()!=1)
+                {
+                    i = false;
+                    return i;
+                }
+                i = true;
+            }
+            return i;
         }
     }
 }
