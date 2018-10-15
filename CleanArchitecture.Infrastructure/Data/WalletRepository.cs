@@ -256,5 +256,13 @@ namespace CleanArchitecture.Infrastructure.Data
                                              select u).Count();
             return response;
         }
+
+        public int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType)
+        {
+            int response = (from u in _dbContext.WalletTransactionQueues
+                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType && u.Status == 4
+                            select u).Count();
+            return response;
+        }
     }
 }
