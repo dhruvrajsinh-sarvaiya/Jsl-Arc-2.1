@@ -13,8 +13,8 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Required]
         public long OrderID { get; set; }
 
-        [Required]
-        public DateTime UpdatedDate { get; set; }
+        //[Required]
+        public DateTime? UpdatedDate { get; set; }
 
         [Required]
         public DateTime TrnDate { get; set; }
