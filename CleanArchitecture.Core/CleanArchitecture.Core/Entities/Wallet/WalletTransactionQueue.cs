@@ -45,8 +45,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public long MemberID { get; set; }
 
         [Required]
-        [StringLength(5)]
-
+        [StringLength(50)]
         public string TimeStamp { get; set; }
 
         public byte Status { get; set; }
