@@ -67,6 +67,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletAllowTrn> WalletAllowTrns { get; set; }
         public DbSet<WalletTransactionOrder> WalletTransactionOrders { get; set; }
         public DbSet<WalletTransactionQueue> WalletTransactionQueues { get; set; }
+        public DbSet<TrnAcBatch> TrnAcBatch { get; set; }
+
 
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
@@ -80,6 +82,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ThirdPartyAPIConfiguration> ThirdPartyAPIConfiguration { get; set; }
         public DbSet<ThirdPartyAPIResponseConfiguration> ThirdPartyAPIResponseConfiguration { get; set; }
         public DbSet<TradePoolMaster > TradePoolMaster { get; set; }
+        public DbSet <TradeCancelQueue> TradeCancelQueue { get; set; }
 
         public DbQuery<TradeHistoryResponce> TradeHistoryInfo { get; set; } //komal 11-10-2018
         public DbQuery<RecentOrderRespose> RecentOrderRespose { get; set; } //komal 12-10-2018
@@ -100,6 +103,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceProviderType> ServiceProviderType { get; set; }
         public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
         public DbSet<TradeStopLoss> TradeStopLoss { get; set; }
+
 
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {

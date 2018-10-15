@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.Entities;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.SharedKernel;
 using System;
@@ -27,6 +28,12 @@ namespace CleanArchitecture.Core.Interfaces
         List<WalletMasterResponse> GetWalletMasterResponseById(long UserId, string coin,string walletId);
 
         int CheckTrnRefNo(long TrnRefNo, byte TrnType);
+
+        int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType);
+
+        WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq);
+
+        void CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID);
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
 

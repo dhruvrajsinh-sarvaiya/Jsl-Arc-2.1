@@ -924,5 +924,80 @@ namespace CleanArchitecture.Infrastructure.Services
             var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType);
             return count;
         }
+
+        public WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, byte trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, long isFullSettled, byte orderType)
+        {
+            WalletTransactionQueue tqObj = new WalletTransactionQueue();
+            try
+            {
+                WalletMaster dWalletobj;
+                string remarks = "";
+                WalletTypeMaster walletTypeMaster;
+                //long walletTypeID;
+                WalletDrCrResponse resp = new WalletDrCrResponse();
+
+                if (string.IsNullOrEmpty(crAccWalletID) || coinName == string.Empty || userID == 0)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidWalletOrUserIDorCoinName };
+                }
+                walletTypeMaster = _WalletTypeMasterRepository.GetSingle(e => e.WalletTypeName == coinName);
+                if (walletTypeMaster == null)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidCoinName };
+                }
+                dWalletobj = _commonRepository.GetSingle(e => e.UserID == userID && e.WalletTypeID == walletTypeMaster.Id && e.AccWalletID == crAccWalletID);
+                if (dWalletobj == null)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DefaultWallet404, ErrorCode = enErrorCode.DefaultWalletNotFound };
+                }
+                if (dWalletobj.Status != 1 || dWalletobj.IsValid == false)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
+                }
+                if (orderType != 2) // buy 
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTrnType, ErrorCode = enErrorCode.InvalidTrnType };
+                }
+               
+                //WalletTransactionQueue
+                if (TrnRefNo == 0) // buy
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo };
+                }
+                if (TotalAmount<=0)
+                {
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid().ToString(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 2, EnResponseMessage.InvalidAmt);
+                    tqObj= _walletRepository1.AddIntoWalletTransactionQueue(tqObj);
+
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo,TrnNo= tqObj.TrnNo,Status= tqObj.Status,StatusMsg= tqObj.StatusMsg };
+                }
+                //CreditWalletDrArryTrnID[] arryTrnID
+                int count = CheckTrnRefNoForCredit(TrnRefNo, orderType);
+                if (count == 0)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist };
+                }
+                
+                return resp;
+
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType)
+        {
+            var count = _walletRepository1.CheckTrnRefNoForCredit(TrnRefNo, TrnType);
+            return count;
+        }
+
+        public void CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+        {
+            _walletRepository1.CheckarryTrnID(arryTrnID);
+           // return count;
+        }
     }
 }

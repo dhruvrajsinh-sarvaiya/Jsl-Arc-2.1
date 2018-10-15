@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Interfaces;
@@ -255,6 +256,31 @@ namespace CleanArchitecture.Infrastructure.Data
                                              where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
                                              select u).Count();
             return response;
+        }
+
+        public int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType)
+        {
+            int response = (from u in _dbContext.WalletTransactionQueues
+                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType && u.Status == 4
+                            select u).Count();
+            return response;
+        }
+
+        public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq)
+        {
+            WalletTransactionQueue w = new WalletTransactionQueue();
+             _dbContext.WalletTransactionQueues.Add(wtq);           
+            return wtq;
+        }
+
+        public void CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+        {
+            //for (int t=0;t<=arryTrnID.Length;t++)
+            //{ 
+            //(from u in _dbContext.WalletTransactionQueues
+            // where u.TrnRefNo == arryTrnID[0]  && u.Status == 4
+            // select u).Count();
+            //}
         }
     }
 }

@@ -129,16 +129,18 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     else if (Status ==9)
                     {
                         Result = _dbContext.TradeHistoryInfo.FromSql(
-                            @" Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice  
-                                WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,TTQ.StatusMsg as StatusText, 
-                                TTQ.PairID,TQ.ChargeRs,0 As IsCancelled from  TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo 
-                                WHERE TTQ.PairID =1 AND TTQ.MemberID = 2 AND TTQ.TrnDate Between  DATEADD(day , -3,getdate()) and getdate() 
-                                TTQ.Status = 1 UNION ALL Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN  
-                                TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,CASE WHEN TTQ.TrnType = 4 THEN TCQ.PendingBuyQty else TCQ.DeliverQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status, 
-                                TCQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,1 as 'IsCancelled' from TradeCancelQueue TCQ INNER JOIN TradeTransactionQueue TTQ ON TTQ.TrnNo = TCQ.TrnNo 
-                                INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo WHERE TTQ.PairID = 1 AND TTQ.MemberID = 2 AND TTQ.TrnDate DATEADD(day , -3,getdate()) and getdate() and TCQ.Status = 1
-                                UNION ALL Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice WHEN TTQ.AskPrice=0 THEN TTQ.BidPrice END as Price,CASE WHEN TTQ.TrnType = 4  THEN TTQ.BuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SellQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,TTQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,TTQ.IsCancelled from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.TrnNo=TTQ.TrnNo WHERE TTQ.PairID=@PairID AND TTQ.MemberID=@MemberID AND TTQ.TrnDate Between @FromDate AND @ToDate AND TTQ.Status=3 
-                                Order By TTQ.TrnNo Desc");
+                            @"Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice 
+                                WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,TTQ.StatusMsg as StatusText,
+                                TTQ.PairID,TQ.ChargeRs,CAST(0 as smallint) As IsCancelled from  TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo
+                                WHERE TTQ.PairID ={0} AND TTQ.MemberID = {1} AND TTQ.TrnDate Between  {2} and {3} and TTQ.Status = {4} AND TTQ.TrnType={6}
+                                UNION ALL Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN 
+                                TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,CASE WHEN TTQ.TrnType = 4 THEN TCQ.PendingBuyQty else TCQ.DeliverQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,
+                                TCQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,CAST(1 as smallint) as 'IsCancelled' from TradeCancelQueue TCQ INNER JOIN TradeTransactionQueue TTQ ON TTQ.TrnNo = TCQ.TrnNo
+                                INNER JOIN TransactionQueue TQ ON TQ.Id  = TTQ.TrnNo WHERE TTQ.PairID = {0} AND TTQ.MemberID = {1} AND TTQ.TrnDate Between {2} and {3} and TCQ.Status = {4} AND TTQ.TrnType={6}
+                                UNION ALL Select TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice WHEN TTQ.AskPrice=0 THEN TTQ.BidPrice END as Price,
+                                CASE WHEN TTQ.TrnType = 4  THEN TTQ.BuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SellQty END as Amount,TTQ.TrnDate as DateTime,TTQ.Status,TTQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,TTQ.IsCancelled 
+                                from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id=TTQ.TrnNo WHERE TTQ.PairID={0} AND TTQ.MemberID={1} AND TTQ.TrnDate Between {2} and {3} AND TTQ.Status={5} AND TTQ.TrnType={6}
+                                Order By TTQ.TrnNo Desc", PairId ,MemberID ,fromDate ,Todate , Convert.ToInt16(enTransactionStatus.Success), Convert.ToInt16(enTransactionStatus.SystemFail),TrnType);
                     }
                     else
                     {
@@ -166,7 +168,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetBuySellBook> GetBuyerBook(long id)
         {
             IQueryable<GetBuySellBook> Result = _dbContext.BuyerSellerInfo.FromSql(
-                            @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount, TTQ.BidPrice * (Sum(TTQ.DeliveryTotalQty) - sum(TTQ.SettledBuyQty)) as Count
+                            @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount
                             From TradeTransactionQueue TTQ  where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group By TTQ.BidPrice Order By TTQ.BidPrice", id);
 
             return Result.ToList();
@@ -175,7 +177,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetBuySellBook> GetSellerBook(long id)
         {
             IQueryable<GetBuySellBook> Result = _dbContext.BuyerSellerInfo.FromSql(
-                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,TTQ.AskPrice* (sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty)) as Count from
+                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount from
                               TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
                               TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice order by TTQ.AskPrice ", id);
 

@@ -19,17 +19,17 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     }
     public class RateInfo
     {
-        [DataMember]
-        public decimal SellRate { get; set; }
-        [DataMember]
-        public decimal BuyRate { get; set; }
-        [DataMember]
-        public decimal Buy_Min_Price { get; set; }
-        [DataMember]
-        public decimal Buy_Max_Price { get; set; }
-        [DataMember]
-        public decimal Sell_Min_Price { get; set; }
-        [DataMember]
-        public decimal Sell_Max_Price { get; set; }
+        //[DataMember]
+        //public decimal SellRate { get; set; }
+        //[DataMember]
+        //public decimal BuyRate { get; set; }
+        //[DataMember]
+        //public decimal Buy_Min_Price { get; set; }
+        //[DataMember]
+        //public decimal Buy_Max_Price { get; set; }
+        //[DataMember]
+        //public decimal Sell_Min_Price { get; set; }
+        //[DataMember]
+        //public decimal Sell_Max_Price { get; set; }
     }
 }

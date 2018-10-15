@@ -59,7 +59,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 
     public class NewTradeTransactionRequestCls
     {
-        public long TrnNo { get; set; }
+        //public long TrnNo { get; set; }
         public string TrnTypeName { get; set; }
         public string PairName { get; set; }
         public long OrderWalletID { get; set; }
