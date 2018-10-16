@@ -5,6 +5,7 @@ using System.Text;
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
@@ -323,6 +324,72 @@ namespace CleanArchitecture.Infrastructure.Data
                                                      IsDefaultAddress = u.IsDefaultAddress,                                                  
                                                  }).AsEnumerable().ToList();
             return items;
+        }
+
+        //vsolanki 16-10-2018
+        public DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
+        {
+            List<HistoryObject> items = (from u in _dbContext.DepositHistorys
+                                         where u.userId == Userid && u.CreatedDate >= FromDate && u.CreatedDate <= ToDate && (Status==null ||(u.Status==Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))                                       
+                                         select new HistoryObject
+                                         {
+                                             CoinName = u.SMSCode,
+                                             Status = u.Status,
+                                             Information=u.StatusMsg,
+                                             Amount=u.Amount,
+                                             Date=u.CreatedDate,
+                                             Address=u.Address,
+                                             StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
+                                         }).AsEnumerable().ToList();
+            if(items.Count()==0)
+            {
+                return new DepositHistoryResponse()
+                {
+                    ReturnCode= enResponseCode.Fail,ReturnMsg= EnResponseMessage.NotFound,
+                    ErrorCode = enErrorCode.NotFound
+                };
+            }
+
+            return new DepositHistoryResponse()
+            {
+                ReturnCode = enResponseCode.Success,
+                ReturnMsg = EnResponseMessage.FindRecored,
+                histories=items
+            };
+        }
+
+        //vsolanki 16-10-2018
+        public DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
+        {
+            List<HistoryObject> items = (from u in _dbContext.TransactionQueue
+                                         where u.MemberID == Userid && u.TrnDate >= FromDate && u.TrnDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))
+                                         select new HistoryObject
+                                         {
+                                             CoinName = u.SMSCode,
+                                             Status = u.Status,
+                                             Information = u.StatusMsg,
+                                             Amount = u.Amount,
+                                             Date = u.CreatedDate,
+                                             Address=u.TransactionAccount,
+                                             StatusStr= (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
+                                         }).AsEnumerable().ToList();
+
+            if (items.Count() == 0)
+            {
+                return new DepositHistoryResponse()
+                {
+                    ReturnCode = enResponseCode.Fail,
+                    ReturnMsg = EnResponseMessage.NotFound,
+                    ErrorCode = enErrorCode.NotFound
+                };
+            }
+
+            return new DepositHistoryResponse()
+            {
+                ReturnCode = enResponseCode.Success,
+                ReturnMsg = EnResponseMessage.FindRecored,
+                histories = items
+            };
         }
     }
 }

@@ -39,6 +39,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
+        //  private readonly ICommonRepository<HistoryObject> _DepositHistoryRepository;
         //readonly IBasePage _BaseObj;
         private static Random random = new Random((int)DateTime.Now.Ticks);
         //vsolanki 10-10-2018 
@@ -818,7 +819,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public WalletTransactionOrder InsertIntoWalletTransactionOrder( DateTime? UpdatedDate, DateTime TrnDate, long OWalletID, long DWalletID, decimal Amount, string WalletType, long OTrnNo, long DTrnNo, byte Status, string StatusMsg)
+        public WalletTransactionOrder InsertIntoWalletTransactionOrder(DateTime? UpdatedDate, DateTime TrnDate, long OWalletID, long DWalletID, decimal Amount, string WalletType, long OTrnNo, long DTrnNo, byte Status, string StatusMsg)
         {
             WalletTransactionOrder walletTransactionOrder = new WalletTransactionOrder();
             //walletTransactionOrder.OrderID = OrderID;
@@ -1054,6 +1055,36 @@ namespace CleanArchitecture.Infrastructure.Services
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 AddressResponse.ReturnCode = enResponseCode.InternalError;
                 return AddressResponse;
+            }
+        }
+
+        //16-10-2018 vsolanki 
+        public DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
+        {
+            try
+            {
+                DepositHistoryResponse response = _walletRepository1.DepositHistoy(FromDate,ToDate,Coin,Amount,Status, Userid);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //16-10-2018 vsolanki 
+        public DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
+        {
+            try
+            {
+                DepositHistoryResponse response = _walletRepository1.WithdrawalHistoy(FromDate, ToDate, Coin, Amount, Status, Userid);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
             }
         }
     }
