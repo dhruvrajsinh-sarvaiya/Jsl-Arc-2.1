@@ -88,13 +88,25 @@ namespace CleanArchitecture.Web.API
         [HttpPost("disable2fa")]
         public async Task<IActionResult> Disable2fa()
         {
-            var user = await GetCurrentUserAsync();
-            user.TwoFactorEnabled = false;
-            await _userManager.UpdateAsync(user);
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                user.TwoFactorEnabled = false;
+                await _userManager.UpdateAsync(user);
 
-            _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
-            return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
-
+                _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
+                return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new TwoFactorAuthResponse
+                {
+                    ReturnCode = enResponseCode.InternalError,
+                    ReturnMsg = ex.ToString(),
+                    ErrorCode = enErrorCode.Status500InternalServerError
+                });
+            }
 
         }
 
@@ -124,7 +136,7 @@ namespace CleanArchitecture.Web.API
                 //    AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
                 //};
 
-              //  return Ok(model);
+                //  return Ok(model);
             }
             catch (Exception ex)
             {
