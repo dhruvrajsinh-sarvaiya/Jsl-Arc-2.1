@@ -23,16 +23,31 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _logger = logger;
         }
 
-        public List<ActiveOrderDataResponse> GetActiveOrder(long MemberID,long PairId)
+        public List<ActiveOrderDataResponse> GetActiveOrder(long MemberID, string sCondition, string FromDate, string ToDate, long PairId)
         {
+            string Qry = "";
+            IQueryable<ActiveOrderDataResponse> Result;
+            DateTime fDate, tDate;
             try
             {
-                IQueryable<ActiveOrderDataResponse> Result = _dbContext.ActiveOrderDataResponse.FromSql(
-                   @"Select TQ.Id,TQ.TrnDate,TTQ.TrnType As Type,TTQ.Order_Currency,TTQ.Delivery_Currency,
-                   CASE WHEN TTQ.BuyQty=0 THEN TTQ.SellQty WHEN TTQ.SellQty=0 THEN TTQ.BuyQty END as Amount,
-                   CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice WHEN TTQ.AskPrice=0 THEN TTQ.BidPrice END as Price,
-                   TTQ.IsCancelled from TransactionQueue TQ INNER JOIN TradeTransactionQueue TTQ ON TQ.Id=TTQ.TrnNo 
-                   Where TQ.Status={2} AND TQ.TrnType IN(4,5) And TQ.MemberID={0} AND TTQ.PairID={1}", MemberID, PairId, Convert.ToInt16(enTransactionStatus.Hold));
+                Qry = @"Select TQ.Id,TQ.TrnDate,TTQ.TrnType As Type,TTQ.Order_Currency,TTQ.Delivery_Currency, "+
+                   "CASE WHEN TTQ.BuyQty = 0 THEN TTQ.SellQty WHEN TTQ.SellQty = 0 THEN TTQ.BuyQty END as Amount, "+
+                   "CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price, "+
+                   "TTQ.IsCancelled from TransactionQueue TQ INNER JOIN TradeTransactionQueue TTQ ON TQ.Id = TTQ.TrnNo "+
+                   "Where "+ sCondition  +" AND TQ.Status ={2} And TQ.MemberID ={0} AND TTQ.PairID ={1} ";
+
+                
+
+
+                if (!string.IsNullOrEmpty(FromDate) && !string.IsNullOrEmpty(ToDate))
+                {
+                    fDate = DateTime.ParseExact(FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    tDate = DateTime.ParseExact(ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    Result = _dbContext.ActiveOrderDataResponse.FromSql(Qry
+                   , MemberID, PairId, Convert.ToInt16(enTransactionStatus.Hold),fDate ,tDate);
+                }
+                else
+                    Result = _dbContext.ActiveOrderDataResponse.FromSql(Qry,MemberID, PairId, Convert.ToInt16(enTransactionStatus.Hold));
 
                 return Result.ToList();
             }

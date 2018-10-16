@@ -105,7 +105,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
         public DbSet<TradeStopLoss> TradeStopLoss { get; set; }
         public virtual DbSet<IpMaster> IpMaster { get; set; }
-
+        public DbSet<TradeBuyRequest> TradeBuyRequest { get; set; }
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;

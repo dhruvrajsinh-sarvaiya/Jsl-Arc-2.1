@@ -275,11 +275,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId,int Page)
+        public List<ActiveOrderInfo> GetActiveOrder(long MemberID, string sCondition, string FromDate, string TodDate, long PairId, int Page)
         {
             try
             {
-                List<ActiveOrderDataResponse> ActiveOrderList = _frontTrnRepository.GetActiveOrder(MemberID, PairId);
+                List<ActiveOrderDataResponse> ActiveOrderList = _frontTrnRepository.GetActiveOrder(MemberID,sCondition ,FromDate ,TodDate, PairId);
                 List<ActiveOrderInfo> responceData = new List<ActiveOrderInfo>();
                 if (ActiveOrderList != null)
                 {

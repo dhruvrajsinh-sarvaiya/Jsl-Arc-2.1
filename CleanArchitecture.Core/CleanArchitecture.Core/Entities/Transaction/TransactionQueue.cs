@@ -66,7 +66,7 @@ namespace CleanArchitecture.Core.Entities
         //[Required]
         //public short Status { get; set; }
 
-        public short StatusCode { get; set; }
+        public long StatusCode { get; set; }
        
         public string StatusMsg { get; set; }
         [DefaultValue(0)]
@@ -119,7 +119,17 @@ namespace CleanArchitecture.Core.Entities
             Status = Convert.ToInt16(enTransactionStatus.Success);
             AddValueChangeEvent();
         }
-        public void SetTransactionCode(short statuscode)
+        public void MakeTransactionSystemFail()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.SystemFail);
+            AddValueChangeEvent();
+        }
+        public void MakeTransactionOperatorFail()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.OperatorFail);
+            AddValueChangeEvent();
+        }
+        public void SetTransactionCode(long statuscode)
         {
             StatusCode = statuscode;
             AddValueChangeEvent();

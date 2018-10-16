@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Transaction
@@ -20,5 +21,17 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public decimal Price { get; set; }
         public short IsCancelled { get; set; }
     }
-    
+    public class GetActiveOrderRequest
+    {
+        [Required]
+        public string Pair { get; set; }
+
+        public string OrderType { get; set; }
+
+        public string FromDate { get; set; }
+
+        public string ToDate { get; set; }
+
+        public int Page { get; set; }
+    }
 }

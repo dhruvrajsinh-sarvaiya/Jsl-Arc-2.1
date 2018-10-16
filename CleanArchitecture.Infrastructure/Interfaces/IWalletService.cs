@@ -36,7 +36,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         ListWalletResponse GetWalletById(long userid, string coin,string walletId);
 
-        BizResponseClass GetWalletDeductionNew(string coinName, string timestamp, byte orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType);
+        WalletDrCrResponse GetWalletDeductionNew(string coinName, string timestamp, enWalletTranxOrderType orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType);
 
         ListWalletAddressResponse ListAddress(string AccWalletID);
 
@@ -45,6 +45,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 16-10-2018
         DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
+
+        //ntrivedi 16-10-2018
+        WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType);
 
         //Rushabh 16-10-2018
         string SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request);

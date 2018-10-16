@@ -1,6 +1,8 @@
-﻿using CleanArchitecture.Core.SharedKernel;
+﻿using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -19,7 +21,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public Guid Guid { get; set; }
 
         [Required]
-        public byte TrnType { get; set; }
+        public enWalletTranxOrderType TrnType { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18, 8)")]
@@ -48,10 +50,14 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [StringLength(50)]
         public string TimeStamp { get; set; }
 
-        public byte Status { get; set; }
+        public enTransactionStatus Status { get; set; }
 
         [Required]
         [StringLength(50)]
         public string StatusMsg { get; set; }
+
+        [Column(TypeName = "decimal(18, 8)")]
+        [DefaultValue(0)]
+        public decimal SettedAmt { get; set; }
     }
 }

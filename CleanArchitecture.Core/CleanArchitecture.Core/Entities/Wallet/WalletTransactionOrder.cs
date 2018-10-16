@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -39,7 +40,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Required]
         public long DTrnNo { get; set; }
 
-        public byte Status { get; set; }
+        public enTransactionStatus Status { get; set; }
 
 
         [Required]

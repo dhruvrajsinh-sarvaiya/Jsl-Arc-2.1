@@ -77,13 +77,23 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _Resp = new BizResponse();
             //=========================PROCESS
             //Check balance here
-            var Validation=ValidateTransaction();
-            var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitWalletID); //DI of Wallet for balance check
+            var Validation=ValidateTransaction(_Resp);           
 
-            if (await Validation && BalResult) //validation and balance check success
+            if (!await Validation) //validation and balance check success
             {
-    
+                MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
+                return _Resp;
             }
+            var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitWalletID); //DI of Wallet for balance check
+            if (!BalResult) //validation and balance check success
+            {
+                _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InsufficientBalance;
+                _Resp.ReturnCode = enResponseCodeService.Fail;
+                _Resp.ErrorCode = enErrorCode.ProcessTrn_InsufficientBalance;
+                MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
+                return _Resp;
+            }
+
             //=========================UPDATE
             return null;
         }
@@ -349,12 +359,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         #endregion        
 
         #region RegionProcessTransaction
-        public Task<Boolean> ValidateTransaction()
+        public Task<Boolean> ValidateTransaction(BizResponse _Resp)
         {
             //Member Service Disable check here for regular txn
 
 
             return Task.FromResult(true);
+        }
+        public BizResponse MarkTransactionSystemFail(string StatusMsg,enErrorCode ErrorCode)
+        {
+            var Txn = _TransactionRepository.GetById(Req.TrnNo);
+            Txn.MakeTransactionSystemFail();
+            Txn.SetTransactionStatusMsg(StatusMsg);
+            Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
+            _TransactionRepository.Update(Txn);
+
+            return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal };
         }
         #endregion
 

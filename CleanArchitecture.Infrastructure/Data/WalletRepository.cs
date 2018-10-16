@@ -252,7 +252,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
 
-        public int CheckTrnRefNo(long TrnRefNo, byte TrnType)
+        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType)
         {
             int response = (from u in _dbContext.WalletTransactionQueues
                             where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
@@ -260,10 +260,10 @@ namespace CleanArchitecture.Infrastructure.Data
             return response;
         }
 
-        public int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType)
+        public int CheckTrnRefNoForCredit(long TrnRefNo, enWalletTranxOrderType TrnType) // need to check whether walleet is pre deducted for this order
         {
-            int response = (from u in _dbContext.WalletTransactionQueues
-                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType && u.Status == 4
+            int response = (from u in _dbContext.WalletTransactionQueues                            
+                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType && (u.Status == enTransactionStatus.Hold || u.Status == enTransactionStatus.Success)
                             select u).Count();
             return response;
         }
@@ -278,7 +278,8 @@ namespace CleanArchitecture.Infrastructure.Data
             else
             {
                 _dbContext.Entry(wtq).State = EntityState.Modified;
-            }      
+            }
+            _dbContext.SaveChanges();
             return wtq;
         }
        public  WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate)//1=add,2=update)
@@ -294,19 +295,34 @@ namespace CleanArchitecture.Infrastructure.Data
             return wo;
         }
 
-        public bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+        public bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID, string coinName)
         {
             bool i = false;
-            for (int t = 0; t <= arryTrnID.Length-1; t++)
+            for (int t = 0; t <= arryTrnID.Length - 1; t++)
             {
-              var response = (from u in _dbContext.WalletTransactionQueues
-                                where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.Status == 4 && u.TrnType==1
+                var response = (from u in _dbContext.WalletTransactionQueues                                
+                                where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.Status == enTransactionStatus.Hold && u.TrnType == Core.Enums.enWalletTranxOrderType.Debit
+                                && u.WalletType == coinName
                                 select u);
-                if (response.Count()!=1)
+                if (response.Count() != 1)
                 {
                     i = false;
                     return i;
                 }
+                // total delivered amount _ current amount must less or equals total debit amount
+                decimal deliveredAmt = (from p in _dbContext.WalletTransactionOrders
+                                        join u in _dbContext.WalletTransactionQueues on p.DTrnNo equals u.TrnNo
+                                        where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.TrnType == Core.Enums.enWalletTranxOrderType.Debit
+                                        && u.WalletType == coinName && p.Status != enTransactionStatus.SystemFail
+                                        select p).Sum(e => e.Amount);
+                if (!(response.ToList()[0].Amount - deliveredAmt - arryTrnID[t].Amount >= 0))
+                {
+                    i = false;
+                    return i;
+                }
+                arryTrnID[t].dWalletId = response.ToList()[0].WalletID;
+                arryTrnID[t].DrTQTrnNo = response.ToList()[0].TrnNo;
+
                 i = true;
             }
             return i;
@@ -392,23 +408,62 @@ namespace CleanArchitecture.Infrastructure.Data
                 histories = items
             };
         }
-
-        //Rushabh 16-10-2018
-        public List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID)
+        public bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID)
         {
-            List<WalletLimitConfigurationRes> items = (from u in _dbContext.WalletLimitConfiguration
-                                                       join c in _dbContext.WalletMasters
-                                                       on u.WalletId equals c.Id
-                                                       where c.AccWalletID == AccWaletID && u.Status == 1
-                                                       select new WalletLimitConfigurationRes
-                                                       {
-                                                           TrnType = u.TrnType,
-                                                           LimitPerDay = u.LimitPerDay,
-                                                           LimitPerHour = u.LimitPerHour,
-                                                           LimitPerTransaction = u.LimitPerTransaction,
-                                                           AccWalletID = c.AccWalletID
-                                                       }).AsEnumerable().ToList();
-            return items;
+            try
+            { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
+
+                _dbContext.Database.BeginTransaction();
+                //_dbContext.Set<WalletTransactionQueue>().Add(wtq);
+                //wl1.TrnNo = wtq.TrnNo;
+                var arrayObj = (from p in _dbContext.WalletTransactionOrders
+                                join q in arryTrnID on p.OrderID equals q.OrderID
+                                select p).ToList();
+                arrayObj.ForEach(e => e.Status = enTransactionStatus.Success);
+                arrayObj.ForEach(e => e.StatusMsg = "Success");
+
+                var arrayObjTQ = (from p in _dbContext.WalletTransactionQueues
+                                join q in arryTrnID on p.TrnNo equals q.DrTQTrnNo
+                                select new {p,q }).ToList();
+                arrayObjTQ.ForEach(e => e.p.SettedAmt = e.p.SettedAmt + e.q.Amount );
+                arrayObjTQ.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
+                arrayObjTQ.Where(d => d.p.SettedAmt == d.p.Amount).ToList().ForEach(e => e.p.Status = enTransactionStatus.Success);
+
+
+                _dbContext.Set<WalletLedger>().Add(wl1);
+                _dbContext.Set<TransactionAccount>().Add(ta1);
+                _dbContext.Entry(wm2).State = EntityState.Modified;
+                _dbContext.Entry(wtq).State = EntityState.Modified;
+                _dbContext.SaveChanges();
+                _dbContext.Database.CommitTransaction();
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                _dbContext.Database.RollbackTransaction();
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+
+
+            }
+        }
+        public DateTime UTC_To_IST()
+        {
+            try
+            {
+                DateTime myUTC = DateTime.UtcNow;
+                // 'Dim utcdate As DateTime = DateTime.ParseExact(DateTime.UtcNow, "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                // Dim utcdate As DateTime = DateTime.ParseExact(myUTC, "M/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+                // 'Dim utcdate As DateTime = DateTime.ParseExact("11/09/2016 6:31:00 PM", "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                DateTime istdate = TimeZoneInfo.ConvertTimeFromUtc(myUTC, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                // MsgBox(myUTC & " - " & utcdate & " - " & istdate)
+                return istdate;
+            }
+            catch (Exception ex)
+            {                
+                throw ex;
+            }
         }
     }
 }

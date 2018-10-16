@@ -156,6 +156,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidToDateFormate = 4505,
         InvalidMarketType = 4506,
         InValidPageNo = 4507,
+        ProcessTrn_InsufficientBalance = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -192,6 +193,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidTradeRefNo = 4036,
         AlredyExist=4037,
         InsufficantBal=4038,
+        UserIDWalletIDDidNotMatch = 4039
         
 
     }
@@ -272,5 +274,10 @@ namespace CleanArchitecture.Core.Enums
         MARKET = 2,
         STOP_LOSS = 3,
         SPOT = 4
+    }
+    public enum enWalletTranxOrderType
+    {
+        Debit = 1,
+        Credit = 2
     }
 }
