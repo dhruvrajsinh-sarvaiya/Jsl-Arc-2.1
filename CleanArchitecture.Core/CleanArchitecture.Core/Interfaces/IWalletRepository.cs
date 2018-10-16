@@ -40,8 +40,12 @@ namespace CleanArchitecture.Core.Interfaces
 
         bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID);
 
-        //vsolanki 16-10-2018
+        //vsolanki 16-10-2018 
         DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
+
+        //vsolanki 16-10-2018 
+        DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
+
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
 

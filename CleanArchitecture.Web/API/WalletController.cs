@@ -181,6 +181,7 @@ namespace CleanArchitecture.Web.API
                 return BadRequest();
             }
         }
+
         //vsolanki 2018-10-16
         [HttpGet("{FromDate}/{ToDate}")]
         public async Task<IActionResult> DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status)
@@ -200,6 +201,34 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     response = _walletService.DepositHistoy(FromDate,ToDate,Coin, Amount, Status,user.Id);
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("{FromDate}/{ToDate}")]
+        public async Task<IActionResult> WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status)
+        {
+            DepositHistoryResponse response = new DepositHistoryResponse();
+            try
+            {
+                //ApplicationUser user = new ApplicationUser();
+                //user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.ReturnCode = enResponseCode.Fail;
+                    response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.WithdrawalHistoy(FromDate, ToDate, Coin, Amount, Status, user.Id);
                 }
                 return Ok(response);
             }

@@ -42,5 +42,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 16-10-2018
         DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
+
+        //vsolanki 16-10-2018
+        DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
     }
 }
