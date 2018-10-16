@@ -1028,9 +1028,33 @@ namespace CleanArchitecture.Infrastructure.Services
             return obj;
         }
 
-        //ListWalletResponse IWalletService.GetWalletDeductionNew(string coinName, string timestamp, byte orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        //Rushabh 15-10-2018 List All Addresses Of Specified Wallet
+        public ListWalletAddressResponse ListAddress(string AccWalletID)
+        {
+            ListWalletAddressResponse AddressResponse = new ListWalletAddressResponse();
+            try
+            {
+                var WalletAddResponse = _walletRepository1.ListAddressMasterResponse(AccWalletID);
+                if (WalletAddResponse.Count == 0)
+                {
+                    AddressResponse.ReturnCode = enResponseCode.Fail;
+                    AddressResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    AddressResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    AddressResponse.AddressList = WalletAddResponse;
+                    AddressResponse.ReturnCode = enResponseCode.Success;
+                    AddressResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                return AddressResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                AddressResponse.ReturnCode = enResponseCode.InternalError;
+                return AddressResponse;
+            }
+        }
     }
 }

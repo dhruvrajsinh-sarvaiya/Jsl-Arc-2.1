@@ -208,14 +208,17 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
         }
 
-        public List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, long PairId, short TrnType, short Status, int PageSize, int MarketType, DateTime fromDate, DateTime Todate, int IsAll)
+        public List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll)
         {
             try
             {
-                var list = _frontTrnRepository.GetTradeHistory(MemberID, PairId, TrnType,Status ,PageSize ,MarketType ,fromDate ,Todate, IsAll);
+                List<TradeHistoryResponce> list = _frontTrnRepository.GetTradeHistory(MemberID, sCondition, FromDate, TodDate, page, IsAll);
                 List<GetTradeHistoryInfo> responce = new List<GetTradeHistoryInfo>();
+                int PageSize = 10;
+                int skip = PageSize * (page - 1);
                 if (list != null)
                 {
+                    list = list.Skip(skip).Take(PageSize).ToList();
                     foreach (TradeHistoryResponce model in list)
                     {
                         responce.Add(new GetTradeHistoryInfo

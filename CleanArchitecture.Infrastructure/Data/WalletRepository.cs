@@ -309,5 +309,22 @@ namespace CleanArchitecture.Infrastructure.Data
             }
             return i;
         }
+
+        public List<AddressMasterResponse> ListAddressMasterResponse(string AccWalletID)
+        {
+            List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
+                                                 join c in _dbContext.WalletMasters
+                                                 on u.WalletId equals c.Id
+                                                 where c.AccWalletID == AccWalletID
+                                                 select new AddressMasterResponse
+                                                 {
+                                                     //WalletId = u.WalletId,
+                                                     AddressLable = u.AddressLable,
+                                                     Address = u.Address,
+                                                     IsDefaultAddress = u.IsDefaultAddress,
+                                                     //SerProID = u.SerProID,                                                     
+                                                 }).AsEnumerable().ToList();
+            return items;
+        }
     }
 }

@@ -11,11 +11,13 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.ViewModels.WalletOperations;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using CleanArchitecture.Core.ViewModels.Wallet;
 
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
     //[ApiController]
+    [Authorize]
     public class WalletOperationsController : Controller
     {
         static int i = 1;
@@ -132,7 +134,6 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpPost("{Coin}/{AccWalletID}")]
-        [Authorize]
         public async Task<IActionResult> CreateWalletAddress(string Coin, string AccWalletID)/*[FromBody]CreateWalletAddressReq Request*/ /*Removed Temporarily as Not in use*/
         {
             try
@@ -142,6 +143,26 @@ namespace CleanArchitecture.Web.API
                 //CreateWalletAddressRes Response = new CreateWalletAddressRes();
                 //Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
                 //Response.ReturnCode = enResponseCode.Success;
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+
+
+
+        [HttpGet("{AccWalletID}")]
+        public async Task<IActionResult> ListWalletAddress(string AccWalletID)
+        {
+            try
+            {
+                ListWalletAddressResponse Response = _walletService.ListAddress(AccWalletID);
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
                 return Ok(respObjJson);

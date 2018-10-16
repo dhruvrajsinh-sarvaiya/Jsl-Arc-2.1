@@ -155,7 +155,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidFromDateFormate = 4504,
         InvalidToDateFormate = 4505,
         InvalidMarketType = 4506,
-
+        InValidPageNo = 4507,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
