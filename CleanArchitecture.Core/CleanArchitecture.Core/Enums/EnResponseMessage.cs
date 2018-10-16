@@ -43,8 +43,8 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateAddressFailMsg = "Failed to generate Address.";
         public static string InvalidWallet = "Invalid Wallet or wallet is disabled.";
         public static string ItemOrThirdprtyNotFound = "Unable to Process your request please contact admin.";
-        public static string FindRecored = "Successfully Find Recored";
-        public static string NotFound = "Not Found Recored";
+        public static string FindRecored = "Record Found Successfully!";
+        public static string NotFound = "Record Not Found";
         public static string RecordAdded = "Recored Added Successfully!";
         public static string RecordUpdated = "Recored Updated Successfully!";
         public static string RecordDisable = "Recored Disable Successfully!";
@@ -61,6 +61,8 @@ namespace CleanArchitecture.Core.Enums
         public static string InvalidTradeRefNo = "Invalid Trade RefNo.";
         public static string AlredyExist = "Duplicate Request for same Ref No.";
         public static string InsufficantBal = "Insufficeint Balance";
+        public static string SuccessDebit = "Balance Debited Successfully";
+
 
 
         //========================My Account===============================//
@@ -130,5 +132,6 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirm = "You have already confirm reset password link, please check in your mail if was not received mail then perform to forgot opration.";
         public static string ResetConfirmPassMatch = "New password and confirmation password do not match.";
         public static string ResetConfirmOldNotMatch = "Old password does not match";
+        public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
 {
@@ -29,11 +30,11 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
         public short Status { get; set; }
     }
 
-    public class IpAddressReqViewModel
+    public class IpAddressReqViewModel : TrackerViewModel
     {
-        [Required(ErrorMessage = "1,IPAddress Not Found,4019")]
-        [StringLength(15, ErrorMessage = "1,Invalid IPAddress,4020")]
-        public string IPAddress { get; set; }
+        [Required(ErrorMessage = "1,User selected ip address not found,4044")]
+        [StringLength(15, ErrorMessage = "1,Invalid user selected ip address,4045")]
+        public string SelectedIPAddress { get; set; }
     }
 
     public class IpAddressResponse : BizResponseClass
