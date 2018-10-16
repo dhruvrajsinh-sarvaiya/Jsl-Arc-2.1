@@ -274,7 +274,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId)
+        public List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId,int Page)
         {
             try
             {
@@ -282,6 +282,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 List<ActiveOrderInfo> responceData = new List<ActiveOrderInfo>();
                 if (ActiveOrderList != null)
                 {
+                    int PageSize = 10;
+                    int skip = PageSize * (Page - 1);
+                    ActiveOrderList = ActiveOrderList.Skip(skip).Take(PageSize).ToList();
                     foreach (ActiveOrderDataResponse model in ActiveOrderList)
                     {
                         responceData.Add(new ActiveOrderInfo
