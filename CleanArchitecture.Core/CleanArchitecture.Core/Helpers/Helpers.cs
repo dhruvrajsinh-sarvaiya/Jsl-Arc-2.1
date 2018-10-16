@@ -10,6 +10,7 @@ namespace CleanArchitecture.Core.Helpers
 {
     public static class Helpers
     {
+        public static int PageSize = 10;
         public static string JsonSerialize(object obj)
         {
             return JsonConvert.SerializeObject(obj,

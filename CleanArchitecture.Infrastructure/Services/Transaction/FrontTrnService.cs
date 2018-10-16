@@ -3,6 +3,7 @@ using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels;
@@ -214,11 +215,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 List<TradeHistoryResponce> list = _frontTrnRepository.GetTradeHistory(MemberID, sCondition, FromDate, TodDate, page, IsAll);
                 List<GetTradeHistoryInfo> responce = new List<GetTradeHistoryInfo>();
-                int PageSize = 10;
-                int skip = PageSize * (page - 1);
+                
                 if (list != null)
                 {
-                    list = list.Skip(skip).Take(PageSize).ToList();
+                    int skip = Helpers.PageSize * (page - 1);
+                    list = list.Skip(skip).Take(Helpers.PageSize).ToList();
                     foreach (TradeHistoryResponce model in list)
                     {
                         responce.Add(new GetTradeHistoryInfo
@@ -282,9 +283,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 List<ActiveOrderInfo> responceData = new List<ActiveOrderInfo>();
                 if (ActiveOrderList != null)
                 {
-                    int PageSize = 10;
-                    int skip = PageSize * (Page - 1);
-                    ActiveOrderList = ActiveOrderList.Skip(skip).Take(PageSize).ToList();
+                    int skip = Helpers.PageSize * (Page - 1);
+                    ActiveOrderList = ActiveOrderList.Skip(skip).Take(Helpers.PageSize).ToList();
                     foreach (ActiveOrderDataResponse model in ActiveOrderList)
                     {
                         responceData.Add(new ActiveOrderInfo
