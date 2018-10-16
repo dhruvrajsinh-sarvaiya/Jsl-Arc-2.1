@@ -356,6 +356,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
             return Task.FromResult(true);
         }
+        public BizResponse MarkTransactionSystemFail(string StatusMsg,enErrorCode ErrorCode)
+        {
+            var Txn = _TransactionRepository.GetById(Req.TrnNo);
+            Txn.MakeTransactionSystemFail();
+            Txn.SetTransactionStatusMsg(StatusMsg);
+            Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
+            _TransactionRepository.Update(Txn);
+
+            return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal };
+        }
         #endregion
 
 
