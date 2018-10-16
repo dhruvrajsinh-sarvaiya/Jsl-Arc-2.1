@@ -8,7 +8,7 @@ namespace CleanArchitecture.Core.Interfaces
 {
     public interface IFrontTrnService
     {
-        List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId);
+        List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId,int Page);
         List<BasePairResponse> GetTradePairAsset();
         List<VolumeDataRespose> GetVolumeData(long BasePairId);
         List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll);

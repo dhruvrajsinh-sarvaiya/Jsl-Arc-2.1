@@ -305,9 +305,9 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("GetActiveOrder/{Pair}")]  //GetActiveOrder
+        [HttpPost("GetActiveOrder/{Pair}/{Page:int}")]  //GetActiveOrder
         [Authorize]
-        public async Task<ActionResult> GetActiveOrder(string Pair)
+        public async Task<ActionResult> GetActiveOrder(string Pair,int Page)
         {
             GetActiveOrderResponse Response = new GetActiveOrderResponse();
             try
@@ -326,8 +326,14 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return BadRequest(Response);
                 }
-                long MemberID = user.Id;
-                Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId);
+                if (Page == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InValidPageNo;
+                    return BadRequest(Response);
+                }
+                long MemberID =user.Id;
+                Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId,Page);
                 if (Response.response.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;
@@ -415,22 +421,22 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("GetMemberLedgerAsync")]
-        [Authorize]
-        public async Task<ActionResult> GetMemberLedgerAsync()
-        {
-            try
-            {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                //Response.ReturnCode = enResponseCode.InternalError;
-                return Ok();
-            }
-        }
+        //[HttpPost("GetMemberLedgerAsync")]
+        ////[Authorize]
+        //public async Task<ActionResult> GetMemberLedger(GetMemberLedgerRequest request)
+        //{
+        //    try
+        //    {
+        //        var user = await _userManager.GetUserAsync(HttpContext.User);
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        //Response.ReturnCode = enResponseCode.InternalError;
+        //        return Ok();
+        //    }
+        //}
 
         [HttpGet("GetBuyerBook/{Pair}")]
         public ActionResult GetBuyerBook(string Pair)
