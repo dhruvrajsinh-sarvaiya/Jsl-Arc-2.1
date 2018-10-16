@@ -133,5 +133,13 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirmPassMatch = "New password and confirmation password do not match.";
         public static string ResetConfirmOldNotMatch = "Old password does not match";
         public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
+
+
+
+        //========================My Account===============================//
+        public static string EnableTroFactor = "User two factor authentication successfully activates";
+        public static string DisableTroFactor = "User two factor authentication successfully disable";
+
+
     }
 }
