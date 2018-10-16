@@ -40,5 +40,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         ListWalletAddressResponse ListAddress(string AccWalletID);
 
+        //vsolanki 16-10-2018
+        DepositHistoryResponse DepositHistoy(DepositHistoryRequest dhr, long Userid);
     }
 }

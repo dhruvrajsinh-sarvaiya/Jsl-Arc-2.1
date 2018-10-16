@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.SharedKernel;
+using CleanArchitecture.Core.ViewModels.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,6 +39,9 @@ namespace CleanArchitecture.Core.Interfaces
         WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate);
 
         bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID);
+
+        //vsolanki 16-10-2018
+        DepositHistoryResponse DepositHistoy(DepositHistoryRequest dhr, long Userid);
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
 

@@ -181,7 +181,34 @@ namespace CleanArchitecture.Web.API
                 return BadRequest();
             }
         }
-
+        //vsolanki 2018-10-16
+        [HttpGet]
+        public async Task<IActionResult> DepositHistoy([FromBody]DepositHistoryRequest dhr)
+        {
+            DepositHistoryResponse response = new DepositHistoryResponse();
+            try
+            {
+                //ApplicationUser user = new ApplicationUser();
+                //user.Id = 1;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.ReturnCode = enResponseCode.Fail;
+                    response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.DepositHistoy(dhr,user.Id);
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
         ///// <summary>
         ///// vsolanki 1-10-2018 Add Wallet
         ///// </summary>

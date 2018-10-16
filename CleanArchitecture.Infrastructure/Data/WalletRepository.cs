@@ -5,6 +5,7 @@ using System.Text;
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
@@ -325,6 +326,36 @@ namespace CleanArchitecture.Infrastructure.Data
                                                      //SerProID = u.SerProID,                                                     
                                                  }).AsEnumerable().ToList();
             return items;
+        }
+
+        //vsolanki 16-10-2018
+        public DepositHistoryResponse DepositHistoy(DepositHistoryRequest dhr, long Userid)
+        {
+            List<HistoryObject> items = (from u in _dbContext.DepositHistorys
+                                         where u.CreatedBy == Userid && u.CreatedDate >= dhr.FromDate && u.CreatedDate <= dhr.ToDate && (dhr.Status==null ||(u.Status==dhr.Status && dhr.Status != null)) && (dhr.Coin == null || (u.SMSCode == dhr.Coin && dhr.Coin != null)) && (dhr.Amount == null || (u.Amount == dhr.Amount && dhr.Amount != null))                                       
+                                         select new HistoryObject
+                                         {
+                                             CoinName = u.SMSCode,
+                                             Status = u.Status,
+                                             Information=u.StatusMsg,
+                                             Amount=u.Amount,
+                                             Date=u.CreatedDate
+                                         }).AsEnumerable().ToList();
+            if(items.Count()==0)
+            {
+                return new DepositHistoryResponse()
+                {
+                    ReturnCode= enResponseCode.Fail,ReturnMsg= EnResponseMessage.NotFound,
+                    ErrorCode = enErrorCode.NotFound
+                };
+            }
+
+            return new DepositHistoryResponse()
+            {
+                ReturnCode = enResponseCode.Success,
+                ReturnMsg = EnResponseMessage.FindRecored,
+                histories=items
+            };
         }
     }
 }
