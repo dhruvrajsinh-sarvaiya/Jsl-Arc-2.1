@@ -315,14 +315,12 @@ namespace CleanArchitecture.Infrastructure.Data
             List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
                                                  join c in _dbContext.WalletMasters
                                                  on u.WalletId equals c.Id
-                                                 where c.AccWalletID == AccWalletID
+                                                 where c.AccWalletID == AccWalletID && u.Status == 1
                                                  select new AddressMasterResponse
                                                  {
-                                                     //WalletId = u.WalletId,
                                                      AddressLable = u.AddressLable,
                                                      Address = u.Address,
-                                                     IsDefaultAddress = u.IsDefaultAddress,
-                                                     //SerProID = u.SerProID,                                                     
+                                                     IsDefaultAddress = u.IsDefaultAddress,                                                  
                                                  }).AsEnumerable().ToList();
             return items;
         }

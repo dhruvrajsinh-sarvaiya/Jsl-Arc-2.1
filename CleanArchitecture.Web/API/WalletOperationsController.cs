@@ -223,9 +223,9 @@ namespace CleanArchitecture.Web.API
         //}
 
 
-        //[HttpPost("{coin}/{walletid}")]
+        //[HttpPost("{coin}/{accWalletID}")]
         ////[Authorize]
-        //public async Task<IActionResult> Withdrawal(string coin, string walletid, [FromBody]WithdrawalReq Request)
+        //public async Task<IActionResult> Withdrawal(string coin, string accWalletID, [FromBody]WithdrawalReq Request)
         //{
         //    try
         //    {
