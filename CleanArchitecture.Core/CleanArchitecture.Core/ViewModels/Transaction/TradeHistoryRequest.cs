@@ -18,7 +18,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         
         public int Status { get; set; }
        
-        public int PageSize { get; set; }
+        public int Page { get; set; }
         
         public string MarketType { get; set; }
     }

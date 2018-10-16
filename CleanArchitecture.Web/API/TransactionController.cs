@@ -191,7 +191,7 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpPost("GetTradeHistory")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> GetTradeHistory([FromBody] TradeHistoryRequest request)
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
@@ -278,15 +278,15 @@ namespace CleanArchitecture.Web.API
                     status = Convert.ToInt16(request.Status);
                 }
 
-                if (request.PageSize == 0)
+                if (request.Page == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InValidPageNo;
                     return BadRequest(Response);
                 }
 
-                long MemberID = user.Id;
-                Response.response = _frontTrnService.GetTradeHistory(MemberID, sCondition, request.FromDate, request.ToDate, request.PageSize, status);
+                long MemberID = 2;// user.Id;
+                Response.response = _frontTrnService.GetTradeHistory(MemberID, sCondition, request.FromDate, request.ToDate, request.Page, status);
                 if (Response.response.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;
