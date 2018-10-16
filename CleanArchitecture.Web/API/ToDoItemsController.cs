@@ -7,6 +7,7 @@ using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Web.ApiModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Web.Api
 {
@@ -15,9 +16,10 @@ namespace CleanArchitecture.Web.Api
     {
         private readonly IRepository<ToDoItem> _todoRepository;
         private readonly IMediator _mediator;
-
-        public ToDoItemsController(IRepository<ToDoItem> todoRepository, IMediator mediator)
+        ILogger<ToDoItemsController> _loggerFactory;
+        public ToDoItemsController(ILogger<ToDoItemsController> loggerFactory, IRepository<ToDoItem> todoRepository, IMediator mediator)
         {
+            _loggerFactory = loggerFactory/*.CreateLogger<ToDoItemsController>()*/;
             _todoRepository = todoRepository;
             _mediator = mediator;
         } 
@@ -26,6 +28,9 @@ namespace CleanArchitecture.Web.Api
         [HttpGet]
         public IActionResult List()
         {
+            // _loggerFactory logger = _loggerFactory.CreateLogger("LoggerCategory");
+            _loggerFactory.LogInformation("Your MSg");
+
             var items = _todoRepository.List()
                             .Select(item => ToDoItemDTO.FromToDoItem(item));
             return Ok(items);
