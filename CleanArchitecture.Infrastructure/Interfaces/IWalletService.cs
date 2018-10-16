@@ -45,5 +45,12 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 16-10-2018
         DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
+
+        //Rushabh 16-10-2018
+        string SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request);
+
+        //Rushabh 16-10-2018
+        LimitResponse GetWalletLimitConfig(string accWalletID);
+        
     }
 }

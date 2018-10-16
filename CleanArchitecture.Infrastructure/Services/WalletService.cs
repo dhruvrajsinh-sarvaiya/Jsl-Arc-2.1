@@ -1048,7 +1048,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddressResponse.ReturnCode = enResponseCode.Success;
                     AddressResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
-                return AddressResponse;                
+                return AddressResponse;
             }
             catch (Exception ex)
             {
@@ -1063,7 +1063,7 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                DepositHistoryResponse response = _walletRepository1.DepositHistoy(FromDate,ToDate,Coin,Amount,Status, Userid);
+                DepositHistoryResponse response = _walletRepository1.DepositHistoy(FromDate, ToDate, Coin, Amount, Status, Userid);
                 return response;
             }
             catch (Exception ex)
@@ -1085,6 +1085,39 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
+            }
+        }
+
+        public string SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LimitResponse GetWalletLimitConfig(string accWalletID)
+        {
+            LimitResponse LimitResponse = new LimitResponse();
+            try
+            {
+                var WalletLimitResponse = _walletRepository1.GetWalletLimitResponse(accWalletID);
+                if (WalletLimitResponse.Count == 0)
+                {
+                    LimitResponse.ReturnCode = enResponseCode.Fail;
+                    LimitResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    LimitResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    LimitResponse.WalletLimitConfigurationRes = WalletLimitResponse;
+                    LimitResponse.ReturnCode = enResponseCode.Success;
+                    LimitResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                return LimitResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                LimitResponse.ReturnCode = enResponseCode.InternalError;
+                return LimitResponse;
             }
         }
     }

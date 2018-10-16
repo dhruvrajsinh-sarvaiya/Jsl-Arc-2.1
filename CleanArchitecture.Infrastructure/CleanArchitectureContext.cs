@@ -68,6 +68,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletTransactionOrder> WalletTransactionOrders { get; set; }
         public DbSet<WalletTransactionQueue> WalletTransactionQueues { get; set; }
         public DbSet<TrnAcBatch> TrnAcBatch { get; set; }
+        public DbSet<WalletLimitConfiguration> WalletLimitConfiguration { get; set; }
 
 
         //========Transaction Tables

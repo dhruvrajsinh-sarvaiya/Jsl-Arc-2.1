@@ -3,6 +3,7 @@ using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -49,7 +50,8 @@ namespace CleanArchitecture.Core.Interfaces
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
 
-
+        //Rushabh 16-10-2018
+        List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID); 
 
     }
 }

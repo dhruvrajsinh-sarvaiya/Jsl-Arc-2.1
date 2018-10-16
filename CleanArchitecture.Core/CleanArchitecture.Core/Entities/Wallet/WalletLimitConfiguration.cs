@@ -9,9 +9,6 @@ namespace CleanArchitecture.Core.Entities.Wallet
     public class WalletLimitConfiguration : BizBase
     {
         [Required]
-        public long ID { get; set; }
-
-        [Required]
         public long WalletId { get; set; }
 
         [Required]

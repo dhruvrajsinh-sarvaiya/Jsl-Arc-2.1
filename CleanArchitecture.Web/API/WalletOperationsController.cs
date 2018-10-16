@@ -265,6 +265,43 @@ namespace CleanArchitecture.Web.API
         //        return BadRequest();
         //    }
         //}
+
+        [HttpGet("{AccWalletID}")]
+        public async Task<IActionResult> GetWalletLimit(string AccWalletID)
+        {
+            try
+            {
+                LimitResponse Response = _walletService.GetWalletLimitConfig(AccWalletID);
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+
+
+        //[HttpPost("{AccWalletID}")]
+        //public async Task<IActionResult> SetWalletLimit(string AccWalletID, [FromBody]WalletLimitConfigurationReq Request)
+        //{
+        //    //    try
+        //    //    {
+        //    //        string Response = _walletService.SetWalletLimitConfig(AccWalletID, Request);
+        //    //        var respObj = JsonConvert.SerializeObject(Response);
+        //    //        dynamic respObjJson = JObject.Parse(respObj);
+        //    //        return Ok(respObjJson);
+        //    //    }
+        //    //    catch (Exception ex)
+        //    //    {
+        //    //        _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+        //    //        return BadRequest();
+        //    //    }
+        //    return Ok();
+        //}
     }
 }
 

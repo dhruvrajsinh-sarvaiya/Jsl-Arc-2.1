@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOperations
 {
-    public class WalletLimitConfigurationRes : BizResponseClass 
+    public class WalletLimitConfigurationRes  
     {
         public string AccWalletID { get; set; }
 
@@ -17,5 +17,9 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         public decimal LimitPerDay { get; set; }
 
         public decimal LimitPerTransaction { get; set; }
+    }
+    public class LimitResponse : BizResponseClass
+    {
+        public List<WalletLimitConfigurationRes> WalletLimitConfigurationRes { get; set; }
     }
 }

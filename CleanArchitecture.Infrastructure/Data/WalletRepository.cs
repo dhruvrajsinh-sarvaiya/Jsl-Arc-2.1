@@ -9,6 +9,7 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
 using CleanArchitecture.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -390,6 +391,24 @@ namespace CleanArchitecture.Infrastructure.Data
                 ReturnMsg = EnResponseMessage.FindRecored,
                 histories = items
             };
+        }
+
+        //Rushabh 16-10-2018
+        public List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID)
+        {
+            List<WalletLimitConfigurationRes> items = (from u in _dbContext.WalletLimitConfiguration
+                                                       join c in _dbContext.WalletMasters
+                                                       on u.WalletId equals c.Id
+                                                       where c.AccWalletID == AccWaletID && u.Status == 1
+                                                       select new WalletLimitConfigurationRes
+                                                       {
+                                                           TrnType = u.TrnType,
+                                                           LimitPerDay = u.LimitPerDay,
+                                                           LimitPerHour = u.LimitPerHour,
+                                                           LimitPerTransaction = u.LimitPerTransaction,
+                                                           AccWalletID = c.AccWalletID
+                                                       }).AsEnumerable().ToList();
+            return items;
         }
     }
 }
