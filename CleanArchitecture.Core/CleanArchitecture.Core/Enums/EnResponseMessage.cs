@@ -33,6 +33,7 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrnInvalidAmountMsg = "Invalid Amount";
         public static string CreateTrnDuplicateTrnMsg = "Duplicate Transaction for Same Address, Please Try After 10 Minutes";
         public static string CreateTrn_NoSelfAddressWithdrawAllowMsg = "Invalid Amount";
+        public static string ProcessTrn_InsufficientBalance = "Insufficient Wallet Balance";
         //============================
 
         //============================walelt=================================//       
