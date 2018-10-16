@@ -65,6 +65,9 @@ namespace CleanArchitecture.Core.Entities
 
         public long SerProID { get; set; }
 
+        //vsolanki 2018-10-16
+        public long userId { get; set; }
+
         public void OrderIdUpdated(long orderid)
         {
             try
