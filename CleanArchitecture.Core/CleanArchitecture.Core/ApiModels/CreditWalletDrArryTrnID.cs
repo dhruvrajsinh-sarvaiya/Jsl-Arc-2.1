@@ -10,5 +10,6 @@ namespace CleanArchitecture.Core.ApiModels
         public decimal Amount { get; set; }
         public long dWalletId { get; set; }
         public long OrderID { get; set; }
+        public long DrTQTrnNo { get; set; }
     }
 }

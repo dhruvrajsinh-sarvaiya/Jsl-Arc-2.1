@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -54,5 +55,9 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Required]
         [StringLength(50)]
         public string StatusMsg { get; set; }
+
+        [Column(TypeName = "decimal(18, 8)")]
+        [DefaultValue(0)]
+        public decimal SettedAmt { get; set; }
     }
 }

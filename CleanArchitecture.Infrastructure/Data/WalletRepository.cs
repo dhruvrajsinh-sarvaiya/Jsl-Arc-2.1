@@ -277,7 +277,8 @@ namespace CleanArchitecture.Infrastructure.Data
             else
             {
                 _dbContext.Entry(wtq).State = EntityState.Modified;
-            }      
+            }
+            _dbContext.SaveChanges();
             return wtq;
         }
        public  WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate)//1=add,2=update)
@@ -319,6 +320,8 @@ namespace CleanArchitecture.Infrastructure.Data
                     return i;
                 }
                 arryTrnID[t].dWalletId = response.ToList()[0].WalletID;
+                arryTrnID[t].DrTQTrnNo = response.ToList()[0].TrnNo;
+
                 i = true;
             }
             return i;
@@ -418,6 +421,14 @@ namespace CleanArchitecture.Infrastructure.Data
                 arrayObj.ForEach(e => e.Status = enTransactionStatus.Success);
                 arrayObj.ForEach(e => e.StatusMsg = "Success");
 
+                var arrayObjTQ = (from p in _dbContext.WalletTransactionQueues
+                                join q in arryTrnID on p.TrnNo equals q.DrTQTrnNo
+                                select new {p,q }).ToList();
+                arrayObjTQ.ForEach(e => e.p.SettedAmt = e.p.SettedAmt + e.q.Amount );
+                arrayObjTQ.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
+                arrayObjTQ.Where(d => d.p.SettedAmt == d.p.Amount).ToList().ForEach(e => e.p.Status = enTransactionStatus.Success);
+
+
                 _dbContext.Set<WalletLedger>().Add(wl1);
                 _dbContext.Set<TransactionAccount>().Add(ta1);
                 _dbContext.Entry(wm2).State = EntityState.Modified;
@@ -434,6 +445,23 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
 
 
+            }
+        }
+        public DateTime UTC_To_IST()
+        {
+            try
+            {
+                DateTime myUTC = DateTime.UtcNow;
+                // 'Dim utcdate As DateTime = DateTime.ParseExact(DateTime.UtcNow, "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                // Dim utcdate As DateTime = DateTime.ParseExact(myUTC, "M/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+                // 'Dim utcdate As DateTime = DateTime.ParseExact("11/09/2016 6:31:00 PM", "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                DateTime istdate = TimeZoneInfo.ConvertTimeFromUtc(myUTC, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                // MsgBox(myUTC & " - " & utcdate & " - " & istdate)
+                return istdate;
+            }
+            catch (Exception ex)
+            {                
+                throw ex;
             }
         }
     }
