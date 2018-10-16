@@ -9,6 +9,12 @@ namespace CleanArchitecture.Core.Entities.Transaction
 {
     public class TradePairMaster : BizBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public new long Id
+        {
+            get => Convert.ToInt64(SecondaryCurrencyId.ToString() + BaseCurrencyId.ToString());
+            set => Convert.ToInt64(SecondaryCurrencyId.ToString() + BaseCurrencyId.ToString());
+        }
         [Required]
         public string PairName { get; set; }
 
