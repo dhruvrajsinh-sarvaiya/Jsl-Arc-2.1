@@ -89,8 +89,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             IQueryable<TradeHistoryResponce> Result = null;
             string qry = "";
             DateTime fDate, tDate;
-            var PageSize = 3;
-            var skip = PageSize * (page - 1);
+            
             try
             {
                 if (IsAll == 0)
@@ -114,7 +113,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                    "CASE WHEN TTQ.TrnType = 4  THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Amount," +
                                    "TTQ.TrnDate as DateTime,TTQ.Status,TTQ.StatusMsg as StatusText,TTQ.PairID,TQ.ChargeRs,TTQ.IsCancelled " +
                                    "from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id = TTQ.TrnNo " +
-                                   "WHERE " + sCondition + " AND TTQ.IsCancelled=0 AND TTQ.MemberID=" + MemberID + "  Order By TrnNo desc";
+                                   "WHERE " + sCondition + " AND TTQ.IsCancelled=0 AND TTQ.MemberID=" + MemberID + " AND TTQ.Status=" + Convert.ToInt16(enTransactionStatus.Success) +" Order By TrnNo desc";
 
                     }
                     else if (IsAll == 2)
