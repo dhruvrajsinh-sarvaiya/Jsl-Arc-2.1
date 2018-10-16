@@ -42,6 +42,16 @@ namespace CleanArchitecture.Core.Helpers
                 throw ex;
             }
         }
+        public static long GenerateBatch()
+        {
+            //Method 1
+            //TimeSpan DateDiff = UTC_To_IST() - Convert.ToDateTime("1990-1-1");
+            //return  Convert.ToInt64(DateDiff.TotalSeconds);     
+
+            //Method 2
+            string UniqNo = UTC_To_IST().ToString("yyyyMMddHHmmssf");
+            return Convert.ToInt64(UniqNo);
+        }
 
     }
 
