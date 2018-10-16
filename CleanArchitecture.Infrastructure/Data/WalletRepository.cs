@@ -404,5 +404,37 @@ namespace CleanArchitecture.Infrastructure.Data
                 histories = items
             };
         }
+        public bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID)
+        {
+            try
+            { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
+
+                _dbContext.Database.BeginTransaction();
+                //_dbContext.Set<WalletTransactionQueue>().Add(wtq);
+                //wl1.TrnNo = wtq.TrnNo;
+                var arrayObj = (from p in _dbContext.WalletTransactionOrders
+                                join q in arryTrnID on p.OrderID equals q.OrderID
+                                select p).ToList();
+                arrayObj.ForEach(e => e.Status = enTransactionStatus.Success);
+                arrayObj.ForEach(e => e.StatusMsg = "Success");
+
+                _dbContext.Set<WalletLedger>().Add(wl1);
+                _dbContext.Set<TransactionAccount>().Add(ta1);
+                _dbContext.Entry(wm2).State = EntityState.Modified;
+                _dbContext.Entry(wtq).State = EntityState.Modified;
+                _dbContext.SaveChanges();
+                _dbContext.Database.CommitTransaction();
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                _dbContext.Database.RollbackTransaction();
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+
+
+            }
+        }
     }
 }
