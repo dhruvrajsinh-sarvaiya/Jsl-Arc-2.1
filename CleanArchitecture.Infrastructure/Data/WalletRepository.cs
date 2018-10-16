@@ -251,7 +251,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
 
-        public int CheckTrnRefNo(long TrnRefNo, byte TrnType)
+        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType)
         {
             int response = (from u in _dbContext.WalletTransactionQueues
                             where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
@@ -259,10 +259,10 @@ namespace CleanArchitecture.Infrastructure.Data
             return response;
         }
 
-        public int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType)
+        public int CheckTrnRefNoForCredit(long TrnRefNo, enWalletTranxOrderType TrnType) // need to check whether walleet is pre deducted for this order
         {
-            int response = (from u in _dbContext.WalletTransactionQueues
-                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType && u.Status == 4
+            int response = (from u in _dbContext.WalletTransactionQueues                            
+                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType && (u.Status == enTransactionStatus.Hold || u.Status == enTransactionStatus.Success)
                             select u).Count();
             return response;
         }
@@ -293,19 +293,32 @@ namespace CleanArchitecture.Infrastructure.Data
             return wo;
         }
 
-        public bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID)
+        public bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID, string coinName)
         {
             bool i = false;
-            for (int t = 0; t <= arryTrnID.Length-1; t++)
+            for (int t = 0; t <= arryTrnID.Length - 1; t++)
             {
-              var response = (from u in _dbContext.WalletTransactionQueues
-                                where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.Status == 4 && u.TrnType==1
+                var response = (from u in _dbContext.WalletTransactionQueues                                
+                                where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.Status == enTransactionStatus.Hold && u.TrnType == Core.Enums.enWalletTranxOrderType.Debit
+                                && u.WalletType == coinName
                                 select u);
-                if (response.Count()!=1)
+                if (response.Count() != 1)
                 {
                     i = false;
                     return i;
                 }
+                // total delivered amount _ current amount must less or equals total debit amount
+                decimal deliveredAmt = (from p in _dbContext.WalletTransactionOrders
+                                        join u in _dbContext.WalletTransactionQueues on p.DTrnNo equals u.TrnNo
+                                        where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.TrnType == Core.Enums.enWalletTranxOrderType.Debit
+                                        && u.WalletType == coinName && p.Status != enTransactionStatus.SystemFail
+                                        select p).Sum(e => e.Amount);
+                if (!(response.ToList()[0].Amount - deliveredAmt - arryTrnID[t].Amount >= 0))
+                {
+                    i = false;
+                    return i;
+                }
+                arryTrnID[t].dWalletId = response.ToList()[0].WalletID;
                 i = true;
             }
             return i;

@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using System;
@@ -30,15 +31,15 @@ namespace CleanArchitecture.Core.Interfaces
 
         List<WalletMasterResponse> GetWalletMasterResponseById(long UserId, string coin,string walletId);
 
-        int CheckTrnRefNo(long TrnRefNo, byte TrnType);
+        int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType);
 
-        int CheckTrnRefNoForCredit(long TrnRefNo, byte TrnType);
+        int CheckTrnRefNoForCredit(long TrnRefNo, enWalletTranxOrderType TrnType);
 
         WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq, byte AddorUpdate);
 
         WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate);
 
-        bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID);
+        bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID,string coinName);
 
         //vsolanki 16-10-2018 
         DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
@@ -48,7 +49,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
-
+        bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID);
 
 
     }
