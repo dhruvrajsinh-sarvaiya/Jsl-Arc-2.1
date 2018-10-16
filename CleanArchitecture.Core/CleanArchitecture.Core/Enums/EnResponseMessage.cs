@@ -62,6 +62,7 @@ namespace CleanArchitecture.Core.Enums
         public static string AlredyExist = "Duplicate Request for same Ref No.";
         public static string InsufficantBal = "Insufficeint Balance";
         public static string SuccessDebit = "Balance Debited Successfully";
+        public static string SuccessCredit = "Balance Credited Successfully";
 
 
 

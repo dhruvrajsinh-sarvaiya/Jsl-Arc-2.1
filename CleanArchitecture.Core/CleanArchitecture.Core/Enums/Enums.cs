@@ -192,6 +192,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidTradeRefNo = 4036,
         AlredyExist=4037,
         InsufficantBal=4038,
+        UserIDWalletIDDidNotMatch = 4039
         
 
     }
@@ -272,5 +273,10 @@ namespace CleanArchitecture.Core.Enums
         MARKET = 2,
         STOP_LOSS = 3,
         SPOT = 4
+    }
+    public enum enWalletTranxOrderType
+    {
+        Debit = 1,
+        Credit = 2
     }
 }
