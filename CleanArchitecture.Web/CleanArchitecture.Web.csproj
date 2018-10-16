@@ -22,7 +22,6 @@
     <PackageReference Include="OpenIddict" Version="2.0.0-rc2-final" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="2.0.0-rc2-final" />
     <PackageReference Include="OpenIddict.Mvc" Version="2.0.0-rc2-final" />
-    <PackageReference Include="StackExchange.Redis" Version="2.0.513" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="3.0.0" />
     <PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders" Version="0.7.0" />
