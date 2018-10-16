@@ -11,7 +11,7 @@ namespace CleanArchitecture.Core.Interfaces
         List<ActiveOrderInfo> GetActiveOrder(long MemberID, long PairId);
         List<BasePairResponse> GetTradePairAsset();
         List<VolumeDataRespose> GetVolumeData(long BasePairId);
-        List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, long PairId,short TrnType,short Status,int PageSize,int MarketType,DateTime  fromDate, DateTime Todate, int IsAll);
+        List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll);
         long GetPairIdByName(string pair);
         bool IsValidPairName(string Pair);
         List<RecentOrderInfo> GetRecentOrder(long PairId);
