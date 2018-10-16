@@ -34,6 +34,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
        public BizResponse _CreateTransactionResp;
        public TradePairMaster _TradePairObj;
         private readonly IWalletService _WalletService;
+        NewTransactionRequestCls Req;
+        NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
@@ -50,17 +52,17 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TradeStopLoss = tradeStopLoss;
             _WalletService = WalletService;
         }
-        public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req)
+        public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
-            _Resp = new BizResponse();
-            NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
+            Req = Req1;
+            _Resp = new BizResponse();            
 
-            _Resp = CreateTransaction(Req, _TradeTransactionObj);
+            _Resp = CreateTransaction();
             if (_Resp.ReturnCode != enResponseCodeService.Success)
             {
                 return _Resp;
             }
-            var myResp = new Task(async () => CombineAllInitTransactionAsync(Req, _TradeTransactionObj));
+            var myResp = new Task(async () => CombineAllInitTransactionAsync());
 
             return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
             //_Resp = await MethodRespTsk;
@@ -69,14 +71,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             //return _Resp;
         }
 
-        public async Task<BizResponse> CombineAllInitTransactionAsync(NewTransactionRequestCls Req, NewTradeTransactionRequestCls _TradeTransactionObj)
+        public async Task<BizResponse> CombineAllInitTransactionAsync()
         {
           
             _Resp = new BizResponse();
             //=========================PROCESS
             //Check balance here
-            var Validation=ValidateTransaction(Req);
-            var BalResult = _WalletService.WalletBalanceCheck(0, 0);
+            var Validation=ValidateTransaction();
+            var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitWalletID); //DI of Wallet for balance check
 
             if (await Validation && BalResult) //validation and balance check success
             {
@@ -87,7 +89,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
 
         #region RegionInitTransaction    
-        public BizResponse CreateTransaction(NewTransactionRequestCls Req, NewTradeTransactionRequestCls _TradeTransactionObj)
+        public BizResponse CreateTransaction()
         {
             //long DeliveryWalletID = 0;           
             //string INRSMSCode = "INR";
@@ -115,12 +117,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     if (_TradePairObj.WalletMasterID == 0)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnNoPairSelectedMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrn_NoPairSelected);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoPairSelected);
                     }
                     if (Req.Qty <= 0 || Req.Price <= 0)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnInvalidQtyPriceMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnInvalidQtyPrice);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidQtyPrice);
                     }
                     if (Req.TrnType == enTrnType.Buy_Trade)
                     {
@@ -143,17 +145,18 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     if (_TradeTransactionObj.OrderTotalQty < (decimal)(0.00000001) || _TradeTransactionObj.DeliveryTotalQty < (decimal)(0.00000001))
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnInvalidQtyNAmountMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnInvalidQtyNAmount);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidQtyNAmount);
                     }
                     //Req.SMSCode = _TradeTransactionObj.Order_Currency;
                     //Balace check Here , take DeliveryWalletID output
                     _TradeTransactionObj.DeliveryWalletID = Req.CreditWalletID;
+                    _TradeTransactionObj.OrderWalletID = Req.DebitWalletID;
 
                     Req.Amount = _TradeTransactionObj.OrderTotalQty;
                     if (_TradeTransactionObj.DeliveryWalletID == 0)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrn_NoCreditAccountFoundMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrn_NoCreditAccountFound);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoCreditAccountFound);
                     }
                 }
                 if (Req.TrnType == enTrnType.Shoping_Cart)//IF TRNTYPE = 7 THEN FETCH BALANCE OF INR WALLET 
@@ -162,7 +165,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     if(Amount2 < Req.Amount)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnInvalidAmountMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnInvalidAmount);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidAmount);
                     }
                     //Take balance base on @INRSMSCode and take OrderWalletID,Balance
                 }
@@ -181,14 +184,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     if (DuplicateTxn != null)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnDuplicateTrnMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnDuplicateTrn);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrnDuplicateTrn);
                     }
                 }
                  
                 if(Req.Amount<0)
                 {
                     Req.StatusMsg = EnResponseMessage.CreateTrnInvalidAmountMsg;
-                    return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnInvalidAmount);
+                    return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidAmount);
                 }
                 if (Req.TrnRefNo != "0" || !string.IsNullOrEmpty(Req.TrnRefNo))
                 {
@@ -196,7 +199,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     if (DuplicateTxnWithRefNo != null)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnDuplicateTrnMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrnDuplicateTrn);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrnDuplicateTrn);
                     }
                 }
                 if (Req.TrnType == enTrnType.Withdraw)
@@ -205,16 +208,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     if (_AddressMasterObj != null)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrn_NoSelfAddressWithdrawAllowMsg;
-                        return MarkSystemFailTransaction(Req, _TradeTransactionObj, enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
                     }
                 }
                 Req.Status = enTransactionStatus.Initialize;
-                InsertTransactionInQueue(Req);//ref TrnNo
-                //_TradeTransactionObj.TrnNo = TrnNo;                
+                InsertTransactionInQueue();               
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
-                    InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
-                    InsertTradeStopLoss(Req);
+                    InsertTradeTransactionInQueue();
+                    InsertTradeStopLoss();
                 }
                    
                 return (new BizResponse { ReturnMsg = "", ReturnCode = enResponseCodeService.Success });
@@ -226,18 +228,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public BizResponse MarkSystemFailTransaction(NewTransactionRequestCls Req, NewTradeTransactionRequestCls _TradeTransactionObj, enErrorCode ErrorCode)
+        public BizResponse MarkSystemFailTransaction(enErrorCode ErrorCode)
         {
-            //long TrnNo = 0;
             try
             {
                 Req.Status = enTransactionStatus.SystemFail;
-                InsertTransactionInQueue(Req);//ref TrnNo
-                //_TradeTransactionObj.TrnNo = Req.TrnNo;                
+                InsertTransactionInQueue();              
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
-                    InsertTradeTransactionInQueue(Req, _TradeTransactionObj);
-                    InsertTradeStopLoss(Req);
+                    InsertTradeTransactionInQueue();
+                    InsertTradeStopLoss();
                 }
                 //DI of SMS here
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.Fail, ErrorCode = ErrorCode });
@@ -248,31 +248,31 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
         }
-        public BizResponse InsertTransactionInQueue(NewTransactionRequestCls NewtransactionReq)//ref long TrnNo
+        public BizResponse InsertTransactionInQueue()//ref long TrnNo
         {
             _Resp = new BizResponse();
             try
             {
                 var Newtransaction = new TransactionQueue()
                 {
-                    GUID= Guid.NewGuid(),
-                    TrnMode = NewtransactionReq.TrnMode,
-                    TrnType = Convert.ToInt16(NewtransactionReq.TrnType),
-                    MemberID = NewtransactionReq.MemberID,
-                    MemberMobile = NewtransactionReq.MemberMobile,
-                    TransactionAccount = NewtransactionReq.TransactionAccount,
-                    SMSCode = NewtransactionReq.SMSCode,
-                    Amount = NewtransactionReq.Amount,
-                    Status = Convert.ToInt16(NewtransactionReq.Status),
+                    TrnDate = Helpers.UTC_To_IST(),
+                    GUID = Guid.NewGuid(),
+                    TrnMode = Req.TrnMode,
+                    TrnType = Convert.ToInt16(Req.TrnType),
+                    MemberID = Req.MemberID,
+                    MemberMobile = Req.MemberMobile,
+                    TransactionAccount = Req.TransactionAccount,
+                    SMSCode = Req.SMSCode,
+                    Amount = Req.Amount,
+                    Status = Convert.ToInt16(Req.Status),
                     StatusCode = 0,
-                    StatusMsg = NewtransactionReq.StatusMsg,
-                    TrnRefNo = NewtransactionReq.TrnRefNo,
-                    AdditionalInfo = NewtransactionReq.AdditionalInfo
+                    StatusMsg = Req.StatusMsg,
+                    TrnRefNo = Req.TrnRefNo,
+                    AdditionalInfo = Req.AdditionalInfo
                 };
                 _TransactionRepository.Add(Newtransaction);
-                NewtransactionReq.TrnNo = Newtransaction.Id;
-                NewtransactionReq.GUID = Newtransaction.GUID;
-                //TrnNo = Newtransaction.Id;
+                Req.TrnNo = Newtransaction.Id;
+                Req.GUID = Newtransaction.GUID;
 
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
@@ -284,34 +284,35 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public BizResponse InsertTradeTransactionInQueue(NewTransactionRequestCls NewtransactionReq, NewTradeTransactionRequestCls NewTradetransactionReq)
+        public BizResponse InsertTradeTransactionInQueue()
         {
             _Resp = new BizResponse();
             try
             {
                 var Newtransaction = new TradeTransactionQueue()
                 {
-                    TrnNo = NewtransactionReq.TrnNo,//NewTradetransactionReq.TrnNo,
-                    TrnType = Convert.ToInt16(NewtransactionReq.TrnType),
-                    TrnTypeName = NewTradetransactionReq.TrnTypeName,
-                    MemberID = NewtransactionReq.MemberID,
-                    PairID = NewtransactionReq.PairID,
-                    PairName = NewTradetransactionReq.PairName,
-                    OrderWalletID = NewTradetransactionReq.OrderWalletID,
-                    DeliveryWalletID = NewTradetransactionReq.DeliveryWalletID,
-                    BuyQty = NewTradetransactionReq.BuyQty,
-                    BidPrice = NewTradetransactionReq.BidPrice,
-                    SellQty = NewTradetransactionReq.SellQty,
-                    AskPrice = NewTradetransactionReq.AskPrice,
-                    Order_Currency = NewTradetransactionReq.Order_Currency,
-                    OrderTotalQty = NewTradetransactionReq.OrderTotalQty,
-                    Delivery_Currency = NewTradetransactionReq.Delivery_Currency,
-                    DeliveryTotalQty = NewTradetransactionReq.DeliveryTotalQty,
-                    SettledBuyQty = NewTradetransactionReq.SettledBuyQty,
-                    SettledSellQty = NewTradetransactionReq.SettledSellQty,
-                    Status = Convert.ToInt16(NewtransactionReq.Status),
-                    StatusCode = NewtransactionReq.StatusCode,
-                    StatusMsg = NewtransactionReq.StatusMsg
+                    TrnDate= Helpers.UTC_To_IST(),
+                    TrnNo = Req.TrnNo,//NewTradetransactionReq.TrnNo,
+                    TrnType = Convert.ToInt16(Req.TrnType),
+                    TrnTypeName = _TradeTransactionObj.TrnTypeName,
+                    MemberID = Req.MemberID,
+                    PairID = Req.PairID,
+                    PairName = _TradeTransactionObj.PairName,
+                    OrderWalletID = _TradeTransactionObj.OrderWalletID,
+                    DeliveryWalletID = _TradeTransactionObj.DeliveryWalletID,
+                    BuyQty = _TradeTransactionObj.BuyQty,
+                    BidPrice = _TradeTransactionObj.BidPrice,
+                    SellQty = _TradeTransactionObj.SellQty,
+                    AskPrice = _TradeTransactionObj.AskPrice,
+                    Order_Currency = _TradeTransactionObj.Order_Currency,
+                    OrderTotalQty = _TradeTransactionObj.OrderTotalQty,
+                    Delivery_Currency = _TradeTransactionObj.Delivery_Currency,
+                    DeliveryTotalQty = _TradeTransactionObj.DeliveryTotalQty,
+                    SettledBuyQty = _TradeTransactionObj.SettledBuyQty,
+                    SettledSellQty = _TradeTransactionObj.SettledSellQty,
+                    Status = Convert.ToInt16(Req.Status),
+                    StatusCode = Req.StatusCode,
+                    StatusMsg = Req.StatusMsg
                 };
                 _TradeTransactionRepository.Add(Newtransaction);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
@@ -324,15 +325,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public BizResponse InsertTradeStopLoss(NewTransactionRequestCls NewtransactionReq)
+        public BizResponse InsertTradeStopLoss()
         {
             _Resp = new BizResponse();
             try
             {
                 var Newtransaction = new TradeStopLoss()
                 {
-                    TrnNo = NewtransactionReq.TrnNo,
-                    ordertype = Convert.ToInt16(NewtransactionReq.ordertype)                   
+                    TrnNo = Req.TrnNo,
+                    ordertype = Convert.ToInt16(Req.ordertype)                   
                 };
                 _TradeStopLoss.Add(Newtransaction);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
@@ -348,7 +349,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         #endregion        
 
         #region RegionProcessTransaction
-        public Task<Boolean> ValidateTransaction(NewTransactionRequestCls Req)
+        public Task<Boolean> ValidateTransaction()
         {
             //Member Service Disable check here for regular txn
 
