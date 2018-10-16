@@ -1059,11 +1059,11 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //16-10-2018 vsolanki
-        public DepositHistoryResponse DepositHistoy(DepositHistoryRequest dhr,long Userid)
+        public DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
         {
             try
             {
-                DepositHistoryResponse response = _walletRepository1.DepositHistoy(dhr, Userid);
+                DepositHistoryResponse response = _walletRepository1.DepositHistoy(FromDate,ToDate,Coin,Amount,Status, Userid);
                 return response;
             }
             catch (Exception ex)

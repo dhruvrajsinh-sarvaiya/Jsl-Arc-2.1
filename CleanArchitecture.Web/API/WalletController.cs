@@ -182,8 +182,8 @@ namespace CleanArchitecture.Web.API
             }
         }
         //vsolanki 2018-10-16
-        [HttpGet]
-        public async Task<IActionResult> DepositHistoy([FromBody]DepositHistoryRequest dhr)
+        [HttpGet("{FromDate}/{ToDate}")]
+        public async Task<IActionResult> DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status)
         {
             DepositHistoryResponse response = new DepositHistoryResponse();
             try
@@ -199,7 +199,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.DepositHistoy(dhr,user.Id);
+                    response = _walletService.DepositHistoy(FromDate,ToDate,Coin, Amount, Status,user.Id);
                 }
                 return Ok(response);
             }

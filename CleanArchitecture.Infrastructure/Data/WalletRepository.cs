@@ -329,10 +329,10 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsolanki 16-10-2018
-        public DepositHistoryResponse DepositHistoy(DepositHistoryRequest dhr, long Userid)
+        public DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
         {
             List<HistoryObject> items = (from u in _dbContext.DepositHistorys
-                                         where u.CreatedBy == Userid && u.CreatedDate >= dhr.FromDate && u.CreatedDate <= dhr.ToDate && (dhr.Status==null ||(u.Status==dhr.Status && dhr.Status != null)) && (dhr.Coin == null || (u.SMSCode == dhr.Coin && dhr.Coin != null)) && (dhr.Amount == null || (u.Amount == dhr.Amount && dhr.Amount != null))                                       
+                                         where u.CreatedBy == Userid && u.CreatedDate >= FromDate && u.CreatedDate <= ToDate && (Status==null ||(u.Status==Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))                                       
                                          select new HistoryObject
                                          {
                                              CoinName = u.SMSCode,
