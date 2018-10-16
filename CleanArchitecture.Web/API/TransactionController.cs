@@ -285,7 +285,7 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(Response);
                 }
 
-                long MemberID = user.Id;
+                long MemberID =  user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, sCondition, request.FromDate, request.ToDate, request.Page, status);
                 if (Response.response.Count == 0)
                 {
@@ -305,35 +305,73 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("GetActiveOrder/{Pair}/{Page:int}")]  //GetActiveOrder
+        [HttpPost("GetActiveOrder")]  //GetActiveOrder
         [Authorize]
-        public async Task<ActionResult> GetActiveOrder(string Pair,int Page)
+        public async Task<ActionResult> GetActiveOrder([FromBody]GetActiveOrderRequest request)
         {
             GetActiveOrderResponse Response = new GetActiveOrderResponse();
+            Int16 trnType = 999;
+            string sCondition = "1=1";
             try
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                if (!_frontTrnService.IsValidPairName(Pair))
+
+                if (!_frontTrnService.IsValidPairName(request.Pair))
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return BadRequest(Response);
                 }
-                long PairId = _frontTrnService.GetPairIdByName(Pair);
+
+                long PairId = _frontTrnService.GetPairIdByName(request.Pair);
                 if (PairId == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return BadRequest(Response);
                 }
-                if (Page == 0)
+                if (request.Page == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.InValidPageNo;
                     return BadRequest(Response);
                 }
-                long MemberID =user.Id;
-                Response.response = _frontTrnService.GetActiveOrder(MemberID, PairId,Page);
+                if (!string.IsNullOrEmpty(request.OrderType))
+                {
+                    trnType = _frontTrnService.IsValidTradeType(request.OrderType);
+                    if (trnType == 999)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InValidTrnType;
+                        return BadRequest(Response);
+                    }
+                    sCondition += " AND TTQ.TrnType=" + trnType +" ";
+                }
+                if (!string.IsNullOrEmpty(request.FromDate))
+                {
+                    if (string.IsNullOrEmpty(request.ToDate))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidFromDateFormate;
+                        return BadRequest(Response);
+                    }
+                    if (!_frontTrnService.IsValidDateFormate(request.FromDate))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidFromDateFormate;
+                        return BadRequest(Response);
+                    }
+                    if (!_frontTrnService.IsValidDateFormate(request.ToDate))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidToDateFormate;
+                        return BadRequest(Response);
+                    }
+                    //sCondition += " AND TTQ.TrnDate Between '" + fDate  + " AND '" + tDate  + "' ";
+                    sCondition += "AND TTQ.TrnDate Between {3} AND {4} ";
+                }
+                long MemberID = user.Id;
+                Response.response = _frontTrnService.GetActiveOrder(MemberID, sCondition,request .FromDate,request .ToDate, PairId, request.Page);
                 if (Response.response.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;
