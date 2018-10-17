@@ -189,6 +189,7 @@ namespace CleanArchitecture.Core.Enums
         Status4051RefreshToken = 4051,
         Status4052UserToken = 4052,
         Status4053Granttype = 4053,
+        Status4054FactorFail =4054,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
