@@ -24,24 +24,29 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
     public class NewTransaction : ITransactionProcess
     {
         private readonly ICommonRepository<TradePairMaster> _TradePairMaster;
+        private readonly ICommonRepository<TradePairDetail> _TradePairDetail;
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly EFCommonRepository<TradeStopLoss> _TradeStopLoss;
         private readonly ICommonRepository<ServiceMaster> _ServiceConfi;
         private readonly ICommonRepository<AddressMaster> _AddressMasterRepository;
-       public BizResponse _Resp;
         private readonly ILogger<NewTransaction> _log;
-       public BizResponse _CreateTransactionResp;
-       public TradePairMaster _TradePairObj;
         private readonly IWalletService _WalletService;
+        public BizResponse _Resp;        
+        public BizResponse _CreateTransactionResp;
+        public TradePairMaster _TradePairObj;
+        public TradePairDetail _TradePairDetailObj;
+       
         NewTransactionRequestCls Req;
         NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
+        ProcessTransactionCls _TransactionObj;
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository,
             ICommonRepository<ServiceMaster> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository,
-            EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService)
+            EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService,
+            ICommonRepository<TradePairDetail> TradePairDetail)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -51,6 +56,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _AddressMasterRepository = AddressMasterRepository;
             _TradeStopLoss = tradeStopLoss;
             _WalletService = WalletService;
+            _TradePairDetail = TradePairDetail;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -87,12 +93,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitWalletID); //DI of Wallet for balance check
             if (!BalResult) //validation and balance check success
             {
-                _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InsufficientBalance;
+                _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InsufficientBalanceMsg;
                 _Resp.ReturnCode = enResponseCodeService.Fail;
                 _Resp.ErrorCode = enErrorCode.ProcessTrn_InsufficientBalance;
                 MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                 return _Resp;
             }
+
+
+
 
             //=========================UPDATE
             return null;
@@ -120,11 +129,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 //IF @PairID <> 0 ntrivedi 18-04-2018  check inside @TrnType (4,5) @TradeWalletMasterID will be 0 or null
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
-
-                    _TradePairObj = new TradePairMaster();
-                    _TradePairObj = _TradePairMaster.GetSingle(item => item.Id == Req.PairID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                    //_TradePairObj = new TradePairMaster();
+                    _TradePairObj = _TradePairMaster.GetSingle(item => item.Id == Req.PairID && item.Status == Convert.ToInt16(ServiceStatus.Active));                   
+                    if (_TradePairObj == null)
+                    {
+                        Req.StatusMsg = EnResponseMessage.CreateTrnNoPairSelectedMsg;
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoPairSelected);
+                    }
                     _TradeTransactionObj.PairName = _TradePairObj.PairName;
-                    if (_TradePairObj.WalletMasterID == 0)
+                    _TradePairDetailObj = _TradePairDetail.GetSingle(item => item.PairId == Req.PairID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                    if (_TradePairDetailObj == null)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnNoPairSelectedMsg;
                         return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoPairSelected);
@@ -361,10 +375,24 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         #region RegionProcessTransaction
         public Task<Boolean> ValidateTransaction(BizResponse _Resp)
         {
+            _TransactionObj =new ProcessTransactionCls();
             //Member Service Disable check here for regular txn
+            if (Req.TrnType == enTrnType.Buy_Trade)
+            {
+                _TransactionObj.BidPrice_TQ = _TradeTransactionObj.BidPrice;
+                _TransactionObj.BidPrice_BuyReq = Helpers.DoRoundForTrading(1/ _TradeTransactionObj.BidPrice, 8);
+                //_TradePairDetailObj
+                if (_TradeTransactionObj.BuyQty < _TradePairDetailObj.BuyMinQty || _TradeTransactionObj.BuyQty > _TradePairDetailObj.BuyMaxQty)
+                {
+                    _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.BuyMinQty.ToString()).Replace("@MAX", _TradePairDetailObj.BuyMaxQty.ToString());
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax;
+                    return Task.FromResult(false);
+                }
 
+            }
 
-            return Task.FromResult(true);
+                return Task.FromResult(true);
         }
         public BizResponse MarkTransactionSystemFail(string StatusMsg,enErrorCode ErrorCode)
         {
@@ -376,6 +404,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
             return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal };
         }
+
         #endregion
 
 

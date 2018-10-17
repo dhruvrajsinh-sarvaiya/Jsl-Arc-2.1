@@ -85,4 +85,16 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public decimal SettledSellQty { get; set; }
         //public decimal TakerPer { get; set; }
     }
+
+    public class ProcessTransactionCls
+    {
+        [Range(0, 9999999999.99999999)]
+        public decimal BidPrice_TQ { get; set; }
+
+        [Range(0, 9999999999.99999999)]
+        public decimal BidPrice_BuyReq { get; set; }
+
+
+
+    }
 }

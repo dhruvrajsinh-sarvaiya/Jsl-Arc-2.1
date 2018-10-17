@@ -157,6 +157,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidMarketType = 4506,
         InValidPageNo = 4507,
         ProcessTrn_InsufficientBalance = 1,
+        ProcessTrn_AmountBetweenMinMax=1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
