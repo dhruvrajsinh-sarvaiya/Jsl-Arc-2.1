@@ -136,13 +136,15 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirmPassMatch = "New password and confirmation password do not match.";
         public static string ResetConfirmOldNotMatch = "Old password does not match";
         public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
-
+        public static string IpAddressUpdateError = "Ip address status not update.";
+        public static string SuccessDesableIpStatus = "Success full desable ip address.";
+        public static string SuccessDeleteIpAddress = "Success full remove ip address.";
+        public static string IpAddressdeleteError = "Ip address not remove.";
+        public static string SuccessGetIpData = "Success full Get Ip Address.";
 
 
         //========================My Account===============================//
         public static string EnableTroFactor = "User two factor authentication successfully activates";
         public static string DisableTroFactor = "User two factor authentication successfully disable";
-
-
     }
 }

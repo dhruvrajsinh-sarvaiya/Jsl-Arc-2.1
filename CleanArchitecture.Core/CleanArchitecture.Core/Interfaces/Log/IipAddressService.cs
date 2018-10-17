@@ -12,7 +12,10 @@ namespace CleanArchitecture.Core.Interfaces.Log
         Task<IpMasterViewModel> GetIpAddressById(long Id);
         Task<List<IpMasterViewModel>> GetIpAddressListByUserId(long UserId);
         void UpdateIpAddress(IpMasterViewModel model);
-        void DeleteIpAddress(IpMasterViewModel model);
+        Task<long> DesableIpAddress(IpMasterViewModel model);
+        Task<long> DeleteIpAddress(IpMasterViewModel model);
+
+
 
     }
 }

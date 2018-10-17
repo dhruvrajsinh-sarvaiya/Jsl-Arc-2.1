@@ -138,7 +138,7 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("userinfo")]
-        public async Task<IActionResult> UserInfo([FromBody]IndexViewModel model)
+        public async Task<IActionResult> UserInfo([FromBody]UserInfoViewModel model)
         {
             try
             {
@@ -148,10 +148,10 @@ namespace CleanArchitecture.Web.API
                     user.FirstName = model.FirstName;
                 if (!string.IsNullOrEmpty(model.LastName))
                     user.LastName = model.LastName;
-                user.UserName = string.IsNullOrEmpty(model.Username) ? user.UserName : model.Username;
-                user.Email = string.IsNullOrEmpty(model.Email) ? user.Email : model.Email;
-                if (!string.IsNullOrEmpty(model.PhoneNumber))
-                    user.PhoneNumber = model.PhoneNumber;
+                //user.UserName = string.IsNullOrEmpty(model.Username) ? user.UserName : model.Username;
+                //user.Email = string.IsNullOrEmpty(model.Email) ? user.Email : model.Email;
+                //if (!string.IsNullOrEmpty(model.PhoneNumber))
+                //    user.PhoneNumber = model.PhoneNumber;
 
                 var result = await _userManager.UpdateAsync(user);
                 if (result == IdentityResult.Success)
@@ -185,7 +185,7 @@ namespace CleanArchitecture.Web.API
             {
                 string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
                 if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
-                {                    
+                {
                     return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
 
                 }
@@ -201,13 +201,157 @@ namespace CleanArchitecture.Web.API
                 {
                     IpMasterViewModel imodel = new IpMasterViewModel();
                     imodel.UserId = user.Id;
-                    imodel.IpAddress = model.IPAddress;
+                    imodel.IpAddress = model.SelectedIPAddress;
 
                     long id = await _ipAddressService.AddIpAddress(imodel);
 
                     if (id > 0)
                     {
                         return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddIpData });
+                    }
+                    else
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+        [HttpPost("DesableIpAddress")]
+        public async Task<IActionResult> DesableIpAddress([FromBody]IpAddressReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+                string UserCountryCode = await _userdata.GetCountryByIP(model.SelectedIPAddress);
+                if (!string.IsNullOrEmpty(UserCountryCode) && UserCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUserSelectedIp, ErrorCode = enErrorCode.Status4045InvalidUserSelectedIp });
+                }
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    IpMasterViewModel imodel = new IpMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.IpAddress = model.SelectedIPAddress;
+
+                    long id = await _ipAddressService.DesableIpAddress(imodel);
+                    if (id > 0)
+                    {
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDesableIpStatus });
+                    }
+                    else
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressUpdateError, ErrorCode = enErrorCode.Status4046NotUpdateIpStatus });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+
+        [HttpPost("DeleteIpAddress")]
+        public async Task<IActionResult> DeleteIpAddress([FromBody]IpAddressReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+                }
+                string UserCountryCode = await _userdata.GetCountryByIP(model.SelectedIPAddress);
+                if (!string.IsNullOrEmpty(UserCountryCode) && UserCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUserSelectedIp, ErrorCode = enErrorCode.Status4045InvalidUserSelectedIp });
+                }
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    IpMasterViewModel imodel = new IpMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.IpAddress = model.SelectedIPAddress;
+
+                    long id = await _ipAddressService.DeleteIpAddress(imodel);
+                    if (id > 0)
+                    {
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDeleteIpAddress });
+                    }
+                    else
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressdeleteError, ErrorCode = enErrorCode.Status4047NotDeleteIp });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+
+               
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+
+        [HttpGet("GetIpAddress/{PageIndex}/{PAGE_SIZE}")]
+        public async Task<IActionResult> GetIpAddress(int PageIndex =0,int PAGE_SIZE = 0)
+        {
+            try
+            {   
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    var IpList  = await _ipAddressService.GetIpAddressListByUserId(user.Id);
+
+                    if (IpList.Count > 0)
+                    {
+                    
+                        // Set the total count
+                        // so GridView knows how many pages to create
+                        var TotalRowCount = IpList.Count();
+                        //int PageIndex = 1;
+                        //int PAGE_SIZE = 10;
+
+                        // Get only the rows we need for the page requested
+                      var Ip = IpList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
+
+
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = Ip.ToList(), TotalRow =TotalRowCount });
                     }
                     else
                     {
