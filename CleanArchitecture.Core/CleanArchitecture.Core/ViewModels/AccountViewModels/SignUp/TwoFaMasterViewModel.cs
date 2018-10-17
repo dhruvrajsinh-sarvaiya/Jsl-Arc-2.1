@@ -1,9 +1,11 @@
-﻿using System;
-using CleanArchitecture.Core.SharedKernel;
+﻿using CleanArchitecture.Core.SharedKernel;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
 {
-   public class OtpMasterViewModel : BizBase
+   public class TwoFaMasterViewModel : BizBase
     {
         public int UserId { get; set; }
         public int RegTypeId { get; set; }
@@ -11,7 +13,5 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
         public DateTime CreatedTime { get; set; }
         public DateTime ExpirTime { get; set; }
         public bool EnableStatus { get; set; }
-        public string Password { get; set; }
-        public string appkey { get; set; }
     }
 }

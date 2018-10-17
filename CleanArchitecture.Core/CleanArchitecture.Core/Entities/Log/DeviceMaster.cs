@@ -27,8 +27,6 @@ namespace CleanArchitecture.Core.Entities.Log
         {
             IsEnable = false;
             Events.Add(new ServiceStatusEvent<DeviceMaster>(this));
-        }
-
-    
+        }     
     }
 }

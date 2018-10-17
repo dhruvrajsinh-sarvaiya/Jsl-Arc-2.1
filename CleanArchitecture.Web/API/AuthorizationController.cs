@@ -9,8 +9,12 @@ using AspNet.Security.OpenIdConnect.Server;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces.Session;
+using CleanArchitecture.Core.Interfaces.User;
+using CleanArchitecture.Core.Services;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.Services.Session;
+using CleanArchitecture.Core.ViewModels.AccountViewModels.Login;
+using CleanArchitecture.Infrastructure.Services.User;
 using CleanArchitecture.Web.Filters;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +31,6 @@ namespace CleanArchitecture.Web.API
     [ApiController]
     public class AuthorizationController : ControllerBase
     {
-
         private readonly IOptions<IdentityOptions> _identityOptions;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -35,13 +38,17 @@ namespace CleanArchitecture.Web.API
         private readonly IUserSessionService _userSessionService;
         private readonly IRedisConnectionFactory _fact;
         private readonly RedisSessionStorage _redisSessionStora;
+        private readonly IOtpMasterService _otpMasterService;
+        private readonly ICustomPassword _customPassword;
 
         public AuthorizationController(IOptions<IdentityOptions> identityOptions,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             ILoggerFactory loggerFactory,
             IUserSessionService userSessionService, RedisSessionStorage redisSessionStora,
-            IRedisConnectionFactory factory)
+            IRedisConnectionFactory factory,
+            IUserService userService,
+            IOtpMasterService otpMasterService, ICustomPassword customPassword)
         {
             _identityOptions = identityOptions;
             _signInManager = signInManager;
@@ -50,12 +57,14 @@ namespace CleanArchitecture.Web.API
             _userSessionService = userSessionService;
             _redisSessionStora = redisSessionStora;
             _fact = factory;
+            _otpMasterService = otpMasterService;
+            _customPassword = customPassword;
         }
 
         [AllowAnonymous]
         //[ServiceFilter(typeof(ApiResultFilter))]
-        [HttpPost("~/connect/token"), Produces("application/x-www-form-urlencoded")]
-        public async Task<IActionResult> Exchange(OpenIdConnectRequest request, [FromHeader]string Authorization)
+        [HttpPost("~/connect/token"), Produces("application/json")]
+        public async Task<IActionResult> Exchange(OpenIdConnectRequest request, string appkey)
         {
             Debug.Assert(request.IsTokenRequest(),
                 "The OpenIddict binder for ASP.NET Core MVC is not registered. " +
@@ -63,59 +72,76 @@ namespace CleanArchitecture.Web.API
 
             ApplicationUser user;  /// Create Application user Instance For set the user using Redis session Or using Database
             string RedisDBKey = string.Empty;
+            if (!string.IsNullOrEmpty(appkey) && !string.IsNullOrEmpty(request.Password)) /// added by nirav savariya for login with email and mobile on 16-10-2018
+            {
+                var userdata = await _userManager.FindByNameAsync(request.Username);
+                var model = await _customPassword.IsValidPassword(appkey, request.Password);
+                if (model != null)
+                {
+                    request.Password = model.Password;
+                    var newPassword = _userManager.PasswordHasher.HashPassword(userdata, model.Password);
+                    userdata.PasswordHash = newPassword;
+                    var res = await _userManager.UpdateAsync(userdata);
+                    _customPassword.UpdateOtp(model.Id);
+                }
+                else
+                {
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidAppkey, ErrorCode = enErrorCode.Status4048Invalidappkey });
+                    //return BadRequest("Invalid appkey.");
+                }
+            }
 
+            if (string.IsNullOrEmpty(appkey) && request.IsPasswordGrantType())
+            {
+                string numeric = string.Empty;
+                foreach (char str in request.Password)
+                {
+                    if (char.IsDigit(str))
+                    {
+                        if (numeric.Length < 6)
+                            numeric += str.ToString();   
+                    }
+                }
+                if (numeric.Length == 6)
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Appkey, ErrorCode = enErrorCode.Status4049appkey });
+            }
 
             if (request.IsPasswordGrantType())
             {
-
                 var Userdata = new RedisUserdata(); ///  If not find the RadisDbKey then we Set key 
                 var redis = new RadisServices<RedisUserdata>(this._fact);
 
-                if (string.IsNullOrEmpty(Authorization))
+                user = await _userManager.FindByNameAsync(request.Username);
+                if (user == null)
                 {
-                    user = await _userManager.FindByNameAsync(request.Username);
+                    //return BadRequest("The username/password couple is invalid.");
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUser, ErrorCode = enErrorCode.Status4050InvalidUser });
+                }
+                else
+                {
                     Userdata.RedisDBKey = Guid.NewGuid().ToString();
                     Userdata.RedisSessionKey = Guid.NewGuid().ToString();
                     RedisDBKey = Userdata.RedisDBKey;
                     redis.Save(Userdata.RedisDBKey, Userdata);
                     _redisSessionStora.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
                 }
-                else
-                {
-                    Userdata = redis.Get(Authorization);
-                    if (string.IsNullOrEmpty(Userdata.RedisDBKey) && string.IsNullOrEmpty(Userdata.RedisSessionKey))
-                    {
-                        user = await _userManager.FindByNameAsync(request.Username);
-                        Userdata.RedisDBKey = Guid.NewGuid().ToString();
-                        Userdata.RedisSessionKey = Guid.NewGuid().ToString();
-                        RedisDBKey = Userdata.RedisDBKey;
-                        redis.Save(Userdata.RedisDBKey, Userdata);
-                        _redisSessionStora.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
-                    }
-                    else
-                    {
-                        user = _redisSessionStora.GetObjectFromJson<ApplicationUser>(Userdata.RedisSessionKey, Userdata.RedisDBKey);
-                        RedisDBKey = Userdata.RedisDBKey;
-                        if (user == null)
-                        {
-                            user = await _userManager.FindByNameAsync(request.Username);
-                            _redisSessionStora.SetObject(Userdata.RedisSessionKey, user, RedisDBKey);
-                        }
-                    }
-                }
-                if (user == null)
-                {
-                    return BadRequest("The username/password couple is invalid.");
-                }
 
                 // Validate the username/password parameters and ensure the account is not locked out.
                 var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
                 if (!result.Succeeded)
                 {
-                    return BadRequest("The username/password couple is invalid.");
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUser, ErrorCode = enErrorCode.Status4050InvalidUser });
+                    //return BadRequest("The username/password couple is invalid.");
                 }
                 // Create a new authentication ticket.
                 var ticket = await CreateTicketAsync(request, user, null, RedisDBKey);
+                if (!string.IsNullOrEmpty(appkey))
+                {
+                    var setpwd = _userManager.PasswordHasher.HashPassword(user, DateTime.UtcNow.ToString());
+                    user.PasswordHash = setpwd;
+                    var res = await _userManager.UpdateAsync(user);
+                }
+                //return Ok(new Customtokenresponse { ReturnCode = enResponseCode.Success, ReturnMsg = "Success", SignIntoken = SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme)});
 
                 return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
             }
@@ -132,36 +158,40 @@ namespace CleanArchitecture.Web.API
                 user = await _userManager.GetUserAsync(info.Principal);
                 if (user == null)
                 {
-                    return BadRequest(new OpenIdConnectResponse
-                    {
-                        Error = OpenIdConnectConstants.Errors.InvalidGrant,
-                        ErrorDescription = "The refresh token is no longer valid."
-                    });
+                    //return BadRequest(new OpenIdConnectResponse
+                    //{
+                    //    Error = OpenIdConnectConstants.Errors.InvalidGrant,
+                    //    ErrorDescription = "The refresh token is no longer valid."
+                    //});
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.RefreshToken, ErrorCode = enErrorCode.Status4051RefreshToken });
                 }
 
                 // Ensure the user is still allowed to sign in.
                 if (!await _signInManager.CanSignInAsync(user))
                 {
-                    return BadRequest(new OpenIdConnectResponse
-                    {
-                        Error = OpenIdConnectConstants.Errors.InvalidGrant,
-                        ErrorDescription = "The user is no longer allowed to sign in."
-                    });
+                    //return BadRequest(new OpenIdConnectResponse
+                    //{
+                    //    Error = OpenIdConnectConstants.Errors.InvalidGrant,
+                    //    ErrorDescription = "The user is no longer allowed to sign in."
+                    //});
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.UserToken, ErrorCode = enErrorCode.Status4052UserToken });
                 }
 
                 // Create a new authentication ticket, but reuse the properties stored
                 // in the refresh token, including the scopes originally granted.
                 var ticket = await CreateTicketAsync(request, user, info.Properties);
 
+                //return Ok(new Customtokenresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP, SignIntoken = SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme)});
+
                 return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
             }
 
-            return BadRequest(new OpenIdConnectResponse
-            {
-                Error = OpenIdConnectConstants.Errors.UnsupportedGrantType,
-                ErrorDescription = "The specified grant type is not supported."
-            });
-
+            //return BadRequest(new OpenIdConnectResponse
+            //{
+            //    Error = OpenIdConnectConstants.Errors.UnsupportedGrantType,
+            //    ErrorDescription = "The specified grant type is not supported."
+            //});
+            return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Granttype, ErrorCode = enErrorCode.Status4053Granttype });
         }
 
 

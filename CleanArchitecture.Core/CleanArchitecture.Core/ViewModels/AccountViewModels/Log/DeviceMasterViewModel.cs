@@ -15,5 +15,16 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
         public string DeviceId { get; set; }
         public bool IsEnable { get; set; }
         public bool IsDeleted { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedDate { get; set; }
+
+        public long CreatedBy { get; set; }
+
+        public long? UpdatedBy { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime UpdatedDate { get; set; }
+
+        public short Status { get; set; }
     }
 }

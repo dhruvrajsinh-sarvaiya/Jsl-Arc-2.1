@@ -50,7 +50,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType);
 
         //Rushabh 16-10-2018
-        string SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request);
+        LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long userID);
 
         //Rushabh 16-10-2018
         LimitResponse GetWalletLimitConfig(string accWalletID);

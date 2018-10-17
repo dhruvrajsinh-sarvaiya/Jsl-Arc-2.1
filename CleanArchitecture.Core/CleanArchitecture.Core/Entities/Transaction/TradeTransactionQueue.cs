@@ -1,4 +1,6 @@
-﻿using CleanArchitecture.Core.SharedKernel;
+﻿using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Events;
+using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -61,7 +63,7 @@ namespace CleanArchitecture.Core.Entities
 
         //public short Status { get; set; }
 
-        public int StatusCode { get; set; }
+        public long StatusCode { get; set; }
 
         public string StatusMsg { get; set; }
 
@@ -86,6 +88,36 @@ namespace CleanArchitecture.Core.Entities
         public DateTime? SettledDate { get; set; }
 
         public decimal TakerPer { get; set; }
+
+        public void MakeTransactionSuccess()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.Success);
+            AddValueChangeEvent();
+        }
+        public void MakeTransactionSystemFail()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.SystemFail);
+            AddValueChangeEvent();
+        }
+        public void MakeTransactionOperatorFail()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.OperatorFail);
+            AddValueChangeEvent();
+        }
+        public void SetTransactionCode(long statuscode)
+        {
+            StatusCode = statuscode;
+            AddValueChangeEvent();
+        }
+        public void SetTransactionStatusMsg(string statusMsg)
+        {
+            StatusMsg = statusMsg;
+            AddValueChangeEvent();
+        }
+        public void AddValueChangeEvent()
+        {
+            Events.Add(new ServiceStatusEvent<TradeTransactionQueue>(this));
+        }
     }
 
 }

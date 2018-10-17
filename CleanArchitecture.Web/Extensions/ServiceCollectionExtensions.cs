@@ -224,7 +224,22 @@ namespace CleanArchitecture.Web.Extensions
                 options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-               .AddOAuthValidation()               
+               .AddOAuthValidation()
+
+               //.AddOAuth("Customprovider", "Custom provider", o =>
+               //{
+               //    o.ClientId = Startup.Configuration["Authentication:ClientId"];
+               //    o.ClientSecret = Startup.Configuration["Authentication:ClientSecret"];
+               //    o.CallbackPath = new PathString("/connect/Customprovider");
+               //    //o.AuthorizationEndpoint = MicrosoftAccountDefaults.AuthorizationEndpoint;
+               //    //o.TokenEndpoint = MicrosoftAccountDefaults.TokenEndpoint;
+               //    //o.Scope.Add("https://graph.microsoft.com/user.read");
+               //    o.SaveTokens = true;
+               //    //o.Events = new OAuthEvents()
+               //    //{
+               //    //    OnRemoteFailure = HandleOnRemoteFailure
+               //    //};
+               //})
                // https://console.developers.google.com/projectselector/apis/library?pli=1
                .AddGoogle(options =>
                {
@@ -341,7 +356,8 @@ namespace CleanArchitecture.Web.Extensions
 
             //Ipaddress Service
             services.AddScoped<IipAddressService, IpAddressService>();
-            
+            //Custom password Service
+            services.AddScoped<ICustomPassword, CustomPasswordService>();
             return services;
         }
     }

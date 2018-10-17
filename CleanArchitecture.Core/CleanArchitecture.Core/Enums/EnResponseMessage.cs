@@ -25,7 +25,7 @@ namespace CleanArchitecture.Core.Enums
         //=========================Transactional Msg
         //public static string CreateTrnSuccessMsg = "Success";
         //public static string CreateTrnFailMsg = "Fail";
-        public static string CreateTrnNoPairSelectedMsg = "No Pair Selected";
+        public static string CreateTrnNoPairSelectedMsg = "Invalid Pair Selected";
         public static string CreateTrnInvalidQtyPriceMsg = "Invalid Qty or Price";
         public static string CreateTrnInvalidQtyNAmountMsg = "Invalid Order Qty and Amount";
         public static string CreateTrn_NoCreditAccountFoundMsg = "No Credit Account Found";
@@ -33,12 +33,18 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrnInvalidAmountMsg = "Invalid Amount";
         public static string CreateTrnDuplicateTrnMsg = "Duplicate Transaction for Same Address, Please Try After 10 Minutes";
         public static string CreateTrn_NoSelfAddressWithdrawAllowMsg = "Invalid Amount";
-        public static string ProcessTrn_InsufficientBalance = "Insufficient Wallet Balance";
+        public static string ProcessTrn_InsufficientBalanceMsg = "Insufficient Wallet Balance";
+        public static string ProcessTrn_AmountBetweenMinMaxMsg = "Amount Must be Between: @MIN AND @MAX";
+        public static string ProcessTrn_PriceBetweenMinMaxMsg = "Price Must be Between: @MIN AND @MAX";
+        public static string ProcessTrn_InvalidBidPriceValueMsg = "Invalid BidPrice Value";
+        public static string ProcessTrn_PoolOrderCreateFailMsg = "Order Creation Fail";
+        public static string ProcessTrn_InitializeMsg = "Initialize";
         //============================
 
         //============================walelt=================================//       
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
+        public static string SetWalletLimitSuccessMsg = "Limit Created Successfully";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
         public static string CreateAddressFailMsg = "Failed to generate Address.";
@@ -72,8 +78,8 @@ namespace CleanArchitecture.Core.Enums
         public static string ReSendMailSubject = "Registration confirmation resend email";
         public static string ForgotPasswordMail = "Forgot password email";
         public static string ResetPasswordMail = "Reset password conformation email";
-        public static string SendMailBody = "use this code: ";
-        public static string SendSMSSubject = "SMS for use this code ";
+        public static string SendMailBody = "Do not Share this code with anyone for security reasons. Your unique verfication code is ";
+        public static string SendSMSSubject = "Do not Share this code with anyone for security reasons. Your unique verfication code is ";
         public static string LoginEmailSubject = "Login With Email Otp ";
         public static string StandardSignUpPhonevelid = "Please Enter Valid Mobile Number";
         public static string StandardSignUp = "Your account has been created, please verify it by clicking the activation link that has been send to your email.";
@@ -135,13 +141,21 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirmPassMatch = "New password and confirmation password do not match.";
         public static string ResetConfirmOldNotMatch = "Old password does not match";
         public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
-
-
-
-        //========================My Account===============================//
+        public static string IpAddressUpdateError = "Ip address status not update.";
+        public static string SuccessDesableIpStatus = "Success full desable ip address.";
+        public static string SuccessDeleteIpAddress = "Success full remove ip address.";
+        public static string IpAddressdeleteError = "Ip address not remove.";
+        public static string SuccessGetIpData = "Success full Get Ip Address.";
+        public static string InvalidAppkey = "Invalid appkey or password.";
+        public static string Appkey = "This appkey data not available.";
+        public static string InvalidUser = "The username/password couple is invalid.";
+        public static string RefreshToken = "The refresh token is no longer valid.";
+        public static string UserToken = "The user is no longer allowed to sign in.";
+        public static string Granttype = "The specified grant type is not supported.";
         public static string EnableTroFactor = "User two factor authentication successfully activates";
         public static string DisableTroFactor = "User two factor authentication successfully disable";
-
+        public static string FactorFail = "Invalid authenticator code entered for user with ID {UserId}.";
+        public static string FactorRequired = "Two factor authentication is activated please verify your code";
 
     }
 }

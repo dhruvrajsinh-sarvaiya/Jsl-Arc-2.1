@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using CleanArchitecture.Core.ViewModels.ManageViewModels;
 using CleanArchitecture.Infrastructure;
@@ -27,6 +28,7 @@ namespace CleanArchitecture.Web.API
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
         private readonly IBasePage _basePage;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
         #endregion
 
@@ -34,11 +36,12 @@ namespace CleanArchitecture.Web.API
         public TwoFASettingController(
         UserManager<ApplicationUser> userManager,
         ILoggerFactory loggerFactory,
-        UrlEncoder urlEncoder)
+        UrlEncoder urlEncoder, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<ManageController>();
             _urlEncoder = urlEncoder;
+            _signInManager = signInManager;
         }
         #endregion
 
@@ -70,43 +73,32 @@ namespace CleanArchitecture.Web.API
             else
             {
                 ModelState.AddModelError(string.Empty, "Invalid");
-                return BadRequest(new ApiError(ModelState));
+                //  return BadRequest(new ApiError(ModelState));
             }
 
-            //var user = await GetCurrentUserAsync();
+            var user = await GetCurrentUserAsync();
 
-            //var model = new TwoFactorAuthenticationViewModel
-            //{
-            //    HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
-            //    Is2faEnabled = user.TwoFactorEnabled,
-            //    RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
-            //};
 
-            //return Ok(model);
+            var model1 = new TwoFactorAuthenticationViewModel
+            {
+                HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
+                Is2faEnabled = user.TwoFactorEnabled,
+                RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
+            };
+
+            return Ok(model);
         }
 
         [HttpPost("disable2fa")]
         public async Task<IActionResult> Disable2fa()
         {
-            try
-            {
-                var user = await GetCurrentUserAsync();
-                user.TwoFactorEnabled = false;
-                await _userManager.UpdateAsync(user);
+            var user = await GetCurrentUserAsync();
+            user.TwoFactorEnabled = false;
+            await _userManager.UpdateAsync(user);
 
-                _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
-                return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new TwoFactorAuthResponse
-                {
-                    ReturnCode = enResponseCode.InternalError,
-                    ReturnMsg = ex.ToString(),
-                    ErrorCode = enErrorCode.Status500InternalServerError
-                });
-            }
+            _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
+            return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
+
 
         }
 
@@ -120,23 +112,23 @@ namespace CleanArchitecture.Web.API
                 user.TwoFactorEnabled = true;
                 await _userManager.UpdateAsync(user);
 
-                return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
+                //return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
 
 
-                //var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
-                //if (string.IsNullOrEmpty(unformattedKey))
-                //{
-                //    await _userManager.ResetAuthenticatorKeyAsync(user);
-                //    unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
-                //}
+                var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
+                if (string.IsNullOrEmpty(unformattedKey))
+                {
+                    await _userManager.ResetAuthenticatorKeyAsync(user);
+                    unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
+                }
 
-                //var model = new EnableAuthenticatorViewModel
-                //{
-                //    SharedKey = FormatKey(unformattedKey),
-                //    AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
-                //};
+                var model = new EnableAuthenticatorViewModel
+                {
+                    SharedKey = FormatKey(unformattedKey),
+                    AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
+                };
 
-                //  return Ok(model);
+                return Ok(model);
             }
             catch (Exception ex)
             {
@@ -147,28 +139,28 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        //[HttpPost("enableauthenticator")]
-        //public async Task<IActionResult> EnableAuthenticator([FromBody]EnableAuthenticatorViewModel model)
-        //{
+        [HttpPost("enableauthenticator")]
+        public async Task<IActionResult> EnableAuthenticator([FromBody]EnableAuthenticatorViewModel model)
+        {
 
-        //    var user = await GetCurrentUserAsync();
+            var user = await GetCurrentUserAsync();
 
-        //    // Strip spaces and hypens
-        //    var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+            // Strip spaces and hypens
+            var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
-        //    var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
-        //        user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+            var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+                user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
 
-        //    if (!is2faTokenValid)
-        //    {
-        //        ModelState.AddModelError("model.Code", "Verification code is invalid.");
-        //        return BadRequest(new ApiError(ModelState));
-        //    }
+            if (!is2faTokenValid)
+            {
+                ModelState.AddModelError("model.Code", "Verification code is invalid.");
+                return BadRequest(new ApiError(ModelState));
+            }
 
-        //    await _userManager.SetTwoFactorEnabledAsync(user, true);
-        //    _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-        //    return NoContent();
-        //}
+            await _userManager.SetTwoFactorEnabledAsync(user, true);
+            _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
+            return NoContent();
+        }
 
         [HttpPost("resetauthenticator")]
         public async Task<IActionResult> ResetAuthenticator()
@@ -199,6 +191,35 @@ namespace CleanArchitecture.Web.API
 
             return Ok(model);
         }
+        [HttpPost("VerifyCode")]
+
+        public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
+        {
+            // The following code protects for brute force attacks against the two factor codes.
+            // If a user enters incorrect codes for a specified amount of time then the user account
+            // will be locked out for a specified amount of time.
+            //  var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            var authenticatorCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberBrowser);
+            if (result.Succeeded)
+            {
+                // return RedirectToLocal(model.ReturnUrl);
+            }
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning(7, "User account locked out.");
+                return View("Lockout");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid code.");
+                return View(model);
+            }
+        }
+
 
         #endregion
 

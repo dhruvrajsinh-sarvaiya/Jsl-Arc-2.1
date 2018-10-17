@@ -41,7 +41,7 @@ namespace CleanArchitecture.Core.Enums
         Generate_Address = 9,
         Topup = 10,
         Charge = 11,
-        Commission=12        
+        Commission=12
     }
     public enum enOrderStatus
     {
@@ -157,6 +157,11 @@ namespace CleanArchitecture.Core.Enums
         InvalidMarketType = 4506,
         InValidPageNo = 4507,
         ProcessTrn_InsufficientBalance = 1,
+        ProcessTrn_AmountBetweenMinMax=1,
+        ProcessTrn_PriceBetweenMinMax = 1,
+        ProcessTrn_InvalidBidPriceValue = 1,
+        ProcessTrn_PoolOrderCreateFail = 1,
+        ProcessTrn_Initialize = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -176,7 +181,15 @@ namespace CleanArchitecture.Core.Enums
         Status4043ResetConfirmOldNotMatch=4043,
         Status4044UserSelectedIpNotFound = 4044,
         Status4045InvalidUserSelectedIp = 4045,
-
+        Status4046NotUpdateIpStatus = 4046,
+        Status4047NotDeleteIp = 4047,
+        Status4048Invalidappkey = 4048,
+        Status4049appkey = 4049,
+        Status4050InvalidUser = 4050,
+        Status4051RefreshToken = 4051,
+        Status4052UserToken = 4052,
+        Status4053Granttype = 4053,
+        Status4054FactorFail =4054,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -194,7 +207,10 @@ namespace CleanArchitecture.Core.Enums
         AlredyExist=4037,
         InsufficantBal=4038,
         UserIDWalletIDDidNotMatch = 4039
-        
+
+       
+
+
 
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
@@ -279,5 +295,13 @@ namespace CleanArchitecture.Core.Enums
     {
         Debit = 1,
         Credit = 2
+    }
+
+    public enum enWalletLimitType
+    {
+        TradingLimit = 1,
+        WithdrawLimit = 2,
+        DepositLimit = 3,
+        APICallLimit = 4
     }
 }

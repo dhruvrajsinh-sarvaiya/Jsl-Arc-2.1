@@ -2,9 +2,11 @@
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using PhoneNumbers;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -18,6 +20,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
     {
         private readonly CleanArchitectureContext _dbContext;
         private readonly ILogger<UserService> _log;
+
         public UserService(CleanArchitectureContext dbContext, ILogger<UserService> log)
         {
             _dbContext = dbContext;
@@ -32,11 +35,13 @@ namespace CleanArchitecture.Infrastructure.Services.User
             else
                 return true;
         }
+
         /// <summary>
         /// Get User Data
         /// </summary>
         /// <param name="MobileNumber"></param>
         /// <returns></returns>
+
         public async Task<TempUserRegister> FindByMobileNumber(string MobileNumber)
         {
             var userdata = _dbContext.Users.Where(i => i.Mobile == MobileNumber).FirstOrDefault();
@@ -74,28 +79,122 @@ namespace CleanArchitecture.Infrastructure.Services.User
         /// added by nirav savariya for random generate otp on 9/26/2018
         /// </summary>
         /// <returns></returns>
+
         public long GenerateRandomOTP()
         {
             try
             {
-                //string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
-                //string sOTP = String.Empty;
-                //long sTempChars ;
-                //Random rand = new Random();
-                //int iOTPLength = 6;
-                //for (int i = 0; i < iOTPLength; i++)
-                //{
-                //    int p = rand.Next(0, saAllowedCharacters.Length);
-                //    sTempChars = Convert.ToInt64(saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)]);
-                //    sOTP += sTempChars;
-                //}
+                string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+                string sOTP = String.Empty;
+                long sTempChars;
+                Random rand = new Random();
+                int iOTPLength = 6;
+                for (int i = 0; i < iOTPLength; i++)
+                {
+                    int p = rand.Next(0, saAllowedCharacters.Length);
+                    sTempChars = Convert.ToInt64(saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)]);
+                    sOTP += sTempChars;
+                }
+                return Convert.ToInt64(sOTP);
+                //Random generator = new Random();
+                //String sOTP = generator.Next(1, 999999).ToString("D6");
                 //return Convert.ToInt64(sOTP);
 
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
 
-                Random generator = new Random();
-                String sOTP = generator.Next(1, 999999).ToString("D6");
-                return Convert.ToInt64(sOTP);
+        /// <summary>
+        /// added by nirav savariya for random generate otp with password on 10/15/2018
+        /// </summary>
+        /// <returns></returns>
 
+        public string GenerateRandomOTPWithPassword(PasswordOptions opts = null)
+        {
+            try
+            {
+                if (opts == null) opts = new PasswordOptions()
+                {
+                    RequiredLength = 64,
+                    RequiredUniqueChars = 4,
+                    RequireDigit = true,
+                    RequireLowercase = true,
+                    RequireNonAlphanumeric = true,
+                    RequireUppercase = true,
+
+                };
+
+                string[] randomChars = new[] {
+        "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
+        "abcdefghijkmnopqrstuvwxyz",    // lowercase
+        "0123456789",                   // digits
+        "!@$%^*"                      // non-alphanumeric
+    };
+                Random rand = new Random(Environment.TickCount);
+                List<char> chars = new List<char>();
+
+                if (opts.RequireUppercase)
+                    chars.Insert(rand.Next(0, chars.Count),
+                        randomChars[0][rand.Next(0, randomChars[0].Length)]);
+
+                if (opts.RequireLowercase)
+                    chars.Insert(rand.Next(0, chars.Count),
+                        randomChars[1][rand.Next(0, randomChars[1].Length)]);
+
+                if (opts.RequireDigit)
+                    chars.Insert(rand.Next(0, chars.Count),
+                        randomChars[2][rand.Next(0, randomChars[2].Length)]);
+
+                if (opts.RequireNonAlphanumeric)
+                    chars.Insert(rand.Next(0, chars.Count),
+                        randomChars[3][rand.Next(0, randomChars[3].Length)]);
+
+                for (int i = chars.Count; i < opts.RequiredLength
+                    || chars.Distinct().Count() < opts.RequiredUniqueChars; i++)
+                {
+                    string rcs = randomChars[rand.Next(0, randomChars.Length)];
+                    chars.Insert(rand.Next(0, chars.Count),
+                        rcs[rand.Next(0, rcs.Length)]);
+                }
+
+                return new string(chars.ToArray());
+
+                //string lowers = "abcdefghijklmnopqrstuvwxyz";
+                //string uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                //string number = "0123456789";
+                //string specialChars = "@$?()";
+                //Random random = new Random();
+
+                //string generated = "!";
+                //for (int i = 1; i <= 18; i++)
+                //    generated = generated.Insert(
+                //        random.Next(generated.Length),
+                //        lowers[random.Next(lowers.Length - 1)].ToString()
+                //    );
+
+                //for (int i = 1; i <= 15; i++)
+                //    generated = generated.Insert(
+                //        random.Next(generated.Length),
+                //        uppers[random.Next(uppers.Length - 1)].ToString()
+                //    );
+
+                //for (int i = 1; i <= 27; i++)
+                //    generated = generated.Insert(
+                //        random.Next(generated.Length),
+                //        number[random.Next(number.Length - 1)].ToString()
+                //    );
+
+                //for (int i = 1; i <= 4; i++)
+                //    generated = generated.Insert(
+                //        random.Next(generated.Length),
+                //        specialChars[random.Next(specialChars.Length - 1)].ToString()
+                //    );
+
+                //return generated.Replace("!", string.Empty);
             }
             catch (Exception ex)
             {
@@ -116,7 +215,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
                 return phoneUtil.IsValidNumber(phoneNumber); // returns true for valid number    
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -154,11 +253,12 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return ex.ToString();
             }
 
         }
+
     }
 }
