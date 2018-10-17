@@ -20,6 +20,6 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
 
     public class LoginWithMobileResponse : BizResponseClass
     {
-
+        public string appkey { get; set; }
     }
 }

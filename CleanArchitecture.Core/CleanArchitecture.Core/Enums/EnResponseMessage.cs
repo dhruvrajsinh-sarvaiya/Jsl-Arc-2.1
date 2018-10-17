@@ -142,9 +142,12 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessDeleteIpAddress = "Success full remove ip address.";
         public static string IpAddressdeleteError = "Ip address not remove.";
         public static string SuccessGetIpData = "Success full Get Ip Address.";
-
-
-        //========================My Account===============================//
+        public static string InvalidAppkey = "Invalid appkey.";
+        public static string Appkey = "This appkey data not available.";
+        public static string InvalidUser = "The username/password couple is invalid.";
+        public static string RefreshToken = "The refresh token is no longer valid.";
+        public static string UserToken = "The user is no longer allowed to sign in.";
+        public static string Granttype = "The specified grant type is not supported.";
         public static string EnableTroFactor = "User two factor authentication successfully activates";
         public static string DisableTroFactor = "User two factor authentication successfully disable";
     }

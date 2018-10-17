@@ -40,12 +40,23 @@ namespace CleanArchitecture.Infrastructure.Services.User
         {
             var checkotp = await GetOtpData(UserId);
             string OtpValue = string.Empty;
-            //var currentotp = (dynamic)null;
-            //if ((checkotp?.ExpirTime <= DateTime.UtcNow && !checkotp.EnableStatus) || checkotp == null) // Remove expiretime as per discuss with nishit bhai 10-09-2018
-            //{
             if (checkotp != null)
                 UpdateOtp(checkotp.Id);
-            OtpValue = _userService.GenerateRandomOTP().ToString();
+            OtpValue = _userService.GenerateRandomOTPWithPassword().ToString();
+            string alpha = string.Empty; string numeric = string.Empty;
+            foreach (char str in OtpValue)
+            {
+                if (char.IsDigit(str))
+                {
+                    if (numeric.Length < 6)
+                        numeric += str.ToString();
+                    else
+                        alpha += str.ToString();
+                }
+                else
+                    alpha += str.ToString();
+            }
+
             int Regtypeid = 0;
             if (!String.IsNullOrEmpty(Email))
             {
@@ -60,41 +71,37 @@ namespace CleanArchitecture.Infrastructure.Services.User
             {
                 UserId = UserId,
                 RegTypeId = Regtypeid,
-                OTP = OtpValue,
+                OTP = numeric,
                 CreatedTime = DateTime.UtcNow,
                 ExpirTime = DateTime.UtcNow.AddHours(2),
                 Status = 0,
                 CreatedDate = DateTime.Now,
                 CreatedBy = UserId
-
             };
             _customRepository.Add(currentotp);
-            //_customRepository.Insert(currentotp);
-            //}
-            //else
-            //{
-            //    OtpValue = checkotp.OTP;
-            //    currentotp = checkotp;
-            //}
-
+            
             if (!String.IsNullOrEmpty(Email))
             {
-                //var OtpLink = "<a class='btn-primary' href=\"" + OtpValue + "\"> Login with Email Otp = " + OtpValue + " </a>";
-                //_logger.LogInformation(3, "User created a new account with password.");
-
                 SendEmailRequest request = new SendEmailRequest();
                 request.Recepient = Email;
                 request.Subject = EnResponseMessage.LoginEmailSubject;
-                request.Body = EnResponseMessage.SendMailBody + OtpValue;
+                request.Body = EnResponseMessage.SendMailBody + numeric;
                 await _mediator.Send(request);
             }
             if (!String.IsNullOrEmpty(Mobile))
             {
                 SendSMSRequest request = new SendSMSRequest();
                 request.MobileNo = Convert.ToInt64(Mobile);
-                request.Message = EnResponseMessage.SendMailBody  + OtpValue;
+                request.Message = EnResponseMessage.SendMailBody + numeric;
                 await _mediator.Send(request);
             }
+
+            string _Pass1 = alpha.Substring(0, 20);
+            string _Pass11 = _Pass1 + numeric.Substring(0, 3);
+            string _Pass2 = alpha.Substring(20, 10);
+            string _Pass22 = _Pass2 + numeric.Substring(3, 3);
+            string _Pass3 = alpha.Substring(30, 28);
+            string password = _Pass11 + _Pass22 + _Pass3;
 
             OtpMasterViewModel model = new OtpMasterViewModel();
             if (currentotp != null)
@@ -106,6 +113,8 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 model.ExpirTime = currentotp.ExpirTime;
                 model.Status = currentotp.Status;
                 model.Id = currentotp.Id;
+                model.Password = password;
+                model.appkey = alpha;
                 return model;
             }
             else

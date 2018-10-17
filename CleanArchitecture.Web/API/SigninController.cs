@@ -45,11 +45,12 @@ namespace CleanArchitecture.Web.API
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private readonly IBasePage _basePage;
         private readonly EncyptedDecrypted _encdecAEC;
+        private readonly ICustomPassword _custompassword;
         #endregion
 
         #region Ctore
         public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage,
-            EncyptedDecrypted encypted)
+            EncyptedDecrypted encypted, ICustomPassword custompassword)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -60,6 +61,7 @@ namespace CleanArchitecture.Web.API
             _configuration = configuration;
             _basePage = basePage;
             _encdecAEC = encypted;
+            _custompassword = custompassword;
         }
         #endregion
 
@@ -316,19 +318,21 @@ namespace CleanArchitecture.Web.API
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user != null)
                 {
-                    var otpData = _otpMasterService.AddOtp(user.Id, user.Email, "");
+                    var otpData = await _otpMasterService.AddOtp(user.Id, user.Email, "");
                     if (otpData != null)
                     {
+                        CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                        data.Password = otpData.Password;
+                        data.UserId = otpData.UserId;
+                        data.EnableStatus = false;
+                        await _custompassword.AddPassword(data);
                         _logger.LogWarning(1, "User Login with Email Send Success.");
-                        //return AppUtils.Standerdlogin("You have send OTP on email");
-                        return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend });
+                        return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
                     }
                     else
                     {
                         _logger.LogWarning(2, "User Otp Data Not Send.");
-                        //return BadRequest(new ApiError("Invalid login attempt."));
                         return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpDatanotSend, ErrorCode = enErrorCode.Status400BadRequest });
-
                     }
                 }
                 else
@@ -463,12 +467,19 @@ namespace CleanArchitecture.Web.API
                         if (!otpcheck.EnableStatus)
                         {
                             _otpMasterService.UpdateOtp(otpcheck.Id);
+                            var custompwd = await _custompassword.GetPassword(otpcheck.UserId);
+                            if (custompwd != null)
+                                _custompassword.UpdateOtp(custompwd.Id);
                             var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), userdt.Email, "");
                             if (otpData != null)
                             {
+                                CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                data.Password = otpData.Password;
+                                data.UserId = otpData.UserId;
+                                data.EnableStatus = false;
+                                await _custompassword.AddPassword(data);
                                 _logger.LogWarning(1, "User Login with Email OTP Send Success.");
-
-                                return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP });
+                                return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP, appkey = otpData.appkey });
 
                             }
                             else
@@ -481,15 +492,6 @@ namespace CleanArchitecture.Web.API
                         else
                         {
                             return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status400BadRequest });
-                            //SendEmailRequest request = new SendEmailRequest();
-                            //request.Recepient = userdt.Email;
-                            //request.Subject = "Login With Email Otp";
-                            //request.Body = "use this code:" + otpcheck.OTP + "";
-
-                            //await _mediator.Send(request);
-                            //_logger.LogWarning(1, "User Login with Email OTP Send Success.");
-
-                            //return Ok("User Login with Email OTP Send Success.");
                         }
                     }
                     else
@@ -526,13 +528,16 @@ namespace CleanArchitecture.Web.API
                 var userdt = await _userService.FindByMobileNumber(model.Mobile);
                 if (userdt != null)
                 {
-                    var otpData = _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
+                    var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
                     if (otpData != null)
                     {
-                        //var roles = await _userManager.GetRolesAsync(userdt.Result);
+                        CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                        data.Password = otpData.Password;
+                        data.UserId = otpData.UserId;
+                        data.EnableStatus = false;
+                        await _custompassword.AddPassword(data);
                         _logger.LogWarning(1, "User Login with Mobile Send Success.");
-                        return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile });
-                        // return AppUtils.Standerdlogin("You have send OTP on mobile.");
+                        return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile, appkey = otpData.appkey });
                     }
                     else
                     {
@@ -657,16 +662,23 @@ namespace CleanArchitecture.Web.API
                     var otpcheck = await _otpMasterService.GetOtpData(Convert.ToInt32(userdt?.Id));
                     if (otpcheck != null)
                     {
-
                         //if (otpcheck.ExpirTime <= DateTime.UtcNow && !otpcheck.EnableStatus)  // Remove expiretime as per discuss with nishit bhai 10-09-2018
                         if (!otpcheck.EnableStatus)
                         {
                             _otpMasterService.UpdateOtp(otpcheck.Id);
+                            var custompwd = await _custompassword.GetPassword(otpcheck.UserId);
+                            if (custompwd != null)
+                                _custompassword.UpdateOtp(custompwd.Id);
                             var otpData = await _otpMasterService.AddOtp(Convert.ToInt32(userdt.Id), "", userdt.Mobile);
                             if (otpData != null)
                             {
+                                CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                data.Password = otpData.Password;
+                                data.UserId = otpData.UserId;
+                                data.EnableStatus = false;
+                                await _custompassword.AddPassword(data);
                                 _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
-                                return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile });
+                                return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile, appkey = otpData.appkey });
                             }
                             else
                             {

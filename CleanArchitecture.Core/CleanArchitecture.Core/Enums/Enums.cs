@@ -179,7 +179,12 @@ namespace CleanArchitecture.Core.Enums
         Status4045InvalidUserSelectedIp = 4045,
         Status4046NotUpdateIpStatus = 4046,
         Status4047NotDeleteIp = 4047,
-
+        Status4048Invalidappkey = 4048,
+        Status4049appkey = 4049,
+        Status4050InvalidUser = 4050,
+        Status4051RefreshToken = 4051,
+        Status4052UserToken = 4052,
+        Status4053Granttype = 4053,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
