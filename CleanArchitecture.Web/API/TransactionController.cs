@@ -370,7 +370,7 @@ namespace CleanArchitecture.Web.API
                     //sCondition += " AND TTQ.TrnDate Between '" + fDate  + " AND '" + tDate  + "' ";
                     sCondition += "AND TTQ.TrnDate Between {3} AND {4} ";
                 }
-                long MemberID = user.Id;
+                long MemberID =user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, sCondition,request .FromDate,request .ToDate, PairId, request.Page);
                 if (Response.response.Count == 0)
                 {
