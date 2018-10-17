@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using CleanArchitecture.Core.ApiModels;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.ViewModels.ManageViewModels
@@ -15,5 +16,10 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels
         public string SharedKey { get; set; }
 
         public string AuthenticatorUri { get; set; }
+    }
+
+    public class EnableAuthenticationResponse : BizResponseClass
+    {
+        public EnableAuthenticatorViewModel enableAuthenticatorViewModel { get; set; }
     }
 }

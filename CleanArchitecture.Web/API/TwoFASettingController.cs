@@ -127,8 +127,8 @@ namespace CleanArchitecture.Web.API
                     SharedKey = FormatKey(unformattedKey),
                     AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
                 };
-
-                return Ok(model);
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessfullGetUserData,enableAuthenticatorViewModel = model });
+               
             }
             catch (Exception ex)
             {
