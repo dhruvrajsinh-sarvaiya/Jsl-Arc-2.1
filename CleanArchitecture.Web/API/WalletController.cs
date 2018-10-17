@@ -6,6 +6,7 @@ using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using CleanArchitecture.Web.Helper;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,7 +22,7 @@ namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
     [Authorize]
-    public class WalletController : ControllerBase
+    public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
         private readonly IBasePage _basePage;
@@ -33,7 +35,6 @@ namespace CleanArchitecture.Web.API
             _userManager = userManager;
             _walletService = walletService;
         }
-    
         #region"Methods"
 
         /// <summary>
@@ -55,13 +56,12 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> ListWallet()
         {
-            //ApplicationUser user = new ApplicationUser();
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
-                //user.Id = 1;
-                // var items;
                 var user = await _userManager.GetUserAsync(HttpContext.User);
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name,"", accessToken);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -72,11 +72,12 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.ListWallet(user.Id);
                 }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -92,8 +93,8 @@ namespace CleanArchitecture.Web.API
             CreateWalletResponse Response = new CreateWalletResponse();
             try
             {
-               // ApplicationUser user = new ApplicationUser();
-              //  user.Id = 1;
+                // ApplicationUser user = new ApplicationUser();
+                //  user.Id = 1;
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
@@ -155,7 +156,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{coin}/{walletId}")]
-        public async Task<IActionResult> GetWalletByWalletId(string coin,string walletId)
+        public async Task<IActionResult> GetWalletByWalletId(string coin, string walletId)
         {
             ListWalletResponse Response = new ListWalletResponse();
             try
@@ -171,7 +172,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.GetWalletById(user.Id, coin,walletId);
+                    Response = _walletService.GetWalletById(user.Id, coin, walletId);
                 }
                 return Ok(Response);
             }
@@ -200,7 +201,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.DepositHistoy(FromDate,ToDate,Coin, Amount, Status,user.Id);
+                    response = _walletService.DepositHistoy(FromDate, ToDate, Coin, Amount, Status, user.Id);
                 }
                 return Ok(response);
             }
