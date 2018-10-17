@@ -39,5 +39,8 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
 
     public class IpAddressResponse : BizResponseClass
     {
+        public int TotalRow { get; set; }
+        public List<IpMasterViewModel> IpList { get; set; }
+
     }
 }
