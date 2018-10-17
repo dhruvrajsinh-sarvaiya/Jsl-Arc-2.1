@@ -103,7 +103,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                             LC.MaxAmt as MaximumAmountItem
                             from ServiceMaster SC inner join  ProductConfiguration PC on
 			                PC.ServiceID = SC.Id inner join RouteConfiguration RC on RC.ProductID = PC.Id  
-			                inner join ServiceProviderDetail PrC on Prc.ServiceProID = RC.SerProID AND Prc.Id = RC.SerProDetailID AND Prc.TrnTypeID={1} 
+			                inner join ServiceProviderDetail PrC on Prc.Id = RC.SerProDetailID AND Prc.TrnTypeID={1} 
 							inner join Limits LC on LC.ID = RC.LimitID 
 			                where SC.SMSCode = {0}  and RC.TrnType={1} 
 			                and {2} between LC.MinAmt and LC.MaxAmt			                

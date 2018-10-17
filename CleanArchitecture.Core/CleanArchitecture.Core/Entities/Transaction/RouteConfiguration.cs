@@ -22,8 +22,8 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public long ServiceID { get; set; } // spelling mistake ntrivedi 03-10-2018
 
-        [Required]
-        public long SerProID { get; set; }
+        //[Required]
+        //public long SerProID { get; set; }
 
         [Required]
         public long SerProDetailID { get; set; }
