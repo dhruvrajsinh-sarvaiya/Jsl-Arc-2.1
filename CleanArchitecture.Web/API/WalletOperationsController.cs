@@ -12,6 +12,8 @@ using CleanArchitecture.Core.ViewModels.WalletOperations;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using CleanArchitecture.Core.ViewModels.Wallet;
+using Microsoft.AspNetCore.Identity;
+using CleanArchitecture.Core.Entities.User;
 
 namespace CleanArchitecture.Web.API
 {
@@ -23,10 +25,12 @@ namespace CleanArchitecture.Web.API
         static int i = 1;
         private readonly IBasePage _basePage;
         private readonly ILogger<WalletOperationsController> _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWalletService _walletService;
-        public WalletOperationsController(ILogger<WalletOperationsController> logger, IBasePage basePage, IWalletService walletService)
+        public WalletOperationsController(ILogger<WalletOperationsController> logger, UserManager<ApplicationUser> userManager, IBasePage basePage, IWalletService walletService)
         {
             _logger = logger;
+            _userManager = userManager;
             _walletService = walletService;
             _basePage = basePage;
         }
@@ -285,23 +289,32 @@ namespace CleanArchitecture.Web.API
 
 
 
-        //[HttpPost("{AccWalletID}")]
-        //public async Task<IActionResult> SetWalletLimit(string AccWalletID, [FromBody]WalletLimitConfigurationReq Request)
-        //{
-        //    //    try
-        //    //    {
-        //    //        string Response = _walletService.SetWalletLimitConfig(AccWalletID, Request);
-        //    //        var respObj = JsonConvert.SerializeObject(Response);
-        //    //        dynamic respObjJson = JObject.Parse(respObj);
-        //    //        return Ok(respObjJson);
-        //    //    }
-        //    //    catch (Exception ex)
-        //    //    {
-        //    //        _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-        //    //        return BadRequest();
-        //    //    }
-        //    return Ok();
-        //}
+        [HttpPost("{AccWalletID}")]
+        public async Task<IActionResult> SetWalletLimit(string AccWalletID, [FromBody]WalletLimitConfigurationReq Request)
+        {
+            LimitResponse response = new LimitResponse();
+            //if(Request.TrnType )
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.ReturnCode = enResponseCode.Fail;
+                    response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                response = _walletService.SetWalletLimitConfig(AccWalletID, Request,user.Id);
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+            //return Ok();
+        }
     }
 }
 

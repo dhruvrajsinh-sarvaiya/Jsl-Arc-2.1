@@ -41,7 +41,7 @@ namespace CleanArchitecture.Core.Enums
         Generate_Address = 9,
         Topup = 10,
         Charge = 11,
-        Commission=12        
+        Commission=12
     }
     public enum enOrderStatus
     {
@@ -279,5 +279,13 @@ namespace CleanArchitecture.Core.Enums
     {
         Debit = 1,
         Credit = 2
+    }
+
+    public enum enWalletLimitType
+    {
+        TradingLimit = 1,
+        WithdrawLimit = 2,
+        DepositLimit = 3,
+        APICallLimit = 4
     }
 }

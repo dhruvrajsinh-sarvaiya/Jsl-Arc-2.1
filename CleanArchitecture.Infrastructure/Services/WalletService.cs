@@ -23,6 +23,7 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         private readonly ILogger<WalletService> _log;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
+        private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
         private readonly ICommonRepository<AddressMaster> _addressMstRepository;
@@ -53,7 +54,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -72,6 +73,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _WebApiParseResponse = WebApiParseResponse;
             //_walletLedgerRepository = walletledgerrepo;
             _WalletAllowTrnRepo = WalletAllowTrnRepo;
+            _LimitcommonRepository = WalletLimitConfig;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -1132,11 +1134,40 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public string SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request)
+        public LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long Userid)
         {
-            throw new NotImplementedException();
+            WalletLimitConfiguration obj = new WalletLimitConfiguration();
+            LimitResponse Response = new LimitResponse();
+            try
+            {
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
+                if (walletMasters == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                obj.WalletId = walletMasters.Id;
+                obj.TrnType = Convert.ToInt16(request.TrnType);
+                obj.LimitPerHour = request.LimitPerHour;
+                obj.LimitPerDay = request.LimitPerDay;
+                obj.LimitPerTransaction = request.LimitPerHour;
+                obj.CreatedBy = Userid;
+                obj.CreatedDate = UTC_To_IST();
+                obj.Status = Convert.ToInt16(ServiceStatus.Active);
+                obj.UpdatedDate = UTC_To_IST();
+                obj = _LimitcommonRepository.Add(obj);
+                Response.ReturnCode = enResponseCode.Success;
+                Response.ReturnMsg = EnResponseMessage.SetWalletLimitSuccessMsg;
+                return Response;
+            }
+            catch(Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
-
         public LimitResponse GetWalletLimitConfig(string accWalletID)
         {
             LimitResponse LimitResponse = new LimitResponse();
