@@ -4,6 +4,7 @@ using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -50,7 +51,7 @@ namespace CleanArchitecture.Core.Interfaces
         //decimal GetCrSumAmtWallet(long walletid);
         //decimal GetDrSumAmtWallet(long walletid);
         bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID);
-
+        List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID);
 
     }
 }

@@ -465,5 +465,23 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
+
+        //Rushabh 16-10-2018
+        public List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID)
+        {
+            List<WalletLimitConfigurationRes> items = (from u in _dbContext.WalletLimitConfiguration
+                                                       join c in _dbContext.WalletMasters
+                                                       on u.WalletId equals c.Id
+                                                       where c.AccWalletID == AccWaletID && u.Status == 1
+                                                       select new WalletLimitConfigurationRes
+                                                       {
+                                                           TrnType = u.TrnType,
+                                                           LimitPerDay = u.LimitPerDay,
+                                                           LimitPerHour = u.LimitPerHour,
+                                                           LimitPerTransaction = u.LimitPerTransaction,
+                                                           AccWalletID = c.AccWalletID
+                                                       }).AsEnumerable().ToList();
+            return items;
+        }
     }
 }
