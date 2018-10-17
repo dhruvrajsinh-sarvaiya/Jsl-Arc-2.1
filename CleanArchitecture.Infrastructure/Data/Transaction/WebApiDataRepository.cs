@@ -96,13 +96,14 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 //Rita 13-10-2018  remove as no present in New table Service master
                 //,SC.MinimumAmount as MinimumAmountService,SC.MaximumAmount as MaximumAmountService
                 //and {3} between SC.MinimumAmount and SC.MaximumAmount
+                //Rita 17-10-18 further make inner joi in RoutMaster with SerProDetailID with providerdetail
                 IQueryable<TransactionProviderResponse> Result = _dbContext.TransactionProviderResponse.FromSql(
                            @"select SC.ID as ServiceID,SC.Name as ServiceName,Prc.ID as SerProDetailID,Prc.ServiceProID,RC.ID as RouteID,
                             PC.ID as ProductID,RC.RouteName,SC.ServiceType,Prc.ThirPartyAPIID,Prc.AppTypeID,LC.MinAmt as MinimumAmountItem,
                             LC.MaxAmt as MaximumAmountItem
                             from ServiceMaster SC inner join  ProductConfiguration PC on
 			                PC.ServiceID = SC.Id inner join RouteConfiguration RC on RC.ProductID = PC.Id  
-			                inner join ServiceProviderDetail PrC on Prc.ServiceProID = RC.SerProID AND Prc.TrnTypeID={1} 
+			                inner join ServiceProviderDetail PrC on Prc.ServiceProID = RC.SerProID AND Prc.Id = RC.SerProDetailID AND Prc.TrnTypeID={1} 
 							inner join Limits LC on LC.ID = RC.LimitID 
 			                where SC.SMSCode = {0}  and RC.TrnType={1} 
 			                and {2} between LC.MinAmt and LC.MaxAmt			                
