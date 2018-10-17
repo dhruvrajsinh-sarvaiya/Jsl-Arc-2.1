@@ -1,10 +1,11 @@
+using CleanArchitecture.Core.ApiModels;
 using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 {
     public class VerifyCodeViewModel
     {
-        [Required]
+      
         public string Provider { get; set; }
 
         [Required]
@@ -17,5 +18,9 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
+    }
+    public class VerifyCodeResponse : BizResponseClass
+    {
+
     }
 }

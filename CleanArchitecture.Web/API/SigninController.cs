@@ -78,57 +78,88 @@ namespace CleanArchitecture.Web.API
         // Login method to call direct send code
         [HttpGet("SendCode")]
         [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         public async Task<ActionResult> SendCode(string returnUrl = null, bool rememberMe = false)
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                return BadRequest(new ApiError("Error"));
+                return BadRequest(new LoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.CommFailMsgInternal, ErrorCode = enErrorCode.Status400BadRequest });
+
             }
+            //else
+
+            //{
+            //    var otpData = _otpMasterService.AddOtp(user.Id, user.Email, "");
+            //    var message = "Your security code is: " + otpData;
+
+            //        SendEmailRequest request = new SendEmailRequest();
+            //        request.Recepient = user.Email;
+            //        request.Subject = "Security Code";
+            //        request.Body = message;
+
+            //        await _mediator.Send(request);
+            //        //await _emailSender.SendEmailAsync(user.Email, "Security Code", message);
+
+            //}
+            //return null;
             var userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
             var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
+
+            var data = new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe, SelectedProvider = "cleanarchitecture" };
+            return Ok(data);
+            //return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
         [HttpPost("SendCode")]
         [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> SendCode([FromBody]SendCodeViewModel model)
         {
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
+
+            try
+            {
+                var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+                if (user == null)
+                {
+
+                    return BadRequest(new LoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.CommFailMsgInternal, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+
+                // Generate the token and send it
+                var code = await _userManager.GenerateTwoFactorTokenAsync(user, model.SelectedProvider);
+                if (string.IsNullOrWhiteSpace(code))
+                {
+
+                    return BadRequest(new LoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.CommFailMsgInternal, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+
+                var message = "Your security code is: " + code;
+                if (model.SelectedProvider == "Email")
+                {
+                    SendEmailRequest request = new SendEmailRequest();
+                    request.Recepient = user.Email;
+                    request.Subject = "Security Code";
+                    request.Body = message;
+
+                    await _mediator.Send(request);
+                    //await _emailSender.SendEmailAsync(user.Email, "Security Code", message);
+                }
+                // else if (model.SelectedProvider == "Phone")
+                // {
+                //     await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), message);
+                // }
+
+                return RedirectToAction(nameof(VerifyCode), new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+
+            }
+            catch (Exception ex)
             {
 
-                return BadRequest(new LoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.CommFailMsgInternal, ErrorCode = enErrorCode.Status400BadRequest });
+                throw;
             }
-
-            // Generate the token and send it
-            var code = await _userManager.GenerateTwoFactorTokenAsync(user, model.SelectedProvider);
-            if (string.IsNullOrWhiteSpace(code))
-            {
-
-                return BadRequest(new LoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.CommFailMsgInternal, ErrorCode = enErrorCode.Status400BadRequest });
-            }
-
-            var message = "Your security code is: " + code;
-            if (model.SelectedProvider == "Email")
-            {
-                SendEmailRequest request = new SendEmailRequest();
-                request.Recepient = user.Email;
-                request.Subject = "Security Code";
-                request.Body = message;
-
-                await _mediator.Send(request);
-                //await _emailSender.SendEmailAsync(user.Email, "Security Code", message);
-            }
-            // else if (model.SelectedProvider == "Phone")
-            // {
-            //     await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), message);
-            // }
-
-            return RedirectToAction(nameof(VerifyCode), new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
+
 
         //Social Login method direct call this method
         [HttpGet("ExternalLoginCallback")]
@@ -168,7 +199,7 @@ namespace CleanArchitecture.Web.API
         // Login after verify code
         [HttpGet("VerifyCode")]
         [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyCode(string provider, bool rememberMe, string returnUrl = null)
         {
             // Require that the user has already logged in via username/password or external login
@@ -183,27 +214,54 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("VerifyCode")]
         [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
         {
             // The following code protects for brute force attacks against the two factor codes.
             // If a user enters incorrect codes for a specified amount of time then the user account
             // will be locked out for a specified amount of time.
-            var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
-            if (result.Succeeded)
+            //  var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
+            try
             {
-                // return RedirectToLocal(model.ReturnUrl);
+                var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+                var authenticatorCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+                var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberBrowser);
+                if (result.Succeeded)
+                {
+                    return Ok(new VerifyCodeResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+
+                    // return RedirectToLocal(model.ReturnUrl);
+                }
+                else if (result.IsLockedOut)
+                {
+                    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+                else
+
+                {
+                    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
+
+                }
+
+
+                //if (result.IsLockedOut)
+                //{
+                //    _logger.LogWarning(7, "User account locked out.");
+                //    return View("Lockout");
+                //}
+                //return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status400BadRequest });
+
             }
-            if (result.IsLockedOut)
+            catch (Exception ex)
             {
-                _logger.LogWarning(7, "User account locked out.");
-                return View("Lockout");
+                return BadRequest(new LoginResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
+                throw;
             }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Invalid code.");
-                return View(model);
-            }
+
+
+
         }
         #endregion
 
@@ -278,7 +336,7 @@ namespace CleanArchitecture.Web.API
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(SendCode), new { RememberMe = false });
+                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
                 }
                 if (result.IsLockedOut)
                 {

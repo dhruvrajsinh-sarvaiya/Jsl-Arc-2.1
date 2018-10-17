@@ -154,5 +154,8 @@ namespace CleanArchitecture.Core.Enums
         public static string Granttype = "The specified grant type is not supported.";
         public static string EnableTroFactor = "User two factor authentication successfully activates";
         public static string DisableTroFactor = "User two factor authentication successfully disable";
+        public static string FactorFail = "Invalid authenticator code entered for user with ID {UserId}.";
+        public static string FactorRequired = "Two factor authentication is activated please verify your code";
+
     }
 }
