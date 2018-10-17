@@ -96,8 +96,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                 imodel.Status = item.Status;
 
                 IpList.Add(imodel);
-
-            }
+            }     
             return IpList;
 
         }
@@ -105,7 +104,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public void UpdateIpAddress(IpMasterViewModel model)
         {
-            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && !i.IsDeleted);
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && i.IsDeleted);
             if (IpAddress != null)
             {
                 var currentIpAddress = new IpMaster
@@ -125,9 +124,22 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             }
         }
 
-        public void DeleteIpAddress(IpMasterViewModel model)
+        public async Task<long> DesableIpAddress(IpMasterViewModel model)
         {
-            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && !i.IsDeleted);
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && i.IsDeleted);
+            if (IpAddress != null)
+            {              
+                IpAddress.SetAsIsEnabletatus();
+                _ipMasterRepository.Update(IpAddress);
+                //_dbContext.SaveChanges();
+                return IpAddress.Id;
+            }
+            return 0;
+        }
+
+        public async Task<long> DeleteIpAddress(IpMasterViewModel model)
+        {
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (IpAddress != null)
             {
                 //var currentIpAddress = new IpMaster
@@ -143,8 +155,9 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                 IpAddress.SetAsIpDeletetatus();
                 _ipMasterRepository.Update(IpAddress);
                 //_dbContext.SaveChanges();
-
+                return IpAddress.Id;
             }
+            return 0;
 
         }
 

@@ -25,7 +25,7 @@ namespace CleanArchitecture.Core.Enums
         //=========================Transactional Msg
         //public static string CreateTrnSuccessMsg = "Success";
         //public static string CreateTrnFailMsg = "Fail";
-        public static string CreateTrnNoPairSelectedMsg = "No Pair Selected";
+        public static string CreateTrnNoPairSelectedMsg = "Invalid Pair Selected";
         public static string CreateTrnInvalidQtyPriceMsg = "Invalid Qty or Price";
         public static string CreateTrnInvalidQtyNAmountMsg = "Invalid Order Qty and Amount";
         public static string CreateTrn_NoCreditAccountFoundMsg = "No Credit Account Found";
@@ -33,7 +33,8 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrnInvalidAmountMsg = "Invalid Amount";
         public static string CreateTrnDuplicateTrnMsg = "Duplicate Transaction for Same Address, Please Try After 10 Minutes";
         public static string CreateTrn_NoSelfAddressWithdrawAllowMsg = "Invalid Amount";
-        public static string ProcessTrn_InsufficientBalance = "Insufficient Wallet Balance";
+        public static string ProcessTrn_InsufficientBalanceMsg = "Insufficient Wallet Balance";
+        public static string ProcessTrn_AmountBetweenMinMaxMsg = "Amount Must be Between: @MIN AND @MAX";
         //============================
 
         //============================walelt=================================//       
@@ -136,13 +137,15 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirmPassMatch = "New password and confirmation password do not match.";
         public static string ResetConfirmOldNotMatch = "Old password does not match";
         public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
-
+        public static string IpAddressUpdateError = "Ip address status not update.";
+        public static string SuccessDesableIpStatus = "Success full desable ip address.";
+        public static string SuccessDeleteIpAddress = "Success full remove ip address.";
+        public static string IpAddressdeleteError = "Ip address not remove.";
+        public static string SuccessGetIpData = "Success full Get Ip Address.";
 
 
         //========================My Account===============================//
         public static string EnableTroFactor = "User two factor authentication successfully activates";
         public static string DisableTroFactor = "User two factor authentication successfully disable";
-
-
     }
 }

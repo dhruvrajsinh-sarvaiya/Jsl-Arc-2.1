@@ -157,6 +157,7 @@ namespace CleanArchitecture.Core.Enums
         InvalidMarketType = 4506,
         InValidPageNo = 4507,
         ProcessTrn_InsufficientBalance = 1,
+        ProcessTrn_AmountBetweenMinMax=1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -176,6 +177,8 @@ namespace CleanArchitecture.Core.Enums
         Status4043ResetConfirmOldNotMatch=4043,
         Status4044UserSelectedIpNotFound = 4044,
         Status4045InvalidUserSelectedIp = 4045,
+        Status4046NotUpdateIpStatus = 4046,
+        Status4047NotDeleteIp = 4047,
 
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
@@ -194,7 +197,10 @@ namespace CleanArchitecture.Core.Enums
         AlredyExist=4037,
         InsufficantBal=4038,
         UserIDWalletIDDidNotMatch = 4039
-        
+
+       
+
+
 
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
