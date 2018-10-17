@@ -113,6 +113,11 @@ namespace CleanArchitecture.Core.Entities
         public short? ChargeType { get; set; }
 
         //public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
+        public void MakeTransactionInProcess()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.Pending);
+            AddValueChangeEvent();
+        }
 
         public void MakeTransactionSuccess()
         {

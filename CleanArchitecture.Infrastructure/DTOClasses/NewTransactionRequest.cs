@@ -94,7 +94,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         [Range(0, 9999999999.99999999)]
         public decimal BidPrice_BuyReq { get; set; }
 
-
+        public long Delivery_ServiceID { get; set; }
+        public long Pool_OrderID { get; set; }
 
     }
 }

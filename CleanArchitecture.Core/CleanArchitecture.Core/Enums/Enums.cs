@@ -158,6 +158,10 @@ namespace CleanArchitecture.Core.Enums
         InValidPageNo = 4507,
         ProcessTrn_InsufficientBalance = 1,
         ProcessTrn_AmountBetweenMinMax=1,
+        ProcessTrn_PriceBetweenMinMax = 1,
+        ProcessTrn_InvalidBidPriceValue = 1,
+        ProcessTrn_PoolOrderCreateFail = 1,
+        ProcessTrn_Initialize = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

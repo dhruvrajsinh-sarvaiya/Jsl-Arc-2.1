@@ -35,6 +35,10 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrn_NoSelfAddressWithdrawAllowMsg = "Invalid Amount";
         public static string ProcessTrn_InsufficientBalanceMsg = "Insufficient Wallet Balance";
         public static string ProcessTrn_AmountBetweenMinMaxMsg = "Amount Must be Between: @MIN AND @MAX";
+        public static string ProcessTrn_PriceBetweenMinMaxMsg = "Price Must be Between: @MIN AND @MAX";
+        public static string ProcessTrn_InvalidBidPriceValueMsg = "Invalid BidPrice Value";
+        public static string ProcessTrn_PoolOrderCreateFailMsg = "Order Creation Fail";
+        public static string ProcessTrn_InitializeMsg = "Initialize";
         //============================
 
         //============================walelt=================================//       
