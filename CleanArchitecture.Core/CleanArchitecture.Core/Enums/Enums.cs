@@ -190,6 +190,7 @@ namespace CleanArchitecture.Core.Enums
         Status4052UserToken = 4052,
         Status4053Granttype = 4053,
         Status4054FactorFail =4054,
+        Status4042DisableTroFactorError = 4055,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -207,8 +208,8 @@ namespace CleanArchitecture.Core.Enums
         AlredyExist=4037,
         InsufficantBal=4038,
         UserIDWalletIDDidNotMatch = 4039
-
        
+
 
 
 
