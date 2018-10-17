@@ -43,6 +43,7 @@ namespace CleanArchitecture.Infrastructure
         public virtual DbSet<OtpMaster> OtpMaster { get; set; }
         // add by nirav savariya for create password for login with mobile and email
         public virtual DbSet<CustomPassword> CustomPassword { get; set; }
+        public virtual DbSet<DeviceMaster> DeviceMaster { get; set; }
 
         public DbSet<ToDoItem> ToDoItems { get; set; }
         public DbSet<MessagingQueue> MessagingQueue { get; set; }
