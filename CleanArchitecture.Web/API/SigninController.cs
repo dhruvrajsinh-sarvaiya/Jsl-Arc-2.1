@@ -823,7 +823,7 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                var currentUser = await _userManager.FindByNameAsync(model.Email);
+                var currentUser = await _userManager.FindByEmailAsync(model.Email);
 
                 if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
                 {
@@ -864,7 +864,7 @@ namespace CleanArchitecture.Web.API
 
                 await _mediator.Send(request);
 
-                var result = await _userManager.FindByNameAsync(model.Email);
+                var result = await _userManager.FindByEmailAsync(model.Email);
                 if (result != null)
                 {
                     result.EmailConfirmed = false;
@@ -960,7 +960,7 @@ namespace CleanArchitecture.Web.API
                     ResetPasswordViewModel model = JsonConvert.DeserializeObject<ResetPasswordViewModel>(DecryptToken);
                     if (model?.Expirytime >= DateTime.UtcNow)
                     {
-                        var user = await _userManager.FindByNameAsync(model.Email);
+                        var user = await _userManager.FindByEmailAsync(model.Email);
 
                         if (user == null)
                         {
