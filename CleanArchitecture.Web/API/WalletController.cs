@@ -45,6 +45,7 @@ namespace CleanArchitecture.Web.API
         public IActionResult CoinList()
         {
             var items = _walletService.GetWalletTypeMaster();
+            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(items), "");
             return Ok(items);
         }
 
@@ -90,6 +91,8 @@ namespace CleanArchitecture.Web.API
         [HttpPost("{coin}")]
         public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string coin)
         {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Request), accessToken);
             CreateWalletResponse Response = new CreateWalletResponse();
             try
             {
@@ -106,12 +109,12 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.InsertIntoWalletMaster(Request.WalletName, coin, Request.IsDefaultWallet, Request.AllowTrnType, Convert.ToInt64(user.Id));
                 }
-
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 Response.ReturnCode = enResponseCode.InternalError;
                 return BadRequest(Response);
             }
@@ -141,11 +144,12 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetWalletByCoin(user.Id, coin);
                 }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -174,11 +178,12 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetWalletById(user.Id, coin, walletId);
                 }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -203,11 +208,12 @@ namespace CleanArchitecture.Web.API
                 {
                     response = _walletService.DepositHistoy(FromDate, ToDate, Coin, Amount, Status, user.Id);
                 }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -231,11 +237,12 @@ namespace CleanArchitecture.Web.API
                 {
                     response = _walletService.WithdrawalHistoy(FromDate, ToDate, Coin, Amount, Status, user.Id);
                 }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
