@@ -29,8 +29,13 @@ namespace CleanArchitecture.Web.Api
         public IActionResult List()
         {
             // _loggerFactory logger = _loggerFactory.CreateLogger("LoggerCategory");
-            _loggerFactory.LogInformation("Your MSg");
-
+            // _loggerFactory.LogInformation("Your MSg");
+            var logger = NLog.LogManager.GetCurrentClassLogger();
+           // logger.Info("Hello World");
+            logger.Info("Hello World");
+          //  logger.Debug("Sample debug message");
+          // logger.Log(LogLevel.Information, "Sample informational message");
+            logger.Error("ow noos!", "");
             var items = _todoRepository.List()
                             .Select(item => ToDoItemDTO.FromToDoItem(item));
             return Ok(items);
