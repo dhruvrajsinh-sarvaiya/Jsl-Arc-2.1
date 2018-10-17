@@ -26,6 +26,9 @@ namespace CleanArchitecture.Core.Entities
         public long SerProID { get; set; }
 
         [Required]
+        public long SerProDetailID { get; set; }
+
+        [Required]
         public long ProductID { get; set; }
 
         [Required]
