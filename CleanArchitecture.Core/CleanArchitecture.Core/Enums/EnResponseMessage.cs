@@ -39,6 +39,7 @@ namespace CleanArchitecture.Core.Enums
         public static string ProcessTrn_InvalidBidPriceValueMsg = "Invalid BidPrice Value";
         public static string ProcessTrn_PoolOrderCreateFailMsg = "Order Creation Fail";
         public static string ProcessTrn_InitializeMsg = "Initialize";
+        public static string ProcessTrn_ServiceProductNotAvailableMsg = "Service or Product Not Available";
         //============================
 
         //============================walelt=================================//       
