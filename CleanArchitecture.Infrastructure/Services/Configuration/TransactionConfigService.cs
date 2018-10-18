@@ -1912,7 +1912,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 ThirdPartyAPIResponseConfiguration model = _thirdPartyAPIResRepository.GetById(id);
                 if (model != null)
                 {
-                    model.SetActive();
+                    model.SetInActive ();
                     _thirdPartyAPIResRepository.Update(model);
                     return true;
                 }

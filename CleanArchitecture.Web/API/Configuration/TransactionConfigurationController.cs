@@ -1602,6 +1602,55 @@ namespace CleanArchitecture.Web.API.Configuration
             }
 
         }
+
+        [HttpPost("SetActiveThirdPartyAPIConfig/{id:long}")]
+        public IActionResult SetActiveThirdPartyAPIConfig(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveThirdPartyAPI(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveThirdPartyAPIConfig/{id:long}")]
+        public IActionResult SetInActiveThirdPartyAPIConfig(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveThirdPartyAPI(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
         #endregion
 
         #region ThirdPartyAPIResponse
@@ -1719,6 +1768,56 @@ namespace CleanArchitecture.Web.API.Configuration
             }
 
         }
+
+        [HttpPost("SetActiveThirdPartyAPIResponse/{id:long}")]
+        public IActionResult SetActiveThirdPartyAPIResponse(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveThirdPartyAPIResponse (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveThirdPartyAPIResponse/{id:long}")]
+        public IActionResult SetInActiveThirdPartyAPIResponse(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveThirdPartyAPIResponse (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
         #endregion
 
         #region TradePairConfiguration
@@ -1956,6 +2055,172 @@ namespace CleanArchitecture.Web.API.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 Response.ReturnCode = enResponseCode.InternalError;
                 return Ok(Response);
+            }
+        }
+        #endregion
+
+        #region Limit
+
+        [HttpGet("GetAllLimitData")]
+        public IActionResult GetAllLimitData()
+        {
+            LimitResponseAllData  res = new LimitResponseAllData();
+            try
+            {
+                res.response = _transactionConfigService.GetAllLimitData();
+                if (res.response.Count == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpGet("GetLimitsById/{Id:long}")]
+        public IActionResult GetLimitsById(long Id)
+        {
+            LimitResponse  res = new LimitResponse();
+            try
+            {
+                res.response = _transactionConfigService.GetLimitById(Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("AddLimits")]
+        public IActionResult AddLimits([FromBody]LimitRequest  Request)
+        {
+            LimitResponse  Response = new LimitResponse();
+            try
+            {
+                long Id = _transactionConfigService.AddLimitData(Request);
+                if (Id != 0)
+                {
+                    Response.response = _transactionConfigService.GetLimitById(Id);
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [HttpPost("UpdateLimits")]
+        public IActionResult UpdateLimits([FromBody]LimitRequest request)
+        {
+            LimitResponse  res = new LimitResponse();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateLimitData(request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.response = _transactionConfigService.GetLimitById(request.Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("SetActiveLimit/{id:long}")]
+        public IActionResult SetActiveLimit(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveLimit (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveLimit/{id:long}")]
+        public IActionResult SetInActiveLimit(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveLimit (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
             }
         }
         #endregion
