@@ -13,7 +13,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         public enWalletLimitType TrnType { get; set; }
         //public int TrnType { get; set; }
 
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4211")]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4211")]        
         public decimal LimitPerHour { get; set; }
 
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4212")]
