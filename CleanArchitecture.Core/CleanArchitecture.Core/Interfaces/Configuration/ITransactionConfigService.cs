@@ -69,5 +69,10 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         List<RouteConfigurationRequest> GetAllRouteConfiguration();
         int SetActiveRoute(int RouteId);
         int SetInActiveRoute(int RouteId);
+
+        List<ThirdPartyAPIConfigViewModel> GetAllThirdPartyAPIConfig();
+        ThirdPartyAPIConfigViewModel GetThirdPartyAPIConfigById(long Id);
+        long AddThirdPartyAPI(ThirdPartyAPIConfigRequest request);
+        bool UpdateThirdPartyAPI(ThirdPartyAPIConfigRequest request);
     }
 }

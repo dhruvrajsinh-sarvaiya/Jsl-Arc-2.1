@@ -11,6 +11,6 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     }
     public class DemonConfigurationResponce : BizResponseClass
     {
-        public DemonconfigurationViewModel responce { get; set; }
+        public DemonconfigurationViewModel response { get; set; }
     }
 }
