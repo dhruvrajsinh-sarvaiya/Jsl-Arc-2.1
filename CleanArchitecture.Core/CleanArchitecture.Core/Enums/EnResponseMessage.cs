@@ -160,7 +160,9 @@ namespace CleanArchitecture.Core.Enums
         public static string FactorRequired = "Two factor authentication is activated please verify your code";
         public static string TwoFactorVerification = "Two factor authentication Verification code is invalid.";
 
-
+        public static string SuccessAddDeviceData = "Success full add device id.";
+        public static string DeviceidInsertError = "Device id not added.";
+        
 
 
     }

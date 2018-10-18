@@ -132,7 +132,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
         "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
         "abcdefghijkmnopqrstuvwxyz",    // lowercase
         "0123456789",                   // digits
-        "!@$%^*"                      // non-alphanumeric
+        "!@$^*"                      // non-alphanumeric
     };
                 Random rand = new Random(Environment.TickCount);
                 List<char> chars = new List<char>();

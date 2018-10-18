@@ -194,8 +194,9 @@ namespace CleanArchitecture.Core.Enums
         Status4052UserToken = 4052,
         Status4053Granttype = 4053,
         Status4054FactorFail =4054,
-        Status4042DisableTroFactorError = 4055,
-        Status4042TwoFactorVerification=4056,
+        Status4055DisableTroFactorError = 4055,
+        Status4056TwoFactorVerification=4056,
+        Status4057DeviceIdNotAdd=4057,        
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
