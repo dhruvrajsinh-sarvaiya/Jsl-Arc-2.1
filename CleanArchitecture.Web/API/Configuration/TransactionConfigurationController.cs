@@ -352,9 +352,10 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 res.response = _transactionConfigService.GetAppType();
-                if(res.response == null)
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -379,6 +380,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -429,6 +431,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state =_transactionConfigService.UpdateAppType(request);
@@ -467,7 +470,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -488,7 +494,11 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                    
                 return Ok(res);
             }
             catch (Exception ex)
@@ -513,6 +523,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -537,6 +548,8 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -587,6 +600,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state =_transactionConfigService.UpdateProviderType(request);
@@ -625,7 +639,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -646,7 +663,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -671,6 +691,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -721,6 +742,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateProviderConfiguration(request);
@@ -759,7 +781,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -780,7 +805,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -804,6 +832,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -854,6 +883,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateDemonConfiguration (request);
@@ -892,7 +922,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -913,7 +946,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -937,7 +973,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (list == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
-                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.response = _transactionConfigService.getProviderDetailsDataList(list);
@@ -959,13 +995,13 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 ProviderDetailViewModel  obj = _transactionConfigService.GetProviderDetailById(id);
-                if (obj == null)
+                res.response = _transactionConfigService.getProviderDetailDataById(obj);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
-                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
-                res.response = _transactionConfigService.getProviderDetailDataById(obj);
                 //res.responce.Id = obj.Id;
                 //res.responce.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
                 //res.responce.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
@@ -1022,6 +1058,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateProviderDetail(request);
@@ -1069,7 +1106,11 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                    
                 return Ok(res);
             }
             catch (Exception ex)
@@ -1090,7 +1131,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -1432,7 +1476,7 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 res.response  = _transactionConfigService.GetAllThirdPartyAPIConfig();
-                if (res.response == null)
+                if (res.response.Count ==0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     res.ErrorCode = enErrorCode.NoDataFound;
@@ -1488,7 +1532,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode =enErrorCode. // not inserted
+                    //Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -1510,6 +1554,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateThirdPartyAPI(request);

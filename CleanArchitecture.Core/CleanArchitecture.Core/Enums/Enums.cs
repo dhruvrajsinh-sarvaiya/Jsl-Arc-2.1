@@ -156,6 +156,8 @@ namespace CleanArchitecture.Core.Enums
         InvalidToDateFormate = 4505,
         InvalidMarketType = 4506,
         InValidPageNo = 4507,
+        InValid_ID=4565,
+
         ProcessTrn_InsufficientBalance = 1,
         ProcessTrn_AmountBetweenMinMax=1,
         ProcessTrn_PriceBetweenMinMax = 1,
