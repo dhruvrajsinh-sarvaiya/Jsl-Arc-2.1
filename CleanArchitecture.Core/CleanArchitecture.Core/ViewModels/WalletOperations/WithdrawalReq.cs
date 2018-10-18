@@ -1,16 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.WalletOperations
 {
     public class WithdrawalReq
     {
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4207")]
-        [StringLength(50, ErrorMessage = "1,Please Enter Valid  Parameters,4208")]
-        public string address { get; set; }
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4207")]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4220")]
+        [StringLength(50, ErrorMessage = "1,Please Enter Valid  Parameters,4221")]
+        public string sourceAddress { get; set; }
+
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4215")]
+        [StringLength(50, ErrorMessage = "1,Please Enter Valid  Parameters,4216")]
+        public string destinationAddress { get; set; }
+
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4217")]
+        [StringLength(50, ErrorMessage = "1,Please Enter Valid  Parameters,4218")]
+        public string addressLabel { get; set; }
+
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4219")]
+        [Range(0,9999999999.99999999,ErrorMessage = "1,Please Enter Valid  Parameters,4222")]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal amount { get; set; }
 
         // Temporarily Removed

@@ -1195,5 +1195,34 @@ namespace CleanArchitecture.Infrastructure.Services
                 return LimitResponse;
             }
         }
+
+        //vsolanki 18-10-2018
+        public WithdrawalRes Withdrawl (string coin, string accWalletID,WithdrawalReq Request, long userid)
+        {
+            WalletTransactionQueue objTQ = new WalletTransactionQueue();
+            try
+            {
+                var dWalletobj = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
+                if(dWalletobj==null)
+                {
+                    return new WithdrawalRes { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
+                }
+                if(dWalletobj.Balance<= Request.amount)
+                {
+                    return new WithdrawalRes { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficientBal, ErrorCode = enErrorCode.InsufficantBal };
+                }
+                //objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), 0, Request.amount, 0, UTC_To_IST(), null, dWalletobj.Id, coin, userid, "", 0, "Inserted");
+                //objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+
+               // dWalletobj.DebitBalance(Request.amount);
+
+                return new WithdrawalRes { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDebit, txid=12345 /*objTQ.TrnNo*/,statusMsg="Success" /*objTQ.StatusMsg*/ };
+            }
+            catch(Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+              throw ex;
+            }
+        }
     }
 }
