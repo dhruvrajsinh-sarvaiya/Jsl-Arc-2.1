@@ -208,7 +208,8 @@ namespace CleanArchitecture.Web.API
                 {
                     response = _walletService.DepositHistoy(FromDate, ToDate, Coin, Amount, Status, user.Id);
                 }
-                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+               
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(response), "");
                 return Ok(response);
             }
             catch (Exception ex)
@@ -237,7 +238,7 @@ namespace CleanArchitecture.Web.API
                 {
                     response = _walletService.WithdrawalHistoy(FromDate, ToDate, Coin, Amount, Status, user.Id);
                 }
-                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(response), "");
                 return Ok(response);
             }
             catch (Exception ex)
