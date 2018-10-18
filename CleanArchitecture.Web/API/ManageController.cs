@@ -230,8 +230,8 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("DesableIpAddress")]
-        public async Task<IActionResult> DesableIpAddress([FromBody]IpAddressReqViewModel model)
+        [HttpPost("DisableIpAddress")]
+        public async Task<IActionResult> DisableIpAddress([FromBody]IpAddressReqViewModel model)
         {
             try
             {
@@ -318,7 +318,7 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                 }
 
-               
+
 
             }
             catch (Exception ex)
@@ -331,19 +331,19 @@ namespace CleanArchitecture.Web.API
 
 
         [HttpGet("GetIpAddress/{PageIndex}/{PAGE_SIZE}")]
-        public async Task<IActionResult> GetIpAddress(int PageIndex =0,int PAGE_SIZE = 0)
+        public async Task<IActionResult> GetIpAddress(int PageIndex = 0, int PAGE_SIZE = 0)
         {
             try
-            {   
+            {
                 var user = await GetCurrentUserAsync();
 
                 if (user != null)
                 {
-                    var IpList  = await _ipAddressService.GetIpAddressListByUserId(user.Id);
+                    var IpList = await _ipAddressService.GetIpAddressListByUserId(user.Id);
 
                     if (IpList.Count > 0)
                     {
-                    
+
                         // Set the total count
                         // so GridView knows how many pages to create
                         var TotalRowCount = IpList.Count();
@@ -351,10 +351,10 @@ namespace CleanArchitecture.Web.API
                         //int PAGE_SIZE = 10;
 
                         // Get only the rows we need for the page requested
-                      var Ip = IpList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
+                        var Ip = IpList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
 
 
-                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = Ip.ToList(), TotalRow =TotalRowCount });
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = Ip.ToList(), TotalRow = TotalRowCount });
                     }
                     else
                     {
@@ -375,7 +375,7 @@ namespace CleanArchitecture.Web.API
         }
 
         #endregion
-        /*
+
         #region DeviceId
         [HttpPost("AddDevice")]
         public async Task<IActionResult> AddDevice([FromBody]DeviceIdReqViewModel model)
@@ -401,11 +401,11 @@ namespace CleanArchitecture.Web.API
 
                     if (id > 0)
                     {
-                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddIpData });
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddDeviceData });
                     }
                     else
                     {
-                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceidInsertError, ErrorCode = enErrorCode.Status4057DeviceIdNotAdd });
                     }
                 }
                 else
@@ -421,8 +421,9 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("DesableDeviceId")]
-        public async Task<IActionResult> DesableDeviceId([FromBody]DeviceIdReqViewModel model)
+
+        [HttpPost("DisableDeviceId")]
+        public async Task<IActionResult> DisableDeviceId([FromBody]DeviceIdReqViewModel model)
         {
             try
             {
@@ -449,7 +450,7 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressUpdateError, ErrorCode = enErrorCode.Status4046NotUpdateIpStatus });
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceAddressUpdateError, ErrorCode = enErrorCode.Status4058DeviceAddress });
                     }
                 }
                 else
@@ -489,19 +490,17 @@ namespace CleanArchitecture.Web.API
                     long id = _iDeviceIdService.DeleteDeviceId(imodel);
                     if (id > 0)
                     {
-                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDeleteIpAddress });
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDeleteDevice });
                     }
                     else
                     {
-                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressdeleteError, ErrorCode = enErrorCode.Status4047NotDeleteIp });
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceAddressdeleteError, ErrorCode = enErrorCode.Status4059NotDeleteDevice });
                     }
                 }
                 else
                 {
                     return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                 }
-
-
 
             }
             catch (Exception ex)
@@ -512,7 +511,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetIpAddress/{PageIndex}/{PAGE_SIZE}")]
+        [HttpGet("GetDeviceId/{PageIndex}/{PAGE_SIZE}")]
         public async Task<IActionResult> GetDeviceId(int PageIndex = 0, int PAGE_SIZE = 0)
         {
             try
@@ -525,7 +524,6 @@ namespace CleanArchitecture.Web.API
 
                     if (DeviceList.Count > 0)
                     {
-
                         // Set the total count
                         // so GridView knows how many pages to create
                         var TotalRowCount = DeviceList.Count();
@@ -536,11 +534,11 @@ namespace CleanArchitecture.Web.API
                         var Device = DeviceList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
 
 
-                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, DeviceList = Device.ToList(), TotalRow = TotalRowCount });
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetDeviceData, DeviceList = Device.ToList(), TotalRow = TotalRowCount });
                     }
                     else
                     {
-                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceidInsertError, ErrorCode = enErrorCode.Status4057DeviceIdNotAdd });
                     }
                 }
                 else
@@ -557,7 +555,7 @@ namespace CleanArchitecture.Web.API
         }
 
         #endregion
-        */
+
         [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordViewModel model)
         {

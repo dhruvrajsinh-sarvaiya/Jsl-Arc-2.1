@@ -159,11 +159,12 @@ namespace CleanArchitecture.Core.Enums
         public static string FactorFail = "Invalid authenticator code ";
         public static string FactorRequired = "Two factor authentication is activated please verify your code";
         public static string TwoFactorVerification = "Two factor authentication Verification code is invalid.";
-
         public static string SuccessAddDeviceData = "Success full add device id.";
         public static string DeviceidInsertError = "Device id not added.";
-        
-
+        public static string DeviceAddressUpdateError = "Device address status not update.";
+        public static string SuccessDeleteDevice = "Success full remove device address.";
+        public static string DeviceAddressdeleteError = "Device address not remove.";
+        public static string SuccessGetDeviceData = "Success full Get Device Address.";
 
     }
 }

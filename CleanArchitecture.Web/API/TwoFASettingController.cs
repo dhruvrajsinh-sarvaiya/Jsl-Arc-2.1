@@ -92,8 +92,6 @@ namespace CleanArchitecture.Web.API
         [HttpPost("disable2fa")]
         public async Task<IActionResult> Disable2fa()
         {
-
-
             var user = await GetCurrentUserAsync();
             var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
             if (disable2faResult.Succeeded)
@@ -102,18 +100,11 @@ namespace CleanArchitecture.Web.API
                 await _userManager.UpdateAsync(user);
                 _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
                 return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
-
             }
             else
             {
-
-                return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DisableTroFactorError, ErrorCode = enErrorCode.Status4042DisableTroFactorError });
+                return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DisableTroFactorError, ErrorCode = enErrorCode.Status4055DisableTroFactorError });
             }
-
-
-
-
-
         }
 
         [HttpGet("enableauthenticator")]
