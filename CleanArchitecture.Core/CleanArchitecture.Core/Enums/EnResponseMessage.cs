@@ -45,7 +45,8 @@ namespace CleanArchitecture.Core.Enums
         //============================walelt=================================//       
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
-        public static string SetWalletLimitSuccessMsg = "Limit Created Successfully";
+        public static string SetWalletLimitCreateMsg = "Limit Created Successfully";
+        public static string SetWalletLimitUpdateMsg = "Limit Updated Successfully";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
         public static string CreateAddressFailMsg = "Failed to generate Address.";

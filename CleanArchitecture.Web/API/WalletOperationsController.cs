@@ -294,6 +294,10 @@ namespace CleanArchitecture.Web.API
         [HttpPost("{AccWalletID}")]
         public async Task<IActionResult> SetWalletLimit(string AccWalletID, [FromBody]WalletLimitConfigurationReq Request)
         {
+            //if(Request.TrnType == 0)
+            //{
+
+            //}
             LimitResponse response = new LimitResponse();
             //if(Request.TrnType )
             try
@@ -305,7 +309,10 @@ namespace CleanArchitecture.Web.API
                     response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
                     response.ErrorCode = enErrorCode.StandardLoginfailed;
                 }
-                response = _walletService.SetWalletLimitConfig(AccWalletID, Request,user.Id);
+                else
+                {
+                    response = _walletService.SetWalletLimitConfig(AccWalletID, Request, user.Id);                    
+                }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
                 return Ok(respObjJson);
