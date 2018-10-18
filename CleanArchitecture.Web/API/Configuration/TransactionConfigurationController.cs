@@ -1473,7 +1473,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
-        [HttpPost("AddRouteConfiguration")]
+        [HttpPost("AddThirdPartyAPIConfig")]
         public IActionResult AddThirdPartyAPIConfig([FromBody]ThirdPartyAPIConfigRequest Request)
         {
             ThirdPartyAPIConfigResponse  Response = new ThirdPartyAPIConfigResponse();
