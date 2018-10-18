@@ -29,6 +29,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<StateMaster> _stateMasterRepository;
         private readonly ICommonRepository<RouteConfiguration> _routeConfigRepository;
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyAPIRepository;
+        private readonly ICommonRepository<ThirdPartyAPIResponseConfiguration> _thirdPartyAPIResRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -44,7 +45,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<ProductConfiguration> productConfigRepository,
             ICommonRepository<StateMaster> stateMasterRepository,
             ICommonRepository<RouteConfiguration> routeConfigRepository,
-            ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository)
+            ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository,
+            ICommonRepository<ThirdPartyAPIResponseConfiguration> thirdPartyAPIResRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -60,6 +62,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _stateMasterRepository = stateMasterRepository;
             _routeConfigRepository = routeConfigRepository;
             _thirdPartyAPIRepository = thirdPartyAPIRepository;
+            _thirdPartyAPIResRepository = thirdPartyAPIResRepository;
         }
 
         #region Service
@@ -1697,10 +1700,141 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                return false;
             }
         }
 
         #endregion
+
+        #region ThirdPartyAPIResponseConfig
+
+        public List<ThirdPartyAPIResponseConfigViewModel> GetAllThirdPartyAPIResponse()
+        {
+            try
+            {
+                var list = _thirdPartyAPIResRepository.List();
+                List<ThirdPartyAPIResponseConfigViewModel> APIResponseList = new List<ThirdPartyAPIResponseConfigViewModel>();
+                foreach (var model in list)
+                {
+                    APIResponseList.Add(new ThirdPartyAPIResponseConfigViewModel()
+                    {
+                        BalanceRegex =model .BalanceRegex,
+                        ErrorCodeRegex =model .ErrorCodeRegex,
+                        Id =model .Id,
+                        OprTrnRefNoRegex =model .OprTrnRefNoRegex,
+                        Param1Regex =model .Param1Regex,
+                        Param2Regex =model .Param2Regex ,
+                        Param3Regex =model .Param3Regex,
+                        ResponseCodeRegex =model .ResponseCodeRegex,
+                        StatusMsgRegex =model .StatusMsgRegex ,
+                        StatusRegex =model .StatusRegex,
+                        TrnRefNoRegex =model .TrnRefNoRegex 
+                    });
+                }
+                return APIResponseList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public ThirdPartyAPIResponseConfigViewModel GetThirdPartyAPIResponseById(long id)
+        {
+            try
+            {
+                var model = _thirdPartyAPIResRepository.GetById(id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewModel = new ThirdPartyAPIResponseConfigViewModel()
+                {
+                    BalanceRegex = model.BalanceRegex,
+                    ErrorCodeRegex = model.ErrorCodeRegex,
+                    Id = model.Id,
+                    OprTrnRefNoRegex = model.OprTrnRefNoRegex,
+                    Param1Regex = model.Param1Regex,
+                    Param2Regex = model.Param2Regex,
+                    Param3Regex = model.Param3Regex,
+                    ResponseCodeRegex = model.ResponseCodeRegex,
+                    StatusMsgRegex = model.StatusMsgRegex,
+                    StatusRegex = model.StatusRegex,
+                    TrnRefNoRegex = model.TrnRefNoRegex
+                };
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request)
+        {
+            try
+            {
+                var model = new ThirdPartyAPIResponseConfiguration()
+                {
+                    CreatedBy = 1,
+                    CreatedDate=DateTime .UtcNow ,
+                    Status =1,
+                    BalanceRegex = Request.BalanceRegex,
+                    ErrorCodeRegex = Request.ErrorCodeRegex,
+                    OprTrnRefNoRegex = Request.OprTrnRefNoRegex,
+                    Param1Regex = Request.Param1Regex,
+                    Param2Regex = Request.Param2Regex,
+                    Param3Regex = Request.Param3Regex,
+                    ResponseCodeRegex = Request.ResponseCodeRegex,
+                    StatusMsgRegex = Request.StatusMsgRegex,
+                    StatusRegex = Request.StatusRegex,
+                    TrnRefNoRegex = Request.TrnRefNoRegex
+                };
+                var newModel = _thirdPartyAPIResRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request)
+        {
+            try
+            {
+                var model = _thirdPartyAPIResRepository.GetById(Request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.BalanceRegex = Request.BalanceRegex;
+                model.ErrorCodeRegex = Request.ErrorCodeRegex;
+                model.OprTrnRefNoRegex = Request.OprTrnRefNoRegex;
+                model.Param1Regex = Request.Param1Regex;
+                model.Param2Regex = Request.Param2Regex;
+                model.Param3Regex = Request.Param3Regex;
+                model.ResponseCodeRegex = Request.ResponseCodeRegex;
+                model.StatusMsgRegex = Request.StatusMsgRegex;
+                model.StatusRegex = Request.StatusRegex;
+                model.TrnRefNoRegex = Request.TrnRefNoRegex;
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.UtcNow;
+
+                _thirdPartyAPIResRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return false;
+            }
+        }
+
+        #endregion
+
     }
 }

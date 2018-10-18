@@ -74,5 +74,11 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         ThirdPartyAPIConfigViewModel GetThirdPartyAPIConfigById(long Id);
         long AddThirdPartyAPI(ThirdPartyAPIConfigRequest request);
         bool UpdateThirdPartyAPI(ThirdPartyAPIConfigRequest request);
+
+        List<ThirdPartyAPIResponseConfigViewModel> GetAllThirdPartyAPIResponse();
+        ThirdPartyAPIResponseConfigViewModel GetThirdPartyAPIResponseById(long id);
+        long AddThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
+        bool UpdateThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
+
     }
 }

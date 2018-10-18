@@ -1583,5 +1583,122 @@ namespace CleanArchitecture.Web.API.Configuration
 
         }
         #endregion
+
+        #region ThirdPartyAPIResponse
+
+        [HttpGet("GetAllThirdPartyAPIRespose")]
+        public IActionResult GetAllThirdPartyAPIRespose()
+        {
+            ThirdPartyAPIResponseConfigResponseAllData res = new ThirdPartyAPIResponseConfigResponseAllData();
+            try
+            {
+                res.response = _transactionConfigService.GetAllThirdPartyAPIResponse();
+                if (res.response.Count == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpGet("GetThirdPartyAPIResposeById/{Id:long}")]
+        public IActionResult GetThirdPartyAPIResposeById(long Id)
+        {
+            ThirdPartyAPIResponseConfigResponse  res = new ThirdPartyAPIResponseConfigResponse();
+            try
+            {
+                res.response = _transactionConfigService.GetThirdPartyAPIResponseById(Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("AddThirdPartyAPIRespose")]
+        public IActionResult AddThirdPartyAPIRespose([FromBody]ThirdPartyAPIResponseConfigRequest Request)
+        {
+            ThirdPartyAPIResponseConfigResponse  Response = new ThirdPartyAPIResponseConfigResponse();
+            try
+            {
+                long Id = _transactionConfigService.AddThirdPartyAPIResponse(Request);
+                if (Id != 0)
+                {
+                    Response.response = _transactionConfigService.GetThirdPartyAPIResponseById(Id);
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [HttpPost("UpdateThirdPartyAPIResponse")]
+        public IActionResult UpdateThirdPartyAPIResponse([FromBody]ThirdPartyAPIResponseConfigRequest request)
+        {
+            ThirdPartyAPIResponseConfigResponse  res = new ThirdPartyAPIResponseConfigResponse();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateThirdPartyAPIResponse (request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.response = _transactionConfigService.GetThirdPartyAPIResponseById(request.Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+        #endregion
     }
 }
