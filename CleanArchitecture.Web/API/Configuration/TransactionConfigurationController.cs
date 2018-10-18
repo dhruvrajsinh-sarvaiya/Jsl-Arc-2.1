@@ -70,7 +70,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode =enErrorCode. // not found
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -97,6 +97,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -115,7 +116,7 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 var responsedata = _transactionConfigService.GetAllServiceConfiguration();
-                if (responsedata != null)
+                if (responsedata.Count != 0)
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;   
@@ -123,6 +124,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -148,6 +150,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -173,6 +176,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -1088,5 +1092,324 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         #endregion
+
+        #region ProductConfiguration
+        [HttpPost("AddProductConfiguration")]
+        public IActionResult AddProductConfiguration([FromBody]ProductConfigurationRequest Request)
+        {
+            ProductConfigurationResponse Response = new ProductConfigurationResponse();
+            try
+            {
+                long ProductId = _transactionConfigService.AddProductConfiguration(Request);
+
+                if (ProductId != 0)
+                {
+                    Response.response = new ProductConfigurationInfo() { ProductId = ProductId };
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode =enErrorCode. // not inserted
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("UpdateProductConfiguration")]
+        public IActionResult UpdateProductConfiguration([FromBody]ProductConfigurationRequest Request)
+        {
+            ProductConfigurationResponse Response = new ProductConfigurationResponse();
+            try
+            {
+                long ProductId = _transactionConfigService.UpdateProductConfiguration(Request);
+
+                if (ProductId != 0)
+                {
+                    Response.response = new ProductConfigurationInfo() { ProductId = ProductId };
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetProductConfiguration/{ProductId}")]
+        public IActionResult GetProductConfiguration(long ProductId)
+        {
+            ProductConfigurationGetResponse Response = new ProductConfigurationGetResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetProductConfiguration(ProductId);
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetAllProductConfiguration")]
+        public IActionResult GetAllProductConfiguration()
+        {
+            ProductConfigurationGetAllResponse Response = new ProductConfigurationGetAllResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetAllProductConfiguration();
+                if (responsedata.Count != 0)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("SetActiveService/{ProductId}")]
+        public IActionResult SetActiveProduct(int ProductId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var responsedata = _transactionConfigService.SetActiveProduct(ProductId);
+                if (responsedata == 1)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("SetInActiveService/{ProductId}")]
+        public IActionResult SetInActiveProduct(int ProductId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var responsedata = _transactionConfigService.SetInActiveProduct(ProductId);
+                if (responsedata == 1)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        #endregion
+
+        #region RouteConfiguration
+        [HttpPost("AddRouteConfiguration")]
+        public IActionResult AddRouteConfiguration([FromBody]RouteConfigurationRequest Request)
+        {
+            RouteConfigurationResponse Response = new RouteConfigurationResponse();
+            try
+            {
+                long RouteId = _transactionConfigService.AddRouteConfiguration(Request);
+
+                if (RouteId != 0)
+                {
+                    Response.response = new RouteConfigurationInfo() { RouteId = RouteId };
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode =enErrorCode. // not inserted
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("UpdateRouteConfiguration")]
+        public IActionResult UpdateRouteConfiguration([FromBody]RouteConfigurationRequest Request)
+        {
+            RouteConfigurationResponse Response = new RouteConfigurationResponse();
+            try
+            {
+                long RouteId = _transactionConfigService.UpdateRouteConfiguration(Request);
+
+                if (RouteId != 0)
+                {
+                    Response.response = new RouteConfigurationInfo() { RouteId = RouteId };
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetRouteConfiguration/{RouteId}")]
+        public IActionResult GetRouteConfiguration(long RouteId)
+        {
+            RouteConfigurationGetResponse Response = new RouteConfigurationGetResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetRouteConfiguration(RouteId);
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetAllRouteConfiguration")]
+        public IActionResult GetAllRouteConfiguration()
+        {
+            RouteConfigurationGetAllResponse Response = new RouteConfigurationGetAllResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetAllRouteConfiguration();
+                if (responsedata.Count != 0)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("SetActiveRoute/{RouteId}")]
+        public IActionResult SetActiveRoute(int RouteId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var responsedata = _transactionConfigService.SetActiveRoute(RouteId);
+                if (responsedata == 1)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("SetInActiveRoute/{RouteId}")]
+        public IActionResult SetInActiveRoute(int RouteId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var responsedata = _transactionConfigService.SetInActiveRoute(RouteId);
+                if (responsedata == 1)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        #endregion
+
     }
 }

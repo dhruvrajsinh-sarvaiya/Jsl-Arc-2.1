@@ -35,6 +35,10 @@ namespace CleanArchitecture.Core.Enums
         public static string CreateTrn_NoSelfAddressWithdrawAllowMsg = "Invalid Amount";
         public static string ProcessTrn_InsufficientBalanceMsg = "Insufficient Wallet Balance";
         public static string ProcessTrn_AmountBetweenMinMaxMsg = "Amount Must be Between: @MIN AND @MAX";
+        public static string ProcessTrn_PriceBetweenMinMaxMsg = "Price Must be Between: @MIN AND @MAX";
+        public static string ProcessTrn_InvalidBidPriceValueMsg = "Invalid BidPrice Value";
+        public static string ProcessTrn_PoolOrderCreateFailMsg = "Order Creation Fail";
+        public static string ProcessTrn_InitializeMsg = "Initialize";
         //============================
 
         //============================walelt=================================//       
@@ -143,7 +147,7 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessDeleteIpAddress = "Success full remove ip address.";
         public static string IpAddressdeleteError = "Ip address not remove.";
         public static string SuccessGetIpData = "Success full Get Ip Address.";
-        public static string InvalidAppkey = "Invalid appkey.";
+        public static string InvalidAppkey = "Invalid appkey or password.";
         public static string Appkey = "This appkey data not available.";
         public static string InvalidUser = "The username/password couple is invalid.";
         public static string RefreshToken = "The refresh token is no longer valid.";
@@ -151,5 +155,13 @@ namespace CleanArchitecture.Core.Enums
         public static string Granttype = "The specified grant type is not supported.";
         public static string EnableTroFactor = "User two factor authentication successfully activates";
         public static string DisableTroFactor = "User two factor authentication successfully disable";
+        public static string DisableTroFactorError = "Unexpected error occured disabling 2FA for user with ID";
+        public static string FactorFail = "Invalid authenticator code ";
+        public static string FactorRequired = "Two factor authentication is activated please verify your code";
+        public static string TwoFactorVerification = "Two factor authentication Verification code is invalid.";
+
+
+
+
     }
 }

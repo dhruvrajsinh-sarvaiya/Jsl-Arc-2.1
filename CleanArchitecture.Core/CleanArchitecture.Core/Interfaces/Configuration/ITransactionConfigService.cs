@@ -55,5 +55,19 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         bool UpdateProviderDetail(ProviderDetailRequest request);
         bool SetActiveProviderDetail(long id);
         bool SetInActiveProviderDetail(long id);
+
+        long AddProductConfiguration(ProductConfigurationRequest Request);
+        long UpdateProductConfiguration(ProductConfigurationRequest Request);
+        ProductConfigrationGetInfo GetProductConfiguration(long ProductId);
+        List<ProductConfigrationGetInfo> GetAllProductConfiguration();
+        int SetActiveProduct(int ProductId);
+        int SetInActiveProduct(int ProductId);
+
+        long AddRouteConfiguration(RouteConfigurationRequest Request);
+        long UpdateRouteConfiguration(RouteConfigurationRequest Request);
+        RouteConfigurationRequest GetRouteConfiguration(long RouteId);
+        List<RouteConfigurationRequest> GetAllRouteConfiguration();
+        int SetActiveRoute(int RouteId);
+        int SetInActiveRoute(int RouteId);
     }
 }

@@ -158,6 +158,10 @@ namespace CleanArchitecture.Core.Enums
         InValidPageNo = 4507,
         ProcessTrn_InsufficientBalance = 1,
         ProcessTrn_AmountBetweenMinMax=1,
+        ProcessTrn_PriceBetweenMinMax = 1,
+        ProcessTrn_InvalidBidPriceValue = 1,
+        ProcessTrn_PoolOrderCreateFail = 1,
+        ProcessTrn_Initialize = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -185,6 +189,9 @@ namespace CleanArchitecture.Core.Enums
         Status4051RefreshToken = 4051,
         Status4052UserToken = 4052,
         Status4053Granttype = 4053,
+        Status4054FactorFail =4054,
+        Status4042DisableTroFactorError = 4055,
+        Status4042TwoFactorVerification=4056,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -202,8 +209,8 @@ namespace CleanArchitecture.Core.Enums
         AlredyExist=4037,
         InsufficantBal=4038,
         UserIDWalletIDDidNotMatch = 4039
-
        
+
 
 
 

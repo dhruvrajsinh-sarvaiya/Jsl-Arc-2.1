@@ -43,6 +43,7 @@ namespace CleanArchitecture.Infrastructure
         public virtual DbSet<OtpMaster> OtpMaster { get; set; }
         // add by nirav savariya for create password for login with mobile and email
         public virtual DbSet<CustomPassword> CustomPassword { get; set; }
+        public virtual DbSet<DeviceMaster> DeviceMaster { get; set; }
 
         public DbSet<ToDoItem> ToDoItems { get; set; }
         public DbSet<MessagingQueue> MessagingQueue { get; set; }
@@ -107,6 +108,9 @@ namespace CleanArchitecture.Infrastructure
         public virtual DbSet<IpMaster> IpMaster { get; set; }
 
         public DbSet<TradeBuyRequest> TradeBuyRequest { get; set; }
+        public DbSet<CountryMaster> CountryMaster { get; set; } //uday 17-10-2018
+        public DbSet<StateMaster> StateMaster { get; set; } //uday 17-10-2018
+        public DbSet<PoolOrder> PoolOrder { get; set; } //uday 17-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;

@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.Entities.Configuration;
+﻿using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Configuration;
@@ -24,6 +25,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<DemonConfiguration> _DemonRepository;
         private readonly ICommonRepository<ServiceProviderDetail> _ProDetailRepository;
         private readonly ILogger<TransactionConfigService> _logger;
+        private readonly ICommonRepository<ProductConfiguration> _productConfigRepository;
+        private readonly ICommonRepository<StateMaster> _stateMasterRepository;
+        private readonly ICommonRepository<RouteConfiguration> _routeConfigRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -35,7 +39,10 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<ServiceProviderType> ProviderTypeRepository,
             ICommonRepository<ServiceProConfiguration> ProviderConfiguration,
             ICommonRepository<DemonConfiguration> DemonRepository,
-            ICommonRepository<ServiceProviderDetail> ProDetailRepository)
+            ICommonRepository<ServiceProviderDetail> ProDetailRepository,
+            ICommonRepository<ProductConfiguration> productConfigRepository,
+            ICommonRepository<StateMaster> stateMasterRepository,
+            ICommonRepository<RouteConfiguration> routeConfigRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -47,6 +54,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _DemonRepository = DemonRepository;
             _ProDetailRepository = ProDetailRepository;
             _logger = logger;
+            _productConfigRepository = productConfigRepository;
+            _stateMasterRepository = stateMasterRepository;
+            _routeConfigRepository = routeConfigRepository;
         }
 
         #region Service
@@ -198,7 +208,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 }
                 else
                 {
-                    return responsedata;
+                    return null;
                 }
             }
             catch (Exception ex)
@@ -206,7 +216,6 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-            throw new NotImplementedException();
         }
 
         public ServiceConfigurationRequest GetServiceConfiguration(long ServiceId)
@@ -246,7 +255,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 }
                 else
                 {
-                    return responsedata;
+                    return null;
                 }
             }
             catch (Exception ex)
@@ -1169,6 +1178,346 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 res.thirdParty = null;
 
                 return res;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ProductConfiguration
+        public long AddProductConfiguration(ProductConfigurationRequest Request)
+        {
+            try
+            {
+                ProductConfiguration product = new ProductConfiguration()
+                {
+                    ProductName = Request.ProductName,
+                    ServiceID = Request.ServiceID,
+                    StateID = Request.StateID
+                };
+                var newProduct = _productConfigRepository.Add(product);
+                return newProduct.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public long UpdateProductConfiguration(ProductConfigurationRequest Request)
+        {
+            try
+            {
+                var product = _productConfigRepository.GetById(Request.Id);
+                if (product != null)
+                {
+                    product.ProductName = Request.ProductName;
+                    product.ServiceID = Request.ServiceID;
+                    product.StateID = Request.StateID;
+
+                    _productConfigRepository.Update(product);
+                     return product.Id;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public ProductConfigrationGetInfo GetProductConfiguration(long ProductId)
+        {
+            ProductConfigrationGetInfo responsedata;
+            try
+            {
+                responsedata = new ProductConfigrationGetInfo();
+                var product = _productConfigRepository.GetById(ProductId);
+                if (product != null)
+                {
+                    responsedata.Id = product.Id;
+                    responsedata.ProductName = product.ProductName;
+                    
+                    var serviceMaster = _serviceMasterRepository.GetById(product.ServiceID);
+                    var stateMaster = _stateMasterRepository.GetById(product.StateID);
+                    responsedata.StateID = product.StateID;
+                    responsedata.ServiceID = product.ServiceID;
+                    responsedata.ServiceName = serviceMaster.Name;
+                    responsedata.StateName = stateMaster.StateName;
+
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<ProductConfigrationGetInfo> GetAllProductConfiguration()
+        {
+            List<ProductConfigrationGetInfo> responsedata;
+            try
+            {
+                responsedata = new List<ProductConfigrationGetInfo>();
+
+                var productall = _productConfigRepository.GetAll();
+                if (productall != null)
+                {
+                    foreach (var product in productall)
+                    {
+                        ProductConfigrationGetInfo response = new ProductConfigrationGetInfo();
+                        response.Id = product.Id;
+                        response.ProductName = product.ProductName;
+
+                        var serviceMaster = _serviceMasterRepository.GetById(product.ServiceID);
+                        var stateMaster = _stateMasterRepository.GetById(product.StateID);
+                        response.StateID = product.StateID;
+                        response.ServiceID = product.ServiceID;
+                        response.ServiceName = serviceMaster.Name;
+                        response.StateName = stateMaster.StateName;
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetActiveProduct(int ProductId)
+        {
+            try
+            {
+                var product = _productConfigRepository.GetById(ProductId);
+                if (product != null)
+                {
+                    product.SetActiveProduct();
+                    _productConfigRepository.Update(product);
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetInActiveProduct(int ProductId)
+        {
+            try
+            {
+                var product = _productConfigRepository.GetById(ProductId);
+                if (product != null)
+                {
+                    product.SetInActiveProduct();
+                    _productConfigRepository.Update(product);
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region RouteConfiguration
+        public long AddRouteConfiguration(RouteConfigurationRequest Request)
+        {
+            try
+            {
+                RouteConfiguration route = new RouteConfiguration()
+                {
+                    RouteName = Request.RouteName,
+                    ServiceID = Request.ServiceID,
+                    SerProDetailID = Request.ServiceProDetailId,
+                    ProductID = Request.ProductID,
+                    Priority = Request.Priority,
+                    StatusCheckUrl = Request.StatusCheckUrl,
+                    ValidationUrl = Request.ValidationUrl,
+                    TransactionUrl = Request.TransactionUrl,
+                    LimitId = Request.LimitId,
+                    OpCode = Request.OpCode,
+                    TrnType = Request.TrnType,
+                    IsDelayAddress = Request.IsDelayAddress,
+                    ProviderWalletID = Request.ProviderWalletID
+                };
+                var newProduct = _routeConfigRepository.Add(route);
+                return newProduct.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public long UpdateRouteConfiguration(RouteConfigurationRequest Request)
+        {
+            try
+            {
+                var route = _routeConfigRepository.GetById(Request.Id);
+                if(route != null)
+                {
+                    route.RouteName = Request.RouteName;
+                    route.ServiceID = Request.ServiceID;
+                    route.SerProDetailID = Request.ServiceProDetailId;
+                    route.ProductID = Request.ProductID;
+                    route.Priority = Request.Priority;
+                    route.StatusCheckUrl = Request.StatusCheckUrl;
+                    route.ValidationUrl = Request.ValidationUrl;
+                    route.TransactionUrl = Request.TransactionUrl;
+                    route.LimitId = Request.LimitId;
+                    route.OpCode = Request.OpCode;
+                    route.TrnType = Request.TrnType;
+                    route.IsDelayAddress = Request.IsDelayAddress;
+                    route.ProviderWalletID = Request.ProviderWalletID;
+                   
+                    _routeConfigRepository.Update(route);
+                    return route.Id;
+                }
+                else
+                {
+                    return 0;
+                }   
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public RouteConfigurationRequest GetRouteConfiguration(long RouteId)
+        {
+            RouteConfigurationRequest responsedata;
+            try
+            {
+                responsedata = new RouteConfigurationRequest();
+                var route = _routeConfigRepository.GetById(RouteId);
+                if (route != null)
+                {
+                    responsedata.Id = route.Id;
+                    responsedata.RouteName = route.RouteName;
+                    responsedata.ServiceID = route.ServiceID;
+                    responsedata.ServiceProDetailId = route.SerProDetailID;
+                    responsedata.ProductID = route.ProductID;
+                    responsedata.Priority = route.Priority;
+                    responsedata.StatusCheckUrl = route.StatusCheckUrl;
+                    responsedata.ValidationUrl = route.ValidationUrl;
+                    responsedata.TransactionUrl = route.TransactionUrl;
+                    responsedata.LimitId = route.LimitId;
+                    responsedata.OpCode = route.OpCode;
+                    responsedata.TrnType = route.TrnType;
+                    responsedata.IsDelayAddress = route.IsDelayAddress;
+                    responsedata.ProviderWalletID = route.ProviderWalletID;
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<RouteConfigurationRequest> GetAllRouteConfiguration()
+        {
+            List<RouteConfigurationRequest> responsedata;
+            try
+            {
+                responsedata = new List<RouteConfigurationRequest>();
+
+                var routeall = _routeConfigRepository.GetAll();
+                if (routeall != null)
+                {
+                    foreach (var route in routeall)
+                    {
+                        RouteConfigurationRequest response = new RouteConfigurationRequest();
+
+                        response.Id = route.Id;
+                        response.RouteName = route.RouteName;
+                        response.ServiceID = route.ServiceID;
+                        response.ServiceProDetailId = route.SerProDetailID;
+                        response.ProductID = route.ProductID;
+                        response.Priority = route.Priority;
+                        response.StatusCheckUrl = route.StatusCheckUrl;
+                        response.ValidationUrl = route.ValidationUrl;
+                        response.TransactionUrl = route.TransactionUrl;
+                        response.LimitId = route.LimitId;
+                        response.OpCode = route.OpCode;
+                        response.TrnType = route.TrnType;
+                        response.IsDelayAddress = route.IsDelayAddress;
+                        response.ProviderWalletID = route.ProviderWalletID;
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetActiveRoute(int RouteId)
+        {
+            try
+            {
+                var route = _routeConfigRepository.GetById(RouteId);
+                if (route != null)
+                {
+                    route.SetActiveRoute();
+                    _routeConfigRepository.Update(route);
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetInActiveRoute(int RouteId)
+        {
+            try
+            {
+                var route = _routeConfigRepository.GetById(RouteId);
+                if (route != null)
+                {
+                    route.SetInActiveRoute();
+                    _routeConfigRepository.Update(route);
+                    return 1;
+                }
+                return 0;
             }
             catch (Exception ex)
             {

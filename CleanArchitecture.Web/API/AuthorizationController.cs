@@ -91,7 +91,7 @@ namespace CleanArchitecture.Web.API
                 }
             }
 
-            if (string.IsNullOrEmpty(appkey))
+            if (string.IsNullOrEmpty(appkey) && request.IsPasswordGrantType())
             {
                 string numeric = string.Empty;
                 foreach (char str in request.Password)
