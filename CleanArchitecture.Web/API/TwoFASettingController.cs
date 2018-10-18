@@ -27,7 +27,7 @@ namespace CleanArchitecture.Web.API
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
-      ///  private readonly IBasePage _basePage;
+        private readonly IBasePage _basePage;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
         #endregion
