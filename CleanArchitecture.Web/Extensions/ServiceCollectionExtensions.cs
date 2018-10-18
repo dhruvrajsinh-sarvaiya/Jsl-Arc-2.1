@@ -356,6 +356,9 @@ namespace CleanArchitecture.Web.Extensions
 
             //Ipaddress Service
             services.AddScoped<IipAddressService, IpAddressService>();
+            //DeviceId Service
+            services.AddScoped<IDeviceIdService, DeviceIdService>();
+
             //Custom password Service
             services.AddScoped<ICustomPassword, CustomPasswordService>();
             return services;
