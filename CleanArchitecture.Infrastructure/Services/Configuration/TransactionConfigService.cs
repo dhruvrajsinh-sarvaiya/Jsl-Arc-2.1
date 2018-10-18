@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
+using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Configuration;
@@ -30,6 +31,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<RouteConfiguration> _routeConfigRepository;
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyAPIRepository;
         private readonly ICommonRepository<ThirdPartyAPIResponseConfiguration> _thirdPartyAPIResRepository;
+        private readonly ICommonRepository<TradePairMaster> _tradePairMasterRepository;
+        private readonly ICommonRepository<TradePairDetail> _tradePairDetailRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -46,7 +49,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<StateMaster> stateMasterRepository,
             ICommonRepository<RouteConfiguration> routeConfigRepository,
             ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository,
-            ICommonRepository<ThirdPartyAPIResponseConfiguration> thirdPartyAPIResRepository)
+            ICommonRepository<ThirdPartyAPIResponseConfiguration> thirdPartyAPIResRepository,
+            ICommonRepository<TradePairMaster> tradePairMasterRepository,
+            ICommonRepository<TradePairDetail> tradePairDetailRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -63,6 +68,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _routeConfigRepository = routeConfigRepository;
             _thirdPartyAPIRepository = thirdPartyAPIRepository;
             _thirdPartyAPIResRepository = thirdPartyAPIResRepository;
+            _tradePairMasterRepository = tradePairMasterRepository;
+            _tradePairDetailRepository = tradePairDetailRepository;
         }
 
         #region Service
@@ -311,6 +318,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
         #endregion
+
 
         #region ProviderMaster
         public IEnumerable<ServiceProviderViewModel> GetAllProvider()
@@ -1834,6 +1842,307 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
+        #endregion
+
+        #region TradePairConfiguration
+        public long AddPairConfiguration(TradePairConfigRequest Request)
+        {
+            try
+            {
+                var pairMaster = new TradePairMaster()
+                {
+                    PairName = Request.PairName,
+                    SecondaryCurrencyId = Request.SecondaryCurrencyId,
+                    WalletMasterID = Request.WalletMasterID,
+                    BaseCurrencyId = Request.BaseCurrencyId
+                };
+                var newPairMaster = _tradePairMasterRepository.Add(pairMaster);
+
+                var pairDetail = new TradePairDetail()
+                {
+                    PairId = newPairMaster.Id,
+                    Currentrate = Request.Currentrate,
+                    BuyMinQty = Request.BuyMinQty,
+                    BuyMaxQty = Request.BuyMaxQty,
+                    SellMinQty = Request.SellMinQty,
+                    SellMaxQty = Request.SellMaxQty,
+                    DailyHigh = Request.DailyHigh,
+                    DailyLow = Request.DailyLow,
+                    CurrencyPrice = Request.CurrencyPrice,
+                    Volume = Request.Volume,
+                    SellPrice = Request.SellPrice,
+                    BuyPrice = Request.BuyPrice,
+                    BuyMinPrice = Request.BuyMinPrice,
+                    BuyMaxPrice = Request.BuyMaxPrice,
+                    SellMinPrice = Request.SellMinPrice,
+                    SellMaxPrice = Request.SellMaxPrice,
+                    Fee = Request.Fee,
+                    FeeType = Request.FeeType
+                };
+
+                var newPairDetail = _tradePairDetailRepository.Add(pairDetail);
+                return newPairMaster.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public long UpdatePairConfiguration(TradePairConfigRequest Request)
+        {
+            try
+            {
+                var pairMaster = _tradePairMasterRepository.GetById(Request.Id);
+                if (pairMaster != null)
+                {
+                    pairMaster.PairName = Request.PairName;
+                    pairMaster.SecondaryCurrencyId = Request.SecondaryCurrencyId;
+                    pairMaster.WalletMasterID = Request.WalletMasterID;
+                    pairMaster.BaseCurrencyId = Request.BaseCurrencyId;
+
+                    _tradePairMasterRepository.Update(pairMaster);
+
+                    var pairDetail = _tradePairDetailRepository.GetSingle(pair => pair.PairId == Request.Id);
+
+                    pairDetail.Currentrate = Request.Currentrate;
+                    pairDetail.BuyMinQty = Request.BuyMinQty;
+                    pairDetail.BuyMaxQty = Request.BuyMaxQty;
+                    pairDetail.SellMinQty = Request.SellMinQty;
+                    pairDetail.SellMaxQty = Request.SellMaxQty;
+                    pairDetail.DailyHigh = Request.DailyHigh;
+                    pairDetail.DailyLow = Request.DailyLow;
+                    pairDetail.CurrencyPrice = Request.CurrencyPrice;
+                    pairDetail.Volume = Request.Volume;
+                    pairDetail.SellPrice = Request.SellPrice;
+                    pairDetail.BuyPrice = Request.BuyPrice;
+                    pairDetail.BuyMinPrice = Request.BuyMinPrice;
+                    pairDetail.BuyMaxPrice = Request.BuyMaxPrice;
+                    pairDetail.SellMinPrice = Request.SellMinPrice;
+                    pairDetail.SellMaxPrice = Request.SellMaxPrice;
+                    pairDetail.Fee = Request.Fee;
+                    pairDetail.FeeType = Request.FeeType;
+
+                    return Request.Id;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public TradePairConfigRequest GetPairConfiguration(long PairId)
+        {
+            TradePairConfigRequest responsedata;
+            try
+            {
+                responsedata = new TradePairConfigRequest();
+                var pairMaster = _tradePairMasterRepository.GetById(PairId);
+                if (pairMaster != null)
+                {
+                    responsedata.Id = pairMaster.Id;
+                    responsedata.PairName = pairMaster.PairName;
+                    responsedata.SecondaryCurrencyId = pairMaster.SecondaryCurrencyId;
+                    responsedata.WalletMasterID = pairMaster.WalletMasterID;
+                    responsedata.BaseCurrencyId = pairMaster.BaseCurrencyId;
+
+                    var pairDetail = _tradePairDetailRepository.GetSingle(pair => pair.PairId == PairId);
+
+                    responsedata.Currentrate = pairDetail.Currentrate;
+                    responsedata.BuyMinQty = pairDetail.BuyMinQty;
+                    responsedata.BuyMaxQty = pairDetail.BuyMaxQty;
+                    responsedata.SellMinQty = pairDetail.SellMinQty;
+                    responsedata.SellMaxQty = pairDetail.SellMaxQty;
+                    responsedata.DailyHigh = pairDetail.DailyHigh;
+                    responsedata.DailyLow = pairDetail.DailyLow;
+                    responsedata.CurrencyPrice = pairDetail.CurrencyPrice;
+                    responsedata.Volume = pairDetail.Volume;
+                    responsedata.SellPrice = pairDetail.SellPrice;
+                    responsedata.BuyPrice = pairDetail.BuyPrice;
+                    responsedata.BuyMinPrice = pairDetail.BuyMinPrice;
+                    responsedata.BuyMaxPrice = pairDetail.BuyMaxPrice;
+                    responsedata.SellMinPrice = pairDetail.SellMinPrice;
+                    responsedata.SellMaxPrice = pairDetail.SellMaxPrice;
+                    responsedata.Fee = pairDetail.Fee;
+                    responsedata.FeeType = pairDetail.FeeType;
+
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<TradePairConfigRequest> GetAllPairConfiguration()
+        {
+            List<TradePairConfigRequest> responsedata;
+            try
+            {
+                responsedata = new List<TradePairConfigRequest>();
+
+                var pairMaster = _tradePairMasterRepository.GetAll();
+                if (pairMaster != null)
+                {
+                    foreach (var pair in pairMaster)
+                    {
+                        TradePairConfigRequest response = new TradePairConfigRequest();
+                        response.Id = pair.Id;
+                        response.PairName = pair.PairName;
+                        response.SecondaryCurrencyId = pair.SecondaryCurrencyId;
+                        response.WalletMasterID = pair.WalletMasterID;
+                        response.BaseCurrencyId = pair.BaseCurrencyId;
+
+                        var pairDetail = _tradePairDetailRepository.GetSingle(x => x.PairId == pair.Id);
+
+                        response.Currentrate = pairDetail.Currentrate;
+                        response.BuyMinQty = pairDetail.BuyMinQty;
+                        response.BuyMaxQty = pairDetail.BuyMaxQty;
+                        response.SellMinQty = pairDetail.SellMinQty;
+                        response.SellMaxQty = pairDetail.SellMaxQty;
+                        response.DailyHigh = pairDetail.DailyHigh;
+                        response.DailyLow = pairDetail.DailyLow;
+                        response.CurrencyPrice = pairDetail.CurrencyPrice;
+                        response.Volume = pairDetail.Volume;
+                        response.SellPrice = pairDetail.SellPrice;
+                        response.BuyPrice = pairDetail.BuyPrice;
+                        response.BuyMinPrice = pairDetail.BuyMinPrice;
+                        response.BuyMaxPrice = pairDetail.BuyMaxPrice;
+                        response.SellMinPrice = pairDetail.SellMinPrice;
+                        response.SellMaxPrice = pairDetail.SellMaxPrice;
+                        response.Fee = pairDetail.Fee;
+                        response.FeeType = pairDetail.FeeType;
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetActivePair(long PairId)
+        {
+            try
+            {
+                var pairdata = _tradePairMasterRepository.GetById(PairId);
+                if (pairdata != null)
+                {
+                    pairdata.MakePairActive();
+                    _tradePairMasterRepository.Update(pairdata);
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetInActivePair(long PairId)
+        {
+            try
+            {
+                var pairdata = _tradePairMasterRepository.GetById(PairId);
+                if (pairdata != null)
+                {
+                    pairdata.MakePairInActive();
+                    _tradePairMasterRepository.Update(pairdata);
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region Other Configuration
+        public List<ServiceTypeMasterInfo> GetAllServiceTypeMaster()
+        {
+            List<ServiceTypeMasterInfo> responsedata;
+            try
+            {
+                responsedata = new List<ServiceTypeMasterInfo>();
+
+                String[] serviceTypeName = Enum.GetNames(typeof(enServiceType));
+                int[] serviceTypeValues = (int[])Enum.GetValues(typeof(enServiceType));
+                if (serviceTypeName.Length > 0)
+                {
+                    for (int i = 0; i < serviceTypeName.Length; i++)
+                    {
+                        ServiceTypeMasterInfo response = new ServiceTypeMasterInfo();
+                        response.Id = serviceTypeValues[i];
+                        response.SerTypeName = serviceTypeName[i];
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<TransactionTypeInfo> GetAllTransactionType()
+        {
+            List<TransactionTypeInfo> responsedata;
+            try
+            {
+                responsedata = new List<TransactionTypeInfo>();
+
+                String[] trnTypeName = Enum.GetNames(typeof(enTrnType));
+                int[] trnTypeValues = (int[])Enum.GetValues(typeof(enTrnType));
+                if (trnTypeName.Length > 0)
+                {
+                    for (int i = 0; i < trnTypeName.Length; i++)
+                    {
+                        TransactionTypeInfo response = new TransactionTypeInfo();
+                        response.Id = trnTypeValues[i];
+                        response.TrnTypeName = trnTypeName[i];
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         #endregion
 
     }

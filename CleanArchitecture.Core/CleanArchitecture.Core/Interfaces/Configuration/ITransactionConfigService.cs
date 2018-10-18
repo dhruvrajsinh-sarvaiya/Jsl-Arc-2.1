@@ -80,5 +80,15 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         long AddThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
         bool UpdateThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
 
+        long AddPairConfiguration(TradePairConfigRequest Request);
+        long UpdatePairConfiguration(TradePairConfigRequest Request);
+        TradePairConfigRequest GetPairConfiguration(long PairId);
+        List<TradePairConfigRequest> GetAllPairConfiguration();
+        int SetActivePair(long PairId);
+        int SetInActivePair(long PairId);
+
+        List<ServiceTypeMasterInfo> GetAllServiceTypeMaster();
+        List<TransactionTypeInfo> GetAllTransactionType();
+
     }
 }
