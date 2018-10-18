@@ -352,7 +352,8 @@ namespace CleanArchitecture.Web.Extensions
 
             //REDIS RELETED CLASS                  
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IRedisConnectionFactory, RedisConnectionFactory>();
+            //services.AddSingleton<IRedisConnectionFactory, RedisConnectionFactory>();
+            services.AddSingleton<RedisConnectionFactory>();
 
             //Ipaddress Service
             services.AddScoped<IipAddressService, IpAddressService>();

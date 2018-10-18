@@ -26,6 +26,7 @@ using CleanArchitecture.Infrastructure.Services.Configuration;
 using CleanArchitecture.Infrastructure.Services.Transaction;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.Services.Session;
+using CleanArchitecture.Web.SignalR;
 
 namespace CleanArchitecture.Web
 {
@@ -94,6 +95,13 @@ namespace CleanArchitecture.Web
             // MVC Model filter validataion
             services.AddCustomizedMvc();
 
+            //SignalR
+            //services.AddSignalR().AddMessagePackProtocol();
+            services.AddSignalR(options =>
+            {
+                // Faster pings for testing
+                options.KeepAliveInterval = TimeSpan.FromSeconds(5);
+            });
 
             // MVC Redis Cache Store Mamory
             services.RegisterRedisServer();
@@ -218,6 +226,11 @@ namespace CleanArchitecture.Web
                 // Do work that doesn't write to the Response.
                 await next.Invoke();
                 // Do logging or other work that doesn't write to the Response.
+            });
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<Chat>("/chathub");
             });
 
             app.UseSession();

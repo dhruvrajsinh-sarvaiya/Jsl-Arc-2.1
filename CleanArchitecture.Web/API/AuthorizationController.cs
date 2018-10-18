@@ -36,7 +36,8 @@ namespace CleanArchitecture.Web.API
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger _logger;
         private readonly IUserSessionService _userSessionService;
-        private readonly IRedisConnectionFactory _fact;
+        //private readonly IRedisConnectionFactory _fact;
+        private readonly RedisConnectionFactory _fact;
         private readonly RedisSessionStorage _redisSessionStora;
         private readonly IOtpMasterService _otpMasterService;
         private readonly ICustomPassword _customPassword;
@@ -46,7 +47,8 @@ namespace CleanArchitecture.Web.API
             UserManager<ApplicationUser> userManager,
             ILoggerFactory loggerFactory,
             IUserSessionService userSessionService, RedisSessionStorage redisSessionStora,
-            IRedisConnectionFactory factory,
+            RedisConnectionFactory factory,
+            //IRedisConnectionFactory factory,
             IUserService userService,
             IOtpMasterService otpMasterService, ICustomPassword customPassword)
         {

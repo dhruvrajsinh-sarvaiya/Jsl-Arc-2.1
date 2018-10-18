@@ -10,7 +10,9 @@ namespace CleanArchitecture.Core.Interfaces
     public interface ICommonRepository<T> where T : BizBase
     {
         T GetById(long id);
+        T GetActiveById(long id);
         List<T> List();
+        List<T> GetAllList();
         T Add(T entity);
         void Update(T entity);
         void Delete(T entity);
