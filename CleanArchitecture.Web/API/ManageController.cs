@@ -375,7 +375,7 @@ namespace CleanArchitecture.Web.API
         }
 
         #endregion
-
+        /*
         #region DeviceId
         [HttpPost("AddDevice")]
         public async Task<IActionResult> AddDevice([FromBody]DeviceIdReqViewModel model)
@@ -432,7 +432,7 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
 
                 }
-               
+
 
                 var user = await GetCurrentUserAsync();
 
@@ -476,7 +476,7 @@ namespace CleanArchitecture.Web.API
                 {
                     return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
                 }
-               
+
 
                 var user = await GetCurrentUserAsync();
 
@@ -557,7 +557,7 @@ namespace CleanArchitecture.Web.API
         }
 
         #endregion
-
+        */
         [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordViewModel model)
         {
