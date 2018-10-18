@@ -209,7 +209,7 @@ namespace CleanArchitecture.Web.API
 
                 return BadRequest(new LoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.CommFailMsgInternal, ErrorCode = enErrorCode.Status400BadRequest });
             }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            return View(new VerifyCodeViewModel { RememberMe = rememberMe });
         }
 
         [HttpPost("VerifyCode")]

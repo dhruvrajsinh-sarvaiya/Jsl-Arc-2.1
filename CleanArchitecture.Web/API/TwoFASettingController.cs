@@ -111,8 +111,8 @@ namespace CleanArchitecture.Web.API
             }
 
 
-           
-         
+
+
 
         }
 
@@ -123,7 +123,7 @@ namespace CleanArchitecture.Web.API
             {
                 var user = await GetCurrentUserAsync();
 
-               
+
                 user.TwoFactorEnabled = true;
                 await _userManager.UpdateAsync(user);
 
@@ -143,7 +143,7 @@ namespace CleanArchitecture.Web.API
                     AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
                 };
                 return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, enableAuthenticatorViewModel = model });
-               
+
             }
             catch (Exception ex)
             {
@@ -157,24 +157,36 @@ namespace CleanArchitecture.Web.API
         [HttpPost("enableauthenticator")]
         public async Task<IActionResult> EnableAuthenticator([FromBody]EnableAuthenticatorViewModel model)
         {
-
-            var user = await GetCurrentUserAsync();
-
-            // Strip spaces and hypens
-            var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
-
-            var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
-                user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
-
-            if (!is2faTokenValid)
+            try
             {
-                ModelState.AddModelError("model.Code", "Verification code is invalid.");
-                return BadRequest(new ApiError(ModelState));
-            }
 
-            await _userManager.SetTwoFactorEnabledAsync(user, true);
-            _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-            return NoContent();
+
+
+                var user = await GetCurrentUserAsync();
+
+                // Strip spaces and hypens
+                var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+                var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+                    user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+
+                if (!is2faTokenValid)
+                {
+                    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification });
+
+                }
+
+                await _userManager.SetTwoFactorEnabledAsync(user, true);
+                _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
+            }
         }
 
         [HttpPost("resetauthenticator")]
