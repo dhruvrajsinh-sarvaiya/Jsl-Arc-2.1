@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,13 +41,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 mail.Body = Body;
                 mail.IsBodyHtml = true;
                 mail.Priority = MailPriority.High;
+                //ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(ValidateServerCertificate);
 
                 using (SmtpClient smtp = new SmtpClient(Url,Port))
                 {
                     smtp.Credentials = new NetworkCredential(UserID, Password);
                     smtp.EnableSsl = true;
                     await smtp.SendMailAsync(mail);
-                }
+                } 
                 return await Task.FromResult("Success");
             }
             catch (Exception ex)
@@ -53,6 +56,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 ex.ToString();
                 return await Task.FromResult("Fail");
             }            
+        }
+
+        public static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
+            else
+                return true;
         }
 
         public async Task<string> SendSMSAsync(long Mobile, string Message, string Url, string SerderID, string UserID, string Password)

@@ -8,11 +8,11 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
 {
     public class ProviderTypeResponce : BizResponseClass
     {
-        public IEnumerable <ProviderTypeViewModel> responce { get; set; }
+        public IEnumerable <ProviderTypeViewModel> response { get; set; }
     }
     public class ProviderTypeResponceData : BizResponseClass
     {
-        public ProviderTypeViewModel responce { get; set; }
+        public ProviderTypeViewModel response { get; set; }
     }
     public class ProviderTypeRequest
     {

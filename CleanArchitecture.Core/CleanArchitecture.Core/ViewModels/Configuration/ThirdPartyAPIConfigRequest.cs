@@ -1,29 +1,27 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using CleanArchitecture.Core.Enums;
-using CleanArchitecture.Core.Events;
+﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.SharedKernel;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 
-namespace CleanArchitecture.Core.Entities
+namespace CleanArchitecture.Core.ViewModels.Configuration
 {
-    public class ThirdPartyAPIConfiguration : BizBase
+    public class ThirdPartyAPIConfigRequest
     {
-        //[Key]
-        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        //public long ThirPartyAPIID { get; set; }
+        public long Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4528")]
         [StringLength(30)]
         public string APIName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4529")]
         [Url]
         public string APISendURL { get; set; }
-       
+
         [Url]
         public string APIValidateURL { get; set; }
-       
+
         [Url]
         public string APIBalURL { get; set; }
 
@@ -39,13 +37,13 @@ namespace CleanArchitecture.Core.Entities
         //public string UserID { get; set; }
 
         //public string Password { get; set; }
-        
+
         public long SerProConfigurationID { get; set; }
 
         public string ResponseSuccess { get; set; }
 
         public string ResponseFailure { get; set; }
-              
+
         public string ResponseHold { get; set; }
 
         public string AuthHeader { get; set; }
@@ -63,16 +61,15 @@ namespace CleanArchitecture.Core.Entities
         public short AppType { get; set; }
 
         public long ParsingDataID { get; set; }
-
-        public void SetActive()
-        {
-            Status = Convert.ToInt16(ServiceStatus.Active);
-            Events.Add(new ServiceStatusEvent<ThirdPartyAPIConfiguration>(this));
-        }
-        public void SetInActive()
-        {
-            Status = Convert.ToInt16(ServiceStatus.InActive);
-            Events.Add(new ServiceStatusEvent<ThirdPartyAPIConfiguration>(this));
-        }
     }
+
+    public class ThirdPartyAPIConfigResponse : BizResponseClass
+    {
+        public ThirdPartyAPIConfigViewModel response { get; set; }
+    }
+    public class ThirdPartyAPIConfigResponseAllData : BizResponseClass
+    {
+        public List<ThirdPartyAPIConfigViewModel> response { get; set; }
+    }
+
 }

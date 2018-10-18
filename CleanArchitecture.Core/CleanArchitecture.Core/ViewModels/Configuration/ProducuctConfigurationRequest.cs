@@ -14,6 +14,6 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4509")]
         public long ServiceID { get; set; }
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4510")]
-        public long StateID { get; set; }
+        public long CountryID { get; set; }
     }
 }

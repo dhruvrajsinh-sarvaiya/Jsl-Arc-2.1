@@ -54,6 +54,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //Rushabh 16-10-2018
         LimitResponse GetWalletLimitConfig(string accWalletID);
-        
+
+        //vsolanki 18-10-2018
+        WithdrawalRes Withdrawl(string coin, string accWalletID, WithdrawalReq Request, long userid);
     }
 }

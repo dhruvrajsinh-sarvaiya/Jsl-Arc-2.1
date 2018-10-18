@@ -11,8 +11,8 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         long UpdateServiceConfiguration(ServiceConfigurationRequest Request);
         ServiceConfigurationRequest GetServiceConfiguration(long ServiceId);
         List<ServiceConfigurationRequest> GetAllServiceConfiguration();
-        int SetActiveService(int ServiceId);
-        int SetInActiveService(int ServiceId);
+        int SetActiveService(long ServiceId);
+        int SetInActiveService(long ServiceId);
 
         IEnumerable<ServiceProviderViewModel> GetAllProvider();
         ServiceProviderViewModel GetPoviderByID(long ID);
@@ -60,14 +60,45 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         long UpdateProductConfiguration(ProductConfigurationRequest Request);
         ProductConfigrationGetInfo GetProductConfiguration(long ProductId);
         List<ProductConfigrationGetInfo> GetAllProductConfiguration();
-        int SetActiveProduct(int ProductId);
-        int SetInActiveProduct(int ProductId);
+        int SetActiveProduct(long ProductId);
+        int SetInActiveProduct(long ProductId);
 
         long AddRouteConfiguration(RouteConfigurationRequest Request);
         long UpdateRouteConfiguration(RouteConfigurationRequest Request);
         RouteConfigurationRequest GetRouteConfiguration(long RouteId);
         List<RouteConfigurationRequest> GetAllRouteConfiguration();
-        int SetActiveRoute(int RouteId);
-        int SetInActiveRoute(int RouteId);
+        int SetActiveRoute(long RouteId);
+        int SetInActiveRoute(long RouteId);
+
+        List<ThirdPartyAPIConfigViewModel> GetAllThirdPartyAPIConfig();
+        ThirdPartyAPIConfigViewModel GetThirdPartyAPIConfigById(long Id);
+        long AddThirdPartyAPI(ThirdPartyAPIConfigRequest request);
+        bool UpdateThirdPartyAPI(ThirdPartyAPIConfigRequest request);
+        bool SetActiveThirdPartyAPI(long id);
+        bool SetInActiveThirdPartyAPI(long id);
+
+        List<ThirdPartyAPIResponseConfigViewModel> GetAllThirdPartyAPIResponse();
+        ThirdPartyAPIResponseConfigViewModel GetThirdPartyAPIResponseById(long id);
+        long AddThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
+        bool UpdateThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
+        bool SetActiveThirdPartyAPIResponse(long id);
+        bool SetInActiveThirdPartyAPIResponse(long id);
+
+        long AddPairConfiguration(TradePairConfigRequest Request);
+        long UpdatePairConfiguration(TradePairConfigRequest Request);
+        TradePairConfigRequest GetPairConfiguration(long PairId);
+        List<TradePairConfigRequest> GetAllPairConfiguration();
+        int SetActivePair(long PairId);
+        int SetInActivePair(long PairId);
+
+        List<ServiceTypeMasterInfo> GetAllServiceTypeMaster();
+        List<TransactionTypeInfo> GetAllTransactionType();
+
+        List<LimitViewModel> GetAllLimitData();
+        LimitViewModel GetLimitById(long id);
+        long AddLimitData(LimitRequest Request);
+        bool UpdateLimitData(LimitRequest Request);
+        bool SetActiveLimit(long id);
+        bool SetInActiveLimit(long id);
     }
 }

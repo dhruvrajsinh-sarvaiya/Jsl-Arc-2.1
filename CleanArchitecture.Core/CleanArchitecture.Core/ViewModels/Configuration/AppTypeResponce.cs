@@ -8,11 +8,11 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
 {
     public class AppTypeResponce : BizResponseClass
     {
-        public IEnumerable <AppTypeViewModel> responce { get; set; }
+        public IEnumerable <AppTypeViewModel> response { get; set; }
     }
     public class AppTypeResponceData : BizResponseClass
     {
-        public AppTypeViewModel responce { get; set; }
+        public AppTypeViewModel response { get; set; }
     }
     public class AppTypeRequest
     {

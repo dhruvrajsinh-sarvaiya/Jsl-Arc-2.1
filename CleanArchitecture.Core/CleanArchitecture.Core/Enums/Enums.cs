@@ -156,12 +156,16 @@ namespace CleanArchitecture.Core.Enums
         InvalidToDateFormate = 4505,
         InvalidMarketType = 4506,
         InValidPageNo = 4507,
+        InValid_ID=4565,
+
         ProcessTrn_InsufficientBalance = 1,
         ProcessTrn_AmountBetweenMinMax=1,
         ProcessTrn_PriceBetweenMinMax = 1,
         ProcessTrn_InvalidBidPriceValue = 1,
         ProcessTrn_PoolOrderCreateFail = 1,
         ProcessTrn_Initialize = 1,
+        TransactionProcessInternalError = 1,
+        ProcessTrn_ServiceProductNotAvailable = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -190,8 +194,11 @@ namespace CleanArchitecture.Core.Enums
         Status4052UserToken = 4052,
         Status4053Granttype = 4053,
         Status4054FactorFail =4054,
-        Status4042DisableTroFactorError = 4055,
-        Status4042TwoFactorVerification=4056,
+        Status4055DisableTroFactorError = 4055,
+        Status4056TwoFactorVerification=4056,
+        Status4057DeviceIdNotAdd=4057,  
+        Status4058DeviceAddress=4058,
+        Status4059NotDeleteDevice=4059,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

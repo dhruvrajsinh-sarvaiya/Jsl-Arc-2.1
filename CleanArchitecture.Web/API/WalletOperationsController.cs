@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Authorization;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using Microsoft.AspNetCore.Identity;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Web.Helper;
+using Microsoft.AspNetCore.Authentication;
 
 namespace CleanArchitecture.Web.API
 {
@@ -321,6 +323,38 @@ namespace CleanArchitecture.Web.API
                 return BadRequest();
             }
             //return Ok();
+        }
+
+        //vsolanki 18-10-2018
+        [HttpPost("{coin}/{accWalletID}")]
+        [Authorize]
+        public async Task<IActionResult> Withdrawal(string coin, string accWalletID, [FromBody]WithdrawalReq Request)
+        {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Request), accessToken);
+            WithdrawalRes Response = new WithdrawalRes();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.Withdrawl(coin, accWalletID, Request,user.Id);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                Response.ReturnCode = enResponseCode.InternalError;
+                return BadRequest(Response);
+            }
         }
     }
 }

@@ -94,7 +94,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             }
         }
 
-        public long DesableIpAddress(DeviceMasterViewModel model)
+        public long DesableDeviceId(DeviceMasterViewModel model)
         {
             var Devicedata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && i.IsDeleted);
             if (Devicedata != null)
@@ -107,7 +107,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             return 0;
         }
 
-        public long DeleteIpAddress(DeviceMasterViewModel model)
+        public long DeleteDeviceId(DeviceMasterViewModel model)
         {
             var DeviceData = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsDeleted);
             if (DeviceData != null)
