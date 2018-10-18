@@ -384,6 +384,12 @@ namespace CleanArchitecture.Web.API
                         data.UserId = otpData.UserId;
                         data.EnableStatus = false;
                         await _custompassword.AddPassword(data);
+
+                        if (user.TwoFactorEnabled)
+                        {
+                            return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
+                        }
+
                         _logger.LogWarning(1, "User Login with Email Send Success.");
                         return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
                     }
@@ -640,6 +646,13 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
+                                    {
+                                        return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
+
+                                    }
+
+
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(result);
