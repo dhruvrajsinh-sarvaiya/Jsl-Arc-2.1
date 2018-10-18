@@ -62,32 +62,32 @@ namespace CleanArchitecture.Web.API
             return Ok(model);
         }
 
-        [HttpPost("Authentication2FA")]
-        public async Task<IActionResult> Authentication2FA(TwoFactorAuthViewModel model)
-        {
+        //[HttpPost("Authentication2FA")]
+        //public async Task<IActionResult> Authentication2FA(TwoFactorAuthViewModel model)
+        //{
 
-            if (model != null)
-            {
-                return Ok("Success");
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Invalid");
-                //  return BadRequest(new ApiError(ModelState));
-            }
+        //    if (model != null)
+        //    {
+        //        return Ok("Success");
+        //    }
+        //    else
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Invalid");
+        //        //  return BadRequest(new ApiError(ModelState));
+        //    }
 
-            var user = await GetCurrentUserAsync();
+        //    var user = await GetCurrentUserAsync();
 
 
-            var model1 = new TwoFactorAuthenticationViewModel
-            {
-                HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
-                Is2faEnabled = user.TwoFactorEnabled,
-                RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
-            };
+        //    var model1 = new TwoFactorAuthenticationViewModel
+        //    {
+        //        HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
+        //        Is2faEnabled = user.TwoFactorEnabled,
+        //        RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
+        //    };
 
-            return Ok(model);
-        }
+        //    return Ok(model);
+        //}
 
         [HttpPost("disable2fa")]
         public async Task<IActionResult> Disable2fa()
@@ -111,8 +111,8 @@ namespace CleanArchitecture.Web.API
             }
 
 
-           
-         
+
+
 
         }
 
@@ -123,7 +123,7 @@ namespace CleanArchitecture.Web.API
             {
                 var user = await GetCurrentUserAsync();
 
-               
+
                 user.TwoFactorEnabled = true;
                 await _userManager.UpdateAsync(user);
 
@@ -143,71 +143,78 @@ namespace CleanArchitecture.Web.API
                     AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
                 };
                 return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, enableAuthenticatorViewModel = model });
-               
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
                 return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
-
-
         }
 
         [HttpPost("enableauthenticator")]
         public async Task<IActionResult> EnableAuthenticator([FromBody]EnableAuthenticatorViewModel model)
         {
-
-            var user = await GetCurrentUserAsync();
-
-            // Strip spaces and hypens
-            var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
-
-            var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
-                user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
-
-            if (!is2faTokenValid)
+            try
             {
-                ModelState.AddModelError("model.Code", "Verification code is invalid.");
-                return BadRequest(new ApiError(ModelState));
+                var user = await GetCurrentUserAsync();
+
+                // Strip spaces and hypens
+                var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+                var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+                    user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+
+                if (!is2faTokenValid)
+                {
+                    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification });
+
+                }
+
+                await _userManager.SetTwoFactorEnabledAsync(user, true);
+                _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
             }
-
-            await _userManager.SetTwoFactorEnabledAsync(user, true);
-            _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-            return NoContent();
-        }
-
-        [HttpPost("resetauthenticator")]
-        public async Task<IActionResult> ResetAuthenticator()
-        {
-            var user = await GetCurrentUserAsync();
-
-            await _userManager.SetTwoFactorEnabledAsync(user, false);
-            await _userManager.ResetAuthenticatorKeyAsync(user);
-            _logger.LogInformation("User with id '{UserId}' has reset their authentication app key.", user.Id);
-
-            return NoContent();
-        }
-
-        [HttpPost("generaterecoverycodes")]
-        public async Task<IActionResult> GenerateRecoveryCodes()
-        {
-            var user = await GetCurrentUserAsync();
-
-            if (!user.TwoFactorEnabled)
+            catch (Exception ex)
             {
-                return BadRequest(new ApiError($"Cannot generate recovery codes for user with ID '{user.Id}' as they do not have 2FA enabled."));
+
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
-
-            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-            var model = new GenerateRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
-
-            _logger.LogInformation("User with ID {UserId} has generated new 2FA recovery codes.", user.Id);
-
-            return Ok(model);
         }
+
+        //[HttpPost("resetauthenticator")]
+        //public async Task<IActionResult> ResetAuthenticator()
+        //{
+        //    var user = await GetCurrentUserAsync();
+
+        //    await _userManager.SetTwoFactorEnabledAsync(user, false);
+        //    await _userManager.ResetAuthenticatorKeyAsync(user);
+        //    _logger.LogInformation("User with id '{UserId}' has reset their authentication app key.", user.Id);
+
+        //    return NoContent();
+        //}
+
+        //[HttpPost("generaterecoverycodes")]
+        //public async Task<IActionResult> GenerateRecoveryCodes()
+        //{
+        //    var user = await GetCurrentUserAsync();
+
+        //    if (!user.TwoFactorEnabled)
+        //    {
+        //        return BadRequest(new ApiError($"Cannot generate recovery codes for user with ID '{user.Id}' as they do not have 2FA enabled."));
+        //    }
+
+        //    var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+        //    var model = new GenerateRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
+
+        //    _logger.LogInformation("User with ID {UserId} has generated new 2FA recovery codes.", user.Id);
+
+        //    return Ok(model);
+        //}
+        //
         [HttpPost("VerifyCode")]
-
         public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
         {
             // The following code protects for brute force attacks against the two factor codes.

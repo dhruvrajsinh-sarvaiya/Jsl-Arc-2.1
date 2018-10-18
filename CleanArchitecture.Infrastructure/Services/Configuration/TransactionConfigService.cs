@@ -28,6 +28,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<ProductConfiguration> _productConfigRepository;
         private readonly ICommonRepository<StateMaster> _stateMasterRepository;
         private readonly ICommonRepository<RouteConfiguration> _routeConfigRepository;
+        private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyAPIRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -42,7 +43,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<ServiceProviderDetail> ProDetailRepository,
             ICommonRepository<ProductConfiguration> productConfigRepository,
             ICommonRepository<StateMaster> stateMasterRepository,
-            ICommonRepository<RouteConfiguration> routeConfigRepository)
+            ICommonRepository<RouteConfiguration> routeConfigRepository,
+            ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -57,6 +59,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _productConfigRepository = productConfigRepository;
             _stateMasterRepository = stateMasterRepository;
             _routeConfigRepository = routeConfigRepository;
+            _thirdPartyAPIRepository = thirdPartyAPIRepository;
         }
 
         #region Service
@@ -368,9 +371,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     Id = request.Id,
                     ProviderName = request.ProviderName,
                     Status = Convert.ToInt16(ServiceStatus.Active),
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
-                    UpdatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.UtcNow,
                     UpdatedBy = null
                 };
                 var newModel = _ServiceProviderMaster.Add(model);
@@ -394,7 +397,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     return false;
                 }
                 model.ProviderName = request.ProviderName;
-                model.UpdatedDate = DateTime.Now;
+                model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedBy = 1;
 
                 _ServiceProviderMaster.Update(model);
@@ -507,9 +510,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     Id = request.Id,
                     AppTypeName = request.AppTypeName,
                     Status = Convert.ToInt16(ServiceStatus.Active),
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
-                    UpdatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.UtcNow,
                     UpdatedBy = null
                 };
                 var newModel = _ApptypeRepository.Add(model);
@@ -533,7 +536,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     return false;
                 }
                 model.AppTypeName = request.AppTypeName;
-                model.UpdatedDate = DateTime.Now;
+                model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedBy = 1;
 
                 _ApptypeRepository.Update(model);
@@ -649,9 +652,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     Id = request.Id,
                     ServiveProTypeName = request.ServiveProTypeName,
                     Status = Convert.ToInt16(ServiceStatus.Active),
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
-                    UpdatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.UtcNow,
                     UpdatedBy = null
                 };
                 var newModel = _ProviderTypeRepository.Add(model);
@@ -675,7 +678,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     return false;
                 }
                 model.ServiveProTypeName = request.ServiveProTypeName;
-                model.UpdatedDate = DateTime.Now;
+                model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedBy = 1;
                 _ProviderTypeRepository.Update(model);
                 return true;
@@ -770,9 +773,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     Password = request.Password,
                     UserName = request.UserName,
                     CreatedBy = 1,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     UpdatedBy = null,
-                    UpdatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.UtcNow,
                     Status = Convert.ToInt16(ServiceStatus.Active)
                 };
                 var newModel = _ProviderConfiguration.Add(model);
@@ -839,7 +842,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 model.SecretKey = request.SecretKey;
                 model.UserName = request.UserName;
                 model.Password = request.Password;
-                model.UpdatedDate = DateTime.Now;
+                model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedBy = 1;
 
                 _ProviderConfiguration.Update(model);
@@ -889,9 +892,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     PortAdd = request.PortAdd,
                     Url = request.Url,
                     Status = Convert.ToInt16(ServiceStatus.Active),
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
-                    UpdatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.UtcNow,
                     UpdatedBy = null
                 };
 
@@ -918,7 +921,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 model.PortAdd = request.PortAdd;
                 model.Url = request.Url;
                 model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now;
+                model.UpdatedDate = DateTime.UtcNow;
 
 
                 _DemonRepository.Update(model);
@@ -1048,9 +1051,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ServiceProConfigID = request.ServiceProConfigID,
                     ThirPartyAPIID = request.ThirPartyAPIID,
                     Status = Convert.ToInt16(ServiceStatus.Active),
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
-                    UpdatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.UtcNow,
                     UpdatedBy = null
                 };
 
@@ -1081,7 +1084,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 model.DemonConfigID = request.DemonConfigID;
                 model.ServiceProConfigID = request.ServiceProConfigID;
                 model.ThirPartyAPIID = request.ThirPartyAPIID;
-
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.UtcNow;
                 _ProDetailRepository.Update(model);
                 return true;
             }
@@ -1525,6 +1529,178 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
+        #endregion
+
+        #region ThirdPartyAPIConfig
+        public List<ThirdPartyAPIConfigViewModel> GetAllThirdPartyAPIConfig()
+        {
+            try
+            {
+                var list = _thirdPartyAPIRepository.List();
+                List<ThirdPartyAPIConfigViewModel> thirdPartyAPIs = new List<ThirdPartyAPIConfigViewModel>();
+                foreach (ThirdPartyAPIConfiguration model in list)
+                {
+                    thirdPartyAPIs.Add(new ThirdPartyAPIConfigViewModel()
+                    {
+                        Id = model.Id,
+                        APIBalURL = model.APIBalURL,
+                        APIName = model.APIName,
+                        APIRequestBody = model.APIRequestBody,
+                        APISendURL = model.APISendURL,
+                        APIStatusCheckURL = model.APIStatusCheckURL,
+                        APIValidateURL = model.APIValidateURL,
+                        AppType = model.AppType,
+                        AuthHeader = model.AuthHeader,
+                        ContentType = model.ContentType,
+                        HashCode = model.HashCode,
+                        HashCodeRecheck = model.HashCodeRecheck,
+                        HashType = model.HashType,
+                        MerchantCode = model.MerchantCode,
+                        MethodType = model.MethodType,
+                        ParsingDataID = model.ParsingDataID,
+                        ResponseFailure = model.ResponseFailure,
+                        ResponseHold = model.ResponseHold,
+                        ResponseSuccess = model.ResponseSuccess,
+                        SerProConfigurationID = model.SerProConfigurationID,
+                        TransactionIdPrefix = model.TransactionIdPrefix
+                    });
+                }
+
+                return thirdPartyAPIs;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public ThirdPartyAPIConfigViewModel GetThirdPartyAPIConfigById(long Id)
+        {
+            try
+            {
+                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetById(Id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewmodel = new ThirdPartyAPIConfigViewModel
+                {
+                    Id = model.Id ,
+                    APIBalURL =model.APIBalURL,
+                    APIName =model .APIName ,
+                    APIRequestBody =model .APIRequestBody,
+                    APISendURL =model .APISendURL,
+                    APIStatusCheckURL =model .APIStatusCheckURL ,
+                    APIValidateURL =model .APIValidateURL,
+                    AppType =model .AppType ,
+                    AuthHeader =model .AuthHeader ,
+                    ContentType =model .ContentType ,
+                    HashCode  =model .HashCode ,
+                    HashCodeRecheck   =model .HashCodeRecheck,
+                    HashType=model .HashType ,
+                    MerchantCode =model .MerchantCode,
+                    MethodType =model .MethodType ,
+                    ParsingDataID =model .ParsingDataID ,
+                    ResponseFailure =model .ResponseFailure ,
+                    ResponseHold =model .ResponseHold ,
+                    ResponseSuccess =model .ResponseSuccess,
+                    SerProConfigurationID =model .SerProConfigurationID,
+                    TransactionIdPrefix =model .TransactionIdPrefix
+                };
+                return viewmodel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddThirdPartyAPI(ThirdPartyAPIConfigRequest request)
+        {
+            try
+            {
+                var model = new ThirdPartyAPIConfiguration()
+                {
+                    CreatedBy = 1,
+                    CreatedDate= DateTime.UtcNow,
+                    Status =1,
+                    APIBalURL = request.APIBalURL,
+                    APIName = request.APIName,
+                    APIRequestBody = request.APIRequestBody,
+                    APISendURL = request.APISendURL,
+                    APIStatusCheckURL = request.APIStatusCheckURL,
+                    APIValidateURL = request.APIValidateURL,
+                    AppType = request.AppType,
+                    AuthHeader = request.AuthHeader,
+                    ContentType = request.ContentType,
+                    HashCode = request.HashCode,
+                    HashCodeRecheck = request.HashCodeRecheck,
+                    HashType = request.HashType,
+                    MerchantCode = request.MerchantCode,
+                    MethodType = request.MethodType,
+                    ParsingDataID = request.ParsingDataID,
+                    ResponseFailure = request.ResponseFailure,
+                    ResponseHold = request.ResponseHold,
+                    ResponseSuccess = request.ResponseSuccess,
+                    SerProConfigurationID = request.SerProConfigurationID,
+                    TransactionIdPrefix = request.TransactionIdPrefix
+                    
+                };
+                var newModel = _thirdPartyAPIRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateThirdPartyAPI(ThirdPartyAPIConfigRequest request)
+        {
+            try
+            {
+                var model = _thirdPartyAPIRepository.GetById(request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+
+                model.APIBalURL = request.APIBalURL;
+                model.APIName = request.APIName;
+                model.APIRequestBody = request.APIRequestBody;
+                model.APISendURL = request.APISendURL;
+                model.APIStatusCheckURL = request.APIStatusCheckURL;
+                model.APIValidateURL = request.APIValidateURL;
+                model.AppType = request.AppType;
+                model.AuthHeader = request.AuthHeader;
+                model.ContentType = request.ContentType;
+                model.HashCode = request.HashCode;
+                model.HashCodeRecheck = request.HashCodeRecheck;
+                model.HashType = request.HashType;
+                model.MerchantCode = request.MerchantCode;
+                model.MethodType = request.MethodType;
+                model.ParsingDataID = request.ParsingDataID;
+                model.ResponseFailure = request.ResponseFailure;
+                model.ResponseHold = request.ResponseHold;
+                model.ResponseSuccess = request.ResponseSuccess;
+                model.SerProConfigurationID = request.SerProConfigurationID;
+                model.TransactionIdPrefix = request.TransactionIdPrefix;
+                model.UpdatedDate = DateTime.UtcNow;
+                model.UpdatedBy = 1;
+
+                _thirdPartyAPIRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
         #endregion
     }
 }

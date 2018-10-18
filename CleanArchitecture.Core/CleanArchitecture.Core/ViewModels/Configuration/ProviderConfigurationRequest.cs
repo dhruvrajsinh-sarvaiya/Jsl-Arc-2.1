@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     }
     public class ProviderConfigurationResponce : BizResponseClass
     {
-        public ProviderConfigurationViewModel responce { get; set; }
+        public ProviderConfigurationViewModel response { get; set; }
     }
 
 }

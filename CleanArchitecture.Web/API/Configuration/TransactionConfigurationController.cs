@@ -201,7 +201,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.responce == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
-                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -226,7 +226,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.responce == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
-                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -287,6 +287,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.responce == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -350,8 +351,8 @@ namespace CleanArchitecture.Web.API.Configuration
             AppTypeResponce res = new AppTypeResponce();
             try
             {
-                res.responce = _transactionConfigService.GetAppType();
-                if(res.responce == null)
+                res.response = _transactionConfigService.GetAppType();
+                if(res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     return Ok(res);
@@ -374,8 +375,8 @@ namespace CleanArchitecture.Web.API.Configuration
             AppTypeResponceData res = new AppTypeResponceData();
             try
             {
-                res.responce = _transactionConfigService.GetAppTypeById(id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetAppTypeById(id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     return Ok(res);
@@ -402,7 +403,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 long id=_transactionConfigService.AddAppType(request);
                 if(id !=0)
                 {
-                    res.responce = _transactionConfigService.GetAppTypeById(id);
+                    res.response = _transactionConfigService.GetAppTypeById(id);
                     res.ReturnCode = enResponseCode.Success;
                     return Ok(res);
                 }
@@ -434,12 +435,14 @@ namespace CleanArchitecture.Web.API.Configuration
                 if(state == false )
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
-                res.responce = _transactionConfigService.GetAppTypeById(request.Id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetAppTypeById(request.Id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -506,8 +509,8 @@ namespace CleanArchitecture.Web.API.Configuration
             ProviderTypeResponce res = new ProviderTypeResponce();
             try
             {
-                res.responce = _transactionConfigService.GetProviderType();
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetProviderType();
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     return Ok(res);
@@ -530,8 +533,8 @@ namespace CleanArchitecture.Web.API.Configuration
             ProviderTypeResponceData res = new ProviderTypeResponceData();
             try
             {
-                res.responce = _transactionConfigService.GetProviderTypeById(id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetProviderTypeById(id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     return Ok(res);
@@ -558,7 +561,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 long id = _transactionConfigService.AddProviderType(request);
                 if (id != 0)
                 {
-                    res.responce = _transactionConfigService.GetProviderTypeById(id);
+                    res.response = _transactionConfigService.GetProviderTypeById(id);
                     res.ReturnCode = enResponseCode.Success;
                     return Ok(res);
                 }
@@ -590,12 +593,14 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (state == false)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
-                res.responce = _transactionConfigService.GetProviderTypeById(request.Id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetProviderTypeById(request.Id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -662,8 +667,8 @@ namespace CleanArchitecture.Web.API.Configuration
             ProviderConfigurationResponce  res = new ProviderConfigurationResponce();
             try
             {
-                res.responce = _transactionConfigService.GetProviderConfiguration(id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetProviderConfiguration(id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     return Ok(res);
@@ -690,7 +695,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 long id = _transactionConfigService.AddProviderConfiguration(request);
                 if (id != 0)
                 {
-                    res.responce = _transactionConfigService.GetProviderConfiguration(id);
+                    res.response = _transactionConfigService.GetProviderConfiguration(id);
                     res.ReturnCode = enResponseCode.Success ;
                     return Ok(res);
                 }
@@ -722,12 +727,14 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (state == false)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
-                res.responce = _transactionConfigService.GetProviderConfiguration(request.Id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetProviderConfiguration(request.Id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -793,8 +800,8 @@ namespace CleanArchitecture.Web.API.Configuration
             DemonConfigurationResponce  res = new DemonConfigurationResponce();
             try
             {
-                res.responce = _transactionConfigService.GetDemonConfiguration(id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetDemonConfiguration(id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     return Ok(res);
@@ -821,7 +828,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 long id = _transactionConfigService.AddDemonConfiguration (request);
                 if (id != 0)
                 {
-                    res.responce = _transactionConfigService.GetDemonConfiguration(id);
+                    res.response = _transactionConfigService.GetDemonConfiguration(id);
                     res.ReturnCode = enResponseCode.Success;
                     return Ok(res);
                 }
@@ -853,12 +860,14 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (state == false)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
-                res.responce = _transactionConfigService.GetDemonConfiguration(request.Id);
-                if (res.responce == null)
+                res.response = _transactionConfigService.GetDemonConfiguration(request.Id);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -931,7 +940,7 @@ namespace CleanArchitecture.Web.API.Configuration
                     res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
                     return Ok(res);
                 }
-                res.responce = _transactionConfigService.getProviderDetailsDataList(list);
+                res.response = _transactionConfigService.getProviderDetailsDataList(list);
                 res.ReturnCode = enResponseCode.Success;
                 return Ok(res);
             }
@@ -956,7 +965,7 @@ namespace CleanArchitecture.Web.API.Configuration
                     res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
                     return Ok(res);
                 }
-                res.responce = _transactionConfigService.getProviderDetailDataById(obj);
+                res.response = _transactionConfigService.getProviderDetailDataById(obj);
                 //res.responce.Id = obj.Id;
                 //res.responce.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
                 //res.responce.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
@@ -1019,25 +1028,26 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (state == false)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 ProviderDetailViewModel obj = _transactionConfigService.GetProviderDetailById(request.Id);
                 if (obj == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
-                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
 
-                res.responce.Id = obj.Id;
-                res.responce.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
-                res.responce.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
-                res.responce.AppType = _transactionConfigService.GetAppTypeById(obj.AppTypeID);
-                res.responce.TrnType = null;
-                res.responce.Limit = null;
-                res.responce.DemonConfiguration = _transactionConfigService.GetDemonConfiguration(obj.DemonConfigID);
-                res.responce.ProviderConfiguration = _transactionConfigService.GetProviderConfiguration(obj.ServiceProConfigID);
-                res.responce.thirdParty = null;
+                res.response.Id = obj.Id;
+                res.response.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
+                res.response.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
+                res.response.AppType = _transactionConfigService.GetAppTypeById(obj.AppTypeID);
+                res.response.TrnType = null;
+                res.response.Limit = null;
+                res.response.DemonConfiguration = _transactionConfigService.GetDemonConfiguration(obj.DemonConfigID);
+                res.response.ProviderConfiguration = _transactionConfigService.GetProviderConfiguration(obj.ServiceProConfigID);
+                res.response.thirdParty = null;
                 res.ReturnCode = enResponseCode.Success;
                 return Ok(res);
             }
@@ -1094,6 +1104,7 @@ namespace CleanArchitecture.Web.API.Configuration
         #endregion
 
         #region ProductConfiguration
+
         [HttpPost("AddProductConfiguration")]
         public IActionResult AddProductConfiguration([FromBody]ProductConfigurationRequest Request)
         {
@@ -1307,6 +1318,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
+
         [HttpGet("GetRouteConfiguration/{RouteId}")]
         public IActionResult GetRouteConfiguration(long RouteId)
         {
@@ -1411,5 +1423,120 @@ namespace CleanArchitecture.Web.API.Configuration
         }
         #endregion
 
+        #region ThirdPartyAPIConfiguration
+
+        [HttpGet("GetAllThirdPartyAPI")]
+        public IActionResult GetAllThirdPartyAPI()
+        {
+            ThirdPartyAPIConfigResponseAllData res = new ThirdPartyAPIConfigResponseAllData();
+            try
+            {
+                res.response  = _transactionConfigService.GetAllThirdPartyAPIConfig();
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpGet("GetAllThirdPartyAPIById/{Id:long}")]
+        public IActionResult GetAllThirdPartyAPIById(long Id)
+        {
+            ThirdPartyAPIConfigResponse res = new ThirdPartyAPIConfigResponse();
+            try
+            {
+                res.response = _transactionConfigService.GetThirdPartyAPIConfigById(Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("AddRouteConfiguration")]
+        public IActionResult AddThirdPartyAPIConfig([FromBody]ThirdPartyAPIConfigRequest Request)
+        {
+            ThirdPartyAPIConfigResponse  Response = new ThirdPartyAPIConfigResponse();
+            try
+            {
+                long Id= _transactionConfigService.AddThirdPartyAPI(Request);
+                if (Id != 0)
+                {
+                    Response.response = _transactionConfigService.GetThirdPartyAPIConfigById(Id);
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode =enErrorCode. // not inserted
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [HttpPost("UpdateThirdPartyAPIConfig")]
+        public IActionResult UpdateThirdPartyAPIConfig([FromBody]ThirdPartyAPIConfigRequest request)
+        {
+            ThirdPartyAPIConfigResponse res = new ThirdPartyAPIConfigResponse();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateThirdPartyAPI(request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.response = _transactionConfigService.GetThirdPartyAPIConfigById(request.Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+        #endregion
     }
 }

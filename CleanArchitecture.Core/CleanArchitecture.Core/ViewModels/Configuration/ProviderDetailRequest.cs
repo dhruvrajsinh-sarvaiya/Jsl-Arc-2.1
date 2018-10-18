@@ -10,11 +10,11 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     }
     public class ProviderDetailResponce : BizResponseClass
     {
-        public ProviderDetailGetAllResponce responce { get; set; }
+        public ProviderDetailGetAllResponce response { get; set; }
     }
     public class ProviderDetailResponceList : BizResponseClass
     {
-        public IEnumerable<ProviderDetailGetAllResponce> responce { get; set; }
+        public IEnumerable<ProviderDetailGetAllResponce> response { get; set; }
     }
     public class ProviderDetailGetAllResponce
     {
