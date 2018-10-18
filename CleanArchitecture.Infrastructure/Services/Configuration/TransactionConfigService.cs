@@ -354,7 +354,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderMaster model = _ServiceProviderMaster.GetById(ID);
+                ServiceProviderMaster model = _ServiceProviderMaster.GetActiveById(ID);
                 if (model == null)
                 {
                     return null;
@@ -405,7 +405,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderMaster model = _ServiceProviderMaster.GetById(request.Id);
+                ServiceProviderMaster model = _ServiceProviderMaster.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -494,7 +494,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                AppType model = _ApptypeRepository.GetById(id);
+                AppType model = _ApptypeRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -544,7 +544,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                AppType model = _ApptypeRepository.GetById(request.Id);
+                AppType model = _ApptypeRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -635,7 +635,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderType model = _ProviderTypeRepository.GetById(id);
+                ServiceProviderType model = _ProviderTypeRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -686,7 +686,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _ProviderTypeRepository.GetById(request.Id);
+                var model = _ProviderTypeRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -752,7 +752,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProConfiguration model = _ProviderConfiguration.GetById(id);
+                ServiceProConfiguration model = _ProviderConfiguration.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -846,7 +846,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProConfiguration model = _ProviderConfiguration.GetById(request.Id);
+                ServiceProConfiguration model = _ProviderConfiguration.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -875,7 +875,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _DemonRepository.GetById(id);
+                var model = _DemonRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -926,7 +926,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                DemonConfiguration model = _DemonRepository.GetById(request.Id);
+                DemonConfiguration model = _DemonRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -1024,7 +1024,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _ProDetailRepository.GetById(id);
+                var model = _ProDetailRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -1085,7 +1085,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderDetail model = _ProDetailRepository.GetById(request.Id);
+                ServiceProviderDetail model = _ProDetailRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -1593,7 +1593,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetById(Id);
+                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetActiveById(Id);
                 if (model == null)
                 {
                     return null;
@@ -1676,7 +1676,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _thirdPartyAPIRepository.GetById(request.Id);
+                var model = _thirdPartyAPIRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -1795,7 +1795,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _thirdPartyAPIResRepository.GetById(id);
+                var model = _thirdPartyAPIResRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -1857,7 +1857,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _thirdPartyAPIResRepository.GetById(Request.Id);
+                var model = _thirdPartyAPIResRepository.GetActiveById(Request.Id);
                 if (model == null)
                 {
                     return false;
@@ -2273,7 +2273,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _limitRepository.GetById(id);
+                var model = _limitRepository.GetActiveById(id);
                 if (model == null)
                     return null;
 
@@ -2346,7 +2346,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _limitRepository.GetById(Request.Id);
+                var model = _limitRepository.GetActiveById(Request.Id);
                 if (model == null)
                     return false;
 

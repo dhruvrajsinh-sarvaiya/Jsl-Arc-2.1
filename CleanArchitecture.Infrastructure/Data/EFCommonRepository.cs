@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Infrastructure.Data;
@@ -38,8 +39,31 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
-
+        public T GetActiveById(long id)
+        {
+            try
+            {
+                return _dbContext.Set<T>().SingleOrDefault(e => e.Id == id && e.Status == Convert.ToInt16(ServiceStatus.Active));
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         public List<T> List()
+        {
+            try
+            {
+                return _dbContext.Set<T>().Where(e => e.Status == Convert.ToInt16(ServiceStatus.Active)).ToList();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<T> GetAllList()
         {
             try
             {
@@ -51,7 +75,6 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
-
         public T Add(T entity)
         {
             try
