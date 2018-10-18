@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.Helpers;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.Entities
 {
     public class TrnAcBatch : BizBase
     {
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public new long Id { get; set; }
        

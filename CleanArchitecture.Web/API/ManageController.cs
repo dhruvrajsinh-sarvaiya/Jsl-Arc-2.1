@@ -41,7 +41,8 @@ namespace CleanArchitecture.Web.API
         //private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
-        private readonly IRedisConnectionFactory _fact;
+        //private readonly IRedisConnectionFactory _fact;
+        private readonly RedisConnectionFactory _fact;
         private readonly RedisSessionStorage _redisSessionStorage;
         private readonly IUserService _userdata;
         private readonly IipAddressService _ipAddressService;
@@ -55,7 +56,9 @@ namespace CleanArchitecture.Web.API
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         ILoggerFactory loggerFactory,
-        UrlEncoder urlEncoder, IRedisConnectionFactory factory,
+        UrlEncoder urlEncoder, 
+        //IRedisConnectionFactory factory,
+        RedisConnectionFactory factory,
         RedisSessionStorage redisSessionStorage,
         IUserService userdata,
         IipAddressService ipAddressService,
