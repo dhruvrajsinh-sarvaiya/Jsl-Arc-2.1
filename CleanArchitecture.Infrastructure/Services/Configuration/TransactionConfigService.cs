@@ -85,6 +85,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     Name = Request.Name,
                     SMSCode = Request.SMSCode,
                     ServiceType = Request.Type,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newServiceMaster = _serviceMasterRepository.Add(serviceMaster);
 
@@ -99,7 +104,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     EncryptionAlgorithm = Request.EncryptionAlgorithm,
                     WebsiteUrl = Request.WebsiteUrl,
                     WhitePaperPath = Request.WebsiteUrl,
-                    Introduction = Request.Introduction
+                    Introduction = Request.Introduction,
+
                 };
 
                 ServiceDetail serviceDetail = new ServiceDetail()
@@ -115,7 +121,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     IssueDate = Request.IssueDate,
                     IssuePrice = Request.IssuePrice,
                     MaxSupply = Request.MaxSupply,
-                    CirculatingSupply = Request.CirculatingSupply
+                    CirculatingSupply = Request.CirculatingSupply,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newServiceStastics = _serviceStasticsRepository.Add(serviceStastics);
 
@@ -133,12 +143,14 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var serviceMaster = _serviceMasterRepository.GetById(Request.ServiceId);
+                var serviceMaster = _serviceMasterRepository.GetActiveById(Request.ServiceId);
                 if (serviceMaster != null)
                 {
                     serviceMaster.Name = Request.Name;
                     serviceMaster.SMSCode = Request.SMSCode;
                     serviceMaster.ServiceType = Request.Type;
+                    serviceMaster.UpdatedBy = 1;
+                    serviceMaster.UpdatedDate = DateTime.UtcNow;
 
                     _serviceMasterRepository.Update(serviceMaster);
 
@@ -165,6 +177,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     serviceStastics.IssuePrice = Request.IssuePrice;
                     serviceStastics.MaxSupply = Request.MaxSupply;
                     serviceStastics.CirculatingSupply = Request.CirculatingSupply;
+                    serviceStastics.UpdatedDate = DateTime.UtcNow;
+                    serviceStastics.UpdatedBy = 1;
                     _serviceStasticsRepository.Update(serviceStastics);
 
                     return Request.ServiceId;
@@ -188,7 +202,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new List<ServiceConfigurationRequest>();
 
-                var serviceMaster = _serviceMasterRepository.GetAll();
+                var serviceMaster = _serviceMasterRepository.List();
                 if (serviceMaster != null)
                 {
                     foreach (var service in serviceMaster)
@@ -240,7 +254,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new ServiceConfigurationRequest();
-                var serviceMaster = _serviceMasterRepository.GetById(ServiceId);
+                var serviceMaster = _serviceMasterRepository.GetActiveById(ServiceId);
                 if (serviceMaster != null)
                 {
                     responsedata.ServiceId = serviceMaster.Id;
@@ -1214,7 +1228,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     ProductName = Request.ProductName,
                     ServiceID = Request.ServiceID,
-                    CountryID = Request.CountryID
+                    CountryID = Request.CountryID,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newProduct = _productConfigRepository.Add(product);
                 return newProduct.Id;
@@ -1229,15 +1247,17 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var product = _productConfigRepository.GetById(Request.Id);
+                var product = _productConfigRepository.GetActiveById(Request.Id);
                 if (product != null)
                 {
                     product.ProductName = Request.ProductName;
                     product.ServiceID = Request.ServiceID;
                     product.CountryID = Request.CountryID;
+                    product.UpdatedDate = DateTime.UtcNow;
+                    product.UpdatedBy = 1;
 
                     _productConfigRepository.Update(product);
-                     return product.Id;
+                    return product.Id;
                 }
                 else
                 {
@@ -1256,12 +1276,12 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new ProductConfigrationGetInfo();
-                var product = _productConfigRepository.GetById(ProductId);
+                var product = _productConfigRepository.GetActiveById(ProductId);
                 if (product != null)
                 {
                     responsedata.Id = product.Id;
                     responsedata.ProductName = product.ProductName;
-                    
+
                     var serviceMaster = _serviceMasterRepository.GetById(product.ServiceID);
                     var countryMaster = _countryMasterRepository.GetById(product.CountryID);
                     responsedata.CountryID = product.CountryID;
@@ -1289,7 +1309,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new List<ProductConfigrationGetInfo>();
 
-                var productall = _productConfigRepository.GetAll();
+                var productall = _productConfigRepository.List();
                 if (productall != null)
                 {
                     foreach (var product in productall)
@@ -1379,7 +1399,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     OpCode = Request.OpCode,
                     TrnType = Request.TrnType,
                     IsDelayAddress = Request.IsDelayAddress,
-                    ProviderWalletID = Request.ProviderWalletID
+                    ProviderWalletID = Request.ProviderWalletID,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newProduct = _routeConfigRepository.Add(route);
                 return newProduct.Id;
@@ -1394,8 +1418,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var route = _routeConfigRepository.GetById(Request.Id);
-                if(route != null)
+                var route = _routeConfigRepository.GetActiveById(Request.Id);
+                if (route != null)
                 {
                     route.RouteName = Request.RouteName;
                     route.ServiceID = Request.ServiceID;
@@ -1410,14 +1434,16 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     route.TrnType = Request.TrnType;
                     route.IsDelayAddress = Request.IsDelayAddress;
                     route.ProviderWalletID = Request.ProviderWalletID;
-                   
+                    route.UpdatedDate = DateTime.UtcNow;
+                    route.UpdatedBy = 1;
+
                     _routeConfigRepository.Update(route);
                     return route.Id;
                 }
                 else
                 {
                     return 0;
-                }   
+                }
             }
             catch (Exception ex)
             {
@@ -1431,7 +1457,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new RouteConfigurationRequest();
-                var route = _routeConfigRepository.GetById(RouteId);
+                var route = _routeConfigRepository.GetActiveById(RouteId);
                 if (route != null)
                 {
                     responsedata.Id = route.Id;
@@ -1468,7 +1494,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new List<RouteConfigurationRequest>();
 
-                var routeall = _routeConfigRepository.GetAll();
+                var routeall = _routeConfigRepository.List();
                 if (routeall != null)
                 {
                     foreach (var route in routeall)
@@ -1937,7 +1963,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     PairName = Request.PairName,
                     SecondaryCurrencyId = Request.SecondaryCurrencyId,
                     WalletMasterID = Request.WalletMasterID,
-                    BaseCurrencyId = Request.BaseCurrencyId
+                    BaseCurrencyId = Request.BaseCurrencyId,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newPairMaster = _tradePairMasterRepository.Add(pairMaster);
 
@@ -1960,7 +1990,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     SellMinPrice = Request.SellMinPrice,
                     SellMaxPrice = Request.SellMaxPrice,
                     Fee = Request.Fee,
-                    FeeType = Request.FeeType
+                    FeeType = Request.FeeType,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
 
                 var newPairDetail = _tradePairDetailRepository.Add(pairDetail);
@@ -1976,13 +2010,15 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var pairMaster = _tradePairMasterRepository.GetById(Request.Id);
+                var pairMaster = _tradePairMasterRepository.GetActiveById(Request.Id);
                 if (pairMaster != null)
                 {
                     pairMaster.PairName = Request.PairName;
                     pairMaster.SecondaryCurrencyId = Request.SecondaryCurrencyId;
                     pairMaster.WalletMasterID = Request.WalletMasterID;
                     pairMaster.BaseCurrencyId = Request.BaseCurrencyId;
+                    pairMaster.UpdatedDate = DateTime.UtcNow;
+                    pairMaster.UpdatedBy = 1;
 
                     _tradePairMasterRepository.Update(pairMaster);
 
@@ -2005,6 +2041,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     pairDetail.SellMaxPrice = Request.SellMaxPrice;
                     pairDetail.Fee = Request.Fee;
                     pairDetail.FeeType = Request.FeeType;
+                    pairMaster.UpdatedDate = DateTime.UtcNow;
+                    pairMaster.UpdatedBy = 1;
 
                     return Request.Id;
                 }
@@ -2025,7 +2063,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new TradePairConfigRequest();
-                var pairMaster = _tradePairMasterRepository.GetById(PairId);
+                var pairMaster = _tradePairMasterRepository.GetActiveById(PairId);
                 if (pairMaster != null)
                 {
                     responsedata.Id = pairMaster.Id;
@@ -2074,7 +2112,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new List<TradePairConfigRequest>();
 
-                var pairMaster = _tradePairMasterRepository.GetAll();
+                var pairMaster = _tradePairMasterRepository.List();
                 if (pairMaster != null)
                 {
                     foreach (var pair in pairMaster)
