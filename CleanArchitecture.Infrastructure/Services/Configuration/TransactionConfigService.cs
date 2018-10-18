@@ -33,6 +33,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<ThirdPartyAPIResponseConfiguration> _thirdPartyAPIResRepository;
         private readonly ICommonRepository<TradePairMaster> _tradePairMasterRepository;
         private readonly ICommonRepository<TradePairDetail> _tradePairDetailRepository;
+        private readonly ICommonRepository<Limits> _limitRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -51,7 +52,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository,
             ICommonRepository<ThirdPartyAPIResponseConfiguration> thirdPartyAPIResRepository,
             ICommonRepository<TradePairMaster> tradePairMasterRepository,
-            ICommonRepository<TradePairDetail> tradePairDetailRepository)
+            ICommonRepository<TradePairDetail> tradePairDetailRepository,
+            ICommonRepository<Limits> limitRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -70,6 +72,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _thirdPartyAPIResRepository = thirdPartyAPIResRepository;
             _tradePairMasterRepository = tradePairMasterRepository;
             _tradePairDetailRepository = tradePairDetailRepository;
+            _limitRepository = limitRepository;
         }
 
         #region Service
@@ -1712,6 +1715,46 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
+        public bool SetActiveThirdPartyAPI(long id)
+        {
+            try
+            {
+                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetActive();
+                    _thirdPartyAPIRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveThirdPartyAPI(long id)
+        {
+            try
+            {
+                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetInActive();
+                    _thirdPartyAPIRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
         #endregion
 
         #region ThirdPartyAPIResponseConfig
@@ -1839,6 +1882,46 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 return false;
+            }
+        }
+
+        public bool SetActiveThirdPartyAPIResponse(long id)
+        {
+            try
+            {
+                ThirdPartyAPIResponseConfiguration model = _thirdPartyAPIResRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetActive();
+                    _thirdPartyAPIResRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveThirdPartyAPIResponse(long id)
+        {
+            try
+            {
+                ThirdPartyAPIResponseConfiguration model = _thirdPartyAPIResRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetActive();
+                    _thirdPartyAPIResRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
             }
         }
 
@@ -2145,5 +2228,197 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         }
         #endregion
 
+        #region Limit
+
+        public List<LimitViewModel> GetAllLimitData()
+        {
+            try
+            {
+                var list = _limitRepository.List();
+                List<LimitViewModel> limitList = new List<LimitViewModel>();
+                foreach (var model in list)
+                {
+                    limitList.Add(new LimitViewModel()
+                    {
+                        Id = model.Id,
+                        MaxAmt = model.MaxAmt,
+                        MaxAmtDaily = model.MaxAmtDaily,
+                        MaxAmtMonthly = model.MaxAmtMonthly,
+                        MaxAmtWeekly = model.MaxAmtWeekly,
+                        Maxrange = model.Maxrange,
+                        MaxRangeDaily = model.MaxRangeDaily,
+                        MaxRangeMonthly = model.MaxRangeMonthly,
+                        MaxRangeWeekly = model.MaxRangeWeekly,
+                        MinAmt = model.MinAmt,
+                        MinAmtDaily = model.MinAmtDaily,
+                        MinAmtMonthly = model.MinAmtMonthly,
+                        MinAmtWeekly = model.MinAmtWeekly,
+                        MinRange = model.MinRange,
+                        MinRangeDaily = model.MinRangeDaily,
+                        MinRangeMonthly = model.MinRangeMonthly,
+                        MinRangeWeekly = model.MinRangeWeekly
+                    });
+                }
+
+                return limitList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public LimitViewModel GetLimitById(long id)
+        {
+            try
+            {
+                var model = _limitRepository.GetById(id);
+                if (model == null)
+                    return null;
+
+                var viewModel = new LimitViewModel()
+                {
+                    Id = model.Id,
+                    MaxAmt = model.MaxAmt,
+                    MaxAmtDaily = model.MaxAmtDaily,
+                    MaxAmtMonthly = model.MaxAmtMonthly,
+                    MaxAmtWeekly = model.MaxAmtWeekly,
+                    Maxrange = model.Maxrange,
+                    MaxRangeDaily = model.MaxRangeDaily,
+                    MaxRangeMonthly = model.MaxRangeMonthly,
+                    MaxRangeWeekly = model.MaxRangeWeekly,
+                    MinAmt = model.MinAmt,
+                    MinAmtDaily = model.MinAmtDaily,
+                    MinAmtMonthly = model.MinAmtMonthly,
+                    MinAmtWeekly = model.MinAmtWeekly,
+                    MinRange = model.MinRange,
+                    MinRangeDaily = model.MinRangeDaily,
+                    MinRangeMonthly = model.MinRangeMonthly,
+                    MinRangeWeekly = model.MinRangeWeekly
+                };
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddLimitData(LimitRequest Request)
+        {
+            try
+            {
+                var model = new Limits()
+                {
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    Status = 1,
+                    MaxAmt = Request.MaxAmt,
+                    MaxAmtDaily = Request.MaxAmtDaily,
+                    MaxAmtMonthly = Request.MaxAmtMonthly,
+                    MaxAmtWeekly = Request.MaxAmtWeekly,
+                    Maxrange = Request.Maxrange,
+                    MaxRangeDaily = Request.MaxRangeDaily,
+                    MaxRangeMonthly = Request.MaxRangeMonthly,
+                    MaxRangeWeekly = Request.MaxRangeWeekly,
+                    MinAmt = Request.MinAmt,
+                    MinAmtDaily = Request.MinAmtDaily,
+                    MinAmtMonthly = Request.MinAmtMonthly,
+                    MinAmtWeekly = Request.MinAmtWeekly,
+                    MinRange = Request.MinRange,
+                    MinRangeDaily = Request.MinRangeDaily,
+                    MinRangeMonthly = Request.MinRangeMonthly,
+                    MinRangeWeekly = Request.MinRangeWeekly
+                };
+                var newModel = _limitRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateLimitData(LimitRequest Request)
+        {
+            try
+            {
+                var model = _limitRepository.GetById(Request.Id);
+                if (model == null)
+                    return false;
+
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.UtcNow;
+                model.MaxAmt = Request.MaxAmt;
+                model.MaxAmtDaily = Request.MaxAmtDaily;
+                model.MaxAmtMonthly = Request.MaxAmtMonthly;
+                model.MaxAmtWeekly = Request.MaxAmtWeekly;
+                model.Maxrange = Request.Maxrange;
+                model.MaxRangeDaily = Request.MaxRangeDaily;
+                model.MaxRangeMonthly = Request.MaxRangeMonthly;
+                model.MaxRangeWeekly = Request.MaxRangeWeekly;
+                model.MinAmt = Request.MinAmt;
+                model.MinAmtDaily = Request.MinAmtDaily;
+                model.MinAmtMonthly = Request.MinAmtMonthly;
+                model.MinAmtWeekly = Request.MinAmtWeekly;
+                model.MinRange = Request.MinRange;
+                model.MinRangeDaily = Request.MinRangeDaily;
+                model.MinRangeMonthly = Request.MinRangeMonthly;
+                model.MinRangeWeekly = Request.MinRangeWeekly;
+
+                _limitRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return false;
+            }
+        }
+
+        public bool SetActiveLimit(long id)
+        {
+            try
+            {
+                Limits model = _limitRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetActiveLimit();
+                    _limitRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveLimit(long id)
+        {
+            try
+            {
+                Limits model = _limitRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetInActiveLimit();
+                    _limitRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        #endregion
     }
 }

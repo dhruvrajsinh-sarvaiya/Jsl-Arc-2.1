@@ -74,11 +74,15 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         ThirdPartyAPIConfigViewModel GetThirdPartyAPIConfigById(long Id);
         long AddThirdPartyAPI(ThirdPartyAPIConfigRequest request);
         bool UpdateThirdPartyAPI(ThirdPartyAPIConfigRequest request);
+        bool SetActiveThirdPartyAPI(long id);
+        bool SetInActiveThirdPartyAPI(long id);
 
         List<ThirdPartyAPIResponseConfigViewModel> GetAllThirdPartyAPIResponse();
         ThirdPartyAPIResponseConfigViewModel GetThirdPartyAPIResponseById(long id);
         long AddThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
         bool UpdateThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request);
+        bool SetActiveThirdPartyAPIResponse(long id);
+        bool SetInActiveThirdPartyAPIResponse(long id);
 
         long AddPairConfiguration(TradePairConfigRequest Request);
         long UpdatePairConfiguration(TradePairConfigRequest Request);
@@ -90,5 +94,11 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         List<ServiceTypeMasterInfo> GetAllServiceTypeMaster();
         List<TransactionTypeInfo> GetAllTransactionType();
 
+        List<LimitViewModel> GetAllLimitData();
+        LimitViewModel GetLimitById(long id);
+        long AddLimitData(LimitRequest Request);
+        bool UpdateLimitData(LimitRequest Request);
+        bool SetActiveLimit(long id);
+        bool SetInActiveLimit(long id);
     }
 }
