@@ -27,7 +27,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<ServiceProviderDetail> _ProDetailRepository;
         private readonly ILogger<TransactionConfigService> _logger;
         private readonly ICommonRepository<ProductConfiguration> _productConfigRepository;
-        private readonly ICommonRepository<StateMaster> _stateMasterRepository;
+        private readonly ICommonRepository<CountryMaster> _countryMasterRepository;
         private readonly ICommonRepository<RouteConfiguration> _routeConfigRepository;
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyAPIRepository;
         private readonly ICommonRepository<ThirdPartyAPIResponseConfiguration> _thirdPartyAPIResRepository;
@@ -46,7 +46,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<DemonConfiguration> DemonRepository,
             ICommonRepository<ServiceProviderDetail> ProDetailRepository,
             ICommonRepository<ProductConfiguration> productConfigRepository,
-            ICommonRepository<StateMaster> stateMasterRepository,
+            ICommonRepository<CountryMaster> countryMasterRepository,
             ICommonRepository<RouteConfiguration> routeConfigRepository,
             ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository,
             ICommonRepository<ThirdPartyAPIResponseConfiguration> thirdPartyAPIResRepository,
@@ -64,7 +64,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _ProDetailRepository = ProDetailRepository;
             _logger = logger;
             _productConfigRepository = productConfigRepository;
-            _stateMasterRepository = stateMasterRepository;
+            _countryMasterRepository = countryMasterRepository;
             _routeConfigRepository = routeConfigRepository;
             _thirdPartyAPIRepository = thirdPartyAPIRepository;
             _thirdPartyAPIResRepository = thirdPartyAPIResRepository;
@@ -278,7 +278,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public int SetActiveService(int ServiceId)
+        public int SetActiveService(long ServiceId)
         {
             try
             {
@@ -298,7 +298,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public int SetInActiveService(int ServiceId)
+        public int SetInActiveService(long ServiceId)
         {
             try
             {
@@ -1211,7 +1211,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     ProductName = Request.ProductName,
                     ServiceID = Request.ServiceID,
-                    StateID = Request.StateID
+                    CountryID = Request.CountryID
                 };
                 var newProduct = _productConfigRepository.Add(product);
                 return newProduct.Id;
@@ -1231,7 +1231,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     product.ProductName = Request.ProductName;
                     product.ServiceID = Request.ServiceID;
-                    product.StateID = Request.StateID;
+                    product.CountryID = Request.CountryID;
 
                     _productConfigRepository.Update(product);
                      return product.Id;
@@ -1260,11 +1260,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     responsedata.ProductName = product.ProductName;
                     
                     var serviceMaster = _serviceMasterRepository.GetById(product.ServiceID);
-                    var stateMaster = _stateMasterRepository.GetById(product.StateID);
-                    responsedata.StateID = product.StateID;
+                    var countryMaster = _countryMasterRepository.GetById(product.CountryID);
+                    responsedata.CountryID = product.CountryID;
                     responsedata.ServiceID = product.ServiceID;
                     responsedata.ServiceName = serviceMaster.Name;
-                    responsedata.StateName = stateMaster.StateName;
+                    responsedata.CountryName = countryMaster.CountryName;
 
                     return responsedata;
                 }
@@ -1296,11 +1296,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         response.ProductName = product.ProductName;
 
                         var serviceMaster = _serviceMasterRepository.GetById(product.ServiceID);
-                        var stateMaster = _stateMasterRepository.GetById(product.StateID);
-                        response.StateID = product.StateID;
+                        var countryMaster = _countryMasterRepository.GetById(product.CountryID);
+                        response.CountryID = product.CountryID;
                         response.ServiceID = product.ServiceID;
                         response.ServiceName = serviceMaster.Name;
-                        response.StateName = stateMaster.StateName;
+                        response.CountryName = countryMaster.CountryName;
 
                         responsedata.Add(response);
                     }
@@ -1317,7 +1317,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetActiveProduct(int ProductId)
+        public int SetActiveProduct(long ProductId)
         {
             try
             {
@@ -1336,7 +1336,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetInActiveProduct(int ProductId)
+        public int SetInActiveProduct(long ProductId)
         {
             try
             {
@@ -1502,7 +1502,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetActiveRoute(int RouteId)
+        public int SetActiveRoute(long RouteId)
         {
             try
             {
@@ -1521,7 +1521,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetInActiveRoute(int RouteId)
+        public int SetInActiveRoute(long RouteId)
         {
             try
             {

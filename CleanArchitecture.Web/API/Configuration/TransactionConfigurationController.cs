@@ -145,7 +145,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetActiveService/{ServiceId}")]
-        public IActionResult SetActiveService(int ServiceId)
+        public IActionResult SetActiveService(long ServiceId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -177,7 +177,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetInActiveService/{ServiceId}")]
-        public IActionResult SetInActiveService(int ServiceId)
+        public IActionResult SetInActiveService(long ServiceId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1276,7 +1276,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetActiveService/{ProductId}")]
-        public IActionResult SetActiveProduct(int ProductId)
+        public IActionResult SetActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1301,7 +1301,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetInActiveService/{ProductId}")]
-        public IActionResult SetInActiveProduct(int ProductId)
+        public IActionResult SetInActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1436,7 +1436,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetActiveRoute/{RouteId}")]
-        public IActionResult SetActiveRoute(int RouteId)
+        public IActionResult SetActiveRoute(long RouteId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1461,7 +1461,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetInActiveRoute/{RouteId}")]
-        public IActionResult SetInActiveRoute(int RouteId)
+        public IActionResult SetInActiveRoute(long RouteId)
         {
             BizResponseClass Response = new BizResponseClass();
             try

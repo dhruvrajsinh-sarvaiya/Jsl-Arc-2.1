@@ -11,8 +11,8 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         long UpdateServiceConfiguration(ServiceConfigurationRequest Request);
         ServiceConfigurationRequest GetServiceConfiguration(long ServiceId);
         List<ServiceConfigurationRequest> GetAllServiceConfiguration();
-        int SetActiveService(int ServiceId);
-        int SetInActiveService(int ServiceId);
+        int SetActiveService(long ServiceId);
+        int SetInActiveService(long ServiceId);
 
         IEnumerable<ServiceProviderViewModel> GetAllProvider();
         ServiceProviderViewModel GetPoviderByID(long ID);
@@ -60,15 +60,15 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         long UpdateProductConfiguration(ProductConfigurationRequest Request);
         ProductConfigrationGetInfo GetProductConfiguration(long ProductId);
         List<ProductConfigrationGetInfo> GetAllProductConfiguration();
-        int SetActiveProduct(int ProductId);
-        int SetInActiveProduct(int ProductId);
+        int SetActiveProduct(long ProductId);
+        int SetInActiveProduct(long ProductId);
 
         long AddRouteConfiguration(RouteConfigurationRequest Request);
         long UpdateRouteConfiguration(RouteConfigurationRequest Request);
         RouteConfigurationRequest GetRouteConfiguration(long RouteId);
         List<RouteConfigurationRequest> GetAllRouteConfiguration();
-        int SetActiveRoute(int RouteId);
-        int SetInActiveRoute(int RouteId);
+        int SetActiveRoute(long RouteId);
+        int SetInActiveRoute(long RouteId);
 
         List<ThirdPartyAPIConfigViewModel> GetAllThirdPartyAPIConfig();
         ThirdPartyAPIConfigViewModel GetThirdPartyAPIConfigById(long Id);
