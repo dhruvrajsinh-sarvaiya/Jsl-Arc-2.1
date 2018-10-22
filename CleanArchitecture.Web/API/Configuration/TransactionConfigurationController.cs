@@ -1015,6 +1015,12 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 ProviderDetailViewModel  obj = _transactionConfigService.GetProviderDetailById(id);
+                if (obj == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
                 res.response = _transactionConfigService.getProviderDetailDataById(obj);
                 if (res.response == null)
                 {
