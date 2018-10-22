@@ -169,6 +169,8 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessDeleteDevice = "Success full remove device address.";
         public static string DeviceAddressdeleteError = "Device address not remove.";
         public static string SuccessGetDeviceData = "Success full Get Device Address.";
+        public static string TwoFaVerification = "TwoFA Acviate Redirect Verify method";
+        public static string Userpasswordnotupdated = "User password not updated!";
 
     }
 }
