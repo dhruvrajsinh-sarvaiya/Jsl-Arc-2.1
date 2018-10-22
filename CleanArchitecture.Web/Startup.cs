@@ -27,6 +27,7 @@ using CleanArchitecture.Infrastructure.Services.Transaction;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.Services.Session;
 using CleanArchitecture.Web.SignalR;
+using Newtonsoft.Json.Serialization;
 
 namespace CleanArchitecture.Web
 {
@@ -134,7 +135,9 @@ namespace CleanArchitecture.Web
             ////End Swagger
             ////services.AddMvcCore();
             //services.AddDistributedMemoryCache();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1) //ntrivedi 22-10-2018 for camel case response class earlier it was default use walletType eventhouth we have WalletType in our class 
+               .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
             //services.Configure<EmailSettings>(Configuration.GetSection("Email"));
             //services.Configure<SMSSetting>(Configuration.GetSection("SMS"));
@@ -227,7 +230,7 @@ namespace CleanArchitecture.Web
                 await next.Invoke();
                 // Do logging or other work that doesn't write to the Response.
             });
-
+            
             app.UseSignalR(routes =>
             {
                 routes.MapHub<Chat>("/chathub");
