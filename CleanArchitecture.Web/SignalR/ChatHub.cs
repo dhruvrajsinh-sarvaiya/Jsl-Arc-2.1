@@ -21,16 +21,16 @@ namespace CleanArchitecture.Web.SignalR
         {
             return Clients.All.SendAsync("Send", message);
         }
-        public void SendChatMessage(string token, string message)
+        public void SendChatMessage(long UserID, string message)
         {
             // string name = Context.User.Identity.Name;
-            var redis = new RadisServices<ConnetedClientList>(this._fact);
-            ConnetedClientList user = new ConnetedClientList();
-            user = redis.GetConnectionID(token);
+            var Redis = new RadisServices<ConnetedClientList>(this._fact);
+            ConnetedClientList User = new ConnetedClientList();
+            User = Redis.GetConnectionID(UserID + "ConnectionID");
             //foreach (var connectionId in _connections.GetConnections(who))
             //{
-            Clients.Client(user.ConnectionId).SendAsync("RecieveMessage", token + ": " + message);
-            Clients.Group("BroadCast").SendAsync("BroadcastMessage", token + ": " + message);
+            Clients.Client(User.ConnectionId).SendAsync("RecieveMessage", User + ": " + message);
+            Clients.Group("BroadCast").SendAsync("BroadcastMessage", User + ": " + message);
             // Clients.All.SendAsync("BroadcastMessage", token + ": " + message);
             //}
         }
@@ -39,9 +39,18 @@ namespace CleanArchitecture.Web.SignalR
         {
             // Call the broadcastMessage method to update clients.
             Clients.Group("GroupMessage").SendAsync("ReciveGroupMessage", name, message);
-            var redis = new RadisServices<ChatHistory>(this._fact);
-            redis.SaveToSet("GroupChatHistory", new ChatHistory { Name = name, Message = message, Id = Guid.NewGuid() }, name);
-            redis.GetSetData("GroupChatHistory");
+            var Redis = new RadisServices<ChatHistory>(this._fact);
+            Redis.SaveToSet("GroupChatHistory", new ChatHistory { Name = name, Message = message, Id = Guid.NewGuid() }, name);
+            Redis.GetSetData("GroupChatHistory");
+        }
+
+        public void BlockedUsers(string id)
+        {
+            // Call the broadcastMessage method to update clients.
+            //Clients.Group("GroupMessage").SendAsync("ReciveGroupMessage", name, message);
+            //var redis = new RadisServices<ChatHistory>(this._fact);
+            //redis.SaveToSet("GroupChatHistory", new ChatHistory { Name = name, Message = message, Id = Guid.NewGuid() }, name);
+            //redis.GetSetData("GroupChatHistory");
         }
 
         public override Task OnConnectedAsync()
@@ -54,11 +63,16 @@ namespace CleanArchitecture.Web.SignalR
             return base.OnConnectedAsync();
         }
 
-        public void OnConnected(string token)
+        public void OnConnected(long  UserID,string AccessToken,string Username)
         {
-            var redis = new RadisServices<ConnetedClientList>(this._fact);
+            var Redis = new RadisServices<ConnetedClientList>(this._fact);
             //_connections.Add(token, Context.ConnectionId);
-            redis.SaveToHash(token, new ConnetedClientList { ConnectionId = Context.ConnectionId }, Context.ConnectionId);
+            Redis.SaveToHash(UserID + "ConnectionID", new ConnetedClientList { ConnectionId = Context.ConnectionId }, Context.ConnectionId);
+            var Redis1 = new RadisServices<ConnetedClientToken>(this._fact);
+            Redis1.SaveToHash(UserID + "Token", new ConnetedClientToken { Token  = AccessToken }, Context.ConnectionId);
+            var Redis2 = new RadisServices<ConnetedUserDetail>(this._fact);
+            Redis2.SaveToHash(UserID + "Username", new ConnetedUserDetail { UserName = Username }, Context.ConnectionId);
+
             //Groups.AddToGroupAsync(Context.ConnectionId, "BroadCast");
         }
 

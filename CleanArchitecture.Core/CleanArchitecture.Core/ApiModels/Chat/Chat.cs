@@ -9,6 +9,16 @@ namespace CleanArchitecture.Core.ApiModels.Chat
         public string ConnectionId { get; set; }
     }
 
+    public class ConnetedUserDetail
+    {
+        public string UserName { get; set; }
+    }
+
+    public class ConnetedClientToken
+    {
+        public string Token { get; set; }
+    }
+
     public class ChatHistory
     {
         public string Message { get; set; }

@@ -57,6 +57,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 foreach (CommunicationProviderList Provider in Result)
                 {
                     string Response = await _MessageService.SendEmailAsync(Email.Recepient, Email.Subject, Email.BCC, Email.CC, Email.Body, Provider.SendURL,Provider.UserID , Provider.Password,Convert.ToInt16(Provider.SenderID));
+                    Email.BCC = Response;
                     CopyClass.CopyObject(Provider, ref _GetDataForParsingAPI);
                     _GenerateResponse = _WebApiParseResponse.ParseResponseViaRegex(Response, _GetDataForParsingAPI);
                     if (_GenerateResponse.Status == enTransactionStatus.Success)
@@ -70,7 +71,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         continue;
                     }
                 }
-                Email.SentMessage();
+                Email.FailMessage();
                 _MessageRepository.Update(Email);
                 return await Task.FromResult(new CommunicationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFailMessage});
             }
