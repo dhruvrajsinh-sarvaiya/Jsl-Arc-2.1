@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using CleanArchitecture.Core.ApiModels;
-
+using CleanArchitecture.Core.ViewModels.Wallet;
 
 namespace CleanArchitecture.Core.Interfaces
 {
@@ -15,5 +15,6 @@ namespace CleanArchitecture.Core.Interfaces
         //ntrivedi fetch route
         List<TransactionProviderResponse> GetProviderDataList(TransactionApiConfigurationRequest Request);
 
+        List<WalletServiceData> StatusCheck();
     }
 }

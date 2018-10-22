@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Core.Entities.Wallet;
 using System.Linq;
+using CleanArchitecture.Core.ViewModels.WalletConfiguration;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -500,9 +501,12 @@ namespace CleanArchitecture.Infrastructure.Services
         public IEnumerable<WalletTypeMaster> GetWalletTypeMaster()
         {
             try
-            {
+            {              
+              //  IEnumerable<WalletTypeMasterRes> coinlist = new List<WalletTypeMasterRes>();
                 IEnumerable<WalletTypeMaster> coin = new List<WalletTypeMaster>();
+
                 coin = _WalletTypeMasterRepository.FindBy(item => item.Status == Convert.ToInt16(ServiceStatus.Active));
+
                 return coin;
             }
             catch (Exception ex)
@@ -750,7 +754,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else
                 {
-                    listWalletResponse.wallets = walletResponse;
+                    listWalletResponse.Wallets = walletResponse;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
@@ -779,7 +783,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else
                 {
-                    listWalletResponse.wallets = walletResponse;
+                    listWalletResponse.Wallets = walletResponse;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
@@ -808,7 +812,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else
                 {
-                    listWalletResponse.wallets = walletResponse;
+                    listWalletResponse.Wallets = walletResponse;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }

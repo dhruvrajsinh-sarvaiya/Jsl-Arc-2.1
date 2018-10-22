@@ -7,6 +7,6 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
 {
     public class DepositHistoryResponse : BizResponseClass
     {
-       public List<HistoryObject> histories { get; set; }
+       public List<HistoryObject> Histories { get; set; }
     }
 }

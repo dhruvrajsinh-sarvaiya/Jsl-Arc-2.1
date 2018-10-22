@@ -6,6 +6,7 @@ using System.Text;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
+using Newtonsoft.Json;
 
 namespace CleanArchitecture.Core.Entities
 {
@@ -13,6 +14,7 @@ namespace CleanArchitecture.Core.Entities
     {
         [Required]
         [StringLength(50)]
+        [JsonProperty(PropertyName = "CoinName")]
         public string WalletTypeName { get; set; }
 
         [Required]

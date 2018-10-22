@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Wallet

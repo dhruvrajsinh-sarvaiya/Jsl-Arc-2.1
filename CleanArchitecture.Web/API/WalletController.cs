@@ -21,7 +21,7 @@ using CleanArchitecture.Web.Helper;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    [Authorize]
+    //[Authorize]
     public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
@@ -60,7 +60,8 @@ namespace CleanArchitecture.Web.API
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User); ///new ApplicationUser();
+               // user.Id = 2;//
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
                 HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name,"", accessToken);
                 if (user == null)
@@ -88,8 +89,8 @@ namespace CleanArchitecture.Web.API
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        [HttpPost("{coin}")]
-        public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string coin)
+        [HttpPost("{Coin}")]
+        public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string Coin)
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");
             HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Request), accessToken);
@@ -107,7 +108,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, coin, Request.IsDefaultWallet, Request.AllowTrnType, Convert.ToInt64(user.Id));
+                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, Coin, Request.IsDefaultWallet, Request.AllowTrnType, Convert.ToInt64(user.Id));
                 }
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
@@ -125,8 +126,8 @@ namespace CleanArchitecture.Web.API
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        [HttpGet("{coin}")]
-        public async Task<IActionResult> GetWalletByCoin(string coin)
+        [HttpGet("{Coin}")]
+        public async Task<IActionResult> GetWalletByCoin(string Coin)
         {
             ListWalletResponse Response = new ListWalletResponse();
             try
@@ -142,7 +143,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.GetWalletByCoin(user.Id, coin);
+                    Response = _walletService.GetWalletByCoin(user.Id, Coin);
                 }
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
@@ -159,8 +160,8 @@ namespace CleanArchitecture.Web.API
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        [HttpGet("{coin}/{walletId}")]
-        public async Task<IActionResult> GetWalletByWalletId(string coin, string walletId)
+        [HttpGet("{Coin}/{WalletId}")]
+        public async Task<IActionResult> GetWalletByWalletId(string Coin, string WalletId)
         {
             ListWalletResponse Response = new ListWalletResponse();
             try
@@ -176,7 +177,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.GetWalletById(user.Id, coin, walletId);
+                    Response = _walletService.GetWalletById(user.Id, Coin, WalletId);
                 }
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);

@@ -206,7 +206,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                 select new WalletMasterResponse
                                                 {
                                                     AccWalletID = u.AccWalletID,
-                                                    Walletname = u.Walletname,
+                                                    WalletName = u.Walletname,
                                                     CoinName = c.WalletTypeName,
                                                     PublicAddress = u.PublicAddress,
                                                     Balance = u.Balance,
@@ -224,7 +224,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                 select new WalletMasterResponse
                                                 {
                                                     AccWalletID = u.AccWalletID,
-                                                    Walletname = u.Walletname,
+                                                    WalletName = u.Walletname,
                                                     CoinName = c.WalletTypeName,
                                                     PublicAddress = u.PublicAddress,
                                                     Balance = u.Balance,
@@ -242,7 +242,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                 select new WalletMasterResponse
                                                 {
                                                     AccWalletID = u.AccWalletID,
-                                                    Walletname = u.Walletname,
+                                                    WalletName = u.Walletname,
                                                     CoinName = c.WalletTypeName,
                                                     PublicAddress = u.PublicAddress,
                                                     Balance = u.Balance,
@@ -371,7 +371,7 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 ReturnCode = enResponseCode.Success,
                 ReturnMsg = EnResponseMessage.FindRecored,
-                histories=items
+                Histories=items
             };
         }
 
@@ -405,7 +405,7 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 ReturnCode = enResponseCode.Success,
                 ReturnMsg = EnResponseMessage.FindRecored,
-                histories = items
+                Histories = items
             };
         }
         public bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID)
