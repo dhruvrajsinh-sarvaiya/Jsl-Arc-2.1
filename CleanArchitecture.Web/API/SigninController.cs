@@ -386,10 +386,7 @@ namespace CleanArchitecture.Web.API
                         data.EnableStatus = false;
                         await _custompassword.AddPassword(data);
 
-                        if (user.TwoFactorEnabled)
-                        {
-                            return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
-                        }
+
 
                         _logger.LogWarning(1, "User Login with Email Send Success.");
                         return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
@@ -438,6 +435,22 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    if (checkmail.TwoFactorEnabled)
+                                    {
+                                        string currenttime = DateTime.UtcNow.ToString();
+
+                                        var newPassword = _userManager.PasswordHasher.HashPassword(checkmail, currenttime);
+                                        checkmail.PasswordHash = newPassword;
+                                        var res = await _userManager.UpdateAsync(checkmail);
+                                        if (res.Succeeded)
+                                        {
+                                            var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
+                                            return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFaVerification });
+                                        }
+                                        else
+                                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
+
+                                    }
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(checkmail);
@@ -649,9 +662,22 @@ namespace CleanArchitecture.Web.API
                                 {
                                     if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
                                     {
-                                        return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
+                                        string currenttime = DateTime.UtcNow.ToString();
+
+                                        var newPassword = _userManager.PasswordHasher.HashPassword(result, currenttime);
+                                        result.PasswordHash = newPassword;
+                                        var res = await _userManager.UpdateAsync(result);
+                                        if (res.Succeeded)
+                                        {
+                                            var resultdata = await _signInManager.PasswordSignInAsync(result.UserName, currenttime, false, lockoutOnFailure: false);
+
+                                            return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFaVerification });
+                                        }
+                                        else
+                                            return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
 
                                     }
+
 
 
                                     _logger.LogWarning(1, "You are successfully login.");
@@ -847,7 +873,7 @@ namespace CleanArchitecture.Web.API
 
                 string ctoken = GenerateRandomPassword();
                 //    _userManager.GeneratePasswordResetTokenAsync(currentUser).Result;
-                                
+
                 var ResetPassword = new ResetPasswordViewModel
                 {
                     Email = currentUser.Email,
@@ -855,7 +881,7 @@ namespace CleanArchitecture.Web.API
                     Password = ctoken,
                     ConfirmPassword = ctoken,
                     Expirytime = DateTime.UtcNow + TimeSpan.FromMinutes(Convert.ToInt64(_configuration["DefaultValidateLinkTimeSpan"]))
-            };
+                };
                 byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
                 string UserDetails = JsonConvert.SerializeObject(ResetPassword);
