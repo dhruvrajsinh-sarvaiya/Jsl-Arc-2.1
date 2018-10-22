@@ -12,9 +12,9 @@ namespace CleanArchitecture.Core.Interfaces
         IEnumerable<TResponse> GetProviderDataList(TRequest Request);
     }
 
-    public interface IWebApiData<TResponse>
+    public interface IWebApiData
     {
-        TResponse GetAPIConfiguration(long ThirPartyAPIID);
+        WebApiConfigurationResponse GetAPIConfiguration(long ThirPartyAPIID);
     }
 
     public interface IWebApiSendRequest
