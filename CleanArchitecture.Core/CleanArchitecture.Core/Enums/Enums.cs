@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.Enums
         TwoFactor = 3,
         Lockout = 4,
         CreateAccount = 5
-    }  
+    }
 
     public enum ServiceStatus
     {
@@ -22,7 +22,7 @@ namespace CleanArchitecture.Core.Enums
     }
     public enum enTransactionStatus
     {
-        Initialize=0,
+        Initialize = 0,
         Success = 1,
         OperatorFail = 2,
         SystemFail = 3,
@@ -41,7 +41,7 @@ namespace CleanArchitecture.Core.Enums
         Generate_Address = 9,
         Topup = 10,
         Charge = 11,
-        Commission=12
+        Commission = 12
     }
     public enum enOrderStatus
     {
@@ -64,7 +64,7 @@ namespace CleanArchitecture.Core.Enums
 
     public enum enServiceType
     {
-        Recharge = 1,        
+        Recharge = 1,
         DTH = 2,
         BillPayment = 3,
         FlightBooking = 4,
@@ -95,9 +95,9 @@ namespace CleanArchitecture.Core.Enums
     {
         TransactionAPI = 1,
         CommunicationAPI = 2,
-        LiquidityProvider=3,
-        PaymentGateway=4,
-        MarketData=5
+        LiquidityProvider = 3,
+        PaymentGateway = 4,
+        MarketData = 5
 
     }
 
@@ -124,13 +124,13 @@ namespace CleanArchitecture.Core.Enums
         Init = 0,
         Success = 1,
         Fail = 2,
-        Pending = 6        
+        Pending = 6
     }
 
     public enum enErrorCode
     {
         InvalidAmount = 2251,
-        InsufficientBalance = 2252,        
+        InsufficientBalance = 2252,
         Success = 2253,
         ItemNotFoundForGenerateAddress = 2254,
         InvalidThirdpartyID = 2255,
@@ -138,16 +138,16 @@ namespace CleanArchitecture.Core.Enums
         //====================Transactional
         TransactionProcessSuccess = 1,
         TransactionInsertSuccess = 1,
-        TransactionInsertFail =1,
-        TransactionInsertInternalError =1,
+        TransactionInsertFail = 1,
+        TransactionInsertInternalError = 1,
         CreateTrn_NoPairSelected = 1,
         CreateTrnInvalidQtyPrice = 1,
         CreateTrnInvalidQtyNAmount = 1,
         CreateTrn_NoCreditAccountFound = 1,
         CreateTrn_NoDebitAccountFound = 1,
         CreateTrnInvalidAmount = 1,
-        CreateTrnDuplicateTrn=1,
-        CreateTrn_NoSelfAddressWithdrawAllow=1,
+        CreateTrnDuplicateTrn = 1,
+        CreateTrn_NoSelfAddressWithdrawAllow = 1,
         InvalidPairName = 4500,
         NoDataFound = 4501,
         InvalidStatusType = 4502,
@@ -156,10 +156,10 @@ namespace CleanArchitecture.Core.Enums
         InvalidToDateFormate = 4505,
         InvalidMarketType = 4506,
         InValidPageNo = 4507,
-        InValid_ID=4565,
+        InValid_ID = 4565,
 
         ProcessTrn_InsufficientBalance = 1,
-        ProcessTrn_AmountBetweenMinMax=1,
+        ProcessTrn_AmountBetweenMinMax = 1,
         ProcessTrn_PriceBetweenMinMax = 1,
         ProcessTrn_InvalidBidPriceValue = 1,
         ProcessTrn_PoolOrderCreateFail = 1,
@@ -168,7 +168,7 @@ namespace CleanArchitecture.Core.Enums
         ProcessTrn_ServiceProductNotAvailable = 1,
         ProcessTrn_WalletDebitFail = 1,
         ProcessTrn_Hold = 1,
-        ProcessTrn_ThirdPartyDataNotFound=1,
+        ProcessTrn_ThirdPartyDataNotFound = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -184,8 +184,8 @@ namespace CleanArchitecture.Core.Enums
         Status4039ResetPasswordLinkExpired = 4039,
         Status4040ResetPasswordLinkempty = 4040,
         Status4041ResetPasswordConfirm = 4041,
-        Status4042ResetConfirmPassMatch=4042,
-        Status4043ResetConfirmOldNotMatch=4043,
+        Status4042ResetConfirmPassMatch = 4042,
+        Status4043ResetConfirmOldNotMatch = 4043,
         Status4044UserSelectedIpNotFound = 4044,
         Status4045InvalidUserSelectedIp = 4045,
         Status4046NotUpdateIpStatus = 4046,
@@ -196,12 +196,13 @@ namespace CleanArchitecture.Core.Enums
         Status4051RefreshToken = 4051,
         Status4052UserToken = 4052,
         Status4053Granttype = 4053,
-        Status4054FactorFail =4054,
+        Status4054FactorFail = 4054,
         Status4055DisableTroFactorError = 4055,
-        Status4056TwoFactorVerification=4056,
-        Status4057DeviceIdNotAdd=4057,  
-        Status4058DeviceAddress=4058,
-        Status4059NotDeleteDevice=4059,
+        Status4056TwoFactorVerification = 4056,
+        Status4057DeviceIdNotAdd = 4057,
+        Status4058DeviceAddress = 4058,
+        Status4059NotDeleteDevice = 4059,
+        Status4061Userpasswordnotupdated = 4061,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -209,17 +210,17 @@ namespace CleanArchitecture.Core.Enums
         InvalidWalletId = 247,
         InvalidTrnType = 248,
         TrnTypeNotAllowed = 249,
-        RecordNotFound = 250  ,
-        InvalidCoinName=4031,
-        StandardLoginfailed=4032,
-        NotFound=4033,
+        RecordNotFound = 250,
+        InvalidCoinName = 4031,
+        StandardLoginfailed = 4032,
+        NotFound = 4033,
         InvalidWalletOrUserIDorCoinName = 4034,
         InvalidWallet = 4035,
         InvalidTradeRefNo = 4036,
-        AlredyExist=4037,
-        InsufficantBal=4038,
+        AlredyExist = 4037,
+        InsufficantBal = 4038,
         UserIDWalletIDDidNotMatch = 4039
-       
+
 
 
 
@@ -228,7 +229,7 @@ namespace CleanArchitecture.Core.Enums
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
     {
-        Success = 0, 
+        Success = 0,
         Fail = 1,
         InternalError = 9
     }
@@ -281,7 +282,7 @@ namespace CleanArchitecture.Core.Enums
         Cr_Topup = 1,
         cr_Deposit = 2,
         Cr_Buy_Trade = 3,
-        Cr_Refund = 4,        
+        Cr_Refund = 4,
         Cr_Commission = 5,
         Cr_Partial_Cancel = 6,
         Cr_Trans_IN = 7,
