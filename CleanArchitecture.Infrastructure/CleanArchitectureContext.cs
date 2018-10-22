@@ -62,7 +62,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletOrder> WalletOrders { get; set; }
         public DbSet<TransactionAccount> TransactionAccounts { get; set; }
         public DbSet<WalletLedger> WalletLedgers { get; set; }
-        public DbSet<DepositHistory> DepositHistorys { get; set; }
+        public DbSet<DepositHistory> DepositHistory { get; set; }
         public DbSet<TradeBitGoDelayAddresses> TradeBitGoDelayAddressess { get; set; }
         public DbSet<AddressMaster> AddressMasters { get; set; }
         public DbSet<WalletAllowTrn> WalletAllowTrns { get; set; }
