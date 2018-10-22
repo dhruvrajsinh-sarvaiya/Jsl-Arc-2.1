@@ -7,7 +7,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 {
     public interface IGetWebRequest
     {
-        ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproID);
+        ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproDetailID);
 
     }
 }

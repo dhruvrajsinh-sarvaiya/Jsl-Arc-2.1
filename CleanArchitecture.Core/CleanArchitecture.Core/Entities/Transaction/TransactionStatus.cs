@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public  class TransactionStatus
+    public  class TransactionStatus : BizBase
     {
         [Key]
         [Required]
@@ -19,10 +19,10 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public long SerProID { get; set; }
         //IsStatusCheck
-        public short Status { get; set; }
+        //public short Status { get; set; }
         public string StatusMsg { get; set; }
 
-        [DataType(DataType.DateTime)]
-        public DateTime ResponseTime { get; set; }         
+        //[DataType(DataType.DateTime)]
+        //public DateTime ResponseTime { get; set; }         
     }
 }
