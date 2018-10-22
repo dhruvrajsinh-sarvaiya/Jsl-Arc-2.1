@@ -15,6 +15,6 @@ namespace CleanArchitecture.Core.Interfaces
         //ntrivedi fetch route
         List<TransactionProviderResponse> GetProviderDataList(TransactionApiConfigurationRequest Request);
 
-        List<WalletServiceData> StatusCheck();
+        //List<WalletServiceData> StatusCheck();
     }
 }

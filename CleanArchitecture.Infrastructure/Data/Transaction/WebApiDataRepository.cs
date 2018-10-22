@@ -142,22 +142,22 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
         }
 
-        public List<WalletServiceData> StatusCheck()
-        {
-            try
-            {               
-                IQueryable<WalletServiceData> Result = _dbContext.WalletServiceData.FromSql(
-                           @"SELECT SM.Id as ServiceID , SM.SMSCode,WM.Status AS WalletStatus , SM.Status AS ServiceStatus FROM WalletTypeMasters WM INNER JOIN ServiceMaster SM ON SM.WalletTypeID=WM.id WHERE WM.status = 1 and WM.IsDepositionAllow = 1");
+        //public List<WalletServiceData> StatusCheck()
+        //{
+        //    try
+        //    {               
+        //        IQueryable<WalletServiceData> Result = _dbContext.WalletServiceData.FromSql(
+        //                   @"SELECT SM.Id as ServiceID , SM.SMSCode,WM.Status AS WalletStatus , SM.Status AS ServiceStatus FROM WalletTypeMasters WM INNER JOIN ServiceMaster SM ON SM.WalletTypeID=WM.id WHERE WM.status = 1 and WM.IsDepositionAllow = 1");
 
-                var list = new List<WalletServiceData>(Result);
-                return list;                
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "MethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
+        //        var list = new List<WalletServiceData>(Result);
+        //        return list;                
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _log.LogError(ex, "MethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        throw ex;
+        //    }
+        //}
 
     }
 }
