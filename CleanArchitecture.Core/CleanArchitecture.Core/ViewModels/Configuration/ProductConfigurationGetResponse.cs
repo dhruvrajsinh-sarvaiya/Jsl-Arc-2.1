@@ -15,7 +15,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         public string ProductName { get; set; }
         public long ServiceID { get; set; }
         public string ServiceName { get; set; }
-        public long StateID { get; set; }
-        public string StateName { get; set; }
+        public long CountryID { get; set; }
+        public string CountryName { get; set; }
     }
 }

@@ -34,5 +34,16 @@ namespace CleanArchitecture.Core.Entities
         public string Param2Regex { get; set; }
 
         public string Param3Regex { get; set; }
+
+        public void SetActive()
+        {
+            Status = Convert.ToInt16(ServiceStatus.Active);
+            Events.Add(new ServiceStatusEvent<ThirdPartyAPIResponseConfiguration>(this));
+        }
+        public void SetInActive()
+        {
+            Status = Convert.ToInt16(ServiceStatus.InActive);
+            Events.Add(new ServiceStatusEvent<ThirdPartyAPIResponseConfiguration>(this));
+        }
     }
 }

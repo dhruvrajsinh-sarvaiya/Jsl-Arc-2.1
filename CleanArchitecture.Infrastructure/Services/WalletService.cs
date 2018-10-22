@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using CleanArchitecture.Core.Entities;
@@ -1136,8 +1137,10 @@ namespace CleanArchitecture.Infrastructure.Services
 
         public LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long Userid)
         {
-            WalletLimitConfiguration obj = new WalletLimitConfiguration();
+            int type = Convert.ToInt16(request.TrnType);
+            WalletLimitConfiguration IsExist = new WalletLimitConfiguration();
             LimitResponse Response = new LimitResponse();
+            //bool flag = 
             try
             {
                 var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
@@ -1148,18 +1151,33 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.ErrorCode = enErrorCode.InvalidWalletId;
                     return Response;
                 }
-                obj.WalletId = walletMasters.Id;
-                obj.TrnType = Convert.ToInt16(request.TrnType);
-                obj.LimitPerHour = request.LimitPerHour;
-                obj.LimitPerDay = request.LimitPerDay;
-                obj.LimitPerTransaction = request.LimitPerHour;
-                obj.CreatedBy = Userid;
-                obj.CreatedDate = UTC_To_IST();
-                obj.Status = Convert.ToInt16(ServiceStatus.Active);
-                obj.UpdatedDate = UTC_To_IST();
-                obj = _LimitcommonRepository.Add(obj);
+                IsExist = _LimitcommonRepository.GetSingle(item => item.TrnType == type && item.WalletId == walletMasters.Id);
+                if (IsExist == null)
+                {
+                    WalletLimitConfiguration newobj = new WalletLimitConfiguration();
+                    newobj.WalletId = walletMasters.Id;
+                    newobj.TrnType = type;
+                    newobj.LimitPerHour = request.LimitPerHour;
+                    newobj.LimitPerDay = request.LimitPerDay;
+                    newobj.LimitPerTransaction = request.LimitPerTransaction;
+                    newobj.CreatedBy = Userid;
+                    newobj.CreatedDate = UTC_To_IST();
+                    newobj.Status = Convert.ToInt16(ServiceStatus.Active);
+                    //obj.UpdatedDate = UTC_To_IST();
+                    newobj = _LimitcommonRepository.Add(newobj);
+                    Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
+                }
+                else
+                {
+                    IsExist.LimitPerHour = request.LimitPerHour;
+                    IsExist.LimitPerDay = request.LimitPerDay;
+                    IsExist.LimitPerTransaction = request.LimitPerTransaction;
+                    IsExist.UpdatedBy = Userid;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _LimitcommonRepository.Update(IsExist);
+                    Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
+                }                
                 Response.ReturnCode = enResponseCode.Success;
-                Response.ReturnMsg = EnResponseMessage.SetWalletLimitSuccessMsg;
                 return Response;
             }
             catch(Exception ex)
@@ -1168,6 +1186,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
         public LimitResponse GetWalletLimitConfig(string accWalletID)
         {
             LimitResponse LimitResponse = new LimitResponse();

@@ -41,10 +41,12 @@ namespace CleanArchitecture.Web.API
         //private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
-        private readonly IRedisConnectionFactory _fact;
+        //private readonly IRedisConnectionFactory _fact;
+        private readonly RedisConnectionFactory _fact;
         private readonly RedisSessionStorage _redisSessionStorage;
         private readonly IUserService _userdata;
         private readonly IipAddressService _ipAddressService;
+        private readonly IDeviceIdService _iDeviceIdService;
         private readonly IBasePage _basePage;
         #endregion
 
@@ -54,11 +56,14 @@ namespace CleanArchitecture.Web.API
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         ILoggerFactory loggerFactory,
-        UrlEncoder urlEncoder, IRedisConnectionFactory factory,
+        UrlEncoder urlEncoder, 
+        //IRedisConnectionFactory factory,
+        RedisConnectionFactory factory,
         RedisSessionStorage redisSessionStorage,
         IUserService userdata,
         IipAddressService ipAddressService,
-         IBasePage basePage)
+         IBasePage basePage,
+         IDeviceIdService iDeviceIdService)
         {
             _context = context;
             _userManager = userManager;
@@ -71,6 +76,7 @@ namespace CleanArchitecture.Web.API
             _userdata = userdata;
             _ipAddressService = ipAddressService;
             _basePage = basePage;
+            _iDeviceIdService = iDeviceIdService;
         }
         #endregion
 
@@ -222,13 +228,13 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
 
-        [HttpPost("DesableIpAddress")]
-        public async Task<IActionResult> DesableIpAddress([FromBody]IpAddressReqViewModel model)
+        [HttpPost("DisableIpAddress")]
+        public async Task<IActionResult> DisableIpAddress([FromBody]IpAddressReqViewModel model)
         {
             try
             {
@@ -270,7 +276,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -315,32 +321,32 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
                 }
 
-               
+
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
 
 
         [HttpGet("GetIpAddress/{PageIndex}/{PAGE_SIZE}")]
-        public async Task<IActionResult> GetIpAddress(int PageIndex =0,int PAGE_SIZE = 0)
+        public async Task<IActionResult> GetIpAddress(int PageIndex = 0, int PAGE_SIZE = 0)
         {
             try
-            {   
+            {
                 var user = await GetCurrentUserAsync();
 
                 if (user != null)
                 {
-                    var IpList  = await _ipAddressService.GetIpAddressListByUserId(user.Id);
+                    var IpList = await _ipAddressService.GetIpAddressListByUserId(user.Id);
 
                     if (IpList.Count > 0)
                     {
-                    
+
                         // Set the total count
                         // so GridView knows how many pages to create
                         var TotalRowCount = IpList.Count();
@@ -348,10 +354,10 @@ namespace CleanArchitecture.Web.API
                         //int PAGE_SIZE = 10;
 
                         // Get only the rows we need for the page requested
-                      var Ip = IpList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
+                        var Ip = IpList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
 
 
-                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = Ip.ToList(), TotalRow =TotalRowCount });
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = Ip.ToList(), TotalRow = TotalRowCount });
                     }
                     else
                     {
@@ -366,12 +372,192 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
 
-        #endregion 
+        #endregion
+
+        #region DeviceId
+        [HttpPost("AddDevice")]
+        public async Task<IActionResult> AddDevice([FromBody]DeviceIdReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    DeviceMasterViewModel imodel = new DeviceMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.DeviceId = model.SelectedDeviceId;
+
+                    long id = _iDeviceIdService.AddDeviceId(imodel);
+
+                    if (id > 0)
+                    {
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddDeviceData });
+                    }
+                    else
+                    {
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceidInsertError, ErrorCode = enErrorCode.Status4057DeviceIdNotAdd });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+
+        [HttpPost("DisableDeviceId")]
+        public async Task<IActionResult> DisableDeviceId([FromBody]DeviceIdReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    DeviceMasterViewModel imodel = new DeviceMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.DeviceId = model.SelectedDeviceId;
+
+                    long id = _iDeviceIdService.DesableDeviceId(imodel);
+                    if (id > 0)
+                    {
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDesableIpStatus });
+                    }
+                    else
+                    {
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceAddressUpdateError, ErrorCode = enErrorCode.Status4058DeviceAddress });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+
+        [HttpPost("DeleteDeviceId")]
+        public async Task<IActionResult> DeleteDeviceId([FromBody]DeviceIdReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+                }
+
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    DeviceMasterViewModel imodel = new DeviceMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.DeviceId = model.SelectedDeviceId;
+
+                    long id = _iDeviceIdService.DeleteDeviceId(imodel);
+                    if (id > 0)
+                    {
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDeleteDevice });
+                    }
+                    else
+                    {
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceAddressdeleteError, ErrorCode = enErrorCode.Status4059NotDeleteDevice });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+        [HttpGet("GetDeviceId/{PageIndex}/{PAGE_SIZE}")]
+        public async Task<IActionResult> GetDeviceId(int PageIndex = 0, int PAGE_SIZE = 0)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    var DeviceList = _iDeviceIdService.GetDeviceListByUserId(user.Id);
+
+                    if (DeviceList.Count > 0)
+                    {
+                        // Set the total count
+                        // so GridView knows how many pages to create
+                        var TotalRowCount = DeviceList.Count();
+                        //int PageIndex = 1;
+                        //int PAGE_SIZE = 10;
+
+                        // Get only the rows we need for the page requested
+                        var Device = DeviceList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
+
+
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetDeviceData, DeviceList = Device.ToList(), TotalRow = TotalRowCount });
+                    }
+                    else
+                    {
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceidInsertError, ErrorCode = enErrorCode.Status4057DeviceIdNotAdd });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+        #endregion
 
         [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordViewModel model)

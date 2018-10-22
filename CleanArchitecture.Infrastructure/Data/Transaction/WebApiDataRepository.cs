@@ -108,7 +108,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 			                where SC.SMSCode = {0}  and RC.TrnType={1} 
 			                and {2} between LC.MinAmt and LC.MaxAmt			                
 			                and SC.Status = 1 and RC.Status = 1 and Prc.Status=1 
-			                order by RC.Priority", Request.SMSCode, Request.trnType, Request.amount, Request.amount);
+			                order by RC.Priority", Request.SMSCode, Request.trnType, Request.amount);
 
 
                 //return Result.ToList();Prc.SerProName,

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Events;
 using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
@@ -61,5 +63,16 @@ namespace CleanArchitecture.Core.Entities
         public short AppType { get; set; }
 
         public long ParsingDataID { get; set; }
+
+        public void SetActive()
+        {
+            Status = Convert.ToInt16(ServiceStatus.Active);
+            Events.Add(new ServiceStatusEvent<ThirdPartyAPIConfiguration>(this));
+        }
+        public void SetInActive()
+        {
+            Status = Convert.ToInt16(ServiceStatus.InActive);
+            Events.Add(new ServiceStatusEvent<ThirdPartyAPIConfiguration>(this));
+        }
     }
 }

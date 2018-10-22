@@ -9,6 +9,7 @@ namespace CleanArchitecture.Core.Entities.Transaction
 {
     public class TradePairMaster : BizBase
     {
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public new long Id
         {

@@ -8,20 +8,18 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
 {
     public class WalletLimitConfigurationReq
     {
-        //[Required(ErrorMessage = "1,Please Enter Required Parameters,4207")]
-        //public string AccWalletID { get; set; }
-
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4207")]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4210")]
+        [EnumDataType(typeof(enWalletLimitType), ErrorMessage ="1,Fail,4214")]
         public enWalletLimitType TrnType { get; set; }
         //public int TrnType { get; set; }
 
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4207")]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4211")]        
         public decimal LimitPerHour { get; set; }
 
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4207")]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4212")]
         public decimal LimitPerDay { get; set; }
 
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4207")]
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4213")]
         public decimal LimitPerTransaction { get; set; }
 
     }

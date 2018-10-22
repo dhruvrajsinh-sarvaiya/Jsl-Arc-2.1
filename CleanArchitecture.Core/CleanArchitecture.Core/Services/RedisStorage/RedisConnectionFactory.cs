@@ -6,7 +6,8 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Services.RadisDatabase
 {
-  public  class RedisConnectionFactory  : IRedisConnectionFactory
+  //public  class RedisConnectionFactory  : IRedisConnectionFactory
+  public  class RedisConnectionFactory
     {
         private readonly IOptions<RedisConfiguration> redis;
         private readonly Lazy<ConnectionMultiplexer> _connection;

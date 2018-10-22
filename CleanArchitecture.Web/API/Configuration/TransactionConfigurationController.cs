@@ -53,13 +53,18 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-
         [HttpPost("UpdateServiceConfiguration")]
         public IActionResult UpdateServiceConfiguration([FromBody]ServiceConfigurationRequest Request)
         {
             ServiceConfigurationResponse Response = new ServiceConfigurationResponse();
             try
             {
+                if (Request.ServiceId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
                 long ServiceId = _transactionConfigService.UpdateServiceConfiguration(Request);
 
                 if (ServiceId != 0)
@@ -81,13 +86,18 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-
         [HttpGet("GetServiceConfiguration/{ServiceId}")]
         public IActionResult GetServiceConfiguration(long ServiceId)
         {
             ServiceConfigurationGetResponse Response = new ServiceConfigurationGetResponse();
             try
             {
+                if (ServiceId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
                 var responsedata = _transactionConfigService.GetServiceConfiguration(ServiceId);
                 if (responsedata != null)
                 {
@@ -108,7 +118,6 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-
         [HttpGet("GetAllServiceConfiguration")]
         public IActionResult GetAllServiceConfiguration()
         {
@@ -119,7 +128,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responsedata.Count != 0)
                 {
                     Response.ReturnCode = enResponseCode.Success;
-                    Response.response = responsedata;   
+                    Response.response = responsedata;
                 }
                 else
                 {
@@ -135,15 +144,21 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-
         [HttpPost("SetActiveService/{ServiceId}")]
-        public IActionResult SetActiveService(int ServiceId)
+        public IActionResult SetActiveService(long ServiceId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
             {
+                if (ServiceId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
+
                 var responsedata = _transactionConfigService.SetActiveService(ServiceId);
-                if(responsedata == 1)
+                if (responsedata == 1)
                 {
                     Response.ReturnCode = enResponseCode.Success;
                 }
@@ -161,13 +176,18 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-
         [HttpPost("SetInActiveService/{ServiceId}")]
-        public IActionResult SetInActiveService(int ServiceId)
+        public IActionResult SetInActiveService(long ServiceId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
             {
+                if (ServiceId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
                 var responsedata = _transactionConfigService.SetInActiveService(ServiceId);
                 if (responsedata == 1)
                 {
@@ -352,9 +372,10 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 res.response = _transactionConfigService.GetAppType();
-                if(res.response == null)
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -379,6 +400,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -429,6 +451,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state =_transactionConfigService.UpdateAppType(request);
@@ -467,7 +490,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -488,7 +514,11 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                    
                 return Ok(res);
             }
             catch (Exception ex)
@@ -513,6 +543,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -537,6 +568,8 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -587,6 +620,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state =_transactionConfigService.UpdateProviderType(request);
@@ -625,7 +659,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -646,7 +683,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -671,6 +711,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -721,6 +762,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateProviderConfiguration(request);
@@ -759,7 +801,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -780,7 +825,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -804,6 +852,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 res.ReturnCode = enResponseCode.Success;
@@ -854,6 +903,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateDemonConfiguration (request);
@@ -892,7 +942,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -913,7 +966,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -937,7 +993,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (list == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
-                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
                 res.response = _transactionConfigService.getProviderDetailsDataList(list);
@@ -959,13 +1015,13 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 ProviderDetailViewModel  obj = _transactionConfigService.GetProviderDetailById(id);
-                if (obj == null)
+                res.response = _transactionConfigService.getProviderDetailDataById(obj);
+                if (res.response == null)
                 {
                     res.ReturnCode = enResponseCode.Fail;
-                    res.ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress;
+                    res.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(res);
                 }
-                res.response = _transactionConfigService.getProviderDetailDataById(obj);
                 //res.responce.Id = obj.Id;
                 //res.responce.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
                 //res.responce.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
@@ -1022,6 +1078,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateProviderDetail(request);
@@ -1069,7 +1126,11 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                    
                 return Ok(res);
             }
             catch (Exception ex)
@@ -1090,7 +1151,10 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
+                {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -1212,7 +1276,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetActiveService/{ProductId}")]
-        public IActionResult SetActiveProduct(int ProductId)
+        public IActionResult SetActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1237,7 +1301,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetInActiveService/{ProductId}")]
-        public IActionResult SetInActiveProduct(int ProductId)
+        public IActionResult SetInActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1372,7 +1436,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetActiveRoute/{RouteId}")]
-        public IActionResult SetActiveRoute(int RouteId)
+        public IActionResult SetActiveRoute(long RouteId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1397,7 +1461,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
         [HttpPost("SetInActiveRoute/{RouteId}")]
-        public IActionResult SetInActiveRoute(int RouteId)
+        public IActionResult SetInActiveRoute(long RouteId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -1432,7 +1496,7 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 res.response  = _transactionConfigService.GetAllThirdPartyAPIConfig();
-                if (res.response == null)
+                if (res.response.Count ==0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     res.ErrorCode = enErrorCode.NoDataFound;
@@ -1488,7 +1552,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
-                    //Response.ErrorCode =enErrorCode. // not inserted
+                    //Response.ErrorCode = enErrorCode.NoDataFound;
                 }
                 return Ok(Response);
             }
@@ -1510,6 +1574,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 if (request.Id == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
                     return Ok(res);
                 }
                 state = _transactionConfigService.UpdateThirdPartyAPI(request);
@@ -1536,6 +1601,627 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(res);
             }
 
+        }
+
+        [HttpPost("SetActiveThirdPartyAPIConfig/{id:long}")]
+        public IActionResult SetActiveThirdPartyAPIConfig(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveThirdPartyAPI(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveThirdPartyAPIConfig/{id:long}")]
+        public IActionResult SetInActiveThirdPartyAPIConfig(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveThirdPartyAPI(id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+        #endregion
+
+        #region ThirdPartyAPIResponse
+
+        [HttpGet("GetAllThirdPartyAPIRespose")]
+        public IActionResult GetAllThirdPartyAPIRespose()
+        {
+            ThirdPartyAPIResponseConfigResponseAllData res = new ThirdPartyAPIResponseConfigResponseAllData();
+            try
+            {
+                res.response = _transactionConfigService.GetAllThirdPartyAPIResponse();
+                if (res.response.Count == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpGet("GetThirdPartyAPIResposeById/{Id:long}")]
+        public IActionResult GetThirdPartyAPIResposeById(long Id)
+        {
+            ThirdPartyAPIResponseConfigResponse  res = new ThirdPartyAPIResponseConfigResponse();
+            try
+            {
+                res.response = _transactionConfigService.GetThirdPartyAPIResponseById(Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("AddThirdPartyAPIRespose")]
+        public IActionResult AddThirdPartyAPIRespose([FromBody]ThirdPartyAPIResponseConfigRequest Request)
+        {
+            ThirdPartyAPIResponseConfigResponse  Response = new ThirdPartyAPIResponseConfigResponse();
+            try
+            {
+                long Id = _transactionConfigService.AddThirdPartyAPIResponse(Request);
+                if (Id != 0)
+                {
+                    Response.response = _transactionConfigService.GetThirdPartyAPIResponseById(Id);
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [HttpPost("UpdateThirdPartyAPIResponse")]
+        public IActionResult UpdateThirdPartyAPIResponse([FromBody]ThirdPartyAPIResponseConfigRequest request)
+        {
+            ThirdPartyAPIResponseConfigResponse  res = new ThirdPartyAPIResponseConfigResponse();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateThirdPartyAPIResponse (request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.response = _transactionConfigService.GetThirdPartyAPIResponseById(request.Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("SetActiveThirdPartyAPIResponse/{id:long}")]
+        public IActionResult SetActiveThirdPartyAPIResponse(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveThirdPartyAPIResponse (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveThirdPartyAPIResponse/{id:long}")]
+        public IActionResult SetInActiveThirdPartyAPIResponse(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveThirdPartyAPIResponse (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        #endregion
+
+        #region TradePairConfiguration
+        [HttpPost("AddPairConfiguration")]
+        public IActionResult AddPairConfiguration([FromBody]TradePairConfigRequest Request)
+        {
+            TradePairConfigResponse Response = new TradePairConfigResponse();
+            try
+            {
+                long PairId = _transactionConfigService.AddPairConfiguration(Request);
+
+                if (PairId != 0)
+                {
+                    Response.response = new TradePairConfigInfo() { PairId = PairId };
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode =enErrorCode. // not inserted
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("UpdatePairConfiguration")]
+        public IActionResult UpdatePairConfiguration([FromBody]TradePairConfigRequest Request)
+        {
+            TradePairConfigResponse Response = new TradePairConfigResponse();
+            try
+            {
+                if (Request.Id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
+                long PairId = _transactionConfigService.UpdatePairConfiguration(Request);
+
+                if (PairId != 0)
+                {
+                    Response.response = new TradePairConfigInfo() { PairId = PairId };
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetPairConfiguration")]
+        public IActionResult GetPairConfiguration(long PairId)
+        {
+            TradePairConfigGetResponse Response = new TradePairConfigGetResponse();
+            try
+            {
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
+                var responsedata = _transactionConfigService.GetPairConfiguration(PairId);
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetAllPairConfiguration")]
+        public IActionResult GetAllPairConfiguration()
+        {
+            TradePairConfigGetAllResponse Response = new TradePairConfigGetAllResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetAllPairConfiguration();
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("SetActivePair")]
+        public IActionResult SetActivePair(long PairId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
+                var responsedata = _transactionConfigService.SetActivePair(PairId);
+                if (responsedata == 1)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpPost("SetInActivePair/PairId")]
+        public IActionResult SetInActivePair(long PairId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(Response);
+                }
+                var responsedata = _transactionConfigService.SetInActivePair(PairId);
+                if (responsedata == 1)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        #endregion
+
+        #region Other Configuration
+        [HttpGet("GetAllServiceTypeMaster")]
+        public IActionResult GetAllServiceTypeMaster()
+        {
+            ServiceTypeMasterResponse Response = new ServiceTypeMasterResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetAllServiceTypeMaster();
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetAllTransactionType")]
+        public IActionResult GetAllTransactionType()
+        {
+            TransactionTypeResponse Response = new TransactionTypeResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetAllTransactionType();
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        #endregion
+
+        #region Limit
+
+        [HttpGet("GetAllLimitData")]
+        public IActionResult GetAllLimitData()
+        {
+            LimitResponseAllData  res = new LimitResponseAllData();
+            try
+            {
+                res.response = _transactionConfigService.GetAllLimitData();
+                if (res.response.Count == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpGet("GetLimitsById/{Id:long}")]
+        public IActionResult GetLimitsById(long Id)
+        {
+            LimitResponse  res = new LimitResponse();
+            try
+            {
+                res.response = _transactionConfigService.GetLimitById(Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("AddLimits")]
+        public IActionResult AddLimits([FromBody]LimitRequest  Request)
+        {
+            LimitResponse  Response = new LimitResponse();
+            try
+            {
+                long Id = _transactionConfigService.AddLimitData(Request);
+                if (Id != 0)
+                {
+                    Response.response = _transactionConfigService.GetLimitById(Id);
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    //Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [HttpPost("UpdateLimits")]
+        public IActionResult UpdateLimits([FromBody]LimitRequest request)
+        {
+            LimitResponse  res = new LimitResponse();
+            bool state = false;
+            try
+            {
+                if (request.Id == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.InValid_ID;
+                    return Ok(res);
+                }
+                state = _transactionConfigService.UpdateLimitData(request);
+                if (state == false)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.response = _transactionConfigService.GetLimitById(request.Id);
+                if (res.response == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
+                res.ReturnCode = enResponseCode.Success;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+
+        }
+
+        [HttpPost("SetActiveLimit/{id:long}")]
+        public IActionResult SetActiveLimit(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetActiveLimit (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
+        }
+
+        [HttpPost("SetInActiveLimit/{id:long}")]
+        public IActionResult SetInActiveLimit(long id)
+        {
+            BizResponseClass res = new BizResponseClass();
+            try
+            {
+                var responce = _transactionConfigService.SetInActiveLimit (id);
+                if (responce == true)
+                    res.ReturnCode = enResponseCode.Success;
+                else
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                }
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                res.ReturnCode = enResponseCode.InternalError;
+                return Ok(res);
+            }
         }
         #endregion
     }

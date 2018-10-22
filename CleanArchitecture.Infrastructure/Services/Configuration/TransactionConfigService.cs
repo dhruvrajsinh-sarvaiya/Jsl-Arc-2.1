@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
+using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Configuration;
@@ -26,9 +27,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<ServiceProviderDetail> _ProDetailRepository;
         private readonly ILogger<TransactionConfigService> _logger;
         private readonly ICommonRepository<ProductConfiguration> _productConfigRepository;
-        private readonly ICommonRepository<StateMaster> _stateMasterRepository;
+        private readonly ICommonRepository<CountryMaster> _countryMasterRepository;
         private readonly ICommonRepository<RouteConfiguration> _routeConfigRepository;
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyAPIRepository;
+        private readonly ICommonRepository<ThirdPartyAPIResponseConfiguration> _thirdPartyAPIResRepository;
+        private readonly ICommonRepository<TradePairMaster> _tradePairMasterRepository;
+        private readonly ICommonRepository<TradePairDetail> _tradePairDetailRepository;
+        private readonly ICommonRepository<Limits> _limitRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -42,9 +47,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<DemonConfiguration> DemonRepository,
             ICommonRepository<ServiceProviderDetail> ProDetailRepository,
             ICommonRepository<ProductConfiguration> productConfigRepository,
-            ICommonRepository<StateMaster> stateMasterRepository,
+            ICommonRepository<CountryMaster> countryMasterRepository,
             ICommonRepository<RouteConfiguration> routeConfigRepository,
-            ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository)
+            ICommonRepository<ThirdPartyAPIConfiguration> thirdPartyAPIRepository,
+            ICommonRepository<ThirdPartyAPIResponseConfiguration> thirdPartyAPIResRepository,
+            ICommonRepository<TradePairMaster> tradePairMasterRepository,
+            ICommonRepository<TradePairDetail> tradePairDetailRepository,
+            ICommonRepository<Limits> limitRepository)
         {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -57,9 +66,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _ProDetailRepository = ProDetailRepository;
             _logger = logger;
             _productConfigRepository = productConfigRepository;
-            _stateMasterRepository = stateMasterRepository;
+            _countryMasterRepository = countryMasterRepository;
             _routeConfigRepository = routeConfigRepository;
             _thirdPartyAPIRepository = thirdPartyAPIRepository;
+            _thirdPartyAPIResRepository = thirdPartyAPIResRepository;
+            _tradePairMasterRepository = tradePairMasterRepository;
+            _tradePairDetailRepository = tradePairDetailRepository;
+            _limitRepository = limitRepository;
         }
 
         #region Service
@@ -72,6 +85,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     Name = Request.Name,
                     SMSCode = Request.SMSCode,
                     ServiceType = Request.Type,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newServiceMaster = _serviceMasterRepository.Add(serviceMaster);
 
@@ -86,7 +104,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     EncryptionAlgorithm = Request.EncryptionAlgorithm,
                     WebsiteUrl = Request.WebsiteUrl,
                     WhitePaperPath = Request.WebsiteUrl,
-                    Introduction = Request.Introduction
+                    Introduction = Request.Introduction,
+
                 };
 
                 ServiceDetail serviceDetail = new ServiceDetail()
@@ -102,7 +121,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     IssueDate = Request.IssueDate,
                     IssuePrice = Request.IssuePrice,
                     MaxSupply = Request.MaxSupply,
-                    CirculatingSupply = Request.CirculatingSupply
+                    CirculatingSupply = Request.CirculatingSupply,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newServiceStastics = _serviceStasticsRepository.Add(serviceStastics);
 
@@ -120,12 +143,14 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var serviceMaster = _serviceMasterRepository.GetById(Request.ServiceId);
+                var serviceMaster = _serviceMasterRepository.GetActiveById(Request.ServiceId);
                 if (serviceMaster != null)
                 {
                     serviceMaster.Name = Request.Name;
                     serviceMaster.SMSCode = Request.SMSCode;
                     serviceMaster.ServiceType = Request.Type;
+                    serviceMaster.UpdatedBy = 1;
+                    serviceMaster.UpdatedDate = DateTime.UtcNow;
 
                     _serviceMasterRepository.Update(serviceMaster);
 
@@ -152,6 +177,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     serviceStastics.IssuePrice = Request.IssuePrice;
                     serviceStastics.MaxSupply = Request.MaxSupply;
                     serviceStastics.CirculatingSupply = Request.CirculatingSupply;
+                    serviceStastics.UpdatedDate = DateTime.UtcNow;
+                    serviceStastics.UpdatedBy = 1;
                     _serviceStasticsRepository.Update(serviceStastics);
 
                     return Request.ServiceId;
@@ -175,7 +202,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new List<ServiceConfigurationRequest>();
 
-                var serviceMaster = _serviceMasterRepository.GetAll();
+                var serviceMaster = _serviceMasterRepository.List();
                 if (serviceMaster != null)
                 {
                     foreach (var service in serviceMaster)
@@ -227,7 +254,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new ServiceConfigurationRequest();
-                var serviceMaster = _serviceMasterRepository.GetById(ServiceId);
+                var serviceMaster = _serviceMasterRepository.GetActiveById(ServiceId);
                 if (serviceMaster != null)
                 {
                     responsedata.ServiceId = serviceMaster.Id;
@@ -268,7 +295,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public int SetActiveService(int ServiceId)
+        public int SetActiveService(long ServiceId)
         {
             try
             {
@@ -288,7 +315,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public int SetInActiveService(int ServiceId)
+        public int SetInActiveService(long ServiceId)
         {
             try
             {
@@ -308,6 +335,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
         #endregion
+
 
         #region ProviderMaster
         public IEnumerable<ServiceProviderViewModel> GetAllProvider()
@@ -340,7 +368,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderMaster model = _ServiceProviderMaster.GetById(ID);
+                ServiceProviderMaster model = _ServiceProviderMaster.GetActiveById(ID);
                 if (model == null)
                 {
                     return null;
@@ -391,7 +419,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderMaster model = _ServiceProviderMaster.GetById(request.Id);
+                ServiceProviderMaster model = _ServiceProviderMaster.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -480,7 +508,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                AppType model = _ApptypeRepository.GetById(id);
+                AppType model = _ApptypeRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -530,7 +558,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                AppType model = _ApptypeRepository.GetById(request.Id);
+                AppType model = _ApptypeRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -621,7 +649,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderType model = _ProviderTypeRepository.GetById(id);
+                ServiceProviderType model = _ProviderTypeRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -672,7 +700,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _ProviderTypeRepository.GetById(request.Id);
+                var model = _ProviderTypeRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -738,7 +766,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProConfiguration model = _ProviderConfiguration.GetById(id);
+                ServiceProConfiguration model = _ProviderConfiguration.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -832,7 +860,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProConfiguration model = _ProviderConfiguration.GetById(request.Id);
+                ServiceProConfiguration model = _ProviderConfiguration.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -861,7 +889,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _DemonRepository.GetById(id);
+                var model = _DemonRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -912,7 +940,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                DemonConfiguration model = _DemonRepository.GetById(request.Id);
+                DemonConfiguration model = _DemonRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -1010,7 +1038,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _ProDetailRepository.GetById(id);
+                var model = _ProDetailRepository.GetActiveById(id);
                 if (model == null)
                 {
                     return null;
@@ -1071,7 +1099,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ServiceProviderDetail model = _ProDetailRepository.GetById(request.Id);
+                ServiceProviderDetail model = _ProDetailRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -1200,7 +1228,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     ProductName = Request.ProductName,
                     ServiceID = Request.ServiceID,
-                    StateID = Request.StateID
+                    CountryID = Request.CountryID,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newProduct = _productConfigRepository.Add(product);
                 return newProduct.Id;
@@ -1215,15 +1247,17 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var product = _productConfigRepository.GetById(Request.Id);
+                var product = _productConfigRepository.GetActiveById(Request.Id);
                 if (product != null)
                 {
                     product.ProductName = Request.ProductName;
                     product.ServiceID = Request.ServiceID;
-                    product.StateID = Request.StateID;
+                    product.CountryID = Request.CountryID;
+                    product.UpdatedDate = DateTime.UtcNow;
+                    product.UpdatedBy = 1;
 
                     _productConfigRepository.Update(product);
-                     return product.Id;
+                    return product.Id;
                 }
                 else
                 {
@@ -1242,18 +1276,18 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new ProductConfigrationGetInfo();
-                var product = _productConfigRepository.GetById(ProductId);
+                var product = _productConfigRepository.GetActiveById(ProductId);
                 if (product != null)
                 {
                     responsedata.Id = product.Id;
                     responsedata.ProductName = product.ProductName;
-                    
+
                     var serviceMaster = _serviceMasterRepository.GetById(product.ServiceID);
-                    var stateMaster = _stateMasterRepository.GetById(product.StateID);
-                    responsedata.StateID = product.StateID;
+                    var countryMaster = _countryMasterRepository.GetById(product.CountryID);
+                    responsedata.CountryID = product.CountryID;
                     responsedata.ServiceID = product.ServiceID;
                     responsedata.ServiceName = serviceMaster.Name;
-                    responsedata.StateName = stateMaster.StateName;
+                    responsedata.CountryName = countryMaster.CountryName;
 
                     return responsedata;
                 }
@@ -1275,7 +1309,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new List<ProductConfigrationGetInfo>();
 
-                var productall = _productConfigRepository.GetAll();
+                var productall = _productConfigRepository.List();
                 if (productall != null)
                 {
                     foreach (var product in productall)
@@ -1285,11 +1319,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         response.ProductName = product.ProductName;
 
                         var serviceMaster = _serviceMasterRepository.GetById(product.ServiceID);
-                        var stateMaster = _stateMasterRepository.GetById(product.StateID);
-                        response.StateID = product.StateID;
+                        var countryMaster = _countryMasterRepository.GetById(product.CountryID);
+                        response.CountryID = product.CountryID;
                         response.ServiceID = product.ServiceID;
                         response.ServiceName = serviceMaster.Name;
-                        response.StateName = stateMaster.StateName;
+                        response.CountryName = countryMaster.CountryName;
 
                         responsedata.Add(response);
                     }
@@ -1306,7 +1340,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetActiveProduct(int ProductId)
+        public int SetActiveProduct(long ProductId)
         {
             try
             {
@@ -1325,7 +1359,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetInActiveProduct(int ProductId)
+        public int SetInActiveProduct(long ProductId)
         {
             try
             {
@@ -1365,7 +1399,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     OpCode = Request.OpCode,
                     TrnType = Request.TrnType,
                     IsDelayAddress = Request.IsDelayAddress,
-                    ProviderWalletID = Request.ProviderWalletID
+                    ProviderWalletID = Request.ProviderWalletID,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
                 };
                 var newProduct = _routeConfigRepository.Add(route);
                 return newProduct.Id;
@@ -1380,8 +1418,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var route = _routeConfigRepository.GetById(Request.Id);
-                if(route != null)
+                var route = _routeConfigRepository.GetActiveById(Request.Id);
+                if (route != null)
                 {
                     route.RouteName = Request.RouteName;
                     route.ServiceID = Request.ServiceID;
@@ -1396,14 +1434,16 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     route.TrnType = Request.TrnType;
                     route.IsDelayAddress = Request.IsDelayAddress;
                     route.ProviderWalletID = Request.ProviderWalletID;
-                   
+                    route.UpdatedDate = DateTime.UtcNow;
+                    route.UpdatedBy = 1;
+
                     _routeConfigRepository.Update(route);
                     return route.Id;
                 }
                 else
                 {
                     return 0;
-                }   
+                }
             }
             catch (Exception ex)
             {
@@ -1417,7 +1457,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new RouteConfigurationRequest();
-                var route = _routeConfigRepository.GetById(RouteId);
+                var route = _routeConfigRepository.GetActiveById(RouteId);
                 if (route != null)
                 {
                     responsedata.Id = route.Id;
@@ -1454,7 +1494,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 responsedata = new List<RouteConfigurationRequest>();
 
-                var routeall = _routeConfigRepository.GetAll();
+                var routeall = _routeConfigRepository.List();
                 if (routeall != null)
                 {
                     foreach (var route in routeall)
@@ -1491,7 +1531,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetActiveRoute(int RouteId)
+        public int SetActiveRoute(long RouteId)
         {
             try
             {
@@ -1510,7 +1550,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
-        public int SetInActiveRoute(int RouteId)
+        public int SetInActiveRoute(long RouteId)
         {
             try
             {
@@ -1579,7 +1619,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetById(Id);
+                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetActiveById(Id);
                 if (model == null)
                 {
                     return null;
@@ -1662,7 +1702,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                var model = _thirdPartyAPIRepository.GetById(request.Id);
+                var model = _thirdPartyAPIRepository.GetActiveById(request.Id);
                 if (model == null)
                 {
                     return false;
@@ -1693,6 +1733,722 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
 
                 _thirdPartyAPIRepository.Update(model);
                 return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return false;
+            }
+        }
+
+        public bool SetActiveThirdPartyAPI(long id)
+        {
+            try
+            {
+                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetActive();
+                    _thirdPartyAPIRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveThirdPartyAPI(long id)
+        {
+            try
+            {
+                ThirdPartyAPIConfiguration model = _thirdPartyAPIRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetInActive();
+                    _thirdPartyAPIRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region ThirdPartyAPIResponseConfig
+
+        public List<ThirdPartyAPIResponseConfigViewModel> GetAllThirdPartyAPIResponse()
+        {
+            try
+            {
+                var list = _thirdPartyAPIResRepository.List();
+                List<ThirdPartyAPIResponseConfigViewModel> APIResponseList = new List<ThirdPartyAPIResponseConfigViewModel>();
+                foreach (var model in list)
+                {
+                    APIResponseList.Add(new ThirdPartyAPIResponseConfigViewModel()
+                    {
+                        BalanceRegex =model .BalanceRegex,
+                        ErrorCodeRegex =model .ErrorCodeRegex,
+                        Id =model .Id,
+                        OprTrnRefNoRegex =model .OprTrnRefNoRegex,
+                        Param1Regex =model .Param1Regex,
+                        Param2Regex =model .Param2Regex ,
+                        Param3Regex =model .Param3Regex,
+                        ResponseCodeRegex =model .ResponseCodeRegex,
+                        StatusMsgRegex =model .StatusMsgRegex ,
+                        StatusRegex =model .StatusRegex,
+                        TrnRefNoRegex =model .TrnRefNoRegex 
+                    });
+                }
+                return APIResponseList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public ThirdPartyAPIResponseConfigViewModel GetThirdPartyAPIResponseById(long id)
+        {
+            try
+            {
+                var model = _thirdPartyAPIResRepository.GetActiveById(id);
+                if (model == null)
+                {
+                    return null;
+                }
+                var viewModel = new ThirdPartyAPIResponseConfigViewModel()
+                {
+                    BalanceRegex = model.BalanceRegex,
+                    ErrorCodeRegex = model.ErrorCodeRegex,
+                    Id = model.Id,
+                    OprTrnRefNoRegex = model.OprTrnRefNoRegex,
+                    Param1Regex = model.Param1Regex,
+                    Param2Regex = model.Param2Regex,
+                    Param3Regex = model.Param3Regex,
+                    ResponseCodeRegex = model.ResponseCodeRegex,
+                    StatusMsgRegex = model.StatusMsgRegex,
+                    StatusRegex = model.StatusRegex,
+                    TrnRefNoRegex = model.TrnRefNoRegex
+                };
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request)
+        {
+            try
+            {
+                var model = new ThirdPartyAPIResponseConfiguration()
+                {
+                    CreatedBy = 1,
+                    CreatedDate=DateTime .UtcNow ,
+                    Status =1,
+                    BalanceRegex = Request.BalanceRegex,
+                    ErrorCodeRegex = Request.ErrorCodeRegex,
+                    OprTrnRefNoRegex = Request.OprTrnRefNoRegex,
+                    Param1Regex = Request.Param1Regex,
+                    Param2Regex = Request.Param2Regex,
+                    Param3Regex = Request.Param3Regex,
+                    ResponseCodeRegex = Request.ResponseCodeRegex,
+                    StatusMsgRegex = Request.StatusMsgRegex,
+                    StatusRegex = Request.StatusRegex,
+                    TrnRefNoRegex = Request.TrnRefNoRegex
+                };
+                var newModel = _thirdPartyAPIResRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateThirdPartyAPIResponse(ThirdPartyAPIResponseConfigViewModel Request)
+        {
+            try
+            {
+                var model = _thirdPartyAPIResRepository.GetActiveById(Request.Id);
+                if (model == null)
+                {
+                    return false;
+                }
+                model.BalanceRegex = Request.BalanceRegex;
+                model.ErrorCodeRegex = Request.ErrorCodeRegex;
+                model.OprTrnRefNoRegex = Request.OprTrnRefNoRegex;
+                model.Param1Regex = Request.Param1Regex;
+                model.Param2Regex = Request.Param2Regex;
+                model.Param3Regex = Request.Param3Regex;
+                model.ResponseCodeRegex = Request.ResponseCodeRegex;
+                model.StatusMsgRegex = Request.StatusMsgRegex;
+                model.StatusRegex = Request.StatusRegex;
+                model.TrnRefNoRegex = Request.TrnRefNoRegex;
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.UtcNow;
+
+                _thirdPartyAPIResRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return false;
+            }
+        }
+
+        public bool SetActiveThirdPartyAPIResponse(long id)
+        {
+            try
+            {
+                ThirdPartyAPIResponseConfiguration model = _thirdPartyAPIResRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetActive();
+                    _thirdPartyAPIResRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveThirdPartyAPIResponse(long id)
+        {
+            try
+            {
+                ThirdPartyAPIResponseConfiguration model = _thirdPartyAPIResRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetInActive ();
+                    _thirdPartyAPIResRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region TradePairConfiguration
+        public long AddPairConfiguration(TradePairConfigRequest Request)
+        {
+            try
+            {
+                var pairMaster = new TradePairMaster()
+                {
+                    PairName = Request.PairName,
+                    SecondaryCurrencyId = Request.SecondaryCurrencyId,
+                    WalletMasterID = Request.WalletMasterID,
+                    BaseCurrencyId = Request.BaseCurrencyId,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newPairMaster = _tradePairMasterRepository.Add(pairMaster);
+
+                var pairDetail = new TradePairDetail()
+                {
+                    PairId = newPairMaster.Id,
+                    Currentrate = Request.Currentrate,
+                    BuyMinQty = Request.BuyMinQty,
+                    BuyMaxQty = Request.BuyMaxQty,
+                    SellMinQty = Request.SellMinQty,
+                    SellMaxQty = Request.SellMaxQty,
+                    DailyHigh = Request.DailyHigh,
+                    DailyLow = Request.DailyLow,
+                    CurrencyPrice = Request.CurrencyPrice,
+                    Volume = Request.Volume,
+                    SellPrice = Request.SellPrice,
+                    BuyPrice = Request.BuyPrice,
+                    BuyMinPrice = Request.BuyMinPrice,
+                    BuyMaxPrice = Request.BuyMaxPrice,
+                    SellMinPrice = Request.SellMinPrice,
+                    SellMaxPrice = Request.SellMaxPrice,
+                    Fee = Request.Fee,
+                    FeeType = Request.FeeType,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+
+                var newPairDetail = _tradePairDetailRepository.Add(pairDetail);
+                return newPairMaster.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public long UpdatePairConfiguration(TradePairConfigRequest Request)
+        {
+            try
+            {
+                var pairMaster = _tradePairMasterRepository.GetActiveById(Request.Id);
+                if (pairMaster != null)
+                {
+                    pairMaster.PairName = Request.PairName;
+                    pairMaster.SecondaryCurrencyId = Request.SecondaryCurrencyId;
+                    pairMaster.WalletMasterID = Request.WalletMasterID;
+                    pairMaster.BaseCurrencyId = Request.BaseCurrencyId;
+                    pairMaster.UpdatedDate = DateTime.UtcNow;
+                    pairMaster.UpdatedBy = 1;
+
+                    _tradePairMasterRepository.Update(pairMaster);
+
+                    var pairDetail = _tradePairDetailRepository.GetSingle(pair => pair.PairId == Request.Id);
+
+                    pairDetail.Currentrate = Request.Currentrate;
+                    pairDetail.BuyMinQty = Request.BuyMinQty;
+                    pairDetail.BuyMaxQty = Request.BuyMaxQty;
+                    pairDetail.SellMinQty = Request.SellMinQty;
+                    pairDetail.SellMaxQty = Request.SellMaxQty;
+                    pairDetail.DailyHigh = Request.DailyHigh;
+                    pairDetail.DailyLow = Request.DailyLow;
+                    pairDetail.CurrencyPrice = Request.CurrencyPrice;
+                    pairDetail.Volume = Request.Volume;
+                    pairDetail.SellPrice = Request.SellPrice;
+                    pairDetail.BuyPrice = Request.BuyPrice;
+                    pairDetail.BuyMinPrice = Request.BuyMinPrice;
+                    pairDetail.BuyMaxPrice = Request.BuyMaxPrice;
+                    pairDetail.SellMinPrice = Request.SellMinPrice;
+                    pairDetail.SellMaxPrice = Request.SellMaxPrice;
+                    pairDetail.Fee = Request.Fee;
+                    pairDetail.FeeType = Request.FeeType;
+                    pairMaster.UpdatedDate = DateTime.UtcNow;
+                    pairMaster.UpdatedBy = 1;
+
+                    return Request.Id;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public TradePairConfigRequest GetPairConfiguration(long PairId)
+        {
+            TradePairConfigRequest responsedata;
+            try
+            {
+                responsedata = new TradePairConfigRequest();
+                var pairMaster = _tradePairMasterRepository.GetActiveById(PairId);
+                if (pairMaster != null)
+                {
+                    responsedata.Id = pairMaster.Id;
+                    responsedata.PairName = pairMaster.PairName;
+                    responsedata.SecondaryCurrencyId = pairMaster.SecondaryCurrencyId;
+                    responsedata.WalletMasterID = pairMaster.WalletMasterID;
+                    responsedata.BaseCurrencyId = pairMaster.BaseCurrencyId;
+
+                    var pairDetail = _tradePairDetailRepository.GetSingle(pair => pair.PairId == PairId);
+
+                    responsedata.Currentrate = pairDetail.Currentrate;
+                    responsedata.BuyMinQty = pairDetail.BuyMinQty;
+                    responsedata.BuyMaxQty = pairDetail.BuyMaxQty;
+                    responsedata.SellMinQty = pairDetail.SellMinQty;
+                    responsedata.SellMaxQty = pairDetail.SellMaxQty;
+                    responsedata.DailyHigh = pairDetail.DailyHigh;
+                    responsedata.DailyLow = pairDetail.DailyLow;
+                    responsedata.CurrencyPrice = pairDetail.CurrencyPrice;
+                    responsedata.Volume = pairDetail.Volume;
+                    responsedata.SellPrice = pairDetail.SellPrice;
+                    responsedata.BuyPrice = pairDetail.BuyPrice;
+                    responsedata.BuyMinPrice = pairDetail.BuyMinPrice;
+                    responsedata.BuyMaxPrice = pairDetail.BuyMaxPrice;
+                    responsedata.SellMinPrice = pairDetail.SellMinPrice;
+                    responsedata.SellMaxPrice = pairDetail.SellMaxPrice;
+                    responsedata.Fee = pairDetail.Fee;
+                    responsedata.FeeType = pairDetail.FeeType;
+
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<TradePairConfigRequest> GetAllPairConfiguration()
+        {
+            List<TradePairConfigRequest> responsedata;
+            try
+            {
+                responsedata = new List<TradePairConfigRequest>();
+
+                var pairMaster = _tradePairMasterRepository.List();
+                if (pairMaster != null)
+                {
+                    foreach (var pair in pairMaster)
+                    {
+                        TradePairConfigRequest response = new TradePairConfigRequest();
+                        response.Id = pair.Id;
+                        response.PairName = pair.PairName;
+                        response.SecondaryCurrencyId = pair.SecondaryCurrencyId;
+                        response.WalletMasterID = pair.WalletMasterID;
+                        response.BaseCurrencyId = pair.BaseCurrencyId;
+
+                        var pairDetail = _tradePairDetailRepository.GetSingle(x => x.PairId == pair.Id);
+
+                        response.Currentrate = pairDetail.Currentrate;
+                        response.BuyMinQty = pairDetail.BuyMinQty;
+                        response.BuyMaxQty = pairDetail.BuyMaxQty;
+                        response.SellMinQty = pairDetail.SellMinQty;
+                        response.SellMaxQty = pairDetail.SellMaxQty;
+                        response.DailyHigh = pairDetail.DailyHigh;
+                        response.DailyLow = pairDetail.DailyLow;
+                        response.CurrencyPrice = pairDetail.CurrencyPrice;
+                        response.Volume = pairDetail.Volume;
+                        response.SellPrice = pairDetail.SellPrice;
+                        response.BuyPrice = pairDetail.BuyPrice;
+                        response.BuyMinPrice = pairDetail.BuyMinPrice;
+                        response.BuyMaxPrice = pairDetail.BuyMaxPrice;
+                        response.SellMinPrice = pairDetail.SellMinPrice;
+                        response.SellMaxPrice = pairDetail.SellMaxPrice;
+                        response.Fee = pairDetail.Fee;
+                        response.FeeType = pairDetail.FeeType;
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetActivePair(long PairId)
+        {
+            try
+            {
+                var pairdata = _tradePairMasterRepository.GetById(PairId);
+                if (pairdata != null)
+                {
+                    pairdata.MakePairActive();
+                    _tradePairMasterRepository.Update(pairdata);
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int SetInActivePair(long PairId)
+        {
+            try
+            {
+                var pairdata = _tradePairMasterRepository.GetById(PairId);
+                if (pairdata != null)
+                {
+                    pairdata.MakePairInActive();
+                    _tradePairMasterRepository.Update(pairdata);
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region Other Configuration
+        public List<ServiceTypeMasterInfo> GetAllServiceTypeMaster()
+        {
+            List<ServiceTypeMasterInfo> responsedata;
+            try
+            {
+                responsedata = new List<ServiceTypeMasterInfo>();
+
+                String[] serviceTypeName = Enum.GetNames(typeof(enServiceType));
+                int[] serviceTypeValues = (int[])Enum.GetValues(typeof(enServiceType));
+                if (serviceTypeName.Length > 0)
+                {
+                    for (int i = 0; i < serviceTypeName.Length; i++)
+                    {
+                        ServiceTypeMasterInfo response = new ServiceTypeMasterInfo();
+                        response.Id = serviceTypeValues[i];
+                        response.SerTypeName = serviceTypeName[i];
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<TransactionTypeInfo> GetAllTransactionType()
+        {
+            List<TransactionTypeInfo> responsedata;
+            try
+            {
+                responsedata = new List<TransactionTypeInfo>();
+
+                String[] trnTypeName = Enum.GetNames(typeof(enTrnType));
+                int[] trnTypeValues = (int[])Enum.GetValues(typeof(enTrnType));
+                if (trnTypeName.Length > 0)
+                {
+                    for (int i = 0; i < trnTypeName.Length; i++)
+                    {
+                        TransactionTypeInfo response = new TransactionTypeInfo();
+                        response.Id = trnTypeValues[i];
+                        response.TrnTypeName = trnTypeName[i];
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region Limit
+
+        public List<LimitViewModel> GetAllLimitData()
+        {
+            try
+            {
+                var list = _limitRepository.List();
+                List<LimitViewModel> limitList = new List<LimitViewModel>();
+                foreach (var model in list)
+                {
+                    limitList.Add(new LimitViewModel()
+                    {
+                        Id = model.Id,
+                        MaxAmt = model.MaxAmt,
+                        MaxAmtDaily = model.MaxAmtDaily,
+                        MaxAmtMonthly = model.MaxAmtMonthly,
+                        MaxAmtWeekly = model.MaxAmtWeekly,
+                        Maxrange = model.Maxrange,
+                        MaxRangeDaily = model.MaxRangeDaily,
+                        MaxRangeMonthly = model.MaxRangeMonthly,
+                        MaxRangeWeekly = model.MaxRangeWeekly,
+                        MinAmt = model.MinAmt,
+                        MinAmtDaily = model.MinAmtDaily,
+                        MinAmtMonthly = model.MinAmtMonthly,
+                        MinAmtWeekly = model.MinAmtWeekly,
+                        MinRange = model.MinRange,
+                        MinRangeDaily = model.MinRangeDaily,
+                        MinRangeMonthly = model.MinRangeMonthly,
+                        MinRangeWeekly = model.MinRangeWeekly
+                    });
+                }
+
+                return limitList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public LimitViewModel GetLimitById(long id)
+        {
+            try
+            {
+                var model = _limitRepository.GetActiveById(id);
+                if (model == null)
+                    return null;
+
+                var viewModel = new LimitViewModel()
+                {
+                    Id = model.Id,
+                    MaxAmt = model.MaxAmt,
+                    MaxAmtDaily = model.MaxAmtDaily,
+                    MaxAmtMonthly = model.MaxAmtMonthly,
+                    MaxAmtWeekly = model.MaxAmtWeekly,
+                    Maxrange = model.Maxrange,
+                    MaxRangeDaily = model.MaxRangeDaily,
+                    MaxRangeMonthly = model.MaxRangeMonthly,
+                    MaxRangeWeekly = model.MaxRangeWeekly,
+                    MinAmt = model.MinAmt,
+                    MinAmtDaily = model.MinAmtDaily,
+                    MinAmtMonthly = model.MinAmtMonthly,
+                    MinAmtWeekly = model.MinAmtWeekly,
+                    MinRange = model.MinRange,
+                    MinRangeDaily = model.MinRangeDaily,
+                    MinRangeMonthly = model.MinRangeMonthly,
+                    MinRangeWeekly = model.MinRangeWeekly
+                };
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public long AddLimitData(LimitRequest Request)
+        {
+            try
+            {
+                var model = new Limits()
+                {
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    Status = 1,
+                    MaxAmt = Request.MaxAmt,
+                    MaxAmtDaily = Request.MaxAmtDaily,
+                    MaxAmtMonthly = Request.MaxAmtMonthly,
+                    MaxAmtWeekly = Request.MaxAmtWeekly,
+                    Maxrange = Request.Maxrange,
+                    MaxRangeDaily = Request.MaxRangeDaily,
+                    MaxRangeMonthly = Request.MaxRangeMonthly,
+                    MaxRangeWeekly = Request.MaxRangeWeekly,
+                    MinAmt = Request.MinAmt,
+                    MinAmtDaily = Request.MinAmtDaily,
+                    MinAmtMonthly = Request.MinAmtMonthly,
+                    MinAmtWeekly = Request.MinAmtWeekly,
+                    MinRange = Request.MinRange,
+                    MinRangeDaily = Request.MinRangeDaily,
+                    MinRangeMonthly = Request.MinRangeMonthly,
+                    MinRangeWeekly = Request.MinRangeWeekly
+                };
+                var newModel = _limitRepository.Add(model);
+                return newModel.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool UpdateLimitData(LimitRequest Request)
+        {
+            try
+            {
+                var model = _limitRepository.GetActiveById(Request.Id);
+                if (model == null)
+                    return false;
+
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.UtcNow;
+                model.MaxAmt = Request.MaxAmt;
+                model.MaxAmtDaily = Request.MaxAmtDaily;
+                model.MaxAmtMonthly = Request.MaxAmtMonthly;
+                model.MaxAmtWeekly = Request.MaxAmtWeekly;
+                model.Maxrange = Request.Maxrange;
+                model.MaxRangeDaily = Request.MaxRangeDaily;
+                model.MaxRangeMonthly = Request.MaxRangeMonthly;
+                model.MaxRangeWeekly = Request.MaxRangeWeekly;
+                model.MinAmt = Request.MinAmt;
+                model.MinAmtDaily = Request.MinAmtDaily;
+                model.MinAmtMonthly = Request.MinAmtMonthly;
+                model.MinAmtWeekly = Request.MinAmtWeekly;
+                model.MinRange = Request.MinRange;
+                model.MinRangeDaily = Request.MinRangeDaily;
+                model.MinRangeMonthly = Request.MinRangeMonthly;
+                model.MinRangeWeekly = Request.MinRangeWeekly;
+
+                _limitRepository.Update(model);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return false;
+            }
+        }
+
+        public bool SetActiveLimit(long id)
+        {
+            try
+            {
+                Limits model = _limitRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetActiveLimit();
+                    _limitRepository.Update(model);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public bool SetInActiveLimit(long id)
+        {
+            try
+            {
+                Limits model = _limitRepository.GetById(id);
+                if (model != null)
+                {
+                    model.SetInActiveLimit();
+                    _limitRepository.Update(model);
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {

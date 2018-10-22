@@ -70,5 +70,15 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
            
         }
+
+        // khushali 18-10-2018 For signalr scaleout with Redis
+
+        public string[] ToStringArray(RedisValue[] values)
+        {
+            string[] nix = new string[0];
+            if (values == null) return null;
+            if (values.Length == 0) return nix;
+            return Array.ConvertAll(values, x => (string)x);
+        }
     }
 }

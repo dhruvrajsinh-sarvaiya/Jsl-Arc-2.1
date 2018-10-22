@@ -47,7 +47,8 @@ namespace CleanArchitecture.Core.Enums
         //============================walelt=================================//       
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
-        public static string SetWalletLimitSuccessMsg = "Limit Created Successfully";
+        public static string SetWalletLimitCreateMsg = "Limit Created Successfully";
+        public static string SetWalletLimitUpdateMsg = "Limit Updated Successfully";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
         public static string CreateAddressFailMsg = "Failed to generate Address.";
@@ -161,9 +162,12 @@ namespace CleanArchitecture.Core.Enums
         public static string FactorFail = "Invalid authenticator code ";
         public static string FactorRequired = "Two factor authentication is activated please verify your code";
         public static string TwoFactorVerification = "Two factor authentication Verification code is invalid.";
-
-
-
+        public static string SuccessAddDeviceData = "Success full add device id.";
+        public static string DeviceidInsertError = "Device id not added.";
+        public static string DeviceAddressUpdateError = "Device address status not update.";
+        public static string SuccessDeleteDevice = "Success full remove device address.";
+        public static string DeviceAddressdeleteError = "Device address not remove.";
+        public static string SuccessGetDeviceData = "Success full Get Device Address.";
 
     }
 }

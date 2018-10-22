@@ -21,8 +21,11 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public long ServiceID { get; set; } // ntrivedi added 03-11-2018
 
+        //[Required]
+        //public long StateID { get; set; }    
+
         [Required]
-        public long StateID { get; set; }        
+        public long CountryID { get; set; }   
 
         public void SetActiveProduct()
         {
