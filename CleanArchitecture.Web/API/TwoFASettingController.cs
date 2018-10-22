@@ -127,13 +127,27 @@ namespace CleanArchitecture.Web.API
                     await _userManager.ResetAuthenticatorKeyAsync(user);
                     unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
                 }
-
-                var model = new EnableAuthenticatorViewModel
+                if (string.IsNullOrEmpty(user.Email))
                 {
-                    SharedKey = FormatKey(unformattedKey),
-                    AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
-                };
-                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, enableAuthenticatorViewModel = model });
+                    var model = new EnableAuthenticatorViewModel
+                    {
+                        SharedKey = FormatKey(unformattedKey),
+                        AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
+                    };
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, enableAuthenticatorViewModel = model });
+
+                }
+                else
+                {
+
+                    var model = new EnableAuthenticatorViewModel
+                    {
+                        SharedKey = FormatKey(unformattedKey),
+                        AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
+                    };
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, enableAuthenticatorViewModel = model });
+
+                }
 
             }
             catch (Exception ex)

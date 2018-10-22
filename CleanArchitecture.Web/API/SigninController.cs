@@ -78,7 +78,7 @@ namespace CleanArchitecture.Web.API
         // Login method to call direct send code
         [HttpGet("SendCode")]
         [AllowAnonymous]
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<ActionResult> SendCode(string returnUrl = null, bool rememberMe = false)
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -113,7 +113,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("SendCode")]
         [AllowAnonymous]
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> SendCode([FromBody]SendCodeViewModel model)
         {
 
@@ -164,6 +164,7 @@ namespace CleanArchitecture.Web.API
         //Social Login method direct call this method
         [HttpGet("ExternalLoginCallback")]
         [AllowAnonymous]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null)
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
@@ -199,7 +200,7 @@ namespace CleanArchitecture.Web.API
         // Login after verify code
         [HttpGet("VerifyCode")]
         [AllowAnonymous]
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyCode(string provider, bool rememberMe, string returnUrl = null)
         {
             // Require that the user has already logged in via username/password or external login
@@ -385,10 +386,7 @@ namespace CleanArchitecture.Web.API
                         data.EnableStatus = false;
                         await _custompassword.AddPassword(data);
 
-                        if (user.TwoFactorEnabled)
-                        {
-                            return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
-                        }
+
 
                         _logger.LogWarning(1, "User Login with Email Send Success.");
                         return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
@@ -437,6 +435,22 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    if (checkmail.TwoFactorEnabled)
+                                    {
+                                        string currenttime = DateTime.UtcNow.ToString();
+
+                                        var newPassword = _userManager.PasswordHasher.HashPassword(checkmail, currenttime);
+                                        checkmail.PasswordHash = newPassword;
+                                        var res = await _userManager.UpdateAsync(checkmail);
+                                        if (res.Succeeded)
+                                        {
+                                            var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
+                                            return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFaVerification });
+                                        }
+                                        else
+                                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
+
+                                    }
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(checkmail);
@@ -648,9 +662,22 @@ namespace CleanArchitecture.Web.API
                                 {
                                     if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
                                     {
-                                        return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
+                                        string currenttime = DateTime.UtcNow.ToString();
+
+                                        var newPassword = _userManager.PasswordHasher.HashPassword(result, currenttime);
+                                        result.PasswordHash = newPassword;
+                                        var res = await _userManager.UpdateAsync(result);
+                                        if (res.Succeeded)
+                                        {
+                                            var resultdata = await _signInManager.PasswordSignInAsync(result.UserName, currenttime, false, lockoutOnFailure: false);
+
+                                            return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFaVerification });
+                                        }
+                                        else
+                                            return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
 
                                     }
+
 
 
                                     _logger.LogWarning(1, "You are successfully login.");
@@ -838,7 +865,7 @@ namespace CleanArchitecture.Web.API
             {
                 var currentUser = await _userManager.FindByEmailAsync(model.Email);
 
-                if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
+                if (currentUser == null) // || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return BadRequest(new ForgotpassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetUserNotAvailable, ErrorCode = enErrorCode.Status4037UserNotAvailable });
@@ -853,7 +880,7 @@ namespace CleanArchitecture.Web.API
                     Code = ctoken,
                     Password = ctoken,
                     ConfirmPassword = ctoken,
-                    Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2)
+                    Expirytime = DateTime.UtcNow + TimeSpan.FromMinutes(Convert.ToInt64(_configuration["DefaultValidateLinkTimeSpan"]))
                 };
                 byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 

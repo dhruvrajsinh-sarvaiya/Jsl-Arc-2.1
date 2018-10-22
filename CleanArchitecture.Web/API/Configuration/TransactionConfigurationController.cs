@@ -797,7 +797,7 @@ namespace CleanArchitecture.Web.API.Configuration
             BizResponseClass res = new BizResponseClass();
             try
             {
-                var responce = _transactionConfigService.SetInActiveProviderConfiguration(id);
+                var responce = _transactionConfigService.SetActiveProviderConfiguration(id);
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
@@ -1015,6 +1015,12 @@ namespace CleanArchitecture.Web.API.Configuration
             try
             {
                 ProviderDetailViewModel  obj = _transactionConfigService.GetProviderDetailById(id);
+                if (obj == null)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(res);
+                }
                 res.response = _transactionConfigService.getProviderDetailDataById(obj);
                 if (res.response == null)
                 {
@@ -1100,8 +1106,8 @@ namespace CleanArchitecture.Web.API.Configuration
                 res.response.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
                 res.response.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
                 res.response.AppType = _transactionConfigService.GetAppTypeById(obj.AppTypeID);
-                res.response.TrnType = null;
-                res.response.Limit = null;
+                res.response.TrnType = obj.TrnTypeID ;
+                res.response.Limit = _transactionConfigService.GetLimitById(obj.LimitID);
                 res.response.DemonConfiguration = _transactionConfigService.GetDemonConfiguration(obj.DemonConfigID);
                 res.response.ProviderConfiguration = _transactionConfigService.GetProviderConfiguration(obj.ServiceProConfigID);
                 res.response.thirdParty = null;
@@ -1275,7 +1281,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-        [HttpPost("SetActiveService/{ProductId}")]
+        [HttpPost("SetActiveProduct/{ProductId}")]
         public IActionResult SetActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();
@@ -1300,7 +1306,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-        [HttpPost("SetInActiveService/{ProductId}")]
+        [HttpPost("SetInActiveProduct/{ProductId}")]
         public IActionResult SetInActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();
@@ -1513,8 +1519,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
-        [HttpGet("GetAllThirdPartyAPIById/{Id:long}")]
-        public IActionResult GetAllThirdPartyAPIById(long Id)
+        [HttpGet("GetThirdPartyAPIById/{Id:long}")]
+        public IActionResult GetThirdPartyAPIById(long Id)
         {
             ThirdPartyAPIConfigResponse res = new ThirdPartyAPIConfigResponse();
             try

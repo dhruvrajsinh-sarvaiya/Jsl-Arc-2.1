@@ -109,8 +109,8 @@ namespace CleanArchitecture.Web.API
             var user = await _userManager.GetUserAsync(HttpContext.User);
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
             Req.TrnMode = Request.TrnMode;
-            Req.TrnType = Request.orderSide;
-            Req.ordertype = Request.ordertype;
+            Req.TrnType = Request.OrderSide;
+            Req.ordertype = Request.OrderType;
             Req.MemberID = user.Id;
             Req.MemberMobile = user.Mobile;
             //Req.MemberID = 5;
@@ -119,7 +119,7 @@ namespace CleanArchitecture.Web.API
             Req.TransactionAccount = Request.CurrencyPairID.ToString();
             Req.Amount = Request.Total;
             Req.PairID = Request.CurrencyPairID;
-            Req.Price = Request.price;
+            Req.Price = Request.Price;
             Req.Qty = Request.Amount;
             Req.DebitWalletID = Request.DebitWalletID;
             Req.CreditWalletID = Request.CreditWalletID;
@@ -155,6 +155,7 @@ namespace CleanArchitecture.Web.API
             //Response.ReturnCode = enResponseCode.Success;
             return returnDynamicResult(Response);
         }
+
         [HttpGet("GetVolumeData/{BasePair}")]
         public IActionResult GetVolumeData(string BasePair)
         {
@@ -458,24 +459,7 @@ namespace CleanArchitecture.Web.API
             }
 
         }
-
-        //[HttpPost("GetMemberLedgerAsync")]
-        ////[Authorize]
-        //public async Task<ActionResult> GetMemberLedger(GetMemberLedgerRequest request)
-        //{
-        //    try
-        //    {
-        //        var user = await _userManager.GetUserAsync(HttpContext.User);
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-        //        //Response.ReturnCode = enResponseCode.InternalError;
-        //        return Ok();
-        //    }
-        //}
-
+        
         [HttpGet("GetBuyerBook/{Pair}")]
         public ActionResult GetBuyerBook(string Pair)
         {
@@ -571,6 +555,37 @@ namespace CleanArchitecture.Web.API
             }
 
         }
+
+        //[HttpGet("GetMarketCap{Pair}")]
+        //public ActionResult GetMarketCap(string Pair)
+        //{
+        //    MarketCapResponse Response = new MarketCapResponse();
+        //    try
+        //    {
+        //        if (!_frontTrnService.IsValidPairName(Pair))
+        //        {
+        //            Response.ReturnCode = enResponseCode.Fail;
+        //            Response.ErrorCode = enErrorCode.InvalidPairName;
+        //            return Ok(Response);
+        //        }
+        //        long id = _frontTrnService.GetPairIdByName(Pair);
+        //        if (id == 0)
+        //        {
+        //            Response.ReturnCode = enResponseCode.Fail;
+        //            Response.ErrorCode = enErrorCode.NoDataFound;
+        //            return Ok(Response);
+        //        }
+        //        Response.response = _frontTrnService.GetTradePairByName(id);
+        //        Response.ReturnCode = enResponseCode.Success;
+        //        return Ok(Response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        Response.ReturnCode = enResponseCode.InternalError;
+        //        return Ok(Response);
+        //    }
+        //}
         #endregion
 
         //[HttpGet("GetTickerInformation")] //get Trade Pair Binnance https://api.binance.com/api/v3/ticker/bookTicker //https://api.binance.com/api/v3/ticker/bookTicker?symbol=LTCBTC

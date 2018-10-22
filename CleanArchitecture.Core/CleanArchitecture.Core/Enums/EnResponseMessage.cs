@@ -40,6 +40,9 @@ namespace CleanArchitecture.Core.Enums
         public static string ProcessTrn_PoolOrderCreateFailMsg = "Order Creation Fail";
         public static string ProcessTrn_InitializeMsg = "Initialize";
         public static string ProcessTrn_ServiceProductNotAvailableMsg = "Service or Product Not Available";
+        public static string ProcessTrn_WalletDebitFailMsg = "Wallet Debit Fail";
+        public static string ProcessTrn_HoldMsg = "Hold";
+        public static string ProcessTrn_ThirdPartyDataNotFoundMsg = "Third Party Data Not Found";
         //============================
 
         //============================walelt=================================//       
@@ -166,6 +169,8 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessDeleteDevice = "Success full remove device address.";
         public static string DeviceAddressdeleteError = "Device address not remove.";
         public static string SuccessGetDeviceData = "Success full Get Device Address.";
+        public static string TwoFaVerification = "TwoFA Acviate Redirect Verify method";
+        public static string Userpasswordnotupdated = "User password not updated!";
 
     }
 }

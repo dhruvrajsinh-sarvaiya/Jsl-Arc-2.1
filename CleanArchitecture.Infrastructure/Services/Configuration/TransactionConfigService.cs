@@ -1177,11 +1177,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         Provider = GetPoviderByID(viewmodel.ServiceProID),
                         ProviderType = GetProviderTypeById(viewmodel.ProTypeID),
                         AppType = GetAppTypeById(viewmodel.AppTypeID),
-                        TrnType = null,
-                        Limit = null,
+                        TrnType = viewmodel.TrnTypeID,
+                        Limit = GetLimitById(viewmodel.LimitID),
                         DemonConfiguration = GetDemonConfiguration(viewmodel.DemonConfigID),
                         ProviderConfiguration = GetProviderConfiguration(viewmodel.Id),
-                        thirdParty = null
+                        thirdParty = GetThirdPartyAPIConfigById(viewmodel.ThirPartyAPIID),
                     });
                 }
                 return responcesData;
@@ -1203,11 +1203,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 res.Provider = GetPoviderByID(viewModel.ServiceProID);
                 res.ProviderType = GetProviderTypeById(viewModel.ProTypeID);
                 res.AppType = GetAppTypeById(viewModel.AppTypeID);
-                res.TrnType = null;
-                res.Limit = null;
+                res.TrnType = viewModel.TrnTypeID;
+                res.Limit = GetLimitById(viewModel.LimitID);
                 res.DemonConfiguration = GetDemonConfiguration(viewModel.DemonConfigID);
                 res.ProviderConfiguration = GetProviderConfiguration(viewModel.Id);
-                res.thirdParty = null;
+                res.thirdParty = GetThirdPartyAPIConfigById(viewModel.ThirPartyAPIID);
 
                 return res;
             }
@@ -1229,6 +1229,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ProductName = Request.ProductName,
                     ServiceID = Request.ServiceID,
                     CountryID = Request.CountryID,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
                     UpdatedDate = DateTime.UtcNow,
@@ -1400,6 +1401,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     TrnType = Request.TrnType,
                     IsDelayAddress = Request.IsDelayAddress,
                     ProviderWalletID = Request.ProviderWalletID,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
                     UpdatedDate = DateTime.UtcNow,
@@ -1964,6 +1966,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     SecondaryCurrencyId = Request.SecondaryCurrencyId,
                     WalletMasterID = Request.WalletMasterID,
                     BaseCurrencyId = Request.BaseCurrencyId,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
                     UpdatedDate = DateTime.UtcNow,
@@ -1991,6 +1994,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     SellMaxPrice = Request.SellMaxPrice,
                     Fee = Request.Fee,
                     FeeType = Request.FeeType,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
                     UpdatedDate = DateTime.UtcNow,

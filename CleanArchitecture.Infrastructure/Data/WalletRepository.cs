@@ -292,12 +292,14 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 _dbContext.Entry(wo).State = EntityState.Modified;
             }
+            _dbContext.SaveChanges();
             return wo;
         }
 
         public bool CheckarryTrnID(CreditWalletDrArryTrnID[] arryTrnID, string coinName)
         {
             bool i = false;
+            decimal totalAmtDrTranx;
             for (int t = 0; t <= arryTrnID.Length - 1; t++)
             {
                 var response = (from u in _dbContext.WalletTransactionQueues                                
@@ -309,13 +311,14 @@ namespace CleanArchitecture.Infrastructure.Data
                     i = false;
                     return i;
                 }
+                totalAmtDrTranx = response.ToList()[0].Amount;
                 // total delivered amount _ current amount must less or equals total debit amount
                 decimal deliveredAmt = (from p in _dbContext.WalletTransactionOrders
                                         join u in _dbContext.WalletTransactionQueues on p.DTrnNo equals u.TrnNo
                                         where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.TrnType == Core.Enums.enWalletTranxOrderType.Debit
                                         && u.WalletType == coinName && p.Status != enTransactionStatus.SystemFail
                                         select p).Sum(e => e.Amount);
-                if (!(response.ToList()[0].Amount - deliveredAmt - arryTrnID[t].Amount >= 0))
+                if (!(totalAmtDrTranx - deliveredAmt - arryTrnID[t].Amount >= 0))
                 {
                     i = false;
                     return i;
@@ -422,12 +425,13 @@ namespace CleanArchitecture.Infrastructure.Data
                 arrayObj.ForEach(e => e.Status = enTransactionStatus.Success);
                 arrayObj.ForEach(e => e.StatusMsg = "Success");
 
+                // update debit transaction(current tranx against which tranx) status if it is fully settled
                 var arrayObjTQ = (from p in _dbContext.WalletTransactionQueues
                                 join q in arryTrnID on p.TrnNo equals q.DrTQTrnNo
                                 select new {p,q }).ToList();
                 arrayObjTQ.ForEach(e => e.p.SettedAmt = e.p.SettedAmt + e.q.Amount );
                 arrayObjTQ.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
-                arrayObjTQ.Where(d => d.p.SettedAmt == d.p.Amount).ToList().ForEach(e => e.p.Status = enTransactionStatus.Success);
+                arrayObjTQ.Where(d => d.p.SettedAmt >= d.p.Amount).ToList().ForEach(e => e.p.Status = enTransactionStatus.Success);
 
 
                 _dbContext.Set<WalletLedger>().Add(wl1);
@@ -444,8 +448,6 @@ namespace CleanArchitecture.Infrastructure.Data
                 _dbContext.Database.RollbackTransaction();
                 _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
-
-
             }
         }
         public DateTime UTC_To_IST()

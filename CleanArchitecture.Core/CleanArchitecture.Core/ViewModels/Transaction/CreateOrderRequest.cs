@@ -28,7 +28,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]
         [Range(0, 9999999999.99999999)]
-        public decimal price { get; set; }
+        public decimal Price { get; set; }
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]
         [Range(0, 9999999999.99999999)]
@@ -40,11 +40,11 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]
         [EnumDataType(typeof(enTransactionMarketType))]
-        public enTransactionMarketType ordertype { get; set; }
+        public enTransactionMarketType OrderType { get; set; }
 
         [Required(ErrorMessage = "1,Required Parameter,4003")] 
         [EnumDataType(typeof(enTrnType),ErrorMessage = "1,Invalid Parameter Value,4003")]
-        public enTrnType orderSide { get; set; }
+        public enTrnType OrderSide { get; set; }
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]
         public long Nonce { get; set; }//Timestamp

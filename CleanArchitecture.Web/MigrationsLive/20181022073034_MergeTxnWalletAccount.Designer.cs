@@ -4,14 +4,16 @@ using CleanArchitecture.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    partial class CleanArchitectureContextModelSnapshot : ModelSnapshot
+    [Migration("20181022073034_MergeTxnWalletAccount")]
+    partial class MergeTxnWalletAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2277,17 +2279,13 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.DepositCounterMaster", b =>
                 {
-                    b.Property<long>("WalletTypeID");
-
-                    b.Property<long>("SerProId");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
-
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("LastTrnID");
 
@@ -2299,6 +2297,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<int>("RecordCount");
 
+                    b.Property<long>("SerProId");
+
                     b.Property<short>("Status");
 
                     b.Property<long>("TPSPickupStatus");
@@ -2307,9 +2307,9 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("UpdatedDate");
 
-                    b.HasKey("WalletTypeID", "SerProId");
+                    b.Property<long>("WalletTypeID");
 
-                    b.HasAlternateKey("SerProId", "WalletTypeID");
+                    b.HasKey("Id");
 
                     b.ToTable("DepositCounterMaster");
                 });

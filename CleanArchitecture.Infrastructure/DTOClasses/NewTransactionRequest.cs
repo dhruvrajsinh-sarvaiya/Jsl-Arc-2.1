@@ -55,6 +55,9 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
        
         public long CreditWalletID { get; set; }
 
+        public enServiceType ServiceType { get; set; }
+        public enWalletTrnType WalletTrnType { get; set; }
+
     }
 
     public class NewTradeTransactionRequestCls
@@ -96,6 +99,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 
         public long Delivery_ServiceID { get; set; }
         public long Pool_OrderID { get; set; }
+
+        public string APIResponse { get; set; }
 
     }
 }

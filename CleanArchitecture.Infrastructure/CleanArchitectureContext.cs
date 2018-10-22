@@ -114,6 +114,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<CountryMaster> CountryMaster { get; set; } //uday 17-10-2018
         public DbSet<StateMaster> StateMaster { get; set; } //uday 17-10-2018
         public DbSet<PoolOrder> PoolOrder { get; set; } //uday 17-10-2018
+        public DbSet<CityMaster> CityMaster { get; set; } //uday 22-10-2018
+        public DbSet<ZipCodeMaster> ZipCodeMaster { get; set; } //uday 22-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
@@ -161,6 +163,7 @@ namespace CleanArchitecture.Infrastructure
             // Add your customizations after calling base.OnModelCreating(builder);
             modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
             modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
+            modelBuilder.Entity<DepositCounterMaster>().HasKey(e => new {e.WalletTypeID, e.SerProId}); // Rita 22-10-2018 composite primary key
 
         }
 
