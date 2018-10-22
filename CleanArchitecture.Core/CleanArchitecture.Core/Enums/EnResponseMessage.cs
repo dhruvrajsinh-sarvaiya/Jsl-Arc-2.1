@@ -40,6 +40,8 @@ namespace CleanArchitecture.Core.Enums
         public static string ProcessTrn_PoolOrderCreateFailMsg = "Order Creation Fail";
         public static string ProcessTrn_InitializeMsg = "Initialize";
         public static string ProcessTrn_ServiceProductNotAvailableMsg = "Service or Product Not Available";
+        public static string ProcessTrn_WalletDebitFailMsg = "Wallet Debit Fail";
+        public static string ProcessTrn_HoldMsg = "Hold";
         //============================
 
         //============================walelt=================================//       
