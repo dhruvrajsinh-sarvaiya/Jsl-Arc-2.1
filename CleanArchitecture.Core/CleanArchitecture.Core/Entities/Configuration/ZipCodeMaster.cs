@@ -6,15 +6,14 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Configuration
 {
-    public class StateMaster : BizBase
+    public class ZipCodeMaster : BizBase
     {
         [Required]
+        public long ZipCode { get; set; }
+        [Required]
         [StringLength(30)]
-        public string StateName { get; set; }
+        public string ZipAreaName { get; set; }
         [Required]
-        [StringLength(2)]
-        public string StateCode { get; set; }
-        [Required]
-        public long CountryID { get; set; }
+        public long CityID { get; set; }
     }
 }

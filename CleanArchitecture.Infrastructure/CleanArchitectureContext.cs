@@ -114,6 +114,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<CountryMaster> CountryMaster { get; set; } //uday 17-10-2018
         public DbSet<StateMaster> StateMaster { get; set; } //uday 17-10-2018
         public DbSet<PoolOrder> PoolOrder { get; set; } //uday 17-10-2018
+        public DbSet<CityMaster> CityMaster { get; set; } //uday 22-10-2018
+        public DbSet<ZipCodeMaster> ZipCodeMaster { get; set; } //uday 22-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
