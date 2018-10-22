@@ -176,6 +176,7 @@ namespace CleanArchitecture.Core.Enums
         Status423Locked = 423,
         Status4013MobileInvalid = 4013,
         Status4020IpInvalid = 4020,
+        Status4033NotFoundRecored = 4033,
         Status4034UnableUpdateUser = 4034,
         Status4035UnableToAddIpAddress = 4035,
         Status4036VerifyPending = 4036,
@@ -203,6 +204,10 @@ namespace CleanArchitecture.Core.Enums
         Status4058DeviceAddress = 4058,
         Status4059NotDeleteDevice = 4059,
         Status4061Userpasswordnotupdated = 4061,
+        Status4062UseralreadRegister = 4062,
+
+
+
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
