@@ -339,7 +339,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                  where c.AccWalletID == AccWalletID && u.Status == 1
                                                  select new AddressMasterResponse
                                                  {
-                                                     AddressLable = u.AddressLable,
+                                                     AddressLabel = u.AddressLable,
                                                      Address = u.Address,
                                                      IsDefaultAddress = u.IsDefaultAddress,                                                  
                                                  }).AsEnumerable().ToList();

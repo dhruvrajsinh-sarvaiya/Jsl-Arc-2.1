@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,18 +11,22 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
     {
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4220")]
         [StringLength(50, ErrorMessage = "1,Please Enter Valid  Parameters,4221")]
+        [JsonProperty(PropertyName = "SourceAddress")]
         public string sourceAddress { get; set; }
 
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4215")]
         [StringLength(50, ErrorMessage = "1,Please Enter Valid  Parameters,4216")]
+        [JsonProperty(PropertyName = "DestinationAddress")]
         public string destinationAddress { get; set; }
 
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4217")]
         [StringLength(50, ErrorMessage = "1,Please Enter Valid  Parameters,4218")]
+        [JsonProperty(PropertyName = "AddressLabel")]
         public string addressLabel { get; set; }
 
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4219")]
         [Range(0,9999999999.99999999,ErrorMessage = "1,Please Enter Valid  Parameters,4222")]
+        [JsonProperty(PropertyName = "Amount")]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal amount { get; set; }
 

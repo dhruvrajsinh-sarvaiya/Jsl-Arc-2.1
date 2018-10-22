@@ -10,6 +10,6 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         public string Address { get; set; }
         public byte IsDefaultAddress { get; set; }
         //public long SerProID { get; set; }
-        public string AddressLable { get; set; }
+        public string AddressLabel { get; set; }
     }
 }
