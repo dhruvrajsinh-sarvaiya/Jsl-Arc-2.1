@@ -349,7 +349,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //vsolanki 16-10-2018
         public DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
         {
-            List<HistoryObject> items = (from u in _dbContext.DepositHistorys
+            List<HistoryObject> items = (from u in _dbContext.DepositHistory
                                          where u.userId == Userid && u.CreatedDate >= FromDate && u.CreatedDate <= ToDate && (Status==null ||(u.Status==Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))                                       
                                          select new HistoryObject
                                          {
