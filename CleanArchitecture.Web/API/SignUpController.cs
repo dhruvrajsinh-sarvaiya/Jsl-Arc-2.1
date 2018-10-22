@@ -186,13 +186,7 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> ConfirmEmail(string emailConfirmCode)
         {
             try
-            {
-                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-
-                }
+            {               
 
                 if (!string.IsNullOrEmpty(emailConfirmCode))
                 {
