@@ -1519,8 +1519,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
-        [HttpGet("GetAllThirdPartyAPIById/{Id:long}")]
-        public IActionResult GetAllThirdPartyAPIById(long Id)
+        [HttpGet("GetThirdPartyAPIById/{Id:long}")]
+        public IActionResult GetThirdPartyAPIById(long Id)
         {
             ThirdPartyAPIConfigResponse res = new ThirdPartyAPIConfigResponse();
             try
