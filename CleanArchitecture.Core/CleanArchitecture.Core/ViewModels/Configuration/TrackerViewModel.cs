@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         //public string MemberType { get; set; }
 
         [Required(ErrorMessage = "1,DeviceID Not Found,4015")]
-        [StringLength(250, ErrorMessage = "1,DeviceID Not Valid,4016")]
+        [StringLength(2000, ErrorMessage = "1,DeviceID Not Valid,4016")]
         public string DeviceId { get; set; }
 
         [Required(ErrorMessage = "1,Mode Not Found,4017")]
