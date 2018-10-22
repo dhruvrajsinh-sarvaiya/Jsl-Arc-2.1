@@ -92,6 +92,7 @@ namespace CleanArchitecture.Core.Enums
         public static string SignUpUser = "This user data not available.";
         public static string SignWithEmail = "Please verify it by clicking the otp that has been send to your email.";
         public static string SignUpEmailValidation = "This email is already registered.";
+        public static string SignUpUserNotRegister = "User not register and verifay.";
         public static string SignUpEmailConfirm = "Your account has been activated, you can now login.";
         public static string SignUpEmailExpired = "Reset links immediately not valid or expired.";
         public static string SignEmailLink = "This email code can't be balck.";

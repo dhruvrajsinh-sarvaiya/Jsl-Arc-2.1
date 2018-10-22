@@ -410,6 +410,25 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+        public GetGraphDetailInfo GetGraphDetail(long PairId)
+        {
+            try
+            {
+                var list = _frontTrnRepository.GetBuyerBook(PairId);
+                //List<GetBuySellBook> responce = new List<GetBuySellBook>();
+                //if (list != null)
+                //{
+                //    responce = list;
+                //}
+                //return responce;
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         #endregion
 
         #region parameterValidation

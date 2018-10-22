@@ -14,5 +14,6 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<RecentOrderRespose> GetRecentOrder(long PairId);
         List<GetBuySellBook> GetBuyerBook(long id);
         List<GetBuySellBook> GetSellerBook(long id);
+        List<GetGraphResponse> GetGraphData(long id);
     }
 }

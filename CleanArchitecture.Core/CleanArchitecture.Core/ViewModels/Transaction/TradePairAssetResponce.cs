@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +22,9 @@ namespace CleanArchitecture.Core.ViewModels
     public class TradePairRespose
     {
         public long PairId { get; set; }
+        [JsonProperty(PropertyName = "PairName")]
         public string Pairname { get; set; }
+        [JsonProperty(PropertyName = "CurrentRate")]
         public decimal Currentrate { get; set; }
         public decimal Volume { get; set; }
         public decimal Fee { get; set; }

@@ -205,7 +205,8 @@ namespace CleanArchitecture.Core.Enums
         Status4059NotDeleteDevice = 4059,
         Status4061Userpasswordnotupdated = 4061,
         Status4062UseralreadRegister = 4062,
-
+        Status4063UserNotRegister = 4063,
+        Status4064EmailLinkBlanck = 4064,
 
 
         // wallet
