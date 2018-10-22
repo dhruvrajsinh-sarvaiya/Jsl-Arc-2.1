@@ -1281,7 +1281,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-        [HttpPost("SetActiveService/{ProductId}")]
+        [HttpPost("SetActiveProduct/{ProductId}")]
         public IActionResult SetActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();
@@ -1306,7 +1306,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-        [HttpPost("SetInActiveService/{ProductId}")]
+        [HttpPost("SetInActiveProduct/{ProductId}")]
         public IActionResult SetInActiveProduct(long ProductId)
         {
             BizResponseClass Response = new BizResponseClass();

@@ -78,7 +78,7 @@ namespace CleanArchitecture.Web.API
         // Login method to call direct send code
         [HttpGet("SendCode")]
         [AllowAnonymous]
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<ActionResult> SendCode(string returnUrl = null, bool rememberMe = false)
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -113,7 +113,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("SendCode")]
         [AllowAnonymous]
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> SendCode([FromBody]SendCodeViewModel model)
         {
 
@@ -164,6 +164,7 @@ namespace CleanArchitecture.Web.API
         //Social Login method direct call this method
         [HttpGet("ExternalLoginCallback")]
         [AllowAnonymous]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null)
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
@@ -199,7 +200,7 @@ namespace CleanArchitecture.Web.API
         // Login after verify code
         [HttpGet("VerifyCode")]
         [AllowAnonymous]
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyCode(string provider, bool rememberMe, string returnUrl = null)
         {
             // Require that the user has already logged in via username/password or external login
@@ -838,7 +839,7 @@ namespace CleanArchitecture.Web.API
             {
                 var currentUser = await _userManager.FindByEmailAsync(model.Email);
 
-                if (currentUser == null || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
+                if (currentUser == null) // || !(await _userManager.IsEmailConfirmedAsync(currentUser)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return BadRequest(new ForgotpassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ResetUserNotAvailable, ErrorCode = enErrorCode.Status4037UserNotAvailable });
@@ -846,15 +847,15 @@ namespace CleanArchitecture.Web.API
 
                 string ctoken = GenerateRandomPassword();
                 //    _userManager.GeneratePasswordResetTokenAsync(currentUser).Result;
-
+                                
                 var ResetPassword = new ResetPasswordViewModel
                 {
                     Email = currentUser.Email,
                     Code = ctoken,
                     Password = ctoken,
                     ConfirmPassword = ctoken,
-                    Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2)
-                };
+                    Expirytime = DateTime.UtcNow + TimeSpan.FromMinutes(Convert.ToInt64(_configuration["DefaultValidateLinkTimeSpan"]))
+            };
                 byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
                 string UserDetails = JsonConvert.SerializeObject(ResetPassword);
