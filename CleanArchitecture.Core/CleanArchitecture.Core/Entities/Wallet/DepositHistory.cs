@@ -68,7 +68,7 @@ namespace CleanArchitecture.Core.Entities
         //vsolanki 2018-10-16
         public long userId { get; set; }
 
-        public long SerProId { get; set; }
+        //public long SerProId { get; set; }
 
 
 

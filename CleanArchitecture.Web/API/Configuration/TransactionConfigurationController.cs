@@ -797,7 +797,7 @@ namespace CleanArchitecture.Web.API.Configuration
             BizResponseClass res = new BizResponseClass();
             try
             {
-                var responce = _transactionConfigService.SetInActiveProviderConfiguration(id);
+                var responce = _transactionConfigService.SetActiveProviderConfiguration(id);
                 if (responce == true)
                     res.ReturnCode = enResponseCode.Success;
                 else
@@ -1106,8 +1106,8 @@ namespace CleanArchitecture.Web.API.Configuration
                 res.response.Provider = _transactionConfigService.GetPoviderByID(obj.ServiceProID);
                 res.response.ProviderType = _transactionConfigService.GetProviderTypeById(obj.ProTypeID);
                 res.response.AppType = _transactionConfigService.GetAppTypeById(obj.AppTypeID);
-                res.response.TrnType = null;
-                res.response.Limit = null;
+                res.response.TrnType = obj.TrnTypeID ;
+                res.response.Limit = _transactionConfigService.GetLimitById(obj.LimitID);
                 res.response.DemonConfiguration = _transactionConfigService.GetDemonConfiguration(obj.DemonConfigID);
                 res.response.ProviderConfiguration = _transactionConfigService.GetProviderConfiguration(obj.ServiceProConfigID);
                 res.response.thirdParty = null;

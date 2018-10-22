@@ -42,6 +42,7 @@ namespace CleanArchitecture.Core.Enums
         public static string ProcessTrn_ServiceProductNotAvailableMsg = "Service or Product Not Available";
         public static string ProcessTrn_WalletDebitFailMsg = "Wallet Debit Fail";
         public static string ProcessTrn_HoldMsg = "Hold";
+        public static string ProcessTrn_ThirdPartyDataNotFoundMsg = "Third Party Data Not Found";
         //============================
 
         //============================walelt=================================//       

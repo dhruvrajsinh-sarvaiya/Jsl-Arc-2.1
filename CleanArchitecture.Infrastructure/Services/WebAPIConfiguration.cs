@@ -11,7 +11,7 @@ using CleanArchitecture.Infrastructure.DTOClasses;
 namespace CleanArchitecture.Infrastructure.Services
 {   
     //Take Transaction Route Data
-    public class TransactionWebAPIConfiguration : IWebApiData<WebApiConfigurationResponse>
+    public class TransactionWebAPIConfiguration : IWebApiData
     {
         private readonly WebApiDataRepository _webapiDataRepository;
         public TransactionWebAPIConfiguration(WebApiDataRepository webapiDataRepository)

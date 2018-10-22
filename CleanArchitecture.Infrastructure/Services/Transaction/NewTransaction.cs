@@ -35,6 +35,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly IWebApiRepository _WebApiRepository;
         private readonly ICommonRepository<TransactionRequest> _TransactionRequest;
         private readonly IGetWebRequest _IGetWebRequest;
+        private readonly IWebApiSendRequest _IWebApiSendRequest;
+        private readonly IWebApiData _IWebApiData;
+
         public BizResponse _Resp;        
         public BizResponse _CreateTransactionResp;
         public TradePairMaster _TradePairObj;
@@ -53,7 +56,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ICommonRepository<ServiceMaster> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository,
             EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService,
             ICommonRepository<TradePairDetail> TradePairDetail, IWebApiRepository WebApiRepository,
-            ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest)
+            ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest,
+            IWebApiSendRequest WebApiSendRequest)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -67,6 +71,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _WebApiRepository = WebApiRepository;
             _TransactionRequest = TransactionRequest;
             _IGetWebRequest = IGetWebRequest;
+            _IWebApiSendRequest = WebApiSendRequest;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -112,7 +117,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
                 //Deduct balance here
                 if(_WalletService.GetWalletDeductionNew(Req.SMSCode, "", enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
-                    Req.DebitWalletID.ToString(), Req.TrnNo, enServiceType.Recharge, enWalletTrnType.Cr_Buy_Trade).ReturnCode!=enResponseCode.Fail)
+                    Req.DebitWalletID.ToString(), Req.TrnNo, enServiceType.Recharge, enWalletTrnType.Dr_Sell_Trade).ReturnCode!=enResponseCode.Fail)
                 {
                     _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_WalletDebitFailMsg;
                     _Resp.ReturnCode = enResponseCodeService.Fail;
@@ -542,16 +547,76 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+        public void MarkTransactionOperatorFail(string StatusMsg, enErrorCode ErrorCode)
+        {
+            CreditWalletDrArryTrnID[] CreditWalletDrArryTrnIDObj = new CreditWalletDrArryTrnID[1];
+            try
+            {
+                var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Txn.MakeTransactionOperatorFail();
+                Txn.SetTransactionStatusMsg(StatusMsg);
+                Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TransactionRepository.Update(Txn);
+
+                //Cr Amount to member back
+                CreditWalletDrArryTrnIDObj[0].DrTrnRefNo = Req.TrnNo;
+                CreditWalletDrArryTrnIDObj[0].Amount = Req.Amount;
+
+                _WalletService.GetWalletCreditNew(Req.SMSCode, "", enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
+                Req.DebitWalletID.ToString(), CreditWalletDrArryTrnIDObj, Req.TrnNo,1, enWalletTranxOrderType.Credit, enServiceType.Recharge);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         public void CallWebAPI()
         {
-            TransactionRequest TransactionRequestObj=new TransactionRequest(); //_TransactionRequest 
+            //TransactionRequest TransactionRequestObj=new TransactionRequest(); 
             ThirdPartyAPIRequest ThirdPartyAPIRequestOnj;
+            WebApiConfigurationResponse WebApiConfigurationResponseObj;
+            long TxnRequestID = 0;
             try
             {
                 foreach (TransactionProviderResponse Provider in TxnProviderList)//Make txn on every API
                 {
-                    _IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID);
 
+                    WebApiConfigurationResponseObj=_IWebApiData.GetAPIConfiguration(Provider.ThirPartyAPIID);
+                    if(WebApiConfigurationResponseObj==null)
+                    {
+                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_ThirdPartyDataNotFoundMsg;
+                        _Resp.ReturnCode = enResponseCodeService.Fail;
+                        _Resp.ErrorCode = enErrorCode.ProcessTrn_ThirdPartyDataNotFound;
+                        MarkTransactionOperatorFail(_Resp.ReturnMsg, _Resp.ErrorCode);
+                        return;
+                    }
+                    ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID);
+                    //Insert API request Data
+                    InsertUpdateTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody, false);
+
+                    switch (Provider.AppTypeID)
+                    {
+                        case (long)enAppType.WebSocket:
+
+                        case (long)enAppType.JsonRPC:
+
+                        case (long)enAppType.TCPSocket:
+
+                        case (long)enAppType.RestAPI:
+                            _TransactionObj.APIResponse = _IWebApiSendRequest.SendAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL, ThirdPartyAPIRequestOnj.RequestBody, WebApiConfigurationResponseObj.ContentType, 30000, ThirdPartyAPIRequestOnj.keyValuePairsHeader, WebApiConfigurationResponseObj.MethodType);
+                            break;
+                        case (long)enAppType.HttpApi:
+                            _TransactionObj.APIResponse =_IWebApiSendRequest.SendAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL, ThirdPartyAPIRequestOnj.RequestBody, WebApiConfigurationResponseObj.ContentType, 30000, ThirdPartyAPIRequestOnj.keyValuePairsHeader, WebApiConfigurationResponseObj.MethodType);
+                            break;
+                        case (long)enAppType.SocketApi:
+
+                        case (long)enAppType.BitcoinDeamon:
+
+                        default:
+                            Console.WriteLine("Default case");
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -559,10 +624,27 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
             }
         }
-        public void InsertUpdateTransactionRequest(long TrnNo)
+        public void InsertUpdateTransactionRequest(TransactionProviderResponse listObj, string Request, bool UpdateBit = true)
         {
             try
             {
+                if(UpdateBit==false) //Insert Here
+                {
+                    var NewtransactionReq = new TransactionRequest()
+                    {
+                        TrnNo=Req.TrnNo,
+                        ServiceID= listObj.ServiceID,
+                        SerProID= listObj.ServiceProID,
+                        SerProDetailID= listObj.SerProDetailID,
+                        CreatedDate=Helpers.UTC_To_IST(),                        
+                        RequestData = Request
+                    };
+                    _TransactionRequest.Add(NewtransactionReq);
+                }
+                else //Update here
+                {
+
+                }
 
             }
             catch(Exception ex)
