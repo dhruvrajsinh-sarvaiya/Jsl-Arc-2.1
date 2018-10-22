@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -20,6 +21,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4534")]
         [Range(0, 9999999999.99999999,ErrorMessage = "1,Please enter a valid parameters,4549"), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
+        [JsonProperty(PropertyName = "CurrentRate")]
         public decimal Currentrate { get; set; }
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4535")]
         [Range(0, 9999999999.99999999, ErrorMessage = "1,Please enter a valid parameters,4550"), DataType(DataType.Currency)]

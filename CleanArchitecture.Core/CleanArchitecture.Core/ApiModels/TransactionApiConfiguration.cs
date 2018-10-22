@@ -97,4 +97,13 @@ namespace CleanArchitecture.Core.ApiModels
         public DateTime DateTime { get; set; }
         public short Status { get; set; }
     }
+    public class GetGraphResponse
+    {
+        public long DataDate { get; set; }
+        public decimal Volume { get; set; }
+        public decimal High { get; set; }
+        public decimal Low { get; set; }
+        public decimal TodayClose { get; set; }
+        public decimal TodayOpen { get; set; }
+    }
 }

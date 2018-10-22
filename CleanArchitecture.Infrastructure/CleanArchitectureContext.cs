@@ -95,6 +95,7 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<TransactionProviderResponse> TransactionProviderResponse { get; set; } // ntrivedi 03-10-2018
         public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; } //komal 12-10-2018
         public DbQuery<GetBuySellBook> BuyerSellerInfo { get; set; } //uday 12-10-2018
+        public DbQuery<GetGraphResponse> GetGraphResponse { get; set; } //uday 22-10-2018
         //Add Tables for Service Master (Not Commited)
 
         public DbSet<ServiceMaster> ServiceMaster { get; set; }
@@ -116,6 +117,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<PoolOrder> PoolOrder { get; set; } //uday 17-10-2018
         public DbSet<CityMaster> CityMaster { get; set; } //uday 22-10-2018
         public DbSet<ZipCodeMaster> ZipCodeMaster { get; set; } //uday 22-10-2018
+        public DbSet<TradeGraphDetail> TradeGraphDetail { get; set; } //uday 22-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
@@ -164,7 +166,7 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
             modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
             modelBuilder.Entity<DepositCounterMaster>().HasKey(e => new {e.WalletTypeID, e.SerProId}); // Rita 22-10-2018 composite primary key
-
+            modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.PairId, e.DataDate }); // Uday 22-10-2018 composite primary key
         }
 
         /// <summary>

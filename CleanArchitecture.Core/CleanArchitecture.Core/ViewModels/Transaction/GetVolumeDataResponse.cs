@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +13,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     public class VolumeDataRespose
     {
         public long PairId { get; set; }
+        [JsonProperty(PropertyName = "CurrentRate")]
         public Decimal Currentrate { get; set; }
         public decimal Volume24 { get; set; }
         public decimal ChangePer { get; set; }

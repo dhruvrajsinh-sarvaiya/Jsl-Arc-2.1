@@ -169,77 +169,55 @@ namespace CleanArchitecture.Infrastructure.Services
             return responseFromServer;
         }
 
-        public JObject SendJsonRpcAPIRequestAsync(string Url, object[] RequestParameter, string method, WebHeaderCollection headerDictionary, string MethodType = "POST")
+        public string SendJsonRpcAPIRequestAsync(string Url,string RequestStr,string UserName,string Password)
         {
             try
             {
-                var perso = JsonConvert.DeserializeObject<dynamic>(method);
-                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(Url);
-
-                webRequest.ContentType = "application/json-rpc";
-                webRequest.Method = MethodType;
-
-                JObject joe = new JObject();
-                joe["jsonrpc"] = "1.0";
-                joe["id"] = "1";
-                joe["method"] = perso;
-
-                if (RequestParameter != null)
-                {
-                    if (RequestParameter.Length > 0)
-                    {
-                        JArray props = new JArray();
-                        foreach (var p in RequestParameter)
-                        {
-                            props.Add(p);
-                        }
-                        joe.Add(new JProperty("params", props));
-                    }
-                }
-
-                string s = JsonConvert.SerializeObject(joe);
-                // serialize json for the request
-                byte[] byteArray = Encoding.UTF8.GetBytes(s);
-                webRequest.ContentLength = byteArray.Length;
-
-                using (Stream dataStream = webRequest.GetRequestStream())
-                {
-                    dataStream.Write(byteArray, 0, byteArray.Length);
-                }
-
-                WebResponse webResponse = null;
+                string WSResponse = "";
                 try
                 {
-                    using (webResponse = webRequest.GetResponse())
-                    {
-                        using (Stream str = webResponse.GetResponseStream())
-                        {
-                            using (StreamReader sr = new StreamReader(str))
-                            {
-                                return JsonConvert.DeserializeObject<JObject>(sr.ReadToEnd());
-                            }
-                        }
-                    }
+                    var authInfo = UserName + ":" + Password;
+                    authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+
+                    var myReqrpc = WebRequest.Create(Url);
+                    myReqrpc.Headers.Add("Authorization", "Basic " + authInfo);
+                    myReqrpc.Method = "Post";
+
+                    var sw = new StreamWriter(myReqrpc.GetRequestStream());
+                    sw.Write(RequestStr);
+                    sw.Close();
+
+                    WebResponse response;
+                    response = myReqrpc.GetResponse();
+
+                    StreamReader StreamReader = new StreamReader(response.GetResponseStream());
+                    WSResponse = StreamReader.ReadToEnd();
+                    StreamReader.Close();
+                    response.Close();
+
+                    return WSResponse;
                 }
-                catch (WebException webex)
+                catch(WebException webex)
                 {
-                    using (Stream str = webex.Response.GetResponseStream())
+                    WebResponse errResp = webex.Response;
+                    Stream respStream = errResp.GetResponseStream();
+                    StreamReader reader = new StreamReader(respStream);
+                    string Text = reader.ReadToEnd();                   
+                    if (Text.ToLower().Contains("code"))
                     {
-                        using (StreamReader sr = new StreamReader(str))
-                        {
-                            var tempRet = JsonConvert.DeserializeObject<JObject>(sr.ReadToEnd());
-                            return tempRet;
-                        }
+                        WSResponse = Text;
                     }
+                    webex = null;
+
+                    return WSResponse;
                 }
+                
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                //throw ex;
+                throw ex;
             }
-            return new JObject();
         }
-
     }
 }
