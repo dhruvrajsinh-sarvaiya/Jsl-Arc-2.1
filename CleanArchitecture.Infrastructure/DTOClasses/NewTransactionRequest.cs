@@ -100,6 +100,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public long Delivery_ServiceID { get; set; }
         public long Pool_OrderID { get; set; }
 
+        public long TransactionRequestID { get; set; }
+
         public string APIResponse { get; set; }
 
     }

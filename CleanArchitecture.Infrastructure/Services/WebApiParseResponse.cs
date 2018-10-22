@@ -22,7 +22,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly WebApiDataRepository _webapiDataRepository;
         public WebAPIParseResponseCls _webapiParseResponse;
             //_webapiParseResponse = webapiParseResponse;
-        public WebApiParseResponse(WebAPIParseResponseCls webapiParseResponse, ILogger<WebAPISendRequest> log, GetDataForParsingAPI txnWebAPIParsingData, 
+        public WebApiParseResponse(WebAPIParseResponseCls webapiParseResponse, ILogger log, GetDataForParsingAPI txnWebAPIParsingData, 
             WebApiDataRepository webapiDataRepository, TransactionWebAPIConfiguration txnWebAPIConf)
         {
             _log = log;

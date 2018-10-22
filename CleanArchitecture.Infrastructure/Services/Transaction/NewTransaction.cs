@@ -37,6 +37,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly IGetWebRequest _IGetWebRequest;
         private readonly IWebApiSendRequest _IWebApiSendRequest;
         private readonly IWebApiData _IWebApiData;
+        WebApiParseResponse _WebApiParseResponseObj;
 
         public BizResponse _Resp;        
         public BizResponse _CreateTransactionResp;
@@ -44,11 +45,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         public TradePairDetail _TradePairDetailObj;
         public List<TransactionProviderResponse> TxnProviderList;
 
+        TransactionQueue Newtransaction;
+        TradeTransactionQueue NewTradetransaction;
         NewTransactionRequestCls Req;
         NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
         ProcessTransactionCls _TransactionObj;
         ServiceMaster _BaseCurrService;
         ServiceMaster _SecondCurrService;
+        TransactionRequest NewtransactionReq;
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
@@ -57,7 +61,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService,
             ICommonRepository<TradePairDetail> TradePairDetail, IWebApiRepository WebApiRepository,
             ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest,
-            IWebApiSendRequest WebApiSendRequest)
+            IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -72,6 +76,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TransactionRequest = TransactionRequest;
             _IGetWebRequest = IGetWebRequest;
             _IWebApiSendRequest = WebApiSendRequest;
+            _WebApiParseResponseObj = WebApiParseResponseObj;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -129,7 +134,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 MarkTransactionHold(EnResponseMessage.ProcessTrn_HoldMsg, enErrorCode.ProcessTrn_Hold);
                 if (Req.TrnType == enTrnType.Transaction || Req.TrnType == enTrnType.Withdraw)
                 {
-                    CallWebAPI();
+                    CallWebAPI(_Resp);
+                    return _Resp;
                 }
                 else//Trading process here
                 {
@@ -318,7 +324,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _Resp = new BizResponse();
             try
             {
-                var Newtransaction = new TransactionQueue()
+                Newtransaction = new TransactionQueue()
                 {
                     TrnDate = Helpers.UTC_To_IST(),
                     GUID = Guid.NewGuid(),
@@ -351,10 +357,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public BizResponse InsertTradeTransactionInQueue()
         {
-            _Resp = new BizResponse();
             try
             {
-                var Newtransaction = new TradeTransactionQueue()
+                NewTradetransaction = new TradeTransactionQueue()
                 {
                     TrnDate= Helpers.UTC_To_IST(),
                     TrnNo = Req.TrnNo,//NewTradetransactionReq.TrnNo,
@@ -379,7 +384,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     StatusCode = Req.StatusCode,
                     StatusMsg = Req.StatusMsg
                 };
-                _TradeTransactionRepository.Add(Newtransaction);
+                _TradeTransactionRepository.Add(NewTradetransaction);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
@@ -392,7 +397,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public BizResponse InsertTradeStopLoss()
         {
-            _Resp = new BizResponse();
             try
             {
                 var Newtransaction = new TradeStopLoss()
@@ -492,11 +496,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     return Task.FromResult(false);
                 }
                 //Make Transaction Initialise
-                var Txn = _TransactionRepository.GetById(Req.TrnNo);
-                Txn.MakeTransactionInProcess();
-                Txn.SetTransactionStatusMsg(EnResponseMessage.ProcessTrn_InitializeMsg);
-                Txn.SetTransactionCode(Convert.ToInt64(enErrorCode.ProcessTrn_Initialize));
-                _TransactionRepository.Update(Txn);
+                //var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Newtransaction.MakeTransactionInProcess();
+                Newtransaction.SetTransactionStatusMsg(EnResponseMessage.ProcessTrn_InitializeMsg);
+                Newtransaction.SetTransactionCode(Convert.ToInt64(enErrorCode.ProcessTrn_Initialize));
+                _TransactionRepository.Update(Newtransaction);
                 //Take Provider Configuration           
 
                 return Task.FromResult(true);
@@ -513,17 +517,17 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
-                var Txn = _TransactionRepository.GetById(Req.TrnNo);
-                Txn.MakeTransactionSystemFail();
-                Txn.SetTransactionStatusMsg(StatusMsg);
-                Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TransactionRepository.Update(Txn);
+                //var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Newtransaction.MakeTransactionSystemFail();
+                Newtransaction.SetTransactionStatusMsg(StatusMsg);
+                Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TransactionRepository.Update(Newtransaction);
 
-                var TradeTxn = _TradeTransactionRepository.GetById(Req.TrnNo);
-                TradeTxn.MakeTransactionSystemFail();
-                TradeTxn.SetTransactionStatusMsg(StatusMsg);
-                TradeTxn.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TradeTransactionRepository.Update(TradeTxn);                
+                //var TradeTxn = _TradeTransactionRepository.GetById(Req.TrnNo);
+                NewTradetransaction.MakeTransactionSystemFail();
+                NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
+                NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TradeTransactionRepository.Update(NewTradetransaction);                
             }
             catch(Exception ex)
             {
@@ -535,11 +539,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
-                var Txn = _TransactionRepository.GetById(Req.TrnNo);
-                Txn.MakeTransactionHold();
-                Txn.SetTransactionStatusMsg(StatusMsg);
-                Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TransactionRepository.Update(Txn);              
+                //var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Newtransaction.MakeTransactionHold();
+                Newtransaction.SetTransactionStatusMsg(StatusMsg);
+                Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TransactionRepository.Update(Newtransaction);              
             }
             catch (Exception ex)
             {
@@ -552,11 +556,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             CreditWalletDrArryTrnID[] CreditWalletDrArryTrnIDObj = new CreditWalletDrArryTrnID[1];
             try
             {
-                var Txn = _TransactionRepository.GetById(Req.TrnNo);
-                Txn.MakeTransactionOperatorFail();
-                Txn.SetTransactionStatusMsg(StatusMsg);
-                Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TransactionRepository.Update(Txn);
+                //var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Newtransaction.MakeTransactionOperatorFail();
+                Newtransaction.SetTransactionStatusMsg(StatusMsg);
+                Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TransactionRepository.Update(Newtransaction);
 
                 //Cr Amount to member back
                 CreditWalletDrArryTrnIDObj[0].DrTrnRefNo = Req.TrnNo;
@@ -571,12 +575,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public void CallWebAPI()
+        public void CallWebAPI(BizResponse _Resp)
         {
             //TransactionRequest TransactionRequestObj=new TransactionRequest(); 
             ThirdPartyAPIRequest ThirdPartyAPIRequestOnj;
             WebApiConfigurationResponse WebApiConfigurationResponseObj;
-            long TxnRequestID = 0;
+            WebAPIParseResponseCls WebAPIParseResponseClsObj;
+            //long TxnRequestID = 0;
+            short IsTxnProceed = 0;
             try
             {
                 foreach (TransactionProviderResponse Provider in TxnProviderList)//Make txn on every API
@@ -589,18 +595,20 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _Resp.ReturnCode = enResponseCodeService.Fail;
                         _Resp.ErrorCode = enErrorCode.ProcessTrn_ThirdPartyDataNotFound;
                         MarkTransactionOperatorFail(_Resp.ReturnMsg, _Resp.ErrorCode);
-                        return;
+                        continue;
                     }
                     ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID);
+
                     //Insert API request Data
-                    InsertUpdateTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody, false);
+                    _TransactionObj.TransactionRequestID = InsertTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody);
 
                     switch (Provider.AppTypeID)
                     {
                         case (long)enAppType.WebSocket:
 
                         case (long)enAppType.JsonRPC:
-
+                            //_IWebApiSendRequest.SendJsonRpcAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL,);
+                                 break;
                         case (long)enAppType.TCPSocket:
 
                         case (long)enAppType.RestAPI:
@@ -616,43 +624,51 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         default:
                             Console.WriteLine("Default case");
                             break;
+                    }                    
+                    NewtransactionReq.SetResponse(_TransactionObj.APIResponse);
+                    if (string.IsNullOrEmpty(_TransactionObj.APIResponse))
+                    {
+                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_HoldMsg;
+                        _Resp.ReturnCode = enResponseCodeService.Success;
+                        _Resp.ErrorCode = enErrorCode.ProcessTrn_GettingResponseBlank;
+                        MarkTransactionHold(_Resp.ReturnMsg, _Resp.ErrorCode);
+                        IsTxnProceed = 1;//no further call next API
+                        break;
                     }
+
+                    WebAPIParseResponseClsObj= _WebApiParseResponseObj.TransactionParseResponse(_TransactionObj.APIResponse, Provider.ThirPartyAPIID);
+                    //if(WebAPIParseResponseClsObj.Status)
                 }
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
             }
         }
-        public void InsertUpdateTransactionRequest(TransactionProviderResponse listObj, string Request, bool UpdateBit = true)
+        public long InsertTransactionRequest(TransactionProviderResponse listObj, string Request)
         {
             try
             {
-                if(UpdateBit==false) //Insert Here
+                NewtransactionReq = new TransactionRequest()
                 {
-                    var NewtransactionReq = new TransactionRequest()
-                    {
-                        TrnNo=Req.TrnNo,
-                        ServiceID= listObj.ServiceID,
-                        SerProID= listObj.ServiceProID,
-                        SerProDetailID= listObj.SerProDetailID,
-                        CreatedDate=Helpers.UTC_To_IST(),                        
-                        RequestData = Request
-                    };
-                    _TransactionRequest.Add(NewtransactionReq);
-                }
-                else //Update here
-                {
-
-                }
+                    TrnNo = Req.TrnNo,
+                    ServiceID = listObj.ServiceID,
+                    SerProID = listObj.ServiceProID,
+                    SerProDetailID = listObj.SerProDetailID,
+                    CreatedDate = Helpers.UTC_To_IST(),
+                    RequestData = Request
+                };
+                _TransactionRequest.Add(NewtransactionReq);
+                return NewtransactionReq.Id;
 
             }
             catch(Exception ex)
             {
-
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return 0;
             }
-        }
-
+        }       
         #endregion
 
 
