@@ -4,12 +4,19 @@ using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.ApiModels.Chat;
+using Microsoft.Extensions.Options;
 
 namespace CleanArchitecture.Web.SignalR
 {
     public class Chat : Hub
     {
-        private readonly RedisConnectionFactory _fact;
+        //private static IOptions<RedisConfiguration> redis;
+        private RedisConnectionFactory _fact;
+        //= new RedisConnectionFactory(redis);
+        public Chat(RedisConnectionFactory factory)
+        {
+            _fact = factory;
+        }
         public Task Send(string message)
         {
             return Clients.All.SendAsync("Send", message);

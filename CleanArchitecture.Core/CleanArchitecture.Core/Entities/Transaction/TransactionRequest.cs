@@ -7,20 +7,21 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public  class TransactionRequest
+    public  class TransactionRequest : BizBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public long Id { get; set; }
 
         [Required]
         public long TrnNo { get; set; }
         public long ServiceID { get; set; }
         public long SerProID { get; set; }
+        public long SerProDetailID { get; set; }
         //IsStatusCheck         
-        [Required]
-        [DataType(DataType.DateTime)]
-        public DateTime RequestTime { get; set; }
+        //[Required]
+        //[DataType(DataType.DateTime)]
+        //public DateTime RequestTime { get; set; }
 
         [Required]
         public string RequestData { get; set; }
@@ -29,7 +30,7 @@ namespace CleanArchitecture.Core.Entities
         public DateTime ResponseTime { get; set; }
         
         public string ResponseData { get; set; }
-        public short Status { get; set; }
+        //public short Status { get; set; }
         public string TrnID { get; set; }
         public string OprTrnID { get; set; }
     }

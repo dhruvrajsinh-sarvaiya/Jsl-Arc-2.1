@@ -21,6 +21,8 @@ namespace CleanArchitecture.Core.Entities.Transaction
         public long BuyServiceID { get; set; }
         [Key]
         public long BidPrice { get; set; }
+        [Key]
+        public long CountPerPrice { get; set; }
 
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]

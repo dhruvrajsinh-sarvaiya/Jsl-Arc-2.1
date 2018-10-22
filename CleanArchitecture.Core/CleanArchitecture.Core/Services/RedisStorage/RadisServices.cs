@@ -31,6 +31,13 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             this.Db.KeyDelete(key);
         }
 
+        public void DeleteHash(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
+            
+            this.Db.KeyDelete(key);
+        }
+
         public T Get(string key)
         {
             try
@@ -94,7 +101,7 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
                     var key = member.Key;
                     var type = member.MemberType;
                     var user = member.GetMemberAs<RedisUserdata>();
-                    Delete(key);
+                    DeleteHash(key);
                 }
             }
             catch (Exception ex)

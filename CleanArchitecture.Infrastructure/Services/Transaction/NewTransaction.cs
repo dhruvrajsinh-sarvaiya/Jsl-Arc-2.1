@@ -32,21 +32,28 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<AddressMaster> _AddressMasterRepository;
         private readonly ILogger<NewTransaction> _log;
         private readonly IWalletService _WalletService;
+        private readonly IWebApiRepository _WebApiRepository;
+        private readonly ICommonRepository<TransactionRequest> _TransactionRequest;
+        private readonly IGetWebRequest _IGetWebRequest;
         public BizResponse _Resp;        
         public BizResponse _CreateTransactionResp;
         public TradePairMaster _TradePairObj;
         public TradePairDetail _TradePairDetailObj;
-       
+        public List<TransactionProviderResponse> TxnProviderList;
+
         NewTransactionRequestCls Req;
         NewTradeTransactionRequestCls _TradeTransactionObj = new NewTradeTransactionRequestCls();
         ProcessTransactionCls _TransactionObj;
+        ServiceMaster _BaseCurrService;
+        ServiceMaster _SecondCurrService;
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository,
             ICommonRepository<ServiceMaster> ServiceConfi, ICommonRepository<AddressMaster> AddressMasterRepository,
             EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService,
-            ICommonRepository<TradePairDetail> TradePairDetail)
+            ICommonRepository<TradePairDetail> TradePairDetail, IWebApiRepository WebApiRepository,
+            ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -57,11 +64,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TradeStopLoss = tradeStopLoss;
             _WalletService = WalletService;
             _TradePairDetail = TradePairDetail;
+            _WebApiRepository = WebApiRepository;
+            _TransactionRequest = TransactionRequest;
+            _IGetWebRequest = IGetWebRequest;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
             Req = Req1;
-            _Resp = new BizResponse();            
+            //_Resp = new BizResponse();            
 
             _Resp = CreateTransaction();
             if (_Resp.ReturnCode != enResponseCodeService.Success)
@@ -79,32 +89,56 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
         public async Task<BizResponse> CombineAllInitTransactionAsync()
         {
-          
             _Resp = new BizResponse();
-            //=========================PROCESS
-            //Check balance here
-            var Validation=ValidateTransaction(_Resp);           
+            try
+            {               
+                //=========================PROCESS
+                //Check balance here
+                var Validation = ValidateTransaction(_Resp);
 
-            if (!await Validation) //validation and balance check success
-            {
-                MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
-                return _Resp;
+                if (!await Validation) //validation and balance check success
+                {
+                    MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
+                    return _Resp;
+                }
+                var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitWalletID); //DI of Wallet for balance check
+                if (!BalResult) //validation and balance check success
+                {
+                    _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InsufficientBalanceMsg;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ErrorCode = enErrorCode.ProcessTrn_InsufficientBalance;
+                    MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
+                    return _Resp;
+                }
+                //Deduct balance here
+                if(_WalletService.GetWalletDeductionNew(Req.SMSCode, "", enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
+                    Req.DebitWalletID.ToString(), Req.TrnNo, enServiceType.Recharge, enWalletTrnType.Cr_Buy_Trade).ReturnCode!=enResponseCode.Fail)
+                {
+                    _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_WalletDebitFailMsg;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ErrorCode = enErrorCode.ProcessTrn_WalletDebitFail;
+                    MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
+                    return _Resp;
+                }
+                //Make txn hold as balance debited
+                MarkTransactionHold(EnResponseMessage.ProcessTrn_HoldMsg, enErrorCode.ProcessTrn_Hold);
+                if (Req.TrnType == enTrnType.Transaction || Req.TrnType == enTrnType.Withdraw)
+                {
+                    CallWebAPI();
+                }
+                else//Trading process here
+                {
+
+                }
+
+                //=========================UPDATE
+                return null;
             }
-            var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitWalletID); //DI of Wallet for balance check
-            if (!BalResult) //validation and balance check success
+            catch (Exception ex)
             {
-                _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InsufficientBalanceMsg;
-                _Resp.ReturnCode = enResponseCodeService.Fail;
-                _Resp.ErrorCode = enErrorCode.ProcessTrn_InsufficientBalance;
-                MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
-                return _Resp;
-            }
-
-
-
-
-            //=========================UPDATE
-            return null;
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionProcessInternalError });
+            }            
         }
 
         #region RegionInitTransaction    
@@ -120,7 +154,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 if (Req.TrnType == enTrnType.Buy_Trade)
                 {
-                    _TradeTransactionObj.TrnTypeName = "BUY";
+                    _TradeTransactionObj.TrnTypeName = "BUY";                    
                 }
                 else if (Req.TrnType == enTrnType.Sell_Trade)
                 {
@@ -148,14 +182,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         Req.StatusMsg = EnResponseMessage.CreateTrnInvalidQtyPriceMsg;
                         return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidQtyPrice);
                     }
+                    _BaseCurrService = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.BaseCurrencyId);
+                    _SecondCurrService = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.SecondaryCurrencyId);
                     if (Req.TrnType == enTrnType.Buy_Trade)
                     {
                         _TradeTransactionObj.BuyQty = Req.Qty;
                         _TradeTransactionObj.BidPrice = Req.Price;
                         _TradeTransactionObj.DeliveryTotalQty = Req.Qty;
                         _TradeTransactionObj.OrderTotalQty = Helpers.DoRoundForTrading(Req.Qty * Req.Price, 8);//235.415001286,8 =  235.41500129                         
-                        _TradeTransactionObj.Order_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.BaseCurrencyId).SMSCode;
-                        _TradeTransactionObj.Delivery_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.SecondaryCurrencyId).SMSCode;
+                        _TradeTransactionObj.Order_Currency = _BaseCurrService.SMSCode;
+                        _TradeTransactionObj.Delivery_Currency = _SecondCurrService.SMSCode;
                     }
                     if (Req.TrnType == enTrnType.Sell_Trade)
                     {
@@ -163,15 +199,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _TradeTransactionObj.AskPrice = Req.Price;
                         _TradeTransactionObj.OrderTotalQty = Req.Qty;
                         _TradeTransactionObj.DeliveryTotalQty = Helpers.DoRoundForTrading(Req.Qty * Req.Price, 8);//235.415001286,8 =  235.41500129                        
-                        _TradeTransactionObj.Order_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.SecondaryCurrencyId).SMSCode;
-                        _TradeTransactionObj.Delivery_Currency = _ServiceConfi.GetSingle(item => item.Id == _TradePairObj.BaseCurrencyId).SMSCode;
+                        _TradeTransactionObj.Order_Currency = _SecondCurrService.SMSCode;
+                        _TradeTransactionObj.Delivery_Currency = _BaseCurrService.SMSCode;
                     }
                     if (_TradeTransactionObj.OrderTotalQty < (decimal)(0.00000001) || _TradeTransactionObj.DeliveryTotalQty < (decimal)(0.00000001))
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnInvalidQtyNAmountMsg;
                         return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidQtyNAmount);
                     }
-                    //Req.SMSCode = _TradeTransactionObj.Order_Currency;
+                    Req.SMSCode = _TradeTransactionObj.Order_Currency;
                     //Balace check Here , take DeliveryWalletID output
                     _TradeTransactionObj.DeliveryWalletID = Req.CreditWalletID;
                     _TradeTransactionObj.OrderWalletID = Req.DebitWalletID;
@@ -377,94 +413,162 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             _TransactionObj =new ProcessTransactionCls();
             //Member Service Disable check here for regular txn
-            
-            if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade) //Only for trade
+            try
             {
-                if (Req.TrnType == enTrnType.Buy_Trade)
+                if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade) //Only for trade
                 {
-                    _TransactionObj.BidPrice_TQ = _TradeTransactionObj.BidPrice;
-                    _TransactionObj.BidPrice_BuyReq = Helpers.DoRoundForTrading(1 / _TradeTransactionObj.BidPrice, 8);
-                    //_TradePairDetailObj
-                    if (_TradeTransactionObj.BuyQty < _TradePairDetailObj.BuyMinQty || _TradeTransactionObj.BuyQty > _TradePairDetailObj.BuyMaxQty)
+                    if (Req.TrnType == enTrnType.Buy_Trade)
                     {
-                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.BuyMinQty.ToString()).Replace("@MAX", _TradePairDetailObj.BuyMaxQty.ToString());
-                        _Resp.ReturnCode = enResponseCodeService.Fail;
-                        _Resp.ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax;
-                        return Task.FromResult(false);
-                    }
-                    if (_TradeTransactionObj.BidPrice < _TradePairDetailObj.BuyMinPrice || _TradeTransactionObj.BidPrice > _TradePairDetailObj.BuyMaxPrice)
-                    {
-                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_PriceBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.BuyMinPrice.ToString()).Replace("@MAX", _TradePairDetailObj.BuyMaxPrice.ToString());
-                        _Resp.ReturnCode = enResponseCodeService.Fail;
-                        _Resp.ErrorCode = enErrorCode.ProcessTrn_PriceBetweenMinMax;
-                        return Task.FromResult(false);
-                    }
+                        _TransactionObj.BidPrice_TQ = _TradeTransactionObj.BidPrice;
+                        _TransactionObj.BidPrice_BuyReq = Helpers.DoRoundForTrading(1 / _TradeTransactionObj.BidPrice, 8);
+                        //_TradePairDetailObj
+                        if (_TradeTransactionObj.BuyQty < _TradePairDetailObj.BuyMinQty || _TradeTransactionObj.BuyQty > _TradePairDetailObj.BuyMaxQty)
+                        {
+                            _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.BuyMinQty.ToString()).Replace("@MAX", _TradePairDetailObj.BuyMaxQty.ToString());
+                            _Resp.ReturnCode = enResponseCodeService.Fail;
+                            _Resp.ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax;
+                            return Task.FromResult(false);
+                        }
+                        if (_TradeTransactionObj.BidPrice < _TradePairDetailObj.BuyMinPrice || _TradeTransactionObj.BidPrice > _TradePairDetailObj.BuyMaxPrice)
+                        {
+                            _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_PriceBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.BuyMinPrice.ToString()).Replace("@MAX", _TradePairDetailObj.BuyMaxPrice.ToString());
+                            _Resp.ReturnCode = enResponseCodeService.Fail;
+                            _Resp.ErrorCode = enErrorCode.ProcessTrn_PriceBetweenMinMax;
+                            return Task.FromResult(false);
+                        }
+                        _TransactionObj.Delivery_ServiceID = _SecondCurrService.Id;
 
-                }
-                else if (Req.TrnType == enTrnType.Buy_Trade)
-                {
-                    _TransactionObj.BidPrice_TQ = Helpers.DoRoundForTrading(1 / _TradeTransactionObj.AskPrice, 8);
-                    _TransactionObj.BidPrice_BuyReq = _TradeTransactionObj.AskPrice;
-                    //_TradePairDetailObj
-                    if (_TradeTransactionObj.SellQty < _TradePairDetailObj.SellMinQty || _TradeTransactionObj.SellQty > _TradePairDetailObj.SellMaxQty)
-                    {
-                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.SellMinQty.ToString()).Replace("@MAX", _TradePairDetailObj.SellMaxQty.ToString());
-                        _Resp.ReturnCode = enResponseCodeService.Fail;
-                        _Resp.ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax;
-                        return Task.FromResult(false);
                     }
-                    if (_TradeTransactionObj.AskPrice < _TradePairDetailObj.SellMinPrice || _TradeTransactionObj.AskPrice > _TradePairDetailObj.SellMaxPrice)
+                    else if (Req.TrnType == enTrnType.Sell_Trade)
                     {
-                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_PriceBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.SellMinPrice.ToString()).Replace("@MAX", _TradePairDetailObj.SellMaxPrice.ToString());
-                        _Resp.ReturnCode = enResponseCodeService.Fail;
-                        _Resp.ErrorCode = enErrorCode.ProcessTrn_PriceBetweenMinMax;
-                        return Task.FromResult(false);
-                    }
+                        _TransactionObj.BidPrice_TQ = Helpers.DoRoundForTrading(1 / _TradeTransactionObj.AskPrice, 8);
+                        _TransactionObj.BidPrice_BuyReq = _TradeTransactionObj.AskPrice;
+                        //_TradePairDetailObj
+                        if (_TradeTransactionObj.SellQty < _TradePairDetailObj.SellMinQty || _TradeTransactionObj.SellQty > _TradePairDetailObj.SellMaxQty)
+                        {
+                            _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.SellMinQty.ToString()).Replace("@MAX", _TradePairDetailObj.SellMaxQty.ToString());
+                            _Resp.ReturnCode = enResponseCodeService.Fail;
+                            _Resp.ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax;
+                            return Task.FromResult(false);
+                        }
+                        if (_TradeTransactionObj.AskPrice < _TradePairDetailObj.SellMinPrice || _TradeTransactionObj.AskPrice > _TradePairDetailObj.SellMaxPrice)
+                        {
+                            _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_PriceBetweenMinMaxMsg.Replace("@MIN", _TradePairDetailObj.SellMinPrice.ToString()).Replace("@MAX", _TradePairDetailObj.SellMaxPrice.ToString());
+                            _Resp.ReturnCode = enResponseCodeService.Fail;
+                            _Resp.ErrorCode = enErrorCode.ProcessTrn_PriceBetweenMinMax;
+                            return Task.FromResult(false);
+                        }
+                        _TransactionObj.Delivery_ServiceID = _BaseCurrService.Id;
 
+                    }
+                    if (_TransactionObj.BidPrice_TQ == 0 || _TransactionObj.BidPrice_BuyReq == 0)
+                    {
+                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InvalidBidPriceValueMsg;
+                        _Resp.ErrorCode = enErrorCode.ProcessTrn_InvalidBidPriceValue;
+                        _Resp.ReturnCode = enResponseCodeService.Fail;
+                        return Task.FromResult(false);
+                    }
+                    //_TransactionObj.Delivery_ServiceID = _ServiceConfi.GetSingle(item => item.SMSCode == _TradeTransactionObj.Delivery_Currency).Id;
+                    //NOTE : Make Pool Order here
+                    if (_TransactionObj.Pool_OrderID == 0)
+                    {
+                        _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_PoolOrderCreateFailMsg;
+                        _Resp.ErrorCode = enErrorCode.ProcessTrn_PoolOrderCreateFail;
+                        _Resp.ReturnCode = enResponseCodeService.Fail;
+                        return Task.FromResult(false);
+                    }
                 }
-                if (_TransactionObj.BidPrice_TQ==0 || _TransactionObj.BidPrice_BuyReq==0)
+                TxnProviderList = _WebApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { amount = Req.Amount, SMSCode = Req.SMSCode, APIType = enWebAPIRouteType.TransactionAPI, trnType = Convert.ToInt32(Req.TrnType) });
+                if (TxnProviderList == null)
                 {
-                    _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InvalidBidPriceValueMsg;                    
-                    _Resp.ErrorCode = enErrorCode.ProcessTrn_InvalidBidPriceValue;
+                    _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_ServiceProductNotAvailableMsg;
+                    _Resp.ErrorCode = enErrorCode.ProcessTrn_ServiceProductNotAvailable;
                     _Resp.ReturnCode = enResponseCodeService.Fail;
                     return Task.FromResult(false);
                 }
-                _TransactionObj.Delivery_ServiceID = _ServiceConfi.GetSingle(item => item.SMSCode == _TradeTransactionObj.Delivery_Currency).Id;
-                //NOTE : Make Pool Order here
-                if(_TransactionObj.Pool_OrderID==0)
+                //Make Transaction Initialise
+                var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Txn.MakeTransactionInProcess();
+                Txn.SetTransactionStatusMsg(EnResponseMessage.ProcessTrn_InitializeMsg);
+                Txn.SetTransactionCode(Convert.ToInt64(enErrorCode.ProcessTrn_Initialize));
+                _TransactionRepository.Update(Txn);
+                //Take Provider Configuration           
+
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);                
+                return Task.FromResult(false);
+            }
+
+           
+        }
+        public void MarkTransactionSystemFail(string StatusMsg,enErrorCode ErrorCode)
+        {
+            try
+            {
+                var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Txn.MakeTransactionSystemFail();
+                Txn.SetTransactionStatusMsg(StatusMsg);
+                Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TransactionRepository.Update(Txn);
+
+                var TradeTxn = _TradeTransactionRepository.GetById(Req.TrnNo);
+                TradeTxn.MakeTransactionSystemFail();
+                TradeTxn.SetTransactionStatusMsg(StatusMsg);
+                TradeTxn.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TradeTransactionRepository.Update(TradeTxn);                
+            }
+            catch(Exception ex)
+            {
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            } 
+        }
+        public void MarkTransactionHold(string StatusMsg, enErrorCode ErrorCode)
+        {
+            try
+            {
+                var Txn = _TransactionRepository.GetById(Req.TrnNo);
+                Txn.MakeTransactionHold();
+                Txn.SetTransactionStatusMsg(StatusMsg);
+                Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                _TransactionRepository.Update(Txn);              
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public void CallWebAPI()
+        {
+            TransactionRequest TransactionRequestObj=new TransactionRequest(); //_TransactionRequest 
+            ThirdPartyAPIRequest ThirdPartyAPIRequestOnj;
+            try
+            {
+                foreach (TransactionProviderResponse Provider in TxnProviderList)//Make txn on every API
                 {
-                    _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_PoolOrderCreateFailMsg;
-                    _Resp.ErrorCode = enErrorCode.ProcessTrn_PoolOrderCreateFail;
-                    _Resp.ReturnCode = enResponseCodeService.Fail;
-                    return Task.FromResult(false);
+                    _IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID);
+
                 }
             }
-            //Make Transaction Initialise
-            var Txn = _TransactionRepository.GetById(Req.TrnNo);
-            Txn.MakeTransactionInProcess();
-            Txn.SetTransactionStatusMsg(EnResponseMessage.ProcessTrn_InitializeMsg);
-            Txn.SetTransactionCode(Convert.ToInt64(enErrorCode.ProcessTrn_Initialize));
-            _TransactionRepository.Update(Txn);
-            //Take Provider Configuration
-
-
-            return Task.FromResult(true);
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+            }
         }
-        public BizResponse MarkTransactionSystemFail(string StatusMsg,enErrorCode ErrorCode)
+        public void InsertUpdateTransactionRequest(long TrnNo)
         {
-            var Txn = _TransactionRepository.GetById(Req.TrnNo);
-            Txn.MakeTransactionSystemFail();
-            Txn.SetTransactionStatusMsg(StatusMsg);
-            Txn.SetTransactionCode(Convert.ToInt64(ErrorCode));
-            _TransactionRepository.Update(Txn);
+            try
+            {
 
-            var TradeTxn = _TradeTransactionRepository.GetById(Req.TrnNo);
-            TradeTxn.MakeTransactionSystemFail();
-            TradeTxn.SetTransactionStatusMsg(StatusMsg);
-            TradeTxn.SetTransactionCode(Convert.ToInt64(ErrorCode));
-            _TradeTransactionRepository.Update(TradeTxn);
-            
-            return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal };
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
 
         #endregion

@@ -166,6 +166,8 @@ namespace CleanArchitecture.Core.Enums
         ProcessTrn_Initialize = 1,
         TransactionProcessInternalError = 1,
         ProcessTrn_ServiceProductNotAvailable = 1,
+        ProcessTrn_WalletDebitFail = 1,
+        ProcessTrn_Hold = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

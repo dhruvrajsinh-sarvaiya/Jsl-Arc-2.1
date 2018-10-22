@@ -40,12 +40,15 @@ namespace CleanArchitecture.Core.Enums
         public static string ProcessTrn_PoolOrderCreateFailMsg = "Order Creation Fail";
         public static string ProcessTrn_InitializeMsg = "Initialize";
         public static string ProcessTrn_ServiceProductNotAvailableMsg = "Service or Product Not Available";
+        public static string ProcessTrn_WalletDebitFailMsg = "Wallet Debit Fail";
+        public static string ProcessTrn_HoldMsg = "Hold";
         //============================
 
         //============================walelt=================================//       
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
-        public static string SetWalletLimitSuccessMsg = "Limit Created Successfully";
+        public static string SetWalletLimitCreateMsg = "Limit Created Successfully";
+        public static string SetWalletLimitUpdateMsg = "Limit Updated Successfully";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
         public static string CreateAddressFailMsg = "Failed to generate Address.";
