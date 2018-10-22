@@ -366,6 +366,14 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
+
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+
                 var result = await _userManager.FindByEmailAsync(model.Email);
                 if (string.IsNullOrEmpty(result?.Email))
                 {
@@ -397,7 +405,7 @@ namespace CleanArchitecture.Web.API
                         }
                         else
                         {
-                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                         }
                     }
                     else
@@ -407,7 +415,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status4062UseralreadRegister });
                 }
             }
             catch (Exception ex)
@@ -428,6 +436,13 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+
                 var tempdata = await _tempUserRegisterService.GetEmailDet(model.Email);
                 if (tempdata?.Id > 0)
                 {
@@ -439,7 +454,7 @@ namespace CleanArchitecture.Web.API
                             if (tempdata.Id == 0 && tempotp.Id == 0)
                             {
                                 //ModelState.AddModelError(string.Empty, "Error.");
-                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                             }
                             else if (model.OTP == tempotp.OTP)
                             {
@@ -471,40 +486,40 @@ namespace CleanArchitecture.Web.API
                                         }
                                         else
                                         {
-                                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpRole, ErrorCode = enErrorCode.Status400BadRequest });
+                                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpRole, ErrorCode = enErrorCode.Status4066UserRoleNotAvailable });
                                         }
                                     }
                                     else
                                     {
                                         //ModelState.AddModelError(string.Empty, "This Email is already registered.");
-                                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUserNotRegister, ErrorCode = enErrorCode.Status4063UserNotRegister });
                                     }
                                 }
                                 else
                                 {
-                                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status4062UseralreadRegister });
                                     //return BadRequest(new ApiError(ModelState));
                                 }
                             }
                             else
                             {
-                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpOTP, ErrorCode = enErrorCode.Status400BadRequest });
+                                return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpOTP, ErrorCode = enErrorCode.Status4067InvalidOTPorexpired });
                             }
                         }
                         else
                         {
                             //ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status4067InvalidOTPorexpired });
                         }
                     }
                     else
                     {
-                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                     }
                 }
                 else
                 {
-                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)
@@ -525,6 +540,13 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+
                 var result = await _userManager.FindByEmailAsync(model.Email);
                 if (string.IsNullOrEmpty(result?.Email))
                 {
@@ -552,7 +574,7 @@ namespace CleanArchitecture.Web.API
                         {
                             //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
                             //return BadRequest(new ApiError(ModelState));
-                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status4062UseralreadRegister});
 
                             //SendEmailRequest request = new SendEmailRequest();
                             //request.Recepient = model.Email;
@@ -567,13 +589,13 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                     }
                 }
                 else
                 {
                     //ModelState.AddModelError(string.Empty, "This username or email is already registered.");
-                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)

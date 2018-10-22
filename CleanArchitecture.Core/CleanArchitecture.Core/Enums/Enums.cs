@@ -209,6 +209,9 @@ namespace CleanArchitecture.Core.Enums
         Status4063UserNotRegister = 4063,
         Status4064EmailLinkBlanck = 4064,
 
+        Status4066UserRoleNotAvailable = 4066,
+        Status4067InvalidOTPorexpired = 4067,
+
 
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
