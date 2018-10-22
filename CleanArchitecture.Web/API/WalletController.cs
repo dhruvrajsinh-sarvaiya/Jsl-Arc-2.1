@@ -21,7 +21,7 @@ using CleanArchitecture.Web.Helper;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    //[Authorize]
+    [Authorize]
     public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
