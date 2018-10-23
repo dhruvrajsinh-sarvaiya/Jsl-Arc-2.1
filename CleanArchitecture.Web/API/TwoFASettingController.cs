@@ -162,7 +162,7 @@ namespace CleanArchitecture.Web.API
                         SharedKey = FormatKey(unformattedKey),
                         AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
                     };
-                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor , EnableAuthenticatorViewModel = model });
 
                 }
                 else
@@ -173,7 +173,7 @@ namespace CleanArchitecture.Web.API
                         SharedKey = FormatKey(unformattedKey),
                         AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
                     };
-                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, enableAuthenticatorViewModel = model });
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, EnableAuthenticatorViewModel = model });
 
                 }
 

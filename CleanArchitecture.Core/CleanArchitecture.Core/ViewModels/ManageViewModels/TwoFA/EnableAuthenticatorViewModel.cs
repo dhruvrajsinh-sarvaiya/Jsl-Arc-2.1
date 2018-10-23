@@ -20,6 +20,6 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels
 
     public class EnableAuthenticationResponse : BizResponseClass
     {
-        public EnableAuthenticatorViewModel enableAuthenticatorViewModel { get; set; }
+        public EnableAuthenticatorViewModel EnableAuthenticatorViewModel { get; set; }
     }
 }
