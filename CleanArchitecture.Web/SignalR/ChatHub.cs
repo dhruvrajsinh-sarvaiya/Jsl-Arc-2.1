@@ -17,16 +17,15 @@ namespace CleanArchitecture.Web.SignalR
         }
 
         //For Testing Connection
-        public Task Send(string message)
+        public void SendToAll(string name, string message)
         {
-            return Clients.All.SendAsync("Send", message);
+            Clients.All.SendAsync("sendToAll", name, message);
         }
 
         // Add for Subscription Channel
         public override Task OnConnectedAsync()
         {
-            Groups.AddToGroupAsync(Context.ConnectionId, "BroadCast").Wait();
-            Groups.AddToGroupAsync(Context.ConnectionId, "GroupMessage").Wait();
+            Groups.AddToGroupAsync(Context.ConnectionId, "BroadCast").Wait();            
             return base.OnConnectedAsync();
         }
 
@@ -38,7 +37,18 @@ namespace CleanArchitecture.Web.SignalR
             Redis1.SaveToHash(UserID + ":Token", new ConnetedClientToken { Token = AccessToken }, Context.ConnectionId);
             var Redis2 = new RadisServices<ConnetedUserDetail>(this._fact);
             Redis2.SaveToHash(UserID + ":UserDetail", new ConnetedUserDetail { UserName = Username }, Context.ConnectionId);
-
+            //var Redis3 = new RadisServices<BlockUserDetail>(this._fact);
+            //BlockUserDetail User = new BlockUserDetail();
+            //User = Redis3.GetConnectionID(UserID + ":BlockDetail");
+            //if (string.IsNullOrEmpty(User.ToString()) && !User.IsBlock)
+            //{
+            //    Groups.AddToGroupAsync(Context.ConnectionId, "GroupMessage").Wait();
+            //}
+            //else
+            //{
+            //    // on this action Remove text box from Chat for this client
+            //    Clients.Client(Context.ConnectionId).SendAsync("BlockedUser", User.ToString());
+            //}            
             //Groups.AddToGroupAsync(Context.ConnectionId, "BroadCast");
         }
 
@@ -64,12 +74,12 @@ namespace CleanArchitecture.Web.SignalR
         }
 
         // one to one Message Chat
-        public void SendChatMessage(string UserID, string message)
+        public void SendChatMessage(string UserID, string Message)
         {
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
             User = Redis.GetConnectionID(UserID + ":ConnectionDetail");
-            Clients.Client(User.ConnectionId).SendAsync("RecieveMessage", User + ": " + message);
+            Clients.Client(User.ConnectionId).SendAsync("RecieveMessage", User + ": " + Message);
             //Clients.Group("BroadCast").SendAsync("BroadcastMessage", User + ": " + message);
         }
 
@@ -86,7 +96,6 @@ namespace CleanArchitecture.Web.SignalR
         {
             Clients.Group("BroadCast").SendAsync("BroadcastMessage", Data);
         }
-
 
         public void TransactionHistory(string Data)
         {
@@ -109,7 +118,7 @@ namespace CleanArchitecture.Web.SignalR
             Clients.Client(Context.ConnectionId).SendAsync("RecieveChatHistory", Data);
         }
 
-        public void BlockedUsers(string UserID)
+        public void BlockedUser(string UserID)
         {
             // Add to blocklist
             var Redis2 = new RadisServices<BlockUserDetail>(this._fact);

@@ -437,6 +437,27 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+
+        public MarketCapData GetMarketCap(long PairId)
+        {
+            decimal ChangePer = 0;
+            decimal Volume24 = 0;
+            try
+            {
+                MarketCapData res = new MarketCapData();
+                res = _frontTrnRepository.GetMarketCap(PairId);
+                var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == PairId);
+                GetPairAdditionalVal(PairId, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+                res.Volume24 = Volume24;
+                res.ChangePer = ChangePer;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         #endregion
 
         #region parameterValidation

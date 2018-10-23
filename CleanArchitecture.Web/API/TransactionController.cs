@@ -575,37 +575,6 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        //[HttpGet("GetMarketCap{Pair}")]
-        //public ActionResult GetMarketCap(string Pair)
-        //{
-        //    MarketCapResponse Response = new MarketCapResponse();
-        //    try
-        //    {
-        //        if (!_frontTrnService.IsValidPairName(Pair))
-        //        {
-        //            Response.ReturnCode = enResponseCode.Fail;
-        //            Response.ErrorCode = enErrorCode.InvalidPairName;
-        //            return Ok(Response);
-        //        }
-        //        long id = _frontTrnService.GetPairIdByName(Pair);
-        //        if (id == 0)
-        //        {
-        //            Response.ReturnCode = enResponseCode.Fail;
-        //            Response.ErrorCode = enErrorCode.NoDataFound;
-        //            return Ok(Response);
-        //        }
-        //        Response.response = _frontTrnService.GetTradePairByName(id);
-        //        Response.ReturnCode = enResponseCode.Success;
-        //        return Ok(Response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-        //        Response.ReturnCode = enResponseCode.InternalError;
-        //        return Ok(Response);
-        //    }
-        //}
-
         [HttpGet("GetGraphDetail{Pair}")]
         public ActionResult GetGraphDetail(string Pair)
         {
@@ -645,7 +614,39 @@ namespace CleanArchitecture.Web.API
                 return Ok(Response);
             }
         }
+
+        [HttpGet("GetMarketCap{Pair}")]
+        public ActionResult GetMarketCap(string Pair)
+        {
+            MarketCapResponse Response = new MarketCapResponse();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(Response);
+                }
+                Response.response = _frontTrnService.GetMarketCap(id);
+                Response.ReturnCode = enResponseCode.Success;
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
         #endregion
+
 
         //[HttpGet("GetTickerInformation")] //get Trade Pair Binnance https://api.binance.com/api/v3/ticker/bookTicker //https://api.binance.com/api/v3/ticker/bookTicker?symbol=LTCBTC
         //public IActionResult GetTickerInformation(TradePairAssetRequest request)
