@@ -8,6 +8,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
 {
     public class CreateWalletResponse : BizResponseClass
     {
+
         public string PublicAddress { get; set; }
 
         public string AccWalletID { get; set; }

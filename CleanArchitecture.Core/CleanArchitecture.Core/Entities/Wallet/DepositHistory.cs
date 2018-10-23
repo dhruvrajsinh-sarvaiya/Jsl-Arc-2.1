@@ -22,6 +22,7 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public string SMSCode { get; set; }
 
+        [Key]
         [Required]
         [StringLength(50)]
         public string Address { get; set; }

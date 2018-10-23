@@ -11,7 +11,6 @@ namespace CleanArchitecture.Core.Entities.Wallet
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new long Id { get; set; }
-
         public int RecordCount { get; set; }
         public long Limit { get; set; }
         public string LastTrnID { get; set; }
@@ -21,6 +20,8 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Key]
         public long SerProId { get; set; }
         public string PreviousTrnID { get; set; }
+        public string prevIterationID { get; set; }
+
         public long TPSPickupStatus { get; set; }
         // public long AutoNo { get; set; }
         // public DateTime UpdateDate { get; set; }
