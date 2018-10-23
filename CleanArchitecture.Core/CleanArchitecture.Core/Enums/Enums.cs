@@ -211,7 +211,7 @@ namespace CleanArchitecture.Core.Enums
 
         Status4066UserRoleNotAvailable = 4066,
         Status4067InvalidOTPorexpired = 4067,
-        Status4068TwoFactorVerificationDisable=4068,
+        Status4071TwoFactorVerificationDisable=4071,
 
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
