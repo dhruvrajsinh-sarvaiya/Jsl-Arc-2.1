@@ -87,7 +87,7 @@ namespace CleanArchitecture.Core.Enums
         public static string SendMailBody = "Do not Share this code with anyone for security reasons. Your unique verfication code is ";
         public static string SendSMSSubject = "Do not Share this code with anyone for security reasons. Your unique verfication code is ";
         public static string LoginEmailSubject = "Login With Email Otp ";
-        public static string StandardSignUpPhonevelid = "Please Enter Valid Mobile Number";
+        public static string StandardSignUpPhonevalid = "Please Enter Valid Mobile Number";
         public static string StandardSignUp = "Your account has been created, please verify it by clicking the activation link that has been send to your email.";
         public static string SignUpValidation = "This username or email is already registered.";
         public static string SignUpUser = "This user data not available.";

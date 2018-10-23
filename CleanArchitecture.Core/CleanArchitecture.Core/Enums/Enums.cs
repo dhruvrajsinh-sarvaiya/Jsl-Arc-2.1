@@ -216,6 +216,10 @@ namespace CleanArchitecture.Core.Enums
         Status4069InvalidGoogleProviderKey = 4069,
         Status4070SocialUserInsertError = 4070,
         Status4071TwoFactorVerificationDisable = 4071,
+        Status4074SignUPMobileValidation = 4074,
+        Status4075SignUPOTP = 4075,
+        Status4076SignUpReSendOTP = 4076,
+        Status4078SignUpRole = 4078,
 
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
