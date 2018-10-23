@@ -1025,7 +1025,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
                     for (int w = 0; w <= arryTrnID.Length - 1; w++)
                     {
-                        woObj = InsertIntoWalletTransactionOrder(null, UTC_To_IST(), cWalletobj.Id, arryTrnID[w].dWalletId, arryTrnID[w].Amount, coinName, tqObj.TrnNo, arryTrnID[w].DrTrnRefNo, 0, "Inserted");
+                        woObj = InsertIntoWalletTransactionOrder(null, UTC_To_IST(), cWalletobj.Id, arryTrnID[w].dWalletId, arryTrnID[w].Amount, coinName, tqObj.TrnNo, arryTrnID[w].DrTQTrnNo, 0, "Inserted");
                         woObj = _walletRepository1.AddIntoWalletTransactionOrder(woObj, 1);
                         arryTrnID[w].OrderID = woObj.OrderID;
                     }
@@ -1039,10 +1039,10 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
                 remarks = "Credit for TrnNo:" + tqObj.TrnNo;
-                cWalletobj.CreditBalance(TotalAmount);
+                
                 WalletLedger walletLedger = GetWalletLedger(cWalletobj.Id, 0, 0, TotalAmount, trnType, serviceType, tqObj.TrnNo, remarks, cWalletobj.Balance, 1);
                 TransactionAccount tranxAccount = GetTransactionAccount(cWalletobj.Id, 1, batchObj.Id, 0, TotalAmount, tqObj.TrnNo, remarks, 1);
-
+                cWalletobj.CreditBalance(TotalAmount);
                 //var objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, 1, "Updated");
                 tqObj.Status = enTransactionStatus.Success;
                 tqObj.StatusMsg = "Success.";
