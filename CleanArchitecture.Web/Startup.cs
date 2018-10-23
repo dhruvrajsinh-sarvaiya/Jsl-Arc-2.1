@@ -57,7 +57,16 @@ namespace CleanArchitecture.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-                    //define Redis Configuration
+            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+            {
+                builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin()
+                    .AllowCredentials();
+            }));
+
+            //define Redis Configuration
             services.Configure<RedisConfiguration>(Configuration.GetSection("redis"));
             services.AddSession();
             services.AddDistributedRedisCache(options =>
