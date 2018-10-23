@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.ViewModels;
+﻿using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using System;
 using System.Collections.Generic;
@@ -26,5 +27,6 @@ namespace CleanArchitecture.Core.Interfaces
         GetGraphDetailInfo GetGraphDetail(long PairId);
         MarketCapData GetMarketCap(long PairId);
         VolumeDataRespose GetVolumeDataByPair(long PairId);
+        bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);
     }
 }

@@ -27,8 +27,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<ServiceMaster> _serviceMasterRepository;
         private readonly ILogger<FrontTrnService> _logger;
         private readonly ICommonRepository<TradeTransactionQueue> _tradeTransactionQueueRepository;
+        private readonly ICommonRepository<SettledTradeTransactionQueue> _settelTradeTranQueue;
 
-        public FrontTrnService(IFrontTrnRepository frontTrnRepository, ICommonRepository<TradePairMaster> tradeMasterRepository, ICommonRepository<TradePairDetail> tradeDetailRepository, ILogger<FrontTrnService> logger, ICommonRepository<ServiceMaster> serviceMasterRepository, ICommonRepository<TradeTransactionQueue> tradeTransactionQueueRepository)
+        public FrontTrnService(IFrontTrnRepository frontTrnRepository,
+            ICommonRepository<TradePairMaster> tradeMasterRepository,
+            ICommonRepository<TradePairDetail> tradeDetailRepository,
+            ILogger<FrontTrnService> logger,
+            ICommonRepository<ServiceMaster> serviceMasterRepository,
+            ICommonRepository<TradeTransactionQueue> tradeTransactionQueueRepository,
+            ICommonRepository<SettledTradeTransactionQueue> settelTradeTranQueue)
+
         {
             _frontTrnRepository = frontTrnRepository;
             _tradeMasterRepository = tradeMasterRepository;
@@ -36,6 +44,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _logger = logger;
             _serviceMasterRepository = serviceMasterRepository;
             _tradeTransactionQueueRepository = tradeTransactionQueueRepository;
+            _settelTradeTranQueue = settelTradeTranQueue;
         }
 
         #region method
@@ -485,6 +494,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 {
                     return responsedata;
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData)
+        {
+            try
+            {
+                var model = _settelTradeTranQueue.Add(queueData);
+                if (model.Id != 0)
+                    return true;
+                else
+                    return false;
             }
             catch (Exception ex)
             {
