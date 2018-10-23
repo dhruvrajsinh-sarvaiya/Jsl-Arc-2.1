@@ -34,6 +34,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using CleanArchitecture.Infrastructure.Services.Log;
 using CleanArchitecture.Core.Interfaces.Log;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -240,11 +243,31 @@ namespace CleanArchitecture.Web.Extensions
                //    //    OnRemoteFailure = HandleOnRemoteFailure
                //    //};
                //})
+
+
+
                // https://console.developers.google.com/projectselector/apis/library?pli=1
                .AddGoogle(options =>
                {
                    options.ClientId = Startup.Configuration["Authentication:Google:ClientId"];
                    options.ClientSecret = Startup.Configuration["Authentication:Google:ClientSecret"];
+
+                   // added by nirav savariya for created token with soical login on 10-22-2018
+                   options.Scope.Add("https://www.googleapis.com/auth/plus.login");
+                   options.ClaimActions.MapJsonKey(ClaimTypes.Gender, "gender");
+                   options.SaveTokens = true;
+                   options.Events.OnCreatingTicket = ctx =>
+                   {
+                       List<AuthenticationToken> tokens = ctx.Properties.GetTokens()
+                           as List<AuthenticationToken>;
+                       tokens.Add(new AuthenticationToken()
+                       {
+                           Name = "TicketCreated",
+                           Value = DateTime.UtcNow.ToString()
+                       });
+                       ctx.Properties.StoreTokens(tokens);
+                       return Task.CompletedTask;
+                   };
                })
                // https://developers.facebook.com/apps
                .AddFacebook(options =>

@@ -173,5 +173,8 @@ namespace CleanArchitecture.Core.Enums
         public static string TwoFaVerification = "TwoFA Acviate Redirect Verify method";
         public static string Userpasswordnotupdated = "User password not updated!";
         public static string TwoFactorVerificationDisable = "Two factor authentication Verification code is invalid Can't disable two factor authentication.";
+        public static string InvalidGoogleToken = "Invalid Google access token.";
+        public static string InvalidGoogleProviderKey = "Invalid Google provider key.";
+        public static string SocialUserInsertError = "Social register not inserted.";
     }
 }

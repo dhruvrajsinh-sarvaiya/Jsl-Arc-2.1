@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper.Configuration;
@@ -157,43 +158,6 @@ namespace CleanArchitecture.Web.API
             {
 
                 throw;
-            }
-        }
-
-
-        //Social Login method direct call this method
-        [HttpGet("ExternalLoginCallback")]
-        [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null)
-        {
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
-            if (result.Succeeded)
-            {
-                //return RedirectToLocal(returnUrl);
-            }
-            if (result.RequiresTwoFactor)
-            {
-                return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl });
-            }
-            if (result.IsLockedOut)
-            {
-                return View("Lockout");
-            }
-            else
-            {
-                // If the user does not have an account, then ask the user to create an account.
-                ViewData["ReturnUrl"] = returnUrl;
-                ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLoginConfirmation", new SocialLoginWithEmailViewModel { Email = email });
             }
         }
 
@@ -820,40 +784,113 @@ namespace CleanArchitecture.Web.API
 
         #region Social Login
 
-        ///// <summary>
-        /////  This method are used social media using to login.
-        ///// </summary>  
-        //[HttpPost("SocialLogin")]
-        //[AllowAnonymous]
-        ////[ValidateAntiForgeryToken]
-        //public IActionResult Sociallogin([FromBody] SocialLoginWithEmailViewModel model, string returnUrl = null)
-        //{
-        //    var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-        //    var properties = _signInManager.ConfigureExternalAuthenticationProperties(model.ProviderName, redirectUrl);
-        //    return new ChallengeResult(model.ProviderName, properties);
-        //}
-
         /// <summary>
-        ///  This method are used social media using to login.
-        /// </summary>  
-        [HttpPost("SocialLogin")]
+        ///  This method are use to Social Login method for google
+        /// </summary>
+        [HttpPost("ExternalLoginForGoogle")]
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
-        public IActionResult Sociallogin(string ProviderName, string returnUrl = null)
+        public async Task<IActionResult> ExternalLoginForGoogle([FromBody] SocialLoginWithGoogleViewModel model)
         {
             try
             {
-                var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-                var properties = _signInManager.ConfigureExternalAuthenticationProperties(ProviderName, redirectUrl);
-                return new ChallengeResult(ProviderName, properties);
+                var httpClient = new HttpClient();
+                var appAccessTokenResponse = (dynamic)null;
+                try
+                {
+                    appAccessTokenResponse = await httpClient.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + model.access_token + "");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                    return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidGoogleToken, ErrorCode = enErrorCode.Status4068InvalidGoogleToken });
+                }
+                if (appAccessTokenResponse != null)
+                {
+                    var userAccessTokenValidation = JsonConvert.DeserializeObject<GoogleSocial>(appAccessTokenResponse);
+
+                    if (userAccessTokenValidation.user_id == model.ProviderKey)
+                    {
+                        var result = await _signInManager.ExternalLoginSignInAsync(model.ProviderName, model.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+                        if (result.Succeeded)
+                        {
+                            var user = await _userManager.FindByLoginAsync(model.ProviderName, model.ProviderKey);
+
+                            //var props = new AuthenticationProperties();
+                            //var info = await _signInManager.GetExternalLoginInfoAsync();
+                            //props.StoreTokens(info.AuthenticationTokens);
+                            //await _signInManager.SignInAsync(user, props, model.ProviderName);
+
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            //_logger.LogInformation(
+                            //    "{Name} logged in with {LoginProvider} provider.",
+                            //    info.Principal.Identity.Name, info.LoginProvider);
+                            _logger.LogInformation(1, "User logged in with social using.");
+                            return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                        }
+                        if (result.RequiresTwoFactor)
+                        {
+                            //return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4068InvalidGoogleToken });
+                            return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
+                        }
+                        if (result.IsLockedOut)
+                        {
+                            return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
+                        }
+                        else
+                        {
+                            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                            var userdet = await _userManager.CreateAsync(user);
+                            var infodet = new UserLoginInfo(model.ProviderName, model.ProviderKey, model.ProviderName);
+                            if (userdet.Succeeded)
+                            {
+                                var userlogin = await _userManager.AddLoginAsync(user, infodet);
+
+                                if (userlogin.Succeeded)
+                                {
+                                    // Copy over the gender claim
+                                    //await _userManager.AddClaimAsync(user,
+                                    //    infodet.Principal.FindFirst(ClaimTypes.Gender));
+
+                                    // Include the access token in the properties
+                                    //var props = new AuthenticationProperties();
+                                    //props.StoreTokens(infodet.AuthenticationTokens);
+                                    await _signInManager.SignInAsync(user, isPersistent: false);
+                                    //await _signInManager.SignInAsync(user, props,
+                                    //    authenticationMethod: infodet.LoginProvider);
+                                    //_logger.LogInformation(
+                                    //    "User created an account using {Name} provider.",
+                                    //    info.LoginProvider);
+                                    _logger.LogInformation(1, "User logged in with social using.");
+                                    return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                                }
+                                else
+                                {
+                                    return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SocialUserInsertError, ErrorCode = enErrorCode.Status4070SocialUserInsertError });
+                                }
+                            }
+                            else
+                            {
+                                return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SocialUserInsertError, ErrorCode = enErrorCode.Status4070SocialUserInsertError });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidGoogleProviderKey, ErrorCode = enErrorCode.Status4069InvalidGoogleProviderKey });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidGoogleToken, ErrorCode = enErrorCode.Status4068InvalidGoogleToken });
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new SocialViewModel { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
-
 
         #endregion
 
