@@ -170,6 +170,7 @@ namespace CleanArchitecture.Core.Enums
         ProcessTrn_Hold = 1,
         ProcessTrn_ThirdPartyDataNotFound = 1,
         ProcessTrn_GettingResponseBlank = 1,
+        ProcessTrn_OprFail = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
