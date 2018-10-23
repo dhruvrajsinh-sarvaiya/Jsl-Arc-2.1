@@ -57,14 +57,14 @@ namespace CleanArchitecture.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+            services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
             {
                 builder
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .AllowAnyOrigin()
-                    .AllowCredentials();
+                    .WithOrigins("http://localhost:3000");
             }));
+
 
             //define Redis Configuration
             services.Configure<RedisConfiguration>(Configuration.GetSection("redis"));
@@ -239,14 +239,15 @@ namespace CleanArchitecture.Web
                 await next.Invoke();
                 // Do logging or other work that doesn't write to the Response.
             });
-            
+
+            app.UseCors("CorsPolicy");
+
             app.UseSignalR(routes =>
             {
                 routes.MapHub<Chat>("/chathub");
             });
 
             app.UseSession();
-
             /*
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
