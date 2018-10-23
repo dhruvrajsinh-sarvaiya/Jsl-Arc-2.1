@@ -10,6 +10,7 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using CleanArchitecture.Core.ViewModels.ManageViewModels;
+using CleanArchitecture.Core.ViewModels.ManageViewModels.TwoFA;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Web.Filters;
@@ -90,21 +91,50 @@ namespace CleanArchitecture.Web.API
         //}
 
         [HttpPost("disable2fa")]
-        public async Task<IActionResult> Disable2fa()
+        public async Task<IActionResult> Disable2fa([FromBody]DisableAuthenticatorViewModel model)
         {
             var user = await GetCurrentUserAsync();
-            var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
-            if (disable2faResult.Succeeded)
+            try
             {
-                user.TwoFactorEnabled = false;
-                await _userManager.UpdateAsync(user);
-                _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
-                return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
+                
+
+                // Strip spaces and hypens
+                var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+                var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+                    user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+
+                if (!is2faTokenValid)
+                {
+                    return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerificationDisable , ErrorCode = enErrorCode.Status4071TwoFactorVerificationDisable });
+
+                }
+                else
+                {
+                    var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
+                    if (disable2faResult.Succeeded)
+                    {
+                        user.TwoFactorEnabled = false;
+                        await _userManager.UpdateAsync(user);
+                        _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
+                        return Ok(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
+                    }
+                    else
+                    {
+                        return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DisableTroFactorError, ErrorCode = enErrorCode.Status4055DisableTroFactorError });
+                    }
+                }
+
+               
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DisableTroFactorError, ErrorCode = enErrorCode.Status4055DisableTroFactorError });
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
+
+
+
         }
 
         [HttpGet("enableauthenticator")]
@@ -127,7 +157,7 @@ namespace CleanArchitecture.Web.API
                     await _userManager.ResetAuthenticatorKeyAsync(user);
                     unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
                 }
-                if (string.IsNullOrEmpty(user.Email))
+                if (string.IsNullOrEmpty(user.Email))   ////  This Condition by pankaj for when user login with molile the email field is null so.
                 {
                     var model = new EnableAuthenticatorViewModel
                     {
