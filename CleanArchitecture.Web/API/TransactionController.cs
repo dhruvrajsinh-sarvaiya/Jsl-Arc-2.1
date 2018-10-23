@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class TransactionController : Controller
     {
         private readonly IBasePage _basePage;
@@ -80,7 +81,7 @@ namespace CleanArchitecture.Web.API
             try
             {
                 var responsedata = _frontTrnService.GetTradePairAsset();
-                if (responsedata != null)
+                if (responsedata != null && responsedata.Count != 0)
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
@@ -170,7 +171,7 @@ namespace CleanArchitecture.Web.API
                     return Ok(Response);
                 }
                 var responsedata = _frontTrnService.GetVolumeData(BasePairId);
-                if (responsedata != null)
+                if (responsedata != null && responsedata.Count != 0)
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
@@ -479,8 +480,17 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(Response);
                 }
-                Response.response = _frontTrnService.GetBuyerBook(id);
-                Response.ReturnCode = enResponseCode.Success;
+                var responsedata = _frontTrnService.GetBuyerBook(id);
+                if (responsedata != null && responsedata.Count != 0)
+                {
+                    Response.response = responsedata;
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(Response);
             }
             catch (Exception ex)
@@ -511,8 +521,17 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(Response);
                 }
-                Response.response = _frontTrnService.GetSellerBook(id);
-                Response.ReturnCode = enResponseCode.Success;
+                var responsedata = _frontTrnService.GetSellerBook(id);
+                if (responsedata != null && responsedata.Count != 0)
+                {
+                    Response.response = responsedata;
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(Response);
             }
             catch (Exception ex)
@@ -606,8 +625,17 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(Response);
                 }
-                Response.response = _frontTrnService.GetGraphDetail(id);
-                Response.ReturnCode = enResponseCode.Success;
+                var responsedata = _frontTrnService.GetGraphDetail(id);
+                if (responsedata != null && responsedata.GraphData.Count != 0)
+                {
+                    Response.response = _frontTrnService.GetGraphDetail(id);
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
                 return Ok(Response);
             }
             catch (Exception ex)

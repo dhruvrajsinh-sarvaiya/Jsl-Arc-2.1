@@ -11,6 +11,7 @@ using CleanArchitecture.Core.ViewModels.Transaction;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -414,14 +415,21 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
-                var list = _frontTrnRepository.GetBuyerBook(PairId);
-                //List<GetBuySellBook> responce = new List<GetBuySellBook>();
-                //if (list != null)
-                //{
-                //    responce = list;
-                //}
-                //return responce;
-                return null;
+                GetGraphDetailInfo responseData = new GetGraphDetailInfo();
+                var list = _frontTrnRepository.GetGraphData(PairId);
+                List<decimal[]> chartDataList = new List<decimal[]>();
+                chartDataList = (from GetGraphResponse dr in list
+                                 select new decimal[]
+                                 {
+                                      Convert.ToInt64(dr.DataDate)*1000,
+                                      Convert.ToDecimal(dr.Volume),
+                                      Convert.ToDecimal(dr.High),
+                                      Convert.ToDecimal(dr.Low),
+                                      Convert.ToDecimal(dr.TodayClose),
+                                      Convert.ToDecimal(dr.TodayOpen)
+                                 }).ToList();
+                responseData.GraphData = chartDataList;
+                return responseData;
             }
             catch (Exception ex)
             {
