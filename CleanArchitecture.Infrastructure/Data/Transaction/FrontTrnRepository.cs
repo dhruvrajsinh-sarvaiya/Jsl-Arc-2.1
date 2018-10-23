@@ -217,5 +217,53 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
             return Result.ToList();
         }
+
+        public MarketCapData GetMarketCap(long PairId)
+        {
+            try
+            {
+                MarketCapData res = new MarketCapData();
+                Decimal Low24, Hig24, lastPrice=0;
+                var lowBuy24 = _dbContext.TradeTransactionQueue.Where(e => e.TrnType == Convert.ToInt16(enTrnType.Buy_Trade) && e.Status == Convert.ToInt16(enTransactionStatus.Success) && e.PairID == PairId && (e.TrnDate >= DateTime.UtcNow.AddHours(-24))).DefaultIfEmpty().Min(e => e.BidPrice);
+                var higBuy24 = _dbContext.TradeTransactionQueue.Where(e => e.TrnType == Convert.ToInt16(enTrnType.Buy_Trade) && e.Status == Convert.ToInt16(enTransactionStatus.Success) && e.PairID == PairId && (e.TrnDate >= DateTime.UtcNow.AddHours(-24))).DefaultIfEmpty().Max(e => e.BidPrice);
+
+                var lowSell24 = _dbContext.TradeTransactionQueue.Where(e => e.TrnType == Convert.ToInt16(enTrnType.Sell_Trade) && e.Status == Convert.ToInt16(enTransactionStatus.Success) && e.PairID == PairId && e.TrnDate > DateTime.UtcNow.AddHours(-24)).DefaultIfEmpty().Min(e => e.AskPrice);
+                var higsell24 = _dbContext.TradeTransactionQueue.Where(e => e.TrnType == Convert.ToInt16(enTrnType.Sell_Trade) && e.Status == Convert.ToInt16(enTransactionStatus.Success) && e.PairID == PairId && e.TrnDate > DateTime.UtcNow.AddHours(-24)).DefaultIfEmpty().Max(e => e.AskPrice);
+
+                if (lowBuy24 < lowSell24)
+                    Low24 = lowBuy24;
+                else
+                    Low24 = lowSell24;
+
+                if (higBuy24 < higsell24)
+                    Hig24 = higsell24;
+                else
+                    Hig24 = higBuy24;
+
+                var ObjList = _dbContext.TradeTransactionQueue
+                    .Where(e => e.Status == 1 && e.PairID == PairId).OrderByDescending(e => e.TrnNo)
+                    .Select(e => e).ToList();
+                if(ObjList.Count() !=0 )
+                {
+                    var Obj = ObjList.DefaultIfEmpty().First();
+                    if (Obj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
+                        lastPrice = Obj.BidPrice;
+                    else
+                        lastPrice = Obj.AskPrice;
+                }
+                
+
+                res.Low24 = Low24;
+                res.High24 = Hig24;
+                res.LastPrice = lastPrice;
+                res.Change24 = Hig24 - Low24;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 }

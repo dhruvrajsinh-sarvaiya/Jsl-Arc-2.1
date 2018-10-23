@@ -15,5 +15,6 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<GetBuySellBook> GetBuyerBook(long id);
         List<GetBuySellBook> GetSellerBook(long id);
         List<GetGraphResponse> GetGraphData(long id);
+        MarketCapData GetMarketCap(long PairId);
     }
 }
