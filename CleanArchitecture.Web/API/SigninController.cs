@@ -880,7 +880,7 @@ namespace CleanArchitecture.Web.API
                     Code = ctoken,
                     Password = ctoken,
                     ConfirmPassword = ctoken,
-                    Expirytime = DateTime.UtcNow + TimeSpan.FromMinutes(Convert.ToInt64(_configuration["DefaultValidateLinkTimeSpan"]))
+                    Expirytime = DateTime.UtcNow + TimeSpan.FromHours(Convert.ToInt64(_configuration["DefaultValidateLinkTimeSpan"]))
                 };
                 byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
