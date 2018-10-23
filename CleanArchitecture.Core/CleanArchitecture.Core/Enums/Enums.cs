@@ -205,6 +205,7 @@ namespace CleanArchitecture.Core.Enums
         Status4057DeviceIdNotAdd = 4057,
         Status4058DeviceAddress = 4058,
         Status4059NotDeleteDevice = 4059,
+        Status4060VerifyMethod = 4060,
         Status4061Userpasswordnotupdated = 4061,
         Status4062UseralreadRegister = 4062,
         Status4063UserNotRegister = 4063,
