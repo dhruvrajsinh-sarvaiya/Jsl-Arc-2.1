@@ -437,7 +437,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-
         public MarketCapData GetMarketCap(long PairId)
         {
             decimal ChangePer = 0;
@@ -451,6 +450,41 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 res.Volume24 = Volume24;
                 res.ChangePer = ChangePer;
                 return res;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public VolumeDataRespose GetVolumeDataByPair(long PairId)
+        {
+            decimal ChangePer = 0;
+            decimal Volume24 = 0;
+
+            VolumeDataRespose responsedata;
+            try
+            {
+                responsedata = new VolumeDataRespose();
+                var pairMasterData = _tradeMasterRepository.GetActiveById(PairId);
+
+                if (pairMasterData != null)
+                {
+                    var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pairMasterData.Id);
+                    GetPairAdditionalVal(pairMasterData.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+
+                    responsedata.PairId = pairMasterData.Id;
+                    responsedata.Currentrate = pairDetailData.Currentrate;
+                    responsedata.ChangePer = System.Math.Round(Volume24, 2);
+                    responsedata.Volume24 = System.Math.Round(ChangePer, 2);
+
+                    return responsedata;
+                }
+                else
+                {
+                    return responsedata;
+                }
             }
             catch (Exception ex)
             {
@@ -551,6 +585,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 return false;
             }
         }
+
+        
         #endregion
     }
 }

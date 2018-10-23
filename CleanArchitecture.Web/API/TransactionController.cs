@@ -645,6 +645,47 @@ namespace CleanArchitecture.Web.API
                 return Ok(Response);
             }
         }
+
+        [HttpGet("GetVolumeDataByPair/{Pair}")]
+        public IActionResult GetVolumeDataByPair(string Pair)
+        {
+            GetVolumeDataByPairResponse Response = new GetVolumeDataByPairResponse();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(Response);
+                }
+                var responsedata = _frontTrnService.GetVolumeDataByPair(id);
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
         #endregion
 
 
