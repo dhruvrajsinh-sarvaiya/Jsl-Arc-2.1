@@ -177,5 +177,7 @@ namespace CleanArchitecture.Core.Enums
         public static string InvalidGoogleToken = "Invalid Google access token.";
         public static string InvalidGoogleProviderKey = "Invalid Google provider key.";
         public static string SocialUserInsertError = "Social register not inserted.";
+        public static string UnLockUser = "Successfull unlock user.";
+        public static string UnLockUserError = "User not unlock.";
     }
 }

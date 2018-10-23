@@ -1089,6 +1089,47 @@ namespace CleanArchitecture.Web.API
             return BadRequest(new ResetPassWordResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = "null", ErrorCode = enErrorCode.Status400BadRequest });
         }
 
+        #region UnLockUser
+        /// <summary>
+        /// This method are used for user unlock. 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("UnLockUser")]
+        public async Task<IActionResult> UnLockUser(UnLockUserViewModel model)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId.ToString());
+                if (user != null)
+                {
+                    user.AccessFailedCount = 0;
+                    user.LockoutEnd = null;
+                    var userUpdate = await _userManager.UpdateAsync(user);
+                    if (userUpdate.Succeeded)
+                    {
+                        return Ok(new UnLockUserResponseViewModel { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.UnLockUser });
+                    }
+                    else
+                    {
+                        return BadRequest(new UnLockUserResponseViewModel { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.UnLockUserError, ErrorCode = enErrorCode.Status4077UserUnlockError });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new UnLockUserResponseViewModel { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new UnLockUserResponseViewModel { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
         #region Logout        
         [HttpPost("logout")]
         public async Task<IActionResult> LogOff()
@@ -1107,6 +1148,7 @@ namespace CleanArchitecture.Web.API
             }
         }
         #endregion
+
 
         #endregion
     }

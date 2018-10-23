@@ -220,6 +220,7 @@ namespace CleanArchitecture.Core.Enums
         Status4074SignUPMobileValidation = 4074,
         Status4075SignUPOTP = 4075,
         Status4076SignUpReSendOTP = 4076,
+        Status4077UserUnlockError = 4077,
         Status4078SignUpRole = 4078,
 
         // wallet
