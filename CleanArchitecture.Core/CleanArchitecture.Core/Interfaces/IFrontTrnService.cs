@@ -25,6 +25,6 @@ namespace CleanArchitecture.Core.Interfaces
         GetTradePairByName GetTradePairByName(long id);
         GetGraphDetailInfo GetGraphDetail(long PairId);
         MarketCapData GetMarketCap(long PairId);
-
+        VolumeDataRespose GetVolumeDataByPair(long PairId);
     }
 }
