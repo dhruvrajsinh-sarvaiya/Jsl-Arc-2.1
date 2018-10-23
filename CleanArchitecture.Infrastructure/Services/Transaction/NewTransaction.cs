@@ -580,7 +580,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             //TransactionRequest TransactionRequestObj=new TransactionRequest(); 
             ThirdPartyAPIRequest ThirdPartyAPIRequestOnj;
             WebApiConfigurationResponse WebApiConfigurationResponseObj;
-            WebAPIParseResponseCls WebAPIParseResponseClsObj;
+            WebAPIParseResponseCls WebAPIParseResponseClsObj=new WebAPIParseResponseCls();
             //long TxnRequestID = 0;
             short IsTxnProceed = 0;
             try
@@ -598,7 +598,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         continue;
                     }
                     ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID);
-
+                    Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
                     //Insert API request Data
                     _TransactionObj.TransactionRequestID = InsertTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody);
 
@@ -626,6 +626,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             break;
                     }                    
                     NewtransactionReq.SetResponse(_TransactionObj.APIResponse);
+                    NewtransactionReq.SetResponseTime(Helpers.UTC_To_IST());
                     if (string.IsNullOrEmpty(_TransactionObj.APIResponse))
                     {
                         _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_HoldMsg;
@@ -637,8 +638,36 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
 
                     WebAPIParseResponseClsObj= _WebApiParseResponseObj.TransactionParseResponse(_TransactionObj.APIResponse, Provider.ThirPartyAPIID);
-                    //if(WebAPIParseResponseClsObj.Status)
+                    NewtransactionReq.SetTrnID(WebAPIParseResponseClsObj.TrnRefNo);
+                    NewtransactionReq.SetOprTrnID(WebAPIParseResponseClsObj.OperatorRefNo);
+                    _TransactionRequest.Update(NewtransactionReq);
+
+                    if (WebAPIParseResponseClsObj.Status == enTransactionStatus.Success)
+                    {
+                        Newtransaction.MakeTransactionSuccess();
+                        Newtransaction.SetTransactionStatusMsg(WebAPIParseResponseClsObj.StatusMsg);                        
+                        _TransactionRepository.Update(Newtransaction);
+                        IsTxnProceed = 1;//no further call next API
+                        break;
+                    }
+                    else if (WebAPIParseResponseClsObj.Status == enTransactionStatus.OperatorFail)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Newtransaction.SetTransactionStatusMsg(WebAPIParseResponseClsObj.StatusMsg);
+                        _TransactionRepository.Update(Newtransaction);
+                        IsTxnProceed = 1;//no further call next API
+                        break;
+                    }
                 }
+                if(IsTxnProceed==0)
+                {
+                    _Resp.ErrorCode = enErrorCode.ProcessTrn_OprFail;
+                    MarkTransactionOperatorFail(WebAPIParseResponseClsObj.StatusMsg, _Resp.ErrorCode);
+                }
+
             }
             catch (Exception ex)
             {

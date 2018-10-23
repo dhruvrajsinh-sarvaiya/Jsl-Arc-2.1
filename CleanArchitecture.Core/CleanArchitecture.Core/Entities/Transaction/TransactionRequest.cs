@@ -66,6 +66,11 @@ namespace CleanArchitecture.Core.Entities
             OprTrnID = sOprTrnID;
             AddValueChangeEvent();
         }
+        public void SetResponseTime(DateTime sResponseTime)
+        {
+            ResponseTime = sResponseTime;
+            AddValueChangeEvent();
+        }
         public void AddValueChangeEvent()
         {
             Events.Add(new ServiceStatusEvent<TransactionRequest>(this));
