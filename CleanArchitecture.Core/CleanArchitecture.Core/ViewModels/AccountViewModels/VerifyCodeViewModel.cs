@@ -5,10 +5,10 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels
 {
     public class VerifyCodeViewModel
     {
-      
+
         //public string Provider { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "1,Please enter a twofactore authentication code,4065")]
         public string Code { get; set; }
 
         //public string ReturnUrl { get; set; }
