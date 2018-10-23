@@ -18,6 +18,7 @@ using CleanArchitecture.Core.ViewModels.AccountViewModels.Logoff;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.OTP;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.ResetPassword;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
+using CleanArchitecture.Core.ViewModels.ManageViewModels.TwoFA;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Web.Filters;
 using MediatR;
@@ -180,7 +181,7 @@ namespace CleanArchitecture.Web.API
         [HttpPost("VerifyCode")]
         [AllowAnonymous]
         //[ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
+        public async Task<IActionResult> VerifyCode(EnableAuthenticatorCodeViewModel model)
         {
             // The following code protects for brute force attacks against the two factor codes.
             // If a user enters incorrect codes for a specified amount of time then the user account
@@ -191,7 +192,7 @@ namespace CleanArchitecture.Web.API
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
                 var authenticatorCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
-                var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberBrowser);
+                var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, false, false);
                 if (result.Succeeded)
                 {
                     return Ok(new VerifyCodeResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
@@ -241,9 +242,6 @@ namespace CleanArchitecture.Web.API
             // To enable password failures to trigger account lockout, set lockoutOnFailure: true
             try
             {
-
-
-
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -254,7 +252,8 @@ namespace CleanArchitecture.Web.API
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(SendCode), new { RememberMe = model.RememberMe });
+                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+
                 }
                 if (result.IsLockedOut)
                 {
@@ -301,7 +300,7 @@ namespace CleanArchitecture.Web.API
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
+                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
                 }
                 if (result.IsLockedOut)
                 {
@@ -831,7 +830,7 @@ namespace CleanArchitecture.Web.API
                         if (result.RequiresTwoFactor)
                         {
                             //return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4068InvalidGoogleToken });
-                            return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired });
+                            return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
                         }
                         if (result.IsLockedOut)
                         {

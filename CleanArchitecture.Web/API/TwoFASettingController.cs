@@ -96,8 +96,6 @@ namespace CleanArchitecture.Web.API
             var user = await GetCurrentUserAsync();
             try
             {
-                
-
                 // Strip spaces and hypens
                 var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
@@ -106,7 +104,7 @@ namespace CleanArchitecture.Web.API
 
                 if (!is2faTokenValid)
                 {
-                    return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerificationDisable , ErrorCode = enErrorCode.Status4071TwoFactorVerificationDisable });
+                    return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerificationDisable, ErrorCode = enErrorCode.Status4071TwoFactorVerificationDisable });
 
                 }
                 else
@@ -125,7 +123,7 @@ namespace CleanArchitecture.Web.API
                     }
                 }
 
-               
+
             }
             catch (Exception ex)
             {
@@ -164,7 +162,7 @@ namespace CleanArchitecture.Web.API
                         SharedKey = FormatKey(unformattedKey),
                         AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
                     };
-                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, enableAuthenticatorViewModel = model });
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
 
                 }
                 else
@@ -188,7 +186,7 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("enableauthenticator")]
-        public async Task<IActionResult> EnableAuthenticator([FromBody]EnableAuthenticatorViewModel model)
+        public async Task<IActionResult> EnableAuthenticator([FromBody]EnableAuthenticatorCodeViewModel model)
         {
             try
             {
@@ -205,10 +203,9 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification });
 
                 }
-
                 await _userManager.SetTwoFactorEnabledAsync(user, true);
                 _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success });
             }
             catch (Exception ex)
             {
