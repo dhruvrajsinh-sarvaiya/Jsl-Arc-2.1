@@ -797,7 +797,7 @@ namespace CleanArchitecture.Web.API
                 var appAccessTokenResponse = (dynamic)null;
                 try
                 {
-                    appAccessTokenResponse = await httpClient.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + model.access_token + "");
+                    appAccessTokenResponse = await httpClient.GetStringAsync(_configuration["SocialGoogle"].ToString() + model.access_token);
                 }
                 catch (Exception ex)
                 {
