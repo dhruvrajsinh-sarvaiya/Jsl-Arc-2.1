@@ -92,17 +92,20 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
 
         // khushali 18-10-2018 For signalr scaleout with Redis
 
-        public void scan(string value)
+        public void Scan(string value,string SpecialText)
         {
             try
             {
                 IEnumerable<TagMember> members = this.Context.Cache.GetMembersByTag(value);
                 foreach (TagMember member in members)
                 {
-                    var key = member.Key;
-                    var type = member.MemberType;
-                    var user = member.GetMemberAs<RedisUserdata>();
-                    DeleteHash(key);
+                    if (string.IsNullOrWhiteSpace(member.Key) || member.Key.Contains(SpecialText))
+                    {
+                        var key = member.Key;
+                        var type = member.MemberType;
+                        var user = member.GetMemberAs<RedisUserdata>();
+                        DeleteHash(key);
+                    }                    
                 }
             }
             catch (Exception ex)
@@ -117,8 +120,8 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             {
                 //RedisContext context = new RedisContext();
                 var Messages = this.Db.SetMembers(key);
-                string x = "[" + string.Join(",", Messages) + "]"; // make json format
-                return x;
+                string Data = "[" + string.Join(",", Messages) + "]"; // make json format
+                return Data;
             }
             catch (Exception ex)
             {

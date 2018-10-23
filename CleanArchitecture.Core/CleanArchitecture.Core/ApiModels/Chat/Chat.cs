@@ -19,6 +19,11 @@ namespace CleanArchitecture.Core.ApiModels.Chat
         public string Token { get; set; }
     }
 
+    public class BlockUserDetail
+    {
+        public bool IsBlock { get; set; } = false;
+    }
+
     public class ChatHistory
     {
         public string Message { get; set; }
