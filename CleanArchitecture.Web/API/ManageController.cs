@@ -56,7 +56,7 @@ namespace CleanArchitecture.Web.API
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         ILoggerFactory loggerFactory,
-        UrlEncoder urlEncoder, 
+        UrlEncoder urlEncoder,
         //IRedisConnectionFactory factory,
         RedisConnectionFactory factory,
         RedisSessionStorage redisSessionStorage,
@@ -205,6 +205,12 @@ namespace CleanArchitecture.Web.API
 
                 if (user != null)
                 {
+                    long getIp = await _ipAddressService.GetIpAddressByUserIdandAddress(model.SelectedIPAddress, user.Id);
+                    if (getIp > 0)
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAlreadyExist, ErrorCode = enErrorCode.Status4083IpAddressExist });
+                    }
+
                     IpMasterViewModel imodel = new IpMasterViewModel();
                     imodel.UserId = user.Id;
                     imodel.IpAddress = model.SelectedIPAddress;
@@ -217,12 +223,12 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status4081IpAddressNotInsert });
                     }
                 }
                 else
                 {
-                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)
@@ -270,7 +276,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)
@@ -318,7 +324,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
 
 
@@ -342,31 +348,18 @@ namespace CleanArchitecture.Web.API
 
                 if (user != null)
                 {
-                    var IpList = await _ipAddressService.GetIpAddressListByUserId(user.Id);
-
+                    var IpList = (dynamic)null;
+                    IpList = await _ipAddressService.GetIpAddressListByUserId(user.Id, PageIndex, PAGE_SIZE);
+                    int TotalRowCount = 0;
                     if (IpList.Count > 0)
                     {
-
-                        // Set the total count
-                        // so GridView knows how many pages to create
-                        var TotalRowCount = IpList.Count();
-                        //int PageIndex = 1;
-                        //int PAGE_SIZE = 10;
-
-                        // Get only the rows we need for the page requested
-                        var Ip = IpList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
-
-
-                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = Ip.ToList(), TotalRow = TotalRowCount });
+                        TotalRowCount = IpList.Count();
                     }
-                    else
-                    {
-                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status400BadRequest });
-                    }
+                    return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = IpList, TotalRow = TotalRowCount });
                 }
                 else
                 {
-                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)
@@ -396,6 +389,15 @@ namespace CleanArchitecture.Web.API
 
                 if (user != null)
                 {
+
+
+                    long DeviceId = _iDeviceIdService.GetDeviceByUserIdandId(model.SelectedDeviceId,user.Id);
+                    if (DeviceId > 0)
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceIdAlreadyExist, ErrorCode = enErrorCode.Status4084DeviceIdExist });
+                    }
+
+
                     DeviceMasterViewModel imodel = new DeviceMasterViewModel();
                     imodel.UserId = user.Id;
                     imodel.DeviceId = model.SelectedDeviceId;
@@ -413,7 +415,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)
@@ -458,7 +460,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)
@@ -502,7 +504,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
 
             }
@@ -523,30 +525,19 @@ namespace CleanArchitecture.Web.API
 
                 if (user != null)
                 {
-                    var DeviceList = _iDeviceIdService.GetDeviceListByUserId(user.Id);
-
+                    var DeviceList = (dynamic)null;
+                    DeviceList = _iDeviceIdService.GetDeviceListByUserId(user.Id, PageIndex, PAGE_SIZE);
+                    int TotalRowCount = 0;
                     if (DeviceList.Count > 0)
                     {
-                        // Set the total count
-                        // so GridView knows how many pages to create
-                        var TotalRowCount = DeviceList.Count();
-                        //int PageIndex = 1;
-                        //int PAGE_SIZE = 10;
-
-                        // Get only the rows we need for the page requested
-                        var Device = DeviceList.Skip(PageIndex * PAGE_SIZE).Take(PAGE_SIZE);
-
-
-                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetDeviceData, DeviceList = Device.ToList(), TotalRow = TotalRowCount });
+                        TotalRowCount = DeviceList.Count();
                     }
-                    else
-                    {
-                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceidInsertError, ErrorCode = enErrorCode.Status4057DeviceIdNotAdd });
-                    }
+
+                    return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetDeviceData, DeviceList = DeviceList, TotalRow = TotalRowCount });
                 }
                 else
                 {
-                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                 }
             }
             catch (Exception ex)

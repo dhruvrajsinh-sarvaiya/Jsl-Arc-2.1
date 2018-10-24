@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.Entities.Log
         [Required]
         public int UserId { get; set; }
         [Required]
-        [StringLength(250)]
+        [StringLength(2000)]
         public string DeviceId { get; set; }
         public bool IsEnable { get; set; }
         public bool IsDeleted { get; set; }

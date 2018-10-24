@@ -10,11 +10,11 @@ namespace CleanArchitecture.Core.Interfaces.Log
     {
         Task<long> AddIpAddress(IpMasterViewModel model);
         Task<IpMasterViewModel> GetIpAddressById(long Id);
-        Task<List<IpMasterViewModel>> GetIpAddressListByUserId(long UserId);
+        Task<List<IpMasterViewModel>> GetIpAddressListByUserId(long UserId, int pageIndex, int pageSize);
         void UpdateIpAddress(IpMasterViewModel model);
         Task<long> DesableIpAddress(IpMasterViewModel model);
         Task<long> DeleteIpAddress(IpMasterViewModel model);
-
+        Task<long> GetIpAddressByUserIdandAddress(string IpAddress, long UserId);
 
 
     }
