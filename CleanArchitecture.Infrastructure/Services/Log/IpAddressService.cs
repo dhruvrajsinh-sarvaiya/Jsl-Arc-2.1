@@ -45,7 +45,18 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             return currentIpAddress.Id;
         }
 
-        public async Task<IpMasterViewModel> GetIpAddressById(long Id)
+        public async Task<long> GetIpAddressByUserIdandAddress(string IpAddress,long UserId)
+        {           
+            var getIp = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == IpAddress && i.UserId == UserId && !i.IsDeleted);
+            if (getIp != null)
+            {
+                return getIp.Id;
+            }
+
+            return 0;
+        }
+
+            public async Task<IpMasterViewModel> GetIpAddressById(long Id)
         {
             var IpAddress = _ipMasterRepository.GetById(Id);
             if (IpAddress == null)
@@ -72,7 +83,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         }
 
-        public async Task<List<IpMasterViewModel>> GetIpAddressListByUserId(long UserId)
+        public async Task<List<IpMasterViewModel>> GetIpAddressListByUserId(long UserId, int pageIndex, int pageSize)
         {
             var IpAddressList = _ipMasterRepository.Table.Where(i => i.UserId == UserId && !i.IsDeleted).ToList();
             if (IpAddressList == null)
@@ -97,7 +108,31 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
                 IpList.Add(imodel);
             }     
-            return IpList;
+            //return IpList;
+
+
+            var total = IpList.Count();
+            //var pageSize = 10; // set your page size, which is number of records per page
+
+            //var page = 1; // set current page number, must be >= 1
+            if(pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+
+            if(pageSize == 0)
+            {
+                pageSize = 10;
+            }
+
+            var skip = pageSize * (pageIndex - 1);
+
+            var canPage = skip < total;
+
+            if (canPage) // do what you wish if you can page no further
+                return null;
+
+            return IpList.Skip(skip).Take(pageSize).ToList();
 
         }
 

@@ -10,9 +10,10 @@ namespace CleanArchitecture.Core.Interfaces.Log
     {
         //Task<long> AddDeviceId(DeviceMasterViewModel model);
         long AddDeviceId(DeviceMasterViewModel model);
-        List<DeviceMasterViewModel> GetDeviceListByUserId(long UserId);
+        List<DeviceMasterViewModel> GetDeviceListByUserId(long UserId, int pageIndex, int pageSize);
         void UpdateDeviceId(DeviceMasterViewModel model);
         long DesableDeviceId(DeviceMasterViewModel model);
         long DeleteDeviceId(DeviceMasterViewModel model);
+        long GetDeviceByUserIdandId(string DeviceId, long UserId);
     }
 }
