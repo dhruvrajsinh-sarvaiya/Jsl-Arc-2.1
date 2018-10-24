@@ -10,7 +10,11 @@ namespace CleanArchitecture.Core.Entities.Wallet
     //vsolnkki 24-10-2018
     public class StckingScheme : BizBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
+
         [Required]
+        [Key]
         public long MemberTypeId { get; set; }//organization Id
 
         [Required]
@@ -18,7 +22,6 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal LimitAmount { get; set; }
 
         [Required]
-        [StringLength(50)]
-        public string Type { get; set; }//wallettype
+        public long Type { get; set; }//wallettypemaster fk
     }
 }

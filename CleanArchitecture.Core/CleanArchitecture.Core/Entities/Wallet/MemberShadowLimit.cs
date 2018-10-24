@@ -10,15 +10,18 @@ namespace CleanArchitecture.Core.Entities.Wallet
     //vsolnkki 24-10-2018
     public class MemberShadowLimit : BizBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
+
+        [Key]
         [Required]
-        public long MemberTypeId { get; set; }//organization Id
+        public long MemberTypeId { get; set; }//organization Id = 0
 
         [Required]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal ShadowLimitAmount { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string Type { get; set; }//wallettype
+        [Required]        
+        public long Type { get; set; }//wallettypemaster fk
     }
 }

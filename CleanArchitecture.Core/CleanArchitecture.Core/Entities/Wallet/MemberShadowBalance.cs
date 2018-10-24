@@ -10,16 +10,17 @@ namespace CleanArchitecture.Core.Entities.Wallet
     //vsolnkki 24-10-2018
     public class MemberShadowBalance : BizBase
     {
-        [Required]
-        public long UserId { get; set; }//User Id
+        [Required] // ntrivedi walletid instead of userid 
+        public long WalletID { get; set; }//User Id 
 
         [Required]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal ShadowAmount { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string Type { get; set; }//wallettype
+        // ntrivedi walletid is used instead of userid 
+        //[Required]
+        //[StringLength(50)]
+        //public string Type { get; set; }//wallettype
 
         public string Remarks { get; set; }
     }

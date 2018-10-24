@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -47,11 +48,12 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public string ConfirmedTime { get; set; }
 
-        [Required]
+        
         public string EpochTimePure { get; set; } // time converted from epoch time 
                
         public long OrderID { get; set; }
 
+        [DefaultValue(0)]
         public byte IsProcessing { get; set; }
 
         [Required]
@@ -67,7 +69,7 @@ namespace CleanArchitecture.Core.Entities
         public long SerProID { get; set; }
 
         //vsolanki 2018-10-16
-        public long userId { get; set; }
+        public long UserId { get; set; }
 
         //public long SerProId { get; set; }
 

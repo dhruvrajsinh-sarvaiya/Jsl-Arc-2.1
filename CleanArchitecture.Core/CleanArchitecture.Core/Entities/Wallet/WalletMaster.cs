@@ -11,7 +11,7 @@ namespace CleanArchitecture.Core.Entities
 {
     public class WalletMaster : BizBase
     {
-        [Key]
+        
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new long Id { get; set; }
 
@@ -30,7 +30,8 @@ namespace CleanArchitecture.Core.Entities
         public bool IsValid { get; set; }
 
         [Required]
-        [StringLength(16)]        
+        [StringLength(16)] 
+        [Key]
         public string AccWalletID { get; set; } // dynamically generated accountid 
 
         [Required]
@@ -39,7 +40,7 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         [StringLength(50)]
         public string PublicAddress { get; set; }
-
+                
         public byte IsDefaultWallet { get; set; }
 
         public void CreditBalance(decimal amount)
