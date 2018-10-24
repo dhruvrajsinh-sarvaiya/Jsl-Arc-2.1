@@ -222,6 +222,10 @@ namespace CleanArchitecture.Core.Enums
         Status4076SignUpReSendOTP = 4076,
         Status4077UserUnlockError = 4077,
         Status4078SignUpRole = 4078,
+        Status4081IpAddressNotInsert = 4081,
+        Status4083IpAddressExist = 4083,
+        Status4084DeviceIdExist = 4084,
+
 
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
@@ -336,5 +340,16 @@ namespace CleanArchitecture.Core.Enums
         WithdrawLimit = 2,
         DepositLimit = 3,
         APICallLimit = 4
+    }
+    public enum SignalREventType
+    {
+        Alert = 1,
+        Nofification = 2,
+        GrpMsg = 3,
+        Channel = 4
+    }
+    public enum SignalRMethodName
+    {
+
     }
 }

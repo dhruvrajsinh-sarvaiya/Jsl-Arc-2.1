@@ -19,7 +19,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
         }
         public long AddDeviceId(DeviceMasterViewModel model)
         {
-            var getDeviceId = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && !i.IsDeleted);
+            var getDeviceId = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsDeleted);
             if (getDeviceId != null)
             {
                 return getDeviceId.Id;
@@ -41,8 +41,19 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
             return currentDeviceId.Id;
         }
-      
-        public List<DeviceMasterViewModel> GetDeviceListByUserId(long UserId)
+
+        public long GetDeviceByUserIdandId(string DeviceId, long UserId)
+        {
+            var getDeviceId = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == DeviceId && i.UserId == UserId && !i.IsDeleted);
+            if (getDeviceId != null)
+            {
+                return getDeviceId.Id;
+            }
+
+            return 0;
+        }
+
+        public List<DeviceMasterViewModel> GetDeviceListByUserId(long UserId, int pageIndex, int pageSize)
         {
             var DeviceIdList = _deviceMasterRepository.Table.Where(i => i.UserId == UserId && !i.IsDeleted).ToList();
             if (DeviceIdList == null)
@@ -50,7 +61,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                 return null;
             }
 
-            var IpList = new List<DeviceMasterViewModel>();
+            var DeviceList = new List<DeviceMasterViewModel>();
             foreach (var item in DeviceIdList)
             {
                 DeviceMasterViewModel imodel = new DeviceMasterViewModel();
@@ -65,9 +76,33 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                 imodel.UpdatedBy = item.UpdatedBy;
                 imodel.Status = item.Status;
 
-                IpList.Add(imodel);
+                DeviceList.Add(imodel);
             }
-            return IpList;
+            // return IpList;
+
+            var total = DeviceList.Count();
+            //var pageSize = 10; // set your page size, which is number of records per page
+
+            //var page = 1; // set current page number, must be >= 1
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+
+            if (pageSize == 0)
+            {
+                pageSize = 10;
+            }
+
+            var skip = pageSize * (pageIndex - 1);
+
+            var canPage = skip < total;
+
+            if (canPage) // do what you wish if you can page no further
+                return null;
+
+            return DeviceList.Skip(skip).Take(pageSize).ToList();
+
 
         }
 

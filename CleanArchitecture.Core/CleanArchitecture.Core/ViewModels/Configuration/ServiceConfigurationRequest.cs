@@ -32,7 +32,10 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4526")]
         public string WhitePaperPath { get; set; }
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4527")]
-        public string Introduction { get; set; }    
+        public string Introduction { get; set; }   
+        public short IsTransaction { get; set; }
+        public short IsWithdraw { get; set; }
+        public short IsDeposit { get; set; }
     }
 
     public class ExplorerData
