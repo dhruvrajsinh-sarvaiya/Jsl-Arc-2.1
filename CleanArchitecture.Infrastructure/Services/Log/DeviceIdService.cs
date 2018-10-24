@@ -19,7 +19,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
         }
         public long AddDeviceId(DeviceMasterViewModel model)
         {
-            var getDeviceId = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && !i.IsDeleted);
+            var getDeviceId = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsDeleted);
             if (getDeviceId != null)
             {
                 return getDeviceId.Id;

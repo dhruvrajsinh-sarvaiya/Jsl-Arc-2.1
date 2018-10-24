@@ -22,7 +22,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public async Task<long> AddIpAddress(IpMasterViewModel model)
         {
-            var getIp = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && !i.IsDeleted);
+            var getIp = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress  && i.UserId == model.UserId && !i.IsDeleted);
             if (getIp != null)
             {
                 return getIp.Id;
