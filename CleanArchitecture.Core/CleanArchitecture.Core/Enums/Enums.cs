@@ -337,4 +337,15 @@ namespace CleanArchitecture.Core.Enums
         DepositLimit = 3,
         APICallLimit = 4
     }
+    public enum SignalREventType
+    {
+        Alert = 1,
+        Nofification = 2,
+        GrpMsg = 3,
+        Channel = 4
+    }
+    public enum SignalRMethodName
+    {
+
+    }
 }
