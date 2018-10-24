@@ -5,6 +5,8 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Configuration;
 using CleanArchitecture.Core.ViewModels.Configuration;
+using CleanArchitecture.Core.ViewModels.WalletConfiguration;
+using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -34,6 +36,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<TradePairMaster> _tradePairMasterRepository;
         private readonly ICommonRepository<TradePairDetail> _tradePairDetailRepository;
         private readonly ICommonRepository<Limits> _limitRepository;
+        private readonly ICommonRepository<ServiceTypeMapping> _serviceTypeMapping;
+        private readonly ICommonRepository<WalletTypeMaster> _walletTypeService;
+        private readonly IWalletService _walletService;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -53,8 +58,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<ThirdPartyAPIResponseConfiguration> thirdPartyAPIResRepository,
             ICommonRepository<TradePairMaster> tradePairMasterRepository,
             ICommonRepository<TradePairDetail> tradePairDetailRepository,
-            ICommonRepository<Limits> limitRepository)
-        {
+            ICommonRepository<Limits> limitRepository,
+            ICommonRepository<ServiceTypeMapping> serviceTypeMapping,
+            ICommonRepository<WalletTypeMaster> walletTypeService,
+            IWalletService walletService)
+          {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
             _serviceStasticsRepository = serviceStasticsRepository;
@@ -73,6 +81,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _tradePairMasterRepository = tradePairMasterRepository;
             _tradePairDetailRepository = tradePairDetailRepository;
             _limitRepository = limitRepository;
+            _serviceTypeMapping = serviceTypeMapping;
+            _walletTypeService = walletTypeService;
+            _walletService = walletService;
         }
 
         #region Service
@@ -80,6 +91,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
+                int[] AllowTrnType1 = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
+                var walletMaster1 = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode, 1, AllowTrnType1, 1);
                 ServiceMaster serviceMaster = new ServiceMaster()
                 {
                     Name = Request.Name,
@@ -128,9 +141,65 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     UpdatedBy = null
                 };
                 var newServiceStastics = _serviceStasticsRepository.Add(serviceStastics);
+               
+                var depositSerMapping = new ServiceTypeMapping
+                {
+                    ServiceId = newServiceMaster.Id,
+                    TrnType = Convert.ToInt16(enTrnType.Deposit),
+                    Status = Request.IsDeposit,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newdepositSerMapping = _serviceTypeMapping.Add(depositSerMapping);     
+               
+                var withdrawSerMapping = new ServiceTypeMapping
+                {
+                    ServiceId = newServiceMaster.Id,
+                    TrnType = Convert.ToInt16(enTrnType.Withdraw),
+                    Status = Request.IsWithdraw,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newwithdrawSerMapping = _serviceTypeMapping.Add(withdrawSerMapping);             
+               
+                var tranSerMapping = new ServiceTypeMapping
+                {
+                    ServiceId = newServiceMaster.Id,
+                    TrnType = Convert.ToInt16(enTrnType.Transaction),
+                    Status = Request.IsTransaction,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newtranSerMapping = _serviceTypeMapping.Add(tranSerMapping);
 
+                //Add Default WalletType Master
+                var walletTypeMaster = new WalletTypeMaster
+                {
+                    WalletTypeName = Request.SMSCode,
+                    Discription = Request.SMSCode,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    IsDepositionAllow = Request.IsDeposit,
+                    IsWithdrawalAllow = Request.IsWithdraw,
+                    IsTransactionWallet = Request.IsTransaction,
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow
+                };
+                var newwalletTypeMaster = _walletTypeService.Add(walletTypeMaster);
+
+                //Update WalletTypeId In ServiceMaster
+                newServiceMaster.WalletTypeID = newwalletTypeMaster.Id;
+                _serviceMasterRepository.Update(newServiceMaster);
+
+                ////Add Into WalletMaster For Default Organization
+                //int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
+                //var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1);
                 return newServiceMaster.Id;
-
             }
             catch (Exception ex)
             {
@@ -180,6 +249,33 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     serviceStastics.UpdatedDate = DateTime.UtcNow;
                     serviceStastics.UpdatedBy = 1;
                     _serviceStasticsRepository.Update(serviceStastics);
+
+                    var depositSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == Request.ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Deposit));
+                    if(depositSerMapping != null)
+                    {
+                        depositSerMapping.Status = Request.IsDeposit;
+                        depositSerMapping.UpdatedBy = 1;
+                        depositSerMapping.UpdatedDate = DateTime.UtcNow;
+                        _serviceTypeMapping.Update(depositSerMapping);
+                    }
+
+                    var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == Request.ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
+                    if (withdrawSerMapping != null)
+                    {
+                        withdrawSerMapping.Status = Request.IsWithdraw;
+                        withdrawSerMapping.UpdatedBy = 1;
+                        withdrawSerMapping.UpdatedDate = DateTime.UtcNow;
+                        _serviceTypeMapping.Update(withdrawSerMapping);
+                    }
+
+                    var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == Request.ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
+                    if (tranSerMapping != null)
+                    {
+                        tranSerMapping.Status = Request.IsTransaction;
+                        tranSerMapping.UpdatedBy = 1;
+                        tranSerMapping.UpdatedDate = DateTime.UtcNow;
+                        _serviceTypeMapping.Update(tranSerMapping);
+                    }
 
                     return Request.ServiceId;
                 }
@@ -232,6 +328,24 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         response.IssueDate = serviceStastics.IssueDate;
                         response.IssuePrice = serviceStastics.IssuePrice;
 
+                        var depositSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Deposit));
+                        if (depositSerMapping != null)
+                        {
+                            response.IsDeposit = depositSerMapping.Status;
+                        }
+
+                        var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
+                        if (withdrawSerMapping != null)
+                        {
+                            response.IsDeposit = withdrawSerMapping.Status;
+                        }
+
+                        var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
+                        if (tranSerMapping != null)
+                        {
+                            response.IsDeposit = tranSerMapping.Status;
+                        }
+
                         responsedata.Add(response);
                     }
                     return responsedata;
@@ -280,6 +394,24 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     responsedata.CirculatingSupply = serviceStastics.CirculatingSupply;
                     responsedata.IssueDate = serviceStastics.IssueDate;
                     responsedata.IssuePrice = serviceStastics.IssuePrice;
+
+                    var depositSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Deposit));
+                    if (depositSerMapping != null)
+                    {
+                        responsedata.IsDeposit = depositSerMapping.Status;
+                    }
+
+                    var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
+                    if (withdrawSerMapping != null)
+                    {
+                        responsedata.IsDeposit = withdrawSerMapping.Status;
+                    }
+
+                    var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
+                    if (tranSerMapping != null)
+                    {
+                        responsedata.IsDeposit = tranSerMapping.Status;
+                    }
 
                     return responsedata;
                 }
