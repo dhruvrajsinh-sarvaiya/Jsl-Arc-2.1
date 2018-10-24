@@ -398,6 +398,7 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (checkmail.TwoFactorEnabled)
                                     {
                                         string currenttime = DateTime.UtcNow.ToString();
@@ -623,6 +624,7 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
                                     {
                                         string currenttime = DateTime.UtcNow.ToString();
