@@ -21,7 +21,7 @@ using CleanArchitecture.Web.Helper;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-   // [Authorize]
+    [Authorize]
     public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
@@ -257,8 +257,8 @@ namespace CleanArchitecture.Web.API
             ListBalanceResponse Response = new ListBalanceResponse();
             try
             {
-                var user = new ApplicationUser();
-                user.Id = 1;//await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User); //new ApplicationUser();
+               // user.Id = 1;//await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -284,8 +284,8 @@ namespace CleanArchitecture.Web.API
             ListBalanceResponse Response = new ListBalanceResponse();
             try
             {
-                var user = new ApplicationUser();
-                user.Id = 1;//await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User)/* new ApplicationUser()*/;
+                //user.Id = 1;//await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -313,8 +313,8 @@ namespace CleanArchitecture.Web.API
             ListBalanceResponse Response = new ListBalanceResponse();
             try
             {
-                var user = new ApplicationUser();
-                user.Id = 16;//await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User);//new ApplicationUser();
+               // user.Id = 16;//await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -339,10 +339,11 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> GetAllBalances(long WalletId)
         {
             AllBalanceResponse Response = new AllBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var user = new ApplicationUser();
-                user.Id = 16;//await _userManager.GetUserAsync(HttpContext.User);
+                var user = await _userManager.GetUserAsync(HttpContext.User);// new ApplicationUser();
+               // user.Id = 16;//await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
                     Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
