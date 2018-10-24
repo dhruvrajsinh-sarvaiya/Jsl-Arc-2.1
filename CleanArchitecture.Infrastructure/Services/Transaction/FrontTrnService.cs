@@ -237,13 +237,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             Amount = model.Amount,
                             ChargeRs = model.ChargeRs,
                             DateTime = model.DateTime.Date,
-                            PairID = model.PairID,
+                            PairName = model.PairName,
                             Price = model.Price,
                             Status = model.Status,
                             StatusText = model.StatusText,
                             TrnNo = model.TrnNo,
                             Type = model.Type,
-                            Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount))
+                            Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount)),
+                            IsCancel=model .IsCancelled
+
                         });
                     }
                 }
