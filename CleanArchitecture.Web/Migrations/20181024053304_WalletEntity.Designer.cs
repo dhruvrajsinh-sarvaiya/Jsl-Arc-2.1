@@ -4,14 +4,16 @@ using CleanArchitecture.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    partial class CleanArchitectureContextModelSnapshot : ModelSnapshot
+    [Migration("20181024053304_WalletEntity")]
+    partial class WalletEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
