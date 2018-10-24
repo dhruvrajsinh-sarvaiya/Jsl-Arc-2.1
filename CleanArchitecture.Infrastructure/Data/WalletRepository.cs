@@ -486,6 +486,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                        }).AsEnumerable().ToList();
             return items;
         }
+
         public List<AddressMasterResponse> GetAddressMasterResponse(string AccWalletID)
         {
             List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
@@ -539,7 +540,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
         //vsolanki 24-10-2018
         public List<BalanceResponse> GetAllAvailableBalance(long userid)
-        {
+        {         
             List<BalanceResponse> items = (from w in _dbContext.WalletMasters
                                            join wt in _dbContext.WalletTypeMasters
                                                    on w.WalletTypeID equals wt.Id
@@ -548,46 +549,222 @@ namespace CleanArchitecture.Infrastructure.Data
                                            {
                                                Balance = w.Balance,
                                                WalletId = w.Id,
-                                               WalletType = wt.WalletTypeName
+                                               WalletType = wt.WalletTypeName,
                                            }).AsEnumerable().ToList();
             return items;
         }
-
+        public decimal GetTotalAvailbleBal(long userid)
+        {
+            var total = (from w in _dbContext.WalletMasters
+                         where w.UserID == userid && w.Status == 1
+                         select w.Balance
+           ).Sum();
+            return total;
+        }
         //vsolanki 24-10-2018
         public List<BalanceResponse> GetUnSettledBalance(long userid,long walletid)
         {
-            var amt =(from w in _dbContext.WalletTransactionQueues
-                    where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
-                    select w.Amount).Sum();
 
-
-            List<BalanceResponse> items = (from w in _dbContext.WalletTransactionQueues
-
-                                           where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
-                                           select new BalanceResponse
-                                           {
-                                               Balance = amt,
-                                               WalletId = walletid,
-                                               WalletType = w.WalletType
-                                           }).AsEnumerable().ToList();
-            return items;
+            var result = (from w in _dbContext.WalletTransactionQueues
+                          where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                          group w by new { w.Amount, w.WalletType } into g
+                          select new BalanceResponse
+                          {
+                              Balance =g.Sum(order => order.Amount),
+                              WalletType = g.Key.WalletType,                            
+                              WalletId=walletid
+                          }).AsEnumerable().ToList();
+                 
+            return result;
         }
         //vsolanki 24-10-2018
         public List<BalanceResponse> GetAllUnSettledBalance(long userid)
         {
-            List<BalanceResponse> items = (from w in _dbContext.WalletMasters
-                                           join wt in _dbContext.WalletTypeMasters
-                                                   on w.WalletTypeID equals wt.Id
-                                           where w.UserID == userid && w.Status == 1
-                                           select new BalanceResponse
-                                           {
-                                               Balance = w.Balance,
-                                               WalletId = w.Id,
-                                               WalletType = wt.WalletTypeName
-                                           }).AsEnumerable().ToList();
-            return items;
+            var result = (from w in _dbContext.WalletTransactionQueues
+                          where w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                          group w by new { w.Amount, w.WalletType,w.WalletID } into g
+                          select new BalanceResponse
+                          {
+                              Balance = g.Sum(order => order.Amount),
+                              WalletType = g.Key.WalletType,
+                              WalletId = g.Key.WalletID
+                          }).AsEnumerable().ToList();
+            return result;
         }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetUnClearedBalance(long userid, long walletid)
+        {
 
+            var result = (from w in _dbContext.DepositHistory
+                          join wt in _dbContext.AddressMasters
+                          on w.Address equals wt.Address
+                          where wt.WalletId==walletid  && w.UserId == userid && w.Status == 0                      
+                          select new BalanceResponse
+                          {
+                              Balance = w.Amount,
+                              WalletType = w.SMSCode,
+                              WalletId = walletid
+                          }).AsEnumerable().ToList();
+
+            return result;
+        }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetUnAllClearedBalance(long userid)
+        {
+            var result = (from w in _dbContext.DepositHistory
+                          join wt in _dbContext.AddressMasters
+                          on w.Address equals wt.Address
+                          where w.UserId == userid && w.Status == 0
+                          select new BalanceResponse
+                          {
+                              Balance = w.Amount,
+                              WalletType = w.SMSCode,
+                              WalletId = wt.WalletId
+                          }).AsEnumerable().ToList();
+            return result;
+        }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetStackingBalance(long userid, long walletid)
+        {
+
+            var result = (from u in _dbContext.UserStacking
+                          join w in _dbContext.WalletMasters
+                          on u.WalletId  equals w.Id
+                          where u.WalletId == walletid && w.UserID == userid && w.Status == 0
+                          select new BalanceResponse
+                          {
+                              Balance = u.StackingAmount,
+                              WalletType = u.WalletType,
+                              WalletId = walletid
+                          }).AsEnumerable().ToList();
+
+            if(result.Count()==0)
+            {
+                var result1 = (from u in _dbContext.StckingScheme
+                               join w in _dbContext.WalletMasters
+                              on u.WalletType equals w.WalletTypeID
+                               join wt in _dbContext.WalletTypeMasters
+                               on u.WalletType equals wt.Id
+                               where w.Id == walletid && w.UserID == userid && w.Status == 0
+                              select new BalanceResponse
+                              {
+                                  Balance = u.MaxLimitAmount +'-'+ u.MinLimitAmount,
+                                  WalletType = wt.WalletTypeName,
+                                  WalletId = walletid
+                              }).AsEnumerable().ToList();
+                return result1;
+            }
+
+            return result;
+        }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetAllStackingBalance(long userid)
+        {
+           var result = (from u in _dbContext.UserStacking
+                          join w in _dbContext.WalletMasters
+                          on u.WalletId  equals w.Id
+                          where  w.UserID == userid && w.Status == 0
+                          select new BalanceResponse
+                          {
+                              Balance = u.StackingAmount,
+                              WalletType = u.WalletType,
+                              WalletId = w.Id
+                          }).AsEnumerable().ToList();
+
+            if(result.Count()==0)
+            {
+                var result1 = (from u in _dbContext.StckingScheme
+                               join w in _dbContext.WalletMasters
+                              on u.WalletType equals w.WalletTypeID
+                               join wt in _dbContext.WalletTypeMasters
+                               on u.WalletType equals wt.Id
+                               where  w.UserID == userid && w.Status == 0
+                              select new BalanceResponse
+                              {
+                                  Balance = u.MaxLimitAmount +'-'+ u.MinLimitAmount,
+                                  WalletType = wt.WalletTypeName,
+                                  WalletId = w.Id
+                              }).AsEnumerable().ToList();
+                return result1;
+            }
+            return result;
+        }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetShadowBalance(long userid, long walletid)
+        {
+
+            var result = (from u in _dbContext.MemberShadowBalance
+                          join w in _dbContext.WalletMasters
+                          on u.WalletID equals w.Id
+                          join wt in _dbContext.WalletTypeMasters
+                                                   on u.WalletTypeId equals wt.Id
+                          where u.WalletID == walletid && w.UserID == userid && w.Status == 0
+                          select new BalanceResponse
+                          {
+                              Balance = u.ShadowAmount,
+                              WalletType = wt.WalletTypeName,
+                              WalletId = walletid
+                          }).AsEnumerable().ToList();
+
+            if (result.Count() == 0)
+            {
+                var result1 = (from u in _dbContext.MemberShadowLimit
+                               join w in _dbContext.BizUserTypeMapping
+                               on u.MemberTypeId equals w.UserType
+                               join wt in _dbContext.WalletMasters
+                               on walletid equals wt.Id
+                               join wtm in _dbContext.WalletTypeMasters
+                                                  on wt.WalletTypeID equals wtm.Id
+                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
+                               select new BalanceResponse
+                               {
+                                   Balance = u.ShadowLimitAmount,
+                                   WalletType = wtm.WalletTypeName,
+                                   WalletId = walletid
+                               }).AsEnumerable().ToList();
+                return result1;
+            }
+
+            return result;
+        }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetAllShadowBalance(long userid)
+        {
+            var result = (from u in _dbContext.MemberShadowBalance
+                          join w in _dbContext.WalletMasters
+                          on u.WalletID equals w.Id
+                          join wt in _dbContext.WalletTypeMasters
+                                                   on u.WalletTypeId equals wt.Id
+                          where  w.UserID == userid && w.Status == 0
+                          select new BalanceResponse
+                          {
+                              Balance = u.ShadowAmount,
+                              WalletType = wt.WalletTypeName,
+                              WalletId = w.Id
+                          }).AsEnumerable().ToList();
+
+            if (result.Count() == 0)
+            {
+                var result1 = (from u in _dbContext.MemberShadowLimit
+                               join w in _dbContext.BizUserTypeMapping
+                               on u.MemberTypeId equals w.UserType
+                               join wt in _dbContext.WalletMasters
+                               on u.WalletType equals wt.WalletTypeID
+                               join wtm in _dbContext.WalletTypeMasters
+                               on wt.WalletTypeID equals wtm.Id
+                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
+                               select new BalanceResponse
+                               {
+                                   Balance = u.ShadowLimitAmount,
+                                   WalletType = wtm.WalletTypeName,
+                                   WalletId = wt.Id
+                               }).AsEnumerable().ToList();
+                return result1;
+            }
+
+            return result;
+        }
+        //vsolanki 24-10-2018
         public Balance GetAllBalances(long userid, long walletid)
         {
             var Unsettled = (from w in _dbContext.WalletTransactionQueues
