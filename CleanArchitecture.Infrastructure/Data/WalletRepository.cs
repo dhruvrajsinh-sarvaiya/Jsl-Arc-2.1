@@ -485,5 +485,39 @@ namespace CleanArchitecture.Infrastructure.Data
                                                        }).AsEnumerable().ToList();
             return items;
         }
+        public List<AddressMasterResponse> GetAddressMasterResponse(string AccWalletID)
+        {
+            List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
+                                                 join c in _dbContext.WalletMasters
+                                                 on u.WalletId equals c.Id
+                                                 where c.AccWalletID == AccWalletID && u.IsDefaultAddress == 1 && u.Status == 1
+
+                                                 select new AddressMasterResponse
+                                                 {
+                                                     AddressLabel = u.AddressLable,
+                                                     Address = u.Address
+                                                     //IsDefaultAddress = u.IsDefaultAddress,
+                                                 }).AsEnumerable().ToList();
+            if (items.Count() == 0)
+            {
+                List<AddressMasterResponse> items1 = (from u in _dbContext.AddressMasters
+                                                      join c in _dbContext.WalletMasters
+                                                      on u.WalletId equals c.Id
+                                                      where c.AccWalletID == AccWalletID && u.Status == 1 orderby u.CreatedDate descending
+
+                                                      select new AddressMasterResponse
+                                                      {
+                                                          AddressLabel = u.AddressLable,
+                                                          Address = u.Address,
+                                                          //IsDefaultAddress = u.IsDefaultAddress,
+                                                      }).AsEnumerable().Take(1).ToList();
+                return items1;
+            }
+            else
+            {
+                return items;
+            }
+            
+        }
     }
 }

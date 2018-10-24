@@ -181,6 +181,24 @@ namespace CleanArchitecture.Web.API
         }
 
 
+        [HttpGet("{AccWalletID}")]
+        public async Task<IActionResult> GetDefaultWalletAddress(string AccWalletID)
+        {
+            try
+            {
+                ListWalletAddressResponse Response = _walletService.GetAddress(AccWalletID);
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+
         //[HttpGet("{coin}/{walletId}/{addressOrId}")]
         ////[Authorize]
         //public async Task<IActionResult> GetWalletAddress(string coin, string walletId, string addressOrId)

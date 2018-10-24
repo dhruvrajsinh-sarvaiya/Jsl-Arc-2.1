@@ -52,6 +52,6 @@ namespace CleanArchitecture.Core.Interfaces
         //decimal GetDrSumAmtWallet(long walletid);
         bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID);
         List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID);
-
+        List<AddressMasterResponse> GetAddressMasterResponse(string AccWaletID); //Rushabh 23-10-2018
     }
 }

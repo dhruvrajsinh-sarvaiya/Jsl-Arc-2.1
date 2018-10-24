@@ -57,5 +57,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 18-10-2018
         WithdrawalRes Withdrawl(string coin, string accWalletID, WithdrawalReq Request, long userid);
+
+        ListWalletAddressResponse GetAddress(string AccWalletID);
     }
 }

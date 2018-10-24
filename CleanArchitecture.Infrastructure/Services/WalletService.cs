@@ -1109,6 +1109,34 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        public ListWalletAddressResponse GetAddress(string AccWalletID)
+        {
+            ListWalletAddressResponse AddressResponse = new ListWalletAddressResponse();
+            try
+            {
+                var WalletAddResponse = _walletRepository1.GetAddressMasterResponse(AccWalletID);
+                if (WalletAddResponse.Count == 0)
+                {                    
+                    AddressResponse.ReturnCode = enResponseCode.Fail;
+                    AddressResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    AddressResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    AddressResponse.AddressList = WalletAddResponse;
+                    AddressResponse.ReturnCode = enResponseCode.Success;
+                    AddressResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                return AddressResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                AddressResponse.ReturnCode = enResponseCode.InternalError;
+                return AddressResponse;
+            }
+        }
+
         //16-10-2018 vsolanki 
         public DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
         {
