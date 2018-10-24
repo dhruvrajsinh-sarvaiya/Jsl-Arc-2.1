@@ -21,7 +21,7 @@ using CleanArchitecture.Web.Helper;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    //[Authorize]
+    [Authorize]
     public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
@@ -45,8 +45,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> ListWallet()
         {
-            ApplicationUser user = new ApplicationUser();user.Id = 1;
-          //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser();user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListWalletResponse Response = new ListWalletResponse();
             try
             {              
@@ -80,8 +80,8 @@ namespace CleanArchitecture.Web.API
         [HttpPost("{Coin}")]
         public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string Coin)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             var accessToken = await HttpContext.GetTokenAsync("access_token");
             HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Request), accessToken);
             CreateWalletResponse Response = new CreateWalletResponse();
@@ -116,8 +116,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{Coin}")]
         public async Task<IActionResult> GetWalletByCoin(string Coin)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
@@ -149,8 +149,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{Coin}/{WalletId}")]
         public async Task<IActionResult> GetWalletByWalletId(string Coin, string WalletId)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListWalletResponse Response = new ListWalletResponse();
             try
             {
@@ -178,8 +178,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{FromDate}/{ToDate}")]
         public async Task<IActionResult> DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             DepositHistoryResponse response = new DepositHistoryResponse();
             try
             {
@@ -208,8 +208,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{FromDate}/{ToDate}")]
         public async Task<IActionResult> WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             DepositHistoryResponse response = new DepositHistoryResponse();
             try
             {
@@ -237,8 +237,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{WalletId}")]
         public async Task<IActionResult> GetAvailableBalance(long WalletId)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -271,8 +271,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> GetAllAvailableBalance()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -301,8 +301,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{WalletId}")]
         public async Task<IActionResult> GetUnSettledBalance(long WalletId)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 16;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 16;
+             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -336,8 +336,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> GetAllUnSettledBalance()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -372,8 +372,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{WalletId}")]
         public async Task<IActionResult> GetUnClearedBalance(long WalletId)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 20;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 20;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -407,8 +407,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> GetAllUnClearedBalance()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 20;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 20;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -443,8 +443,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{WalletId}")]
         public async Task<IActionResult> GetStackingBalance(long WalletId)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 20;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 20;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -478,8 +478,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> GetAllStackingBalance()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 20;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 20;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -514,8 +514,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{WalletId}")]
         public async Task<IActionResult> GetShadowBalance(long WalletId)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 20;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 20;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -549,8 +549,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet]
         public async Task<IActionResult> GetAllShadowBalance()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 20;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 20;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -585,8 +585,8 @@ namespace CleanArchitecture.Web.API
         [HttpGet("{WalletId}")]
         public async Task<IActionResult> GetAllBalances(long WalletId)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             AllBalanceResponse Response = new AllBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
