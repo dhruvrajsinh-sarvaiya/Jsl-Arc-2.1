@@ -289,7 +289,7 @@ namespace CleanArchitecture.Web.API
             try
             {
                 //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, lockoutOnFailure: false);
                 var checkmail = await _userManager.FindByEmailAsync(model.Username);
                 if (result.Succeeded)
                 {
@@ -1137,6 +1137,10 @@ namespace CleanArchitecture.Web.API
             try
             {
                 await _signInManager.SignOutAsync();
+                foreach (var cookieKey in Request.Cookies.Keys)
+                {
+                    Response.Cookies.Delete(cookieKey);
+                }
                 _logger.LogInformation(4, "User logged out.");
                 return NoContent();
             }
