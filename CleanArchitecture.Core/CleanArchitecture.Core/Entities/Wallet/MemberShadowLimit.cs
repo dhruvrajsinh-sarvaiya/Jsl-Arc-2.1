@@ -10,10 +10,6 @@ namespace CleanArchitecture.Core.Entities.Wallet
     //vsolnkki 24-10-2018
     public class MemberShadowLimit : BizBase
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public new long Id { get; set; }
-
-        [Key]
         [Required]
         public long MemberTypeId { get; set; }//organization Id = 0
 

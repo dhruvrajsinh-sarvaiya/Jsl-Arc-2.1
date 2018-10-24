@@ -10,18 +10,29 @@ namespace CleanArchitecture.Core.Entities.Wallet
     //vsolnkki 24-10-2018
     public class StckingScheme : BizBase
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public new long Id { get; set; }
-
         [Required]
-        [Key]
-        public long MemberTypeId { get; set; }//organization Id
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal MaxLimitAmount { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18, 8)")]
-        public decimal LimitAmount { get; set; }
+        public decimal MinLimitAmount { get; set; }
 
         [Required]
         public long Type { get; set; }//wallettypemaster fk
+
+        [Required]
+        public string TimePeriod { get; set; }
+
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public new long Id { get; set; }
+
+        //[Required]
+        //[Key]
+        //public long MemberTypeId { get; set; }//organization Id=0
+
+        //[Required]
+        //[Column(TypeName = "decimal(18, 8)")]
+        //public decimal LimitAmount { get; set; }
     }
 }

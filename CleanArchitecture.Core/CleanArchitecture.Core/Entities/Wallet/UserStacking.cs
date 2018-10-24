@@ -11,7 +11,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
     public class UserStacking : BizBase
     {
         [Required]
-        public long UserId { get; set; }//User Id
+        public long SchemeId { get; set; }//fk
 
         [Required]
         [Column(TypeName = "decimal(18, 8)")]

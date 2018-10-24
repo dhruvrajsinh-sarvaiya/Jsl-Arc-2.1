@@ -21,7 +21,7 @@ using CleanArchitecture.Web.Helper;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    [Authorize]
+   // [Authorize]
     public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
@@ -220,6 +220,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        //vsolanki 2018-10-16
         [HttpGet("{FromDate}/{ToDate}")]
         public async Task<IActionResult> WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status)
         {
@@ -248,6 +249,150 @@ namespace CleanArchitecture.Web.API
                 return BadRequest();
             }
         }
+
+        //vsolanki 2018-10-24
+        [HttpGet("{WalletId}")]
+        public async Task<IActionResult> GetAvailableBalance(long WalletId)
+        {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            try
+            {
+                var user = new ApplicationUser();
+                user.Id = 1;//await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetAvailableBalance(user.Id,WalletId);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllAvailableBalance()
+        {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            try
+            {
+                var user = new ApplicationUser();
+                user.Id = 1;//await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetAllAvailableBalance(user.Id);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+
+        //vsolanki 2018-10-24
+        [HttpGet("{WalletId}")]
+        public async Task<IActionResult> GetUnSettledBalance(long WalletId)
+        {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            try
+            {
+                var user = new ApplicationUser();
+                user.Id = 16;//await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetUnSettledBalance(user.Id, WalletId);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("{WalletId}")]
+        public async Task<IActionResult> GetAllBalances(long WalletId)
+        {
+            AllBalanceResponse Response = new AllBalanceResponse();
+            try
+            {
+                var user = new ApplicationUser();
+                user.Id = 16;//await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.BizResponseObj.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetAllBalances(user.Id, WalletId);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+        
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllAvailableBalance()
+        //{
+        //    ListBalanceResponse Response = new ListBalanceResponse();
+        //    try
+        //    {
+        //        var user = new ApplicationUser();
+        //        user.Id = 1;//await _userManager.GetUserAsync(HttpContext.User);
+        //        if (user == null)
+        //        {
+        //            Response.ReturnCode = enResponseCode.Fail;
+        //            Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+        //            Response.ErrorCode = enErrorCode.StandardLoginfailed;
+        //        }
+        //        else
+        //        {
+        //            Response = _walletService.GetAllAvailableBalance(user.Id);
+        //        }
+        //        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+        //        return Ok(Response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+        //        return BadRequest();
+        //    }
+        //}
+
+
+
         ///// <summary>
         ///// vsolanki 1-10-2018 Add Wallet
         ///// </summary>

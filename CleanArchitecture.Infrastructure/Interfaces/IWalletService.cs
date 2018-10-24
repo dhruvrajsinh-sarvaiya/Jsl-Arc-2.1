@@ -59,5 +59,12 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         WithdrawalRes Withdrawl(string coin, string accWalletID, WithdrawalReq Request, long userid);
 
         ListWalletAddressResponse GetAddress(string AccWalletID);
+
+        //vsolanki 24-10-2018
+        ListBalanceResponse GetAvailableBalance(long userid, long walletId);
+        ListBalanceResponse GetAllAvailableBalance(long userid);
+
+        ListBalanceResponse GetUnSettledBalance(long userid, long walletId);
+        AllBalanceResponse GetAllBalances(long userid, long walletId);
     }
 }

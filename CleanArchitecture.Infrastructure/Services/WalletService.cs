@@ -501,8 +501,8 @@ namespace CleanArchitecture.Infrastructure.Services
         public IEnumerable<WalletTypeMaster> GetWalletTypeMaster()
         {
             try
-            {              
-              //  IEnumerable<WalletTypeMasterRes> coinlist = new List<WalletTypeMasterRes>();
+            {
+                //  IEnumerable<WalletTypeMasterRes> coinlist = new List<WalletTypeMasterRes>();
                 IEnumerable<WalletTypeMaster> coin = new List<WalletTypeMaster>();
 
                 coin = _WalletTypeMasterRepository.FindBy(item => item.Status == Convert.ToInt16(ServiceStatus.Active));
@@ -1039,7 +1039,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
                 remarks = "Credit for TrnNo:" + tqObj.TrnNo;
-                
+
                 WalletLedger walletLedger = GetWalletLedger(cWalletobj.Id, 0, 0, TotalAmount, trnType, serviceType, tqObj.TrnNo, remarks, cWalletobj.Balance, 1);
                 TransactionAccount tranxAccount = GetTransactionAccount(cWalletobj.Id, 1, batchObj.Id, 0, TotalAmount, tqObj.TrnNo, remarks, 1);
                 cWalletobj.CreditBalance(TotalAmount);
@@ -1116,7 +1116,7 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 var WalletAddResponse = _walletRepository1.GetAddressMasterResponse(AccWalletID);
                 if (WalletAddResponse.Count == 0)
-                {                    
+                {
                     AddressResponse.ReturnCode = enResponseCode.Fail;
                     AddressResponse.ReturnMsg = EnResponseMessage.NotFound;
                     AddressResponse.ErrorCode = enErrorCode.NotFound;
@@ -1208,11 +1208,11 @@ namespace CleanArchitecture.Infrastructure.Services
                     IsExist.UpdatedDate = UTC_To_IST();
                     _LimitcommonRepository.Update(IsExist);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
-                }                
+                }
                 Response.ReturnCode = enResponseCode.Success;
                 return Response;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
@@ -1248,31 +1248,135 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 18-10-2018
-        public WithdrawalRes Withdrawl (string coin, string accWalletID,WithdrawalReq Request, long userid)
+        public WithdrawalRes Withdrawl(string coin, string accWalletID, WithdrawalReq Request, long userid)
         {
             WalletTransactionQueue objTQ = new WalletTransactionQueue();
             try
             {
                 var dWalletobj = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
-                if(dWalletobj==null)
+                if (dWalletobj == null)
                 {
                     return new WithdrawalRes { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
                 }
-                if(dWalletobj.Balance<= Request.amount)
+                if (dWalletobj.Balance <= Request.amount)
                 {
                     return new WithdrawalRes { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficientBal, ErrorCode = enErrorCode.InsufficantBal };
                 }
                 //objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), 0, Request.amount, 0, UTC_To_IST(), null, dWalletobj.Id, coin, userid, "", 0, "Inserted");
                 //objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
-               // dWalletobj.DebitBalance(Request.amount);
+                // dWalletobj.DebitBalance(Request.amount);
 
-                return new WithdrawalRes { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDebit, txid=12345 /*objTQ.TrnNo*/,statusMsg="Success" /*objTQ.StatusMsg*/ };
+                return new WithdrawalRes { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDebit, txid = 12345 /*objTQ.TrnNo*/, statusMsg = "Success" /*objTQ.StatusMsg*/ };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-              throw ex;
+                throw ex;
+            }
+        }
+
+        //vsolanki 24-10-2018
+        public ListBalanceResponse GetAvailableBalance(long userid, long walletId)
+        {
+            try
+            {
+                var response = _walletRepository1.GetAvailableBalance(userid, walletId);
+                if (response.Count == 0)
+                {
+                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                }
+                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public ListBalanceResponse GetAllAvailableBalance(long userid)
+        {
+            try
+            {
+                var response = _walletRepository1.GetAllAvailableBalance(userid);
+                if (response.Count == 0)
+                {
+                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                }
+                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //vsolanki 24-10-2018
+        public ListBalanceResponse GetUnSettledBalance(long userid, long walletId)
+        {
+            try
+            {
+                var response = _walletRepository1.GetUnSettledBalance(userid, walletId);
+                if (response.Count == 0)
+                {
+                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                }
+                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public ListBalanceResponse GetAllUnSettledBalance(long userid)
+        {
+            try
+            {
+                var response = _walletRepository1.GetAllAvailableBalance(userid);
+                if (response.Count == 0)
+                {
+                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                }
+                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public AllBalanceResponse GetAllBalances(long userid, long walletId)
+        {
+            
+              AllBalanceResponse allBalanceResponse = new AllBalanceResponse();
+            allBalanceResponse.BizResponseObj = new BizResponseClass();
+            try
+            {
+                var response = _walletRepository1.GetAllBalances(userid, walletId);
+                if (response == null)
+                {
+                    allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return allBalanceResponse;
+                }
+                allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Success;
+                allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                allBalanceResponse.Balance = response;
+                allBalanceResponse.WalletType = "btc";
+                allBalanceResponse.WalletName = "Test";
+                allBalanceResponse.IsDefaultWallet = 0;
+                return allBalanceResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
             }
         }
     }

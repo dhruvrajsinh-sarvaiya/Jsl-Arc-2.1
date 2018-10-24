@@ -262,16 +262,16 @@ namespace CleanArchitecture.Infrastructure.Data
 
         public int CheckTrnRefNoForCredit(long TrnRefNo, enWalletTranxOrderType TrnType) // need to check whether walleet is pre deducted for this order
         {
-            int response = (from u in _dbContext.WalletTransactionQueues                            
+            int response = (from u in _dbContext.WalletTransactionQueues
                             where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType && (u.Status == enTransactionStatus.Hold || u.Status == enTransactionStatus.Success)
                             select u).Count();
             return response;
         }
 
-        public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq,byte AddorUpdate)//1=add,2=update
+        public WalletTransactionQueue AddIntoWalletTransactionQueue(WalletTransactionQueue wtq, byte AddorUpdate)//1=add,2=update
         {
             //WalletTransactionQueue w = new WalletTransactionQueue();
-            if(AddorUpdate==1)
+            if (AddorUpdate == 1)
             {
                 _dbContext.WalletTransactionQueues.Add(wtq);
             }
@@ -282,7 +282,7 @@ namespace CleanArchitecture.Infrastructure.Data
             _dbContext.SaveChanges();
             return wtq;
         }
-       public  WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate)//1=add,2=update)
+        public WalletTransactionOrder AddIntoWalletTransactionOrder(WalletTransactionOrder wo, byte AddorUpdate)//1=add,2=update)
         {
             if (AddorUpdate == 1)
             {
@@ -302,7 +302,7 @@ namespace CleanArchitecture.Infrastructure.Data
             decimal totalAmtDrTranx;
             for (int t = 0; t <= arryTrnID.Length - 1; t++)
             {
-                var response = (from u in _dbContext.WalletTransactionQueues                                
+                var response = (from u in _dbContext.WalletTransactionQueues
                                 where u.TrnRefNo == arryTrnID[t].DrTrnRefNo && u.Status == enTransactionStatus.Hold && u.TrnType == Core.Enums.enWalletTranxOrderType.Debit
                                 && u.WalletType == coinName
                                 select u);
@@ -341,7 +341,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                  {
                                                      AddressLabel = u.AddressLable,
                                                      Address = u.Address,
-                                                     IsDefaultAddress = u.IsDefaultAddress,                                                  
+                                                     IsDefaultAddress = u.IsDefaultAddress,
                                                  }).AsEnumerable().ToList();
             return items;
         }
@@ -350,22 +350,23 @@ namespace CleanArchitecture.Infrastructure.Data
         public DepositHistoryResponse DepositHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
         {
             List<HistoryObject> items = (from u in _dbContext.DepositHistory
-                                         where u.UserId == Userid && u.CreatedDate >= FromDate && u.CreatedDate <= ToDate && (Status==null ||(u.Status==Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))                                       
+                                         where u.UserId == Userid && u.CreatedDate >= FromDate && u.CreatedDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))
                                          select new HistoryObject
                                          {
                                              CoinName = u.SMSCode,
                                              Status = u.Status,
-                                             Information=u.StatusMsg,
-                                             Amount=u.Amount,
-                                             Date=u.CreatedDate,
-                                             Address=u.Address,
+                                             Information = u.StatusMsg,
+                                             Amount = u.Amount,
+                                             Date = u.CreatedDate,
+                                             Address = u.Address,
                                              StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
                                          }).AsEnumerable().ToList();
-            if(items.Count()==0)
+            if (items.Count() == 0)
             {
                 return new DepositHistoryResponse()
                 {
-                    ReturnCode= enResponseCode.Fail,ReturnMsg= EnResponseMessage.NotFound,
+                    ReturnCode = enResponseCode.Fail,
+                    ReturnMsg = EnResponseMessage.NotFound,
                     ErrorCode = enErrorCode.NotFound
                 };
             }
@@ -374,7 +375,7 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 ReturnCode = enResponseCode.Success,
                 ReturnMsg = EnResponseMessage.FindRecored,
-                Histories=items
+                Histories = items
             };
         }
 
@@ -390,8 +391,8 @@ namespace CleanArchitecture.Infrastructure.Data
                                              Information = u.StatusMsg,
                                              Amount = u.Amount,
                                              Date = u.CreatedDate,
-                                             Address=u.TransactionAccount,
-                                             StatusStr= (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
+                                             Address = u.TransactionAccount,
+                                             StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
                                          }).AsEnumerable().ToList();
 
             if (items.Count() == 0)
@@ -427,9 +428,9 @@ namespace CleanArchitecture.Infrastructure.Data
 
                 // update debit transaction(current tranx against which tranx) status if it is fully settled
                 var arrayObjTQ = (from p in _dbContext.WalletTransactionQueues
-                                join q in arryTrnID on p.TrnNo equals q.DrTQTrnNo
-                                select new {p,q }).ToList();
-                arrayObjTQ.ForEach(e => e.p.SettedAmt = e.p.SettedAmt + e.q.Amount );
+                                  join q in arryTrnID on p.TrnNo equals q.DrTQTrnNo
+                                  select new { p, q }).ToList();
+                arrayObjTQ.ForEach(e => e.p.SettedAmt = e.p.SettedAmt + e.q.Amount);
                 arrayObjTQ.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
                 arrayObjTQ.Where(d => d.p.SettedAmt >= d.p.Amount).ToList().ForEach(e => e.p.Status = enTransactionStatus.Success);
 
@@ -463,7 +464,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 return istdate;
             }
             catch (Exception ex)
-            {                
+            {
                 throw ex;
             }
         }
@@ -503,7 +504,8 @@ namespace CleanArchitecture.Infrastructure.Data
                 List<AddressMasterResponse> items1 = (from u in _dbContext.AddressMasters
                                                       join c in _dbContext.WalletMasters
                                                       on u.WalletId equals c.Id
-                                                      where c.AccWalletID == AccWalletID && u.Status == 1 orderby u.CreatedDate descending
+                                                      where c.AccWalletID == AccWalletID && u.Status == 1
+                                                      orderby u.CreatedDate descending
 
                                                       select new AddressMasterResponse
                                                       {
@@ -517,7 +519,89 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 return items;
             }
-            
+
+        }
+
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetAvailableBalance(long userid, long walletId)
+        {
+            List<BalanceResponse> items = (from w in _dbContext.WalletMasters
+                                           join wt in _dbContext.WalletTypeMasters
+                                                   on w.WalletTypeID equals wt.Id
+                                           where w.Id == walletId && w.UserID == userid && w.Status == 1
+                                           select new BalanceResponse
+                                           {
+                                               Balance = w.Balance,
+                                               WalletId = w.Id,
+                                               WalletType = wt.WalletTypeName
+                                           }).AsEnumerable().ToList();
+            return items;
+        }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetAllAvailableBalance(long userid)
+        {
+            List<BalanceResponse> items = (from w in _dbContext.WalletMasters
+                                           join wt in _dbContext.WalletTypeMasters
+                                                   on w.WalletTypeID equals wt.Id
+                                           where w.UserID == userid && w.Status == 1
+                                           select new BalanceResponse
+                                           {
+                                               Balance = w.Balance,
+                                               WalletId = w.Id,
+                                               WalletType = wt.WalletTypeName
+                                           }).AsEnumerable().ToList();
+            return items;
+        }
+
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetUnSettledBalance(long userid,long walletid)
+        {
+            var amt =(from w in _dbContext.WalletTransactionQueues
+                    where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                    select w.Amount).Sum();
+
+
+            List<BalanceResponse> items = (from w in _dbContext.WalletTransactionQueues
+
+                                           where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                                           select new BalanceResponse
+                                           {
+                                               Balance = amt,
+                                               WalletId = walletid,
+                                               WalletType = w.WalletType
+                                           }).AsEnumerable().ToList();
+            return items;
+        }
+        //vsolanki 24-10-2018
+        public List<BalanceResponse> GetAllUnSettledBalance(long userid)
+        {
+            List<BalanceResponse> items = (from w in _dbContext.WalletMasters
+                                           join wt in _dbContext.WalletTypeMasters
+                                                   on w.WalletTypeID equals wt.Id
+                                           where w.UserID == userid && w.Status == 1
+                                           select new BalanceResponse
+                                           {
+                                               Balance = w.Balance,
+                                               WalletId = w.Id,
+                                               WalletType = wt.WalletTypeName
+                                           }).AsEnumerable().ToList();
+            return items;
+        }
+
+        public Balance GetAllBalances(long userid, long walletid)
+        {
+            var Unsettled = (from w in _dbContext.WalletTransactionQueues
+                       where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                       select w.Amount).Sum();
+
+            var availble = (from w in _dbContext.WalletMasters
+                            join wt in _dbContext.WalletTypeMasters
+                                    on w.WalletTypeID equals wt.Id
+                            where w.Id == walletid && w.UserID == userid && w.Status == 1
+                            select w.Balance).Sum();
+
+            return new Balance { UnSettledBalance = Unsettled ,AvailableBalance=availble, UnClearedBalance = 42516, ShadowBalance =52000, StackingBalance =251418};
+
         }
     }
 }

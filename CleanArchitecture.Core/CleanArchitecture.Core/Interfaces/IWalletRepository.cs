@@ -53,5 +53,13 @@ namespace CleanArchitecture.Core.Interfaces
         bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID);
         List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID);
         List<AddressMasterResponse> GetAddressMasterResponse(string AccWaletID); //Rushabh 23-10-2018
+
+        //vsolanki 24-10-2018
+        List<BalanceResponse> GetAvailableBalance(long userid, long walletId);
+        List<BalanceResponse> GetAllAvailableBalance(long userid);
+        List<BalanceResponse> GetUnSettledBalance(long userid, long walletId);
+        List<BalanceResponse> GetAllUnSettledBalance(long userid);
+
+        Balance GetAllBalances(long userid, long walletid);
     }
 }
