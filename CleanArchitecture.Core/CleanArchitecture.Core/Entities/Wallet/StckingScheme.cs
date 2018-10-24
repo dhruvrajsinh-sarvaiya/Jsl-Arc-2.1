@@ -19,10 +19,13 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal MinLimitAmount { get; set; }
 
         [Required]
-        public long Type { get; set; }//wallettypemaster fk
+        public long WalletType { get; set; }//wallettypemaster fk
 
         [Required]
         public string TimePeriod { get; set; }
+
+        [Required]
+        public long Percent { get; set; }
 
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         //public new long Id { get; set; }

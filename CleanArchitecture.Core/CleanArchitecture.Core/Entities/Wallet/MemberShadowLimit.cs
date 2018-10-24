@@ -18,6 +18,6 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal ShadowLimitAmount { get; set; }
 
         [Required]        
-        public long Type { get; set; }//wallettypemaster fk
+        public long WalletType { get; set; }//wallettypemaster fk
     }
 }

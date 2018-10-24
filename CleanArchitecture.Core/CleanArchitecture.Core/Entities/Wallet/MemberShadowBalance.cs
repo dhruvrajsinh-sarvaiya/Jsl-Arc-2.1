@@ -22,7 +22,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
 
         // ntrivedi walletid is used instead of userid 
         [Required]
-        public long Type { get; set; }//fk
+        public long WalletTypeId { get; set; }//fk
 
         public string Remarks { get; set; }
     }

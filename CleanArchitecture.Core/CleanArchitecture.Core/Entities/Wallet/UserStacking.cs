@@ -19,7 +19,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
 
         [Required]
         [StringLength(50)]
-        public string Type { get; set; }//wallettype
+        public string WalletType { get; set; }//wallettype
 
         public string Remarks { get; set; }
     }

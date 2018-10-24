@@ -175,8 +175,8 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.PairId, e.DataDate }); // Uday 22-10-2018 composite primary key
             modelBuilder.Entity<DepositHistory>().HasKey(e => new { e.TrnID, e.Address }); // ntrivedi 23-10-2018 composite primary key
             modelBuilder.Entity<BizUserTypeMapping>().Property(p =>p.UserID).ValueGeneratedNever(); // ntrivedi 
-            modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
-            modelBuilder.Entity<StckingScheme>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
+          /*  modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); */// ntrivedi 
+            //modelBuilder.Entity<StckingScheme>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
 
 
         }
