@@ -91,8 +91,6 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                int[] AllowTrnType1 = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
-                var walletMaster1 = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode, 1, AllowTrnType1, 1);
                 ServiceMaster serviceMaster = new ServiceMaster()
                 {
                     Name = Request.Name,
@@ -277,6 +275,18 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         _serviceTypeMapping.Update(tranSerMapping);
                     }
 
+                    var walletType = _walletTypeService.GetById(serviceMaster.WalletTypeID);
+                    if(walletType != null)
+                    {
+                        walletType.IsDepositionAllow = Request.IsDeposit;
+                        walletType.IsWithdrawalAllow = Request.IsWithdraw;
+                        walletType.IsTransactionWallet = Request.IsTransaction;
+                        tranSerMapping.UpdatedBy = 1;
+                        tranSerMapping.UpdatedDate = DateTime.UtcNow;
+
+                        _walletTypeService.Update(walletType);
+                    }
+
                     return Request.ServiceId;
                 }
                 else
@@ -337,13 +347,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
                         if (withdrawSerMapping != null)
                         {
-                            response.IsDeposit = withdrawSerMapping.Status;
+                            response.IsWithdraw = withdrawSerMapping.Status;
                         }
 
                         var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
                         if (tranSerMapping != null)
                         {
-                            response.IsDeposit = tranSerMapping.Status;
+                            response.IsTransaction = tranSerMapping.Status;
                         }
 
                         responsedata.Add(response);
@@ -404,13 +414,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
                     if (withdrawSerMapping != null)
                     {
-                        responsedata.IsDeposit = withdrawSerMapping.Status;
+                        responsedata.IsWithdraw = withdrawSerMapping.Status;
                     }
 
                     var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
                     if (tranSerMapping != null)
                     {
-                        responsedata.IsDeposit = tranSerMapping.Status;
+                        responsedata.IsTransaction = tranSerMapping.Status;
                     }
 
                     return responsedata;

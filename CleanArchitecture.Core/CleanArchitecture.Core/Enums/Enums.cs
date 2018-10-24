@@ -225,7 +225,7 @@ namespace CleanArchitecture.Core.Enums
         Status4081IpAddressNotInsert = 4081,
         Status4083IpAddressExist = 4083,
         Status4084DeviceIdExist = 4084,
-
+        Status4079TwoFAcodeInvalide = 4079,
 
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,

@@ -289,7 +289,7 @@ namespace CleanArchitecture.Web.API
             try
             {
                 //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, lockoutOnFailure: false);
                 var checkmail = await _userManager.FindByEmailAsync(model.Username);
                 if (result.Succeeded)
                 {
@@ -398,6 +398,7 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (checkmail.TwoFactorEnabled)
                                     {
                                         string currenttime = DateTime.UtcNow.ToString();
@@ -623,6 +624,7 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
                                     {
                                         string currenttime = DateTime.UtcNow.ToString();
@@ -1137,6 +1139,10 @@ namespace CleanArchitecture.Web.API
             try
             {
                 await _signInManager.SignOutAsync();
+                foreach (var cookieKey in Request.Cookies.Keys)
+                {
+                    Response.Cookies.Delete(cookieKey);
+                }
                 _logger.LogInformation(4, "User logged out.");
                 return NoContent();
             }

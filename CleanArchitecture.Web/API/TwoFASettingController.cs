@@ -48,7 +48,7 @@ namespace CleanArchitecture.Web.API
 
         #region Method
 
-        [HttpPost("twofactorauthentication")]
+        [HttpPost("Twofactorauthentication")]
         public async Task<IActionResult> TwoFactorAuthentication()
         {
             var user = await GetCurrentUserAsync();
@@ -90,7 +90,7 @@ namespace CleanArchitecture.Web.API
         //    return Ok(model);
         //}
 
-        [HttpPost("disable2fa")]
+        [HttpPost("Disable2fa")]
         public async Task<IActionResult> Disable2fa([FromBody]DisableAuthenticatorViewModel model)
         {
             var user = await GetCurrentUserAsync();
@@ -135,7 +135,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("enableauthenticator")]
+        [HttpGet("Enableauthenticator")]
         public async Task<IActionResult> EnableAuthenticator()
         {
             try
@@ -185,7 +185,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost("enableauthenticator")]
+        [HttpPost("Enableauthenticator")]
         public async Task<IActionResult> EnableAuthenticator([FromBody]EnableAuthenticatorCodeViewModel model)
         {
             try
@@ -200,12 +200,12 @@ namespace CleanArchitecture.Web.API
 
                 if (!is2faTokenValid)
                 {
-                    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification });
+                    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail,ReturnMsg= EnResponseMessage.TwoFactorVerification, ErrorCode =enErrorCode.Status4079TwoFAcodeInvalide});
 
                 }
                 await _userManager.SetTwoFactorEnabledAsync(user, true);
                 _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success });
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success,ReturnMsg= EnResponseMessage.EnableTroFactor });
             }
             catch (Exception ex)
             {

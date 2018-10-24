@@ -287,7 +287,7 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(Response);
                 }
 
-                long MemberID =  user.Id;
+                long MemberID =user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, sCondition, request.FromDate, request.ToDate, request.Page, status);
                 if (Response.response.Count == 0)
                 {
