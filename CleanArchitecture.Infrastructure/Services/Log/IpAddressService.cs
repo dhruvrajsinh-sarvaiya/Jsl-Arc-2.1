@@ -127,10 +127,10 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
             var skip = pageSize * (pageIndex - 1);
 
-            var canPage = skip < total;
+            //var canPage = skip < total;
 
-            if (canPage) // do what you wish if you can page no further
-                return null;
+            //if (canPage) // do what you wish if you can page no further
+            //    return null;
 
             return IpList.Skip(skip).Take(pageSize).ToList();
 

@@ -339,8 +339,8 @@ namespace CleanArchitecture.Web.API
         }
 
 
-        [HttpGet("GetIpAddress/{PageIndex}/{PAGE_SIZE}")]
-        public async Task<IActionResult> GetIpAddress(int PageIndex = 0, int PAGE_SIZE = 0)
+        [HttpGet("GetIpAddress/{PageIndex}/{Page_Size}")]
+        public async Task<IActionResult> GetIpAddress(int PageIndex = 0, int Page_Size = 0)
         {
             try
             {
@@ -349,11 +349,14 @@ namespace CleanArchitecture.Web.API
                 if (user != null)
                 {
                     var IpList = (dynamic)null;
-                    IpList = await _ipAddressService.GetIpAddressListByUserId(user.Id, PageIndex, PAGE_SIZE);
+                    IpList = await _ipAddressService.GetIpAddressListByUserId(user.Id, PageIndex, Page_Size);
                     int TotalRowCount = 0;
-                    if (IpList.Count > 0)
+                    if (IpList != null)
                     {
-                        TotalRowCount = IpList.Count();
+                        if (IpList.Count > 0)
+                        {
+                            TotalRowCount = IpList.Count;
+                        }
                     }
                     return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpData, IpList = IpList, TotalRow = TotalRowCount });
                 }
@@ -516,8 +519,8 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetDeviceId/{PageIndex}/{PAGE_SIZE}")]
-        public async Task<IActionResult> GetDeviceId(int PageIndex = 0, int PAGE_SIZE = 0)
+        [HttpGet("GetDeviceId/{PageIndex}/{Page_Size}")]
+        public async Task<IActionResult> GetDeviceId(int PageIndex = 0, int Page_Size = 0)
         {
             try
             {
@@ -526,11 +529,14 @@ namespace CleanArchitecture.Web.API
                 if (user != null)
                 {
                     var DeviceList = (dynamic)null;
-                    DeviceList = _iDeviceIdService.GetDeviceListByUserId(user.Id, PageIndex, PAGE_SIZE);
+                    DeviceList = _iDeviceIdService.GetDeviceListByUserId(user.Id, PageIndex, Page_Size);
                     int TotalRowCount = 0;
-                    if (DeviceList.Count > 0)
+                    if (DeviceList != null)
                     {
-                        TotalRowCount = DeviceList.Count();
+                        if (DeviceList.Count > 0)
+                        {
+                            TotalRowCount = DeviceList.Count;
+                        }
                     }
 
                     return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetDeviceData, DeviceList = DeviceList, TotalRow = TotalRowCount });

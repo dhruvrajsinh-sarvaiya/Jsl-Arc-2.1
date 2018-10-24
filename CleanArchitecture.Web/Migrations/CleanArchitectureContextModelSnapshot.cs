@@ -15,7 +15,7 @@ namespace CleanArchitecture.Web.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -796,7 +796,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("DeviceId")
                         .IsRequired()
-                        .HasMaxLength(250);
+                        .HasMaxLength(2000);
 
                     b.Property<bool>("IsDeleted");
 
@@ -2034,6 +2034,12 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<string>("AlterNetEmail");
+
+                    b.Property<string>("AlterNetMobile");
+
+                    b.Property<decimal>("Balance");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
@@ -2069,6 +2075,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("PhoneNumber");
 
                     b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<int>("RegTypeId");
 
                     b.Property<string>("SecurityStamp");
 

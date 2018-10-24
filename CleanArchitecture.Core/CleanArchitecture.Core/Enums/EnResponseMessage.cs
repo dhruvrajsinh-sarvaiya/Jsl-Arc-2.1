@@ -181,6 +181,6 @@ namespace CleanArchitecture.Core.Enums
         public static string UnLockUserError = "User not unlock.";
 
         public static string IpAlreadyExist = "Ip Address already exist.";
-        public static string DeviceIdAlreadyExist = "DeviceId already exisi.";
+        public static string DeviceIdAlreadyExist = "DeviceId already exist.";
     }
 }
