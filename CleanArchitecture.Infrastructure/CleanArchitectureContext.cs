@@ -90,7 +90,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<RouteConfiguration> RouteConfiguration { get; set; }
         public DbSet<ThirdPartyAPIConfiguration> ThirdPartyAPIConfiguration { get; set; }
         public DbSet<ThirdPartyAPIResponseConfiguration> ThirdPartyAPIResponseConfiguration { get; set; }
-        public DbSet<TradePoolMaster > TradePoolMaster { get; set; }
+        public DbSet<TradePoolMaster> TradePoolMaster { get; set; }
         public DbSet <TradeCancelQueue> TradeCancelQueue { get; set; }
         public DbSet <TradeTransactionStatus> TradeTransactionStatus { get; set; }
 
@@ -173,6 +173,11 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<DepositCounterMaster>().HasKey(e => new {e.WalletTypeID, e.SerProId}); // Rita 22-10-2018 composite primary key
             modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.PairId, e.DataDate }); // Uday 22-10-2018 composite primary key
             modelBuilder.Entity<DepositHistory>().HasKey(e => new { e.TrnID, e.Address }); // ntrivedi 23-10-2018 composite primary key
+            modelBuilder.Entity<BizUserTypeMapping>().Property(p =>p.UserID).ValueGeneratedNever(); // ntrivedi 
+            modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
+            modelBuilder.Entity<StckingScheme>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
+
+
         }
 
         /// <summary>
