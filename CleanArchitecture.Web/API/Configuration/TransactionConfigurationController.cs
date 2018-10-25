@@ -1945,7 +1945,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
-        [HttpPost("SetActivePair")]
+        [HttpPost("SetActivePair/PairId")]
         public IActionResult SetActivePair(long PairId)
         {
             BizResponseClass Response = new BizResponseClass();

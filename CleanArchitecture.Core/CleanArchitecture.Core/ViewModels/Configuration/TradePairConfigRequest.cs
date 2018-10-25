@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     public class TradePairConfigRequest
     {
         public long Id { get; set; }
-        [Required(ErrorMessage = "1,Please Enter Required Parameters,4530")]
+        //[Required(ErrorMessage = "1,Please Enter Required Parameters,4530")]
         public string PairName { get; set; }
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4531")]
         public long SecondaryCurrencyId { get; set; }
@@ -79,9 +79,14 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [Range(0, 9999999999.99999999, ErrorMessage = "1,Please enter a valid parameters,4563"), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal SellMaxPrice { get; set; }
-        [Range(0, 9999999999.99999999, ErrorMessage = "1,Please enter a valid parameters,4564"), DataType(DataType.Currency)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
-        public decimal Fee { get; set; }
-        public short FeeType { get; set; }
+        public decimal BuyFees { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal SellFees { get; set; }
+        [Required]
+        public string FeesCurrency { get; set; }
     }
 }

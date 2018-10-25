@@ -219,7 +219,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetGraphResponse> GetGraphData(long id)
         {
             IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(
-                            @"Select CONVERT(BIGINT,DATEDIFF(ss,'01-01-1970 00:00:00',DataDate)) As DataDate,Volume,High,Low,TodayClose,TodayOpen 
+                           @"Select CONVERT(BIGINT,DATEDIFF(ss,'01-01-1970 00:00:00',DataDate)) As DataDate,Volume,High24Hr As High,Low24Hr As Low,TodayClose,TodayOpen 
                               From TradeGraphDetail Where PairID={0}
                               AND DataDate>DATEADD(DAY, -366, dbo.GetISTDate()) AND DataDate<=DATEADD(DAY, -1, dbo.GetISTDate())", id);
 

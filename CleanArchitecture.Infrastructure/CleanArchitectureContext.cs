@@ -127,6 +127,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ZipCodeMaster> ZipCodeMaster { get; set; } //uday 22-10-2018
         public DbSet<TradeGraphDetail> TradeGraphDetail { get; set; } //uday 22-10-2018
         public DbSet<ServiceTypeMapping> ServiceTypeMapping { get; set; } //uday 24-10-2018
+        public DbSet<TradePairStastics> TradePairStastics { get; set; } //uday 25-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;

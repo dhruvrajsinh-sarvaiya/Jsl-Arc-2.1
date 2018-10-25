@@ -9,11 +9,7 @@ namespace CleanArchitecture.Core.Entities.Transaction
 {
     public class TradePairDetail : BizBase
     {
-        public long PairId { get; set; }
-        [Required]
-        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 8)")]
-        public decimal Currentrate { get; set; }
+        public long PairId { get; set; }      
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
@@ -30,22 +26,6 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal SellMaxQty { get; set; }
-        [Required]
-        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 8)")]
-        public decimal DailyHigh { get; set; }
-        [Required]
-        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 8)")]
-        public decimal DailyLow { get; set; }
-        [Required]
-        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 8)")]
-        public decimal CurrencyPrice { get; set; }
-        [Required]
-        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 8)")]
-        public decimal Volume { get; set; }
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
@@ -70,11 +50,42 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal SellMaxPrice { get; set; }
-
+        [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
-        public decimal Fee { get; set; }
-        public short FeeType { get; set; }
+        public decimal BuyFees { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal SellFees { get; set; }
+        [Required]
+        public string FeesCurrency { get; set; }
+
+
+        //[Required]
+        //[Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        //[Column(TypeName = "decimal(18, 8)")]
+        //public decimal Currentrate { get; set; }
+        //[Required]
+        //[Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        //[Column(TypeName = "decimal(18, 8)")]
+        //public decimal DailyHigh { get; set; }
+        //[Required]
+        //[Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        //[Column(TypeName = "decimal(18, 8)")]
+        //public decimal DailyLow { get; set; }
+        //[Required]
+        //[Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        //[Column(TypeName = "decimal(18, 8)")]
+        //public decimal CurrencyPrice { get; set; }
+        //[Required]
+        //[Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        //[Column(TypeName = "decimal(18, 8)")]
+        //public decimal Volume { get; set; }
+        //[Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        //[Column(TypeName = "decimal(18, 8)")]
+        //public decimal Fee { get; set; }
+        //public short FeeType { get; set; }
         //[Required]
         //public long LastTrnNo { get; set; }
     }
