@@ -141,6 +141,18 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
         }
 
+        public IEnumerable<T> GetConnectionID1(string Token)
+        {
+            try
+            {
+                return this.Context.Cache.GetObjectsByTag<T>(Token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public void SaveToSet(string key, T obj, string Tag)
         {
             try

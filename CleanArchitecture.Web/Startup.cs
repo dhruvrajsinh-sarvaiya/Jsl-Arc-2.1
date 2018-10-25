@@ -240,7 +240,15 @@ namespace CleanArchitecture.Web
                 // Do logging or other work that doesn't write to the Response.
             });
 
-            app.UseCors("CorsPolicy");
+            //app.UseCors("CorsPolicy");
+
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .WithMethods("GET", "POST")
+                    .AllowCredentials();
+            });
 
             app.UseSignalR(routes =>
             {
