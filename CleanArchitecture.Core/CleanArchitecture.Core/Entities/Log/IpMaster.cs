@@ -19,6 +19,12 @@ namespace CleanArchitecture.Core.Entities.Log
 
         public void SetAsIsEnabletatus()
         {
+            IsEnable = true;
+            Events.Add(new ServiceStatusEvent<IpMaster>(this));
+        }
+
+        public void SetAsIsDisabletatus()
+        {
             IsEnable = false;
             Events.Add(new ServiceStatusEvent<IpMaster>(this));
         }

@@ -149,7 +149,7 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirmOldNotMatch = "Old password does not match";
         public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
         public static string IpAddressUpdateError = "Ip address status not update.";
-        public static string SuccessDesableIpStatus = "Success full desable ip address.";
+        public static string SuccessDesableIpStatus = "Success full disable ip address.";
         public static string SuccessDeleteIpAddress = "Success full remove ip address.";
         public static string IpAddressdeleteError = "Ip address not remove.";
         public static string SuccessGetIpData = "Success full Get Ip Address.";
@@ -182,5 +182,9 @@ namespace CleanArchitecture.Core.Enums
 
         public static string IpAlreadyExist = "Ip Address already exist.";
         public static string DeviceIdAlreadyExist = "DeviceId already exist.";
+
+        public static string SuccessEnableIpStatus = "Success full enable ip address.";
+        public static string SuccessEnableDeviceId = "Success full enable device Id.";
+        public static string SuccessDisableDeviceId = "Success full disable device id.";
     }
 }

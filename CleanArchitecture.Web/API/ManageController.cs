@@ -287,6 +287,54 @@ namespace CleanArchitecture.Web.API
 
         }
 
+        [HttpPost("EnableIpAddress")]
+        public async Task<IActionResult> EnableIpAddress([FromBody]IpAddressReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+                string UserCountryCode = await _userdata.GetCountryByIP(model.SelectedIPAddress);
+                if (!string.IsNullOrEmpty(UserCountryCode) && UserCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUserSelectedIp, ErrorCode = enErrorCode.Status4045InvalidUserSelectedIp });
+                }
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    IpMasterViewModel imodel = new IpMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.IpAddress = model.SelectedIPAddress;
+
+                    long id = await _ipAddressService.EnableIpAddress(imodel);
+                    if (id > 0)
+                    {
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessEnableIpStatus });
+                    }
+                    else
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressUpdateError, ErrorCode = enErrorCode.Status4046NotUpdateIpStatus });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
 
         [HttpPost("DeleteIpAddress")]
         public async Task<IActionResult> DeleteIpAddress([FromBody]IpAddressReqViewModel model)
@@ -454,7 +502,7 @@ namespace CleanArchitecture.Web.API
                     long id = _iDeviceIdService.DesableDeviceId(imodel);
                     if (id > 0)
                     {
-                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDesableIpStatus });
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDisableDeviceId });
                     }
                     else
                     {
@@ -474,6 +522,49 @@ namespace CleanArchitecture.Web.API
 
         }
 
+        [HttpPost("EnableDeviceId")]
+        public async Task<IActionResult> EnableDeviceId([FromBody]DeviceIdReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    DeviceMasterViewModel imodel = new DeviceMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.DeviceId = model.SelectedDeviceId;
+
+                    long id = _iDeviceIdService.EnableDeviceId(imodel);
+                    if (id > 0)
+                    {
+                        return Ok(new DeviceIdResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessEnableDeviceId });
+                    }
+                    else
+                    {
+                        return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceAddressUpdateError, ErrorCode = enErrorCode.Status4058DeviceAddress });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new DeviceIdResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
 
         [HttpPost("DeleteDeviceId")]
         public async Task<IActionResult> DeleteDeviceId([FromBody]DeviceIdReqViewModel model)
