@@ -252,15 +252,9 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     Response = _walletService.GetAvailableBalance(user.Id,WalletId);
-                }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                             new JsonSerializerSettings
-                                                             {
-                                                                 NullValueHandling = NullValueHandling.Ignore
-                                                             });
-                dynamic respObjJson = JObject.Parse(respObj);
+                }               
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -273,7 +267,7 @@ namespace CleanArchitecture.Web.API
         {
            // ApplicationUser user = new ApplicationUser(); user.Id = 1;
              ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
-            ListBalanceResponse Response = new ListBalanceResponse();
+            TotalBalanceRes Response = new TotalBalanceRes();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
@@ -317,14 +311,9 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetUnSettledBalance(user.Id, WalletId);
                 }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                             new JsonSerializerSettings
-                                                             {
-                                                                 NullValueHandling = NullValueHandling.Ignore
-                                                             });
-                dynamic respObjJson = JObject.Parse(respObj);
+            
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -351,15 +340,9 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     Response = _walletService.GetAllUnSettledBalance(user.Id);
-                }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                         new JsonSerializerSettings
-                                                         {
-                                                             NullValueHandling = NullValueHandling.Ignore
-                                                         });
-                dynamic respObjJson = JObject.Parse(respObj);
+                }           
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -388,14 +371,9 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetUnClearedBalance(user.Id, WalletId);
                 }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                             new JsonSerializerSettings
-                                                             {
-                                                                 NullValueHandling = NullValueHandling.Ignore
-                                                             });
-                dynamic respObjJson = JObject.Parse(respObj);
+              
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -423,14 +401,9 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetAllUnClearedBalance(user.Id);
                 }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                         new JsonSerializerSettings
-                                                         {
-                                                             NullValueHandling = NullValueHandling.Ignore
-                                                         });
-                dynamic respObjJson = JObject.Parse(respObj);
+                
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -445,7 +418,7 @@ namespace CleanArchitecture.Web.API
         {
             //ApplicationUser user = new ApplicationUser(); user.Id = 20;
             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
-            ListBalanceResponse Response = new ListBalanceResponse();
+            ListStackingBalanceRes Response = new ListStackingBalanceRes();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
@@ -459,14 +432,9 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetStackingBalance(user.Id, WalletId);
                 }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                             new JsonSerializerSettings
-                                                             {
-                                                                 NullValueHandling = NullValueHandling.Ignore
-                                                             });
-                dynamic respObjJson = JObject.Parse(respObj);
+              
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -480,7 +448,7 @@ namespace CleanArchitecture.Web.API
         {
             //ApplicationUser user = new ApplicationUser(); user.Id = 20;
             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
-            ListBalanceResponse Response = new ListBalanceResponse();
+            ListStackingBalanceRes Response = new ListStackingBalanceRes();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
@@ -494,14 +462,9 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetAllStackingBalance(user.Id);
                 }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                         new JsonSerializerSettings
-                                                         {
-                                                             NullValueHandling = NullValueHandling.Ignore
-                                                         });
-                dynamic respObjJson = JObject.Parse(respObj);
+              
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -530,14 +493,9 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetShadowBalance(user.Id, WalletId);
                 }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                             new JsonSerializerSettings
-                                                             {
-                                                                 NullValueHandling = NullValueHandling.Ignore
-                                                             });
-                dynamic respObjJson = JObject.Parse(respObj);
+              
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {
@@ -565,14 +523,9 @@ namespace CleanArchitecture.Web.API
                 {
                     Response = _walletService.GetAllShadowBalance(user.Id);
                 }
-                var respObj = JsonConvert.SerializeObject(Response, Newtonsoft.Json.Formatting.Indented,
-                                                         new JsonSerializerSettings
-                                                         {
-                                                             NullValueHandling = NullValueHandling.Ignore
-                                                         });
-                dynamic respObjJson = JObject.Parse(respObj);
+               
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
-                return Ok(respObjJson);
+                return Ok(Response);
             }
             catch (Exception ex)
             {

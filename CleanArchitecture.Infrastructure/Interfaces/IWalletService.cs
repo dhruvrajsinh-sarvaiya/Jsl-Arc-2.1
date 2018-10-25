@@ -62,7 +62,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 24-10-2018
         ListBalanceResponse GetAvailableBalance(long userid, long walletId);
-        ListBalanceResponse GetAllAvailableBalance(long userid);
+        TotalBalanceRes GetAllAvailableBalance(long userid);
         //vsolanki 24-10-2018
         ListBalanceResponse GetUnSettledBalance(long userid, long walletId);
         ListBalanceResponse GetAllUnSettledBalance(long userid);
@@ -70,8 +70,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListBalanceResponse GetUnClearedBalance(long userid, long walletId);
         ListBalanceResponse GetAllUnClearedBalance(long userid);
         //vsolanki 24-10-2018
-        ListBalanceResponse GetStackingBalance(long userid, long walletId);
-        ListBalanceResponse GetAllStackingBalance(long userid);
+        ListStackingBalanceRes GetStackingBalance(long userid, long walletId);
+        ListStackingBalanceRes GetAllStackingBalance(long userid);
         //vsolanki 24-10-2018
         ListBalanceResponse GetShadowBalance(long userid, long walletId);
         ListBalanceResponse GetAllShadowBalance(long userid);
