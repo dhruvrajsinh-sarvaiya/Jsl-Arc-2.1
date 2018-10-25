@@ -116,8 +116,8 @@ namespace CleanArchitecture.Core.Enums
         public static string SignUpRole = "This User roles not available.";
         public static string SignUpWithResendEmail = "You have successfully resend Otp in email.";
         public static string SignUpWithResendMobile = "You have successfully resend Otp in mobile.";
-        public static string OTPSendOnMobile = "You have send OTP on mobile";
-        public static string OTPNotSendOnMobile = " Not send OTP on mobile";
+        public static string OTPSendOnMobile = "You have send OTP on mobile.";
+        public static string OTPNotSendOnMobile = "Not send OTP on mobile.";
         public static string LoginUserEmailOTP = "User Login with Email OTP Send Success.";
         public static string LoginEmailOTPNotsend = "User Login with Email OTP not Send Successfully.";
         public static string EmailFail = "Email Address Invalid";

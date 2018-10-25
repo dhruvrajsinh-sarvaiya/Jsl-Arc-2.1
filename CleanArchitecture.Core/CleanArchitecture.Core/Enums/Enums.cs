@@ -179,6 +179,7 @@ namespace CleanArchitecture.Core.Enums
         Status423Locked = 423,
         Status4013MobileInvalid = 4013,
         Status4020IpInvalid = 4020,
+        Status4032LoginFailed=4032,
         Status4033NotFoundRecored = 4033,
         Status4034UnableUpdateUser = 4034,
         Status4035UnableToAddIpAddress = 4035,
@@ -227,6 +228,13 @@ namespace CleanArchitecture.Core.Enums
         Status4083IpAddressExist = 4083,
         Status4084DeviceIdExist = 4084,
         Status4079TwoFAcodeInvalide = 4079,
+        Status4085LoginWithOtpDatanotSend =4085,
+        Status4086LoginWithOtpLoginFailed=4086,
+        Status4087EmailFail=4087,
+        Status4088LoginWithOtpInvalidAttempt=4088,
+        Status4089LoginEmailOTPNotsend=4089,
+        Status409OTPSendOnMobile=4090,
+        Status4091LoginMobileNumberInvalid=4091,
 
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
