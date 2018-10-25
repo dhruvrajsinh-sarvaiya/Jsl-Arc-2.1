@@ -13,7 +13,7 @@ namespace CleanArchitecture.Core.Interfaces.Log
         List<DeviceMasterViewModel> GetDeviceListByUserId(long UserId, int pageIndex, int pageSize);
         void UpdateDeviceId(DeviceMasterViewModel model);
         long DesableDeviceId(DeviceMasterViewModel model);
-        long EnableDeviceId(DeviceMasterViewModel model)
+        long EnableDeviceId(DeviceMasterViewModel model);
         long DeleteDeviceId(DeviceMasterViewModel model);
         long GetDeviceByUserIdandId(string DeviceId, long UserId);
     }
