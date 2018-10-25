@@ -288,24 +288,32 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public List<RecentOrderInfo> GetRecentOrder(long PairId)
+        public List<RecentOrderInfo> GetRecentOrder(long PairId, long MemberID)
         {
             try
             {
-                var list = _frontTrnRepository.GetRecentOrder(PairId);
+                string st = "";
+                var list = _frontTrnRepository.GetRecentOrder(PairId, MemberID);
                 List<RecentOrderInfo> responce = new List<RecentOrderInfo>();
                 if (list != null)
                 {
                     foreach (RecentOrderRespose model in list)
                     {
+                        if (model.Status == Convert.ToInt16(enTransactionStatus.Success))
+                            st = "Success";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                            st = "Hold";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.SystemFail))
+                            st = "Fail";
+
                         responce.Add(new RecentOrderInfo
                         {
                             Qty = model.Qty,
                             DateTime = model.DateTime.Date,
                             Price = model.Price,
-                            Status = model.Status,
                             TrnNo = model.TrnNo,
                             Type = model.Type,
+                            Status = st
                         });
                     }
                 }
