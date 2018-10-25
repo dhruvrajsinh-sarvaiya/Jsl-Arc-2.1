@@ -206,8 +206,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 //var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1);
 
                 //Add BaseCurrency In MarketEntity
-                var marketViewModel = new MarketViewModel { CurrencyName = Request.SMSCode, isBaseCurrency = 1, ServiceID = newServiceMaster.Id };
-                AddMarketData(marketViewModel);
+                if (Request.IsBaseCurrency == 1)
+                {
+                    var marketViewModel = new MarketViewModel { CurrencyName = Request.SMSCode, isBaseCurrency = 1, ServiceID = newServiceMaster.Id };
+                    AddMarketData(marketViewModel);
+                }
 
                 return newServiceMaster.Id;
             }
@@ -2303,6 +2306,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     responsedata.SellMaxPrice = pairDetail.SellMaxPrice;
                     responsedata.BuyFees = pairDetail.BuyFees;
                     responsedata.SellFees = pairDetail.SellFees;
+                    responsedata.FeesCurrency = pairDetail.FeesCurrency;
 
                     var pairStastics = _tradePairStastics.GetSingle(pair => pair.PairId == PairId);
                     responsedata.Volume = pairStastics.ChangeVol24;
@@ -2355,6 +2359,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         response.SellMaxPrice = pairDetail.SellMaxPrice;
                         response.BuyFees = pairDetail.BuyFees;
                         response.SellFees = pairDetail.SellFees;
+                        response.FeesCurrency = pairDetail.FeesCurrency;
 
                         var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pair.Id);
                         response.Volume = pairStastics.ChangeVol24;
