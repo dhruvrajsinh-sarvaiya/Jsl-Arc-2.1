@@ -1388,7 +1388,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
         //vsolanki 24-10-2018
-        public ListBalanceResponse GetUnClearedBalance(long userid, long walletId)    
+        public ListBalanceResponse GetUnClearedBalance(long userid, long walletId)
         {
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
@@ -1546,8 +1546,8 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 24-10-2018
         public AllBalanceResponse GetAllBalances(long userid, long walletId)
         {
-            
-              AllBalanceResponse allBalanceResponse = new AllBalanceResponse();
+
+            AllBalanceResponse allBalanceResponse = new AllBalanceResponse();
             allBalanceResponse.BizResponseObj = new BizResponseClass();
             try
             {
@@ -1736,6 +1736,31 @@ namespace CleanArchitecture.Infrastructure.Services
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+
+        //vsolanki 25-10-2018
+        public List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType)
+        {
+            AllBalanceTypeWiseRes a = new AllBalanceTypeWiseRes();
+            List<AllBalanceTypeWiseRes> Response = new List<AllBalanceTypeWiseRes>();
+            a.Wallet = new WalletResponse();
+            a.Wallet.Balance = new Balance();
+            var listWallet = _walletRepository1.GetWalletMasterResponseByCoin(userId, WalletType);
+            for (int i = 0; i <= listWallet.Count-1; i++)
+            {
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == listWallet[i].AccWalletID);
+                var response = _walletRepository1.GetAllBalances(userId, wallet.Id);
+
+                a.Wallet.AccWalletID = listWallet[i].AccWalletID;
+                a.Wallet.PublicAddress = listWallet[i].PublicAddress;
+                a.Wallet.WalletName = listWallet[i].WalletName;
+                a.Wallet.IsDefaultWallet = listWallet[i].IsDefaultWallet;
+                a.Wallet.TypeName = listWallet[i].CoinName;
+                
+                a.Wallet.Balance = response;
+                Response.Add(a);
+            }
+            return Response;
         }
     }
 }
