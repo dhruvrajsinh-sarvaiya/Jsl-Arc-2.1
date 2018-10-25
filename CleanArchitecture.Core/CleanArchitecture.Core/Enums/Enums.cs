@@ -358,13 +358,40 @@ namespace CleanArchitecture.Core.Enums
         GrpMsg = 3,
         Channel = 4
     }
-    public enum SignalRMethodName
-    {
-
-    }
+    
     public enum SubscriptionType
     {
         OneToOne = 1,
         Broadcast = 2
+    }
+    public enum UserWiseMethodName
+    {
+        OpenOrder=1,
+        OrderHistory=2,
+        TradeHistory=3,
+        ActivityNotification=4
+    }
+    public enum PairWiseMethodName
+    {
+        BuyerBook=5,
+        SellerBook=6,
+        TradingHistory=7,
+        MarketData=8,
+        Price=9,
+        BuyerSideWallet=10,
+        SellerSideWallet=11,
+        ChartData=12
+    }
+    public enum MarketWiseMethodName
+    {
+        PairData=13,
+        MarketTicker=14
+    }
+    public enum GlobalMethodName
+    {
+        Chat=15,
+        News=16,
+        Announcement=17,
+        Time=18
     }
 }
