@@ -624,16 +624,16 @@ namespace CleanArchitecture.Infrastructure.Data
             return result;
         }
         //vsolanki 24-10-2018
-        public List<BalanceResponse> GetStackingBalance(long userid, long walletid)
+        public List<StackingBalanceRes> GetStackingBalance(long userid, long walletid)
         {
 
             var result = (from u in _dbContext.UserStacking
                           join w in _dbContext.WalletMasters
                           on u.WalletId  equals w.Id
-                          where u.WalletId == walletid && w.UserID == userid && w.Status == 0
-                          select new BalanceResponse
+                          where u.WalletId == walletid && w.UserID == userid && u.Status == 0
+                          select new StackingBalanceRes
                           {
-                              Balance = u.StackingAmount,
+                              StackingAmount = u.StackingAmount,
                               WalletType = u.WalletType,
                               WalletId = walletid
                           }).AsEnumerable().ToList();
@@ -645,10 +645,11 @@ namespace CleanArchitecture.Infrastructure.Data
                               on u.WalletType equals w.WalletTypeID
                                join wt in _dbContext.WalletTypeMasters
                                on u.WalletType equals wt.Id
-                               where w.Id == walletid && w.UserID == userid && w.Status == 0
-                              select new BalanceResponse
+                               where w.Id == walletid && w.UserID == userid && u.Status == 0
+                              select new StackingBalanceRes
                               {
-                                  Balance = u.MaxLimitAmount +'-'+ u.MinLimitAmount,
+                                  MaxLimitAmount = u.MaxLimitAmount ,
+                                   MinLimitAmount=u.MinLimitAmount,
                                   WalletType = wt.WalletTypeName,
                                   WalletId = walletid
                               }).AsEnumerable().ToList();
@@ -658,15 +659,15 @@ namespace CleanArchitecture.Infrastructure.Data
             return result;
         }
         //vsolanki 24-10-2018
-        public List<BalanceResponse> GetAllStackingBalance(long userid)
+        public List<StackingBalanceRes> GetAllStackingBalance(long userid)
         {
            var result = (from u in _dbContext.UserStacking
                           join w in _dbContext.WalletMasters
                           on u.WalletId  equals w.Id
-                          where  w.UserID == userid && w.Status == 0
-                          select new BalanceResponse
+                          where  w.UserID == userid && u.Status == 0
+                          select new StackingBalanceRes
                           {
-                              Balance = u.StackingAmount,
+                              StackingAmount = u.StackingAmount,
                               WalletType = u.WalletType,
                               WalletId = w.Id
                           }).AsEnumerable().ToList();
@@ -678,10 +679,11 @@ namespace CleanArchitecture.Infrastructure.Data
                               on u.WalletType equals w.WalletTypeID
                                join wt in _dbContext.WalletTypeMasters
                                on u.WalletType equals wt.Id
-                               where  w.UserID == userid && w.Status == 0
-                              select new BalanceResponse
+                               where  w.UserID == userid && u.Status == 0
+                              select new StackingBalanceRes
                               {
-                                  Balance = u.MaxLimitAmount +'-'+ u.MinLimitAmount,
+                                  MaxLimitAmount = u.MaxLimitAmount ,
+                                  MinLimitAmount=u.MinLimitAmount,
                                   WalletType = wt.WalletTypeName,
                                   WalletId = w.Id
                               }).AsEnumerable().ToList();
@@ -698,7 +700,7 @@ namespace CleanArchitecture.Infrastructure.Data
                           on u.WalletID equals w.Id
                           join wt in _dbContext.WalletTypeMasters
                                                    on u.WalletTypeId equals wt.Id
-                          where u.WalletID == walletid && w.UserID == userid && w.Status == 0
+                          where u.WalletID == walletid && w.UserID == userid && u.Status == 0
                           select new BalanceResponse
                           {
                               Balance = u.ShadowAmount,
@@ -735,7 +737,7 @@ namespace CleanArchitecture.Infrastructure.Data
                           on u.WalletID equals w.Id
                           join wt in _dbContext.WalletTypeMasters
                                                    on u.WalletTypeId equals wt.Id
-                          where  w.UserID == userid && w.Status == 0
+                          where  w.UserID == userid && u.Status == 0
                           select new BalanceResponse
                           {
                               Balance = u.ShadowAmount,
@@ -777,7 +779,28 @@ namespace CleanArchitecture.Infrastructure.Data
                             where w.Id == walletid && w.UserID == userid && w.Status == 1
                             select w.Balance).Sum();
 
-            return new Balance { UnSettledBalance = Unsettled ,AvailableBalance=availble, UnClearedBalance = 42516, ShadowBalance =52000, StackingBalance =251418};
+            var UnClearedBalance = (from w in _dbContext.DepositHistory
+                                    join wt in _dbContext.AddressMasters
+                                    on w.Address equals wt.Address
+                                    where wt.WalletId == walletid && w.UserId == userid && w.Status == 0
+                                    select w.Amount
+                          ).Sum();
+
+            var ShadowBalance = (from u in _dbContext.MemberShadowBalance
+                          join w in _dbContext.WalletMasters
+                          on u.WalletID equals w.Id
+                          join wt in _dbContext.WalletTypeMasters
+                                                   on u.WalletTypeId equals wt.Id
+                          where u.WalletID == walletid && w.UserID == userid && u.Status == 0
+                          select u.ShadowAmount).Sum();
+
+            var StackingBalance = (from u in _dbContext.UserStacking
+                                   join w in _dbContext.WalletMasters
+                                   on u.WalletId equals w.Id
+                                   where u.WalletId == walletid && w.UserID == userid && u.Status == 0
+                                   select u.StackingAmount).Sum(); ;
+
+            return new Balance { UnSettledBalance = Unsettled ,AvailableBalance=availble, UnClearedBalance = UnClearedBalance, ShadowBalance = ShadowBalance, StackingBalance = StackingBalance };
 
         }
     }

@@ -61,8 +61,8 @@ namespace CleanArchitecture.Core.Interfaces
         List<BalanceResponse> GetAllUnSettledBalance(long userid);
         List<BalanceResponse> GetUnClearedBalance(long userid, long walletId);
         List<BalanceResponse> GetUnAllClearedBalance(long userid);
-        List<BalanceResponse> GetStackingBalance(long userid, long walletId);
-        List<BalanceResponse> GetAllStackingBalance(long userid);
+        List<StackingBalanceRes> GetStackingBalance(long userid, long walletId);
+        List<StackingBalanceRes> GetAllStackingBalance(long userid);
         List<BalanceResponse> GetShadowBalance(long userid, long walletId);
         List<BalanceResponse> GetAllShadowBalance(long userid);
         Balance GetAllBalances(long userid, long walletid);

@@ -5,10 +5,10 @@ using System.Text;
 
 namespace CleanArchitecture.Core.ViewModels.Wallet
 {
-    public class ListBalanceResponse 
+    public class TotalBalanceRes
     {
         public List<BalanceResponse> Response { get; set; }
-        //public decimal? TotalBalance { get; set; }
+        public decimal? TotalBalance { get; set; }
         public BizResponseClass BizResponseObj { get; set; }
     }
 }
