@@ -27,9 +27,18 @@ namespace CleanArchitecture.Core.ViewModels
         [JsonProperty(PropertyName = "CurrentRate")]
         public decimal Currentrate { get; set; }
         public decimal Volume { get; set; }
-        public decimal Fee { get; set; }
+        public decimal SellFees { get; set; }
+        public decimal BuyFees { get; set; }
         public string ChildCurrency { get; set; }
         public string Abbrevation { get; set; }
         public decimal ChangePer { get; set; }
+        public decimal High24Hr { get; set; }
+        public decimal Low24Hr { get; set; }
+        public decimal HighWeek { get; set; }
+        public decimal LowWeek { get; set; }
+        public decimal High52Week { get; set; }
+        public decimal Low52Week { get; set; }
+        public short UpDownBit { get; set; }
+
     }
 }

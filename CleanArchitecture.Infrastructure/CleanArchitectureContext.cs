@@ -20,6 +20,7 @@ using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Wallet;
 using System.ComponentModel.DataAnnotations.Schema;
+using CleanArchitecture.Core.Entities.Communication;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -93,7 +94,9 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<TradePoolMaster> TradePoolMaster { get; set; }
         public DbSet <TradeCancelQueue> TradeCancelQueue { get; set; }
         public DbSet <TradeTransactionStatus> TradeTransactionStatus { get; set; }
+        public DbSet <Market> Market { get; set; }
 
+        public DbQuery<GetTradingSummary> GetTradingSummary { get; set; }  //komal 24-10-2018 
         public DbQuery<TradeHistoryResponce> TradeHistoryInfo { get; set; } //komal 11-10-2018
         public DbQuery<RecentOrderRespose> RecentOrderRespose { get; set; } //komal 12-10-2018
         public DbQuery<CommunicationProviderList> CommunicationProviderList { get; set; }
@@ -124,6 +127,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ZipCodeMaster> ZipCodeMaster { get; set; } //uday 22-10-2018
         public DbSet<TradeGraphDetail> TradeGraphDetail { get; set; } //uday 22-10-2018
         public DbSet<ServiceTypeMapping> ServiceTypeMapping { get; set; } //uday 24-10-2018
+        public DbSet<TradePairStastics> TradePairStastics { get; set; } //uday 25-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
