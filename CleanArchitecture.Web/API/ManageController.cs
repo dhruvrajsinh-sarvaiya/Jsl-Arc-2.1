@@ -128,7 +128,9 @@ namespace CleanArchitecture.Web.API
                     Username = user.UserName,
                     IsEmailConfirmed = user.EmailConfirmed,
                     Email = user.Email,
-                    PhoneNumber = user.PhoneNumber
+                    PhoneNumber = user.PhoneNumber,
+                    MobileNo = user.Mobile,
+                    TwoFactorEnabled = user.TwoFactorEnabled
                     // RedisDBKey = RedisDBKey
                 };
                 //string json = JsonConvert.SerializeObject(UserData);
@@ -169,7 +171,9 @@ namespace CleanArchitecture.Web.API
                         Username = user.UserName,
                         IsEmailConfirmed = user.EmailConfirmed,
                         Email = user.Email,
-                        PhoneNumber = user.PhoneNumber
+                        PhoneNumber = user.PhoneNumber,
+                        MobileNo = user.Mobile,
+                        TwoFactorEnabled = user.TwoFactorEnabled
                     };
                     return Ok(new UserInfoResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessfullUpdateUserData, UserData = UserData });
                 }
