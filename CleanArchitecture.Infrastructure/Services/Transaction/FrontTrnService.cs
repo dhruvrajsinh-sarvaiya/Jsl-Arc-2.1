@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
@@ -28,6 +29,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ILogger<FrontTrnService> _logger;
         private readonly ICommonRepository<TradeTransactionQueue> _tradeTransactionQueueRepository;
         private readonly ICommonRepository<SettledTradeTransactionQueue> _settelTradeTranQueue;
+        private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
+        private readonly ICommonRepository<Market> _marketRepository;
 
         public FrontTrnService(IFrontTrnRepository frontTrnRepository,
             ICommonRepository<TradePairMaster> tradeMasterRepository,
@@ -35,7 +38,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ILogger<FrontTrnService> logger,
             ICommonRepository<ServiceMaster> serviceMasterRepository,
             ICommonRepository<TradeTransactionQueue> tradeTransactionQueueRepository,
-            ICommonRepository<SettledTradeTransactionQueue> settelTradeTranQueue)
+            ICommonRepository<SettledTradeTransactionQueue> settelTradeTranQueue,
+            ICommonRepository<TradePairStastics> tradePairStastics,
+            ICommonRepository<Market> marketRepository)
 
         {
             _frontTrnRepository = frontTrnRepository;
@@ -45,6 +50,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _serviceMasterRepository = serviceMasterRepository;
             _tradeTransactionQueueRepository = tradeTransactionQueueRepository;
             _settelTradeTranQueue = settelTradeTranQueue;
+            _tradePairStastics = tradePairStastics;
+            _marketRepository = marketRepository;
         }
 
         #region method
@@ -58,37 +65,48 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             try
             {
                 responsedata = new List<BasePairResponse>();
-                var basePairData = _tradeMasterRepository.GetAll().GroupBy(x => x.BaseCurrencyId).Select(x => x.FirstOrDefault());
+                var basePairData = _marketRepository.GetAll();
+                //var basePairData = _tradeMasterRepository.GetAll().GroupBy(x => x.BaseCurrencyId).Select(x => x.FirstOrDefault());
 
                 if (basePairData != null)
                 {
                     foreach (var bpair in basePairData)
                     {
                         BasePairResponse basePair = new BasePairResponse();
-                        var baseService = _serviceMasterRepository.GetSingle(x => x.Id == bpair.BaseCurrencyId);
+                        var baseService = _serviceMasterRepository.GetSingle(x => x.Id == bpair.ServiceID);
 
                         basePair.BaseCurrencyId = baseService.Id;
                         basePair.BaseCurrencyName = baseService.Name;
                         basePair.Abbrevation = baseService.SMSCode;
 
                         List<TradePairRespose> pairList = new List<TradePairRespose>();
-                        var pairMasterData = _tradeMasterRepository.FindBy(x => x.BaseCurrencyId == bpair.BaseCurrencyId);
+                        var pairMasterData = _tradeMasterRepository.FindBy(x => x.BaseCurrencyId == bpair.ServiceID);
                         foreach (var pmdata in pairMasterData)
                         {
                             TradePairRespose tradePair = new TradePairRespose();
                             var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
                             var chidService = _serviceMasterRepository.GetSingle(x => x.Id == pmdata.SecondaryCurrencyId);
-
-                            GetPairAdditionalVal(pmdata.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+                            var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pmdata.Id);
+                            //GetPairAdditionalVal(pmdata.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
 
                             tradePair.PairId = pmdata.Id;
                             tradePair.Pairname = pmdata.PairName;
-                            tradePair.Currentrate = pairDetailData.Currentrate;
-                            tradePair.Volume = System.Math.Round(Volume24, 2);
-                            tradePair.Fee = pairDetailData.Fee;
+                            tradePair.Currentrate = pairStastics.CurrentRate;
+                            tradePair.BuyFees = pairDetailData.BuyFees;
+                            tradePair.SellFees = pairDetailData.SellFees;
                             tradePair.ChildCurrency = chidService.Name;
                             tradePair.Abbrevation = chidService.SMSCode;
-                            tradePair.ChangePer = System.Math.Round(ChangePer, 2);
+                            //tradePair.ChangePer = System.Math.Round(ChangePer, 2);
+                            //tradePair.Volume = System.Math.Round(Volume24, 2);
+                            tradePair.ChangePer = pairStastics.ChangePer24;
+                            tradePair.Volume = pairStastics.ChangeVol24;
+                            tradePair.High24Hr = pairStastics.High24Hr;
+                            tradePair.Low24Hr = pairStastics.Low24Hr;
+                            tradePair.HighWeek = pairStastics.HighWeek;
+                            tradePair.LowWeek = pairStastics.LowWeek;
+                            tradePair.High52Week = pairStastics.High52Week;
+                            tradePair.Low52Week = pairStastics.Low52Week;
+                            tradePair.UpDownBit = pairStastics.UpDownBit;
 
                             pairList.Add(tradePair);
                         }
@@ -125,12 +143,24 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     {
                         VolumeDataRespose volumedata = new VolumeDataRespose();
                         var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
-                        GetPairAdditionalVal(pmdata.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+                        var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pmdata.Id);
+                        //GetPairAdditionalVal(pmdata.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+
 
                         volumedata.PairId = pmdata.Id;
-                        volumedata.Currentrate = pairDetailData.Currentrate;
-                        volumedata.ChangePer = System.Math.Round(Volume24, 2);
-                        volumedata.Volume24 = System.Math.Round(ChangePer, 2);
+                        volumedata.PairName = pmdata.PairName;
+                        volumedata.Currentrate = pairStastics.CurrentRate;
+                        //volumedata.ChangePer = System.Math.Round(Volume24, 2);
+                        //volumedata.Volume24 = System.Math.Round(ChangePer, 2);
+                        volumedata.ChangePer = pairStastics.ChangePer24;
+                        volumedata.Volume24 = pairStastics.ChangeVol24;
+                        volumedata.High24Hr = pairStastics.High24Hr;
+                        volumedata.Low24Hr = pairStastics.Low24Hr;
+                        volumedata.HighWeek = pairStastics.HighWeek;
+                        volumedata.LowWeek = pairStastics.LowWeek;
+                        volumedata.High52Week = pairStastics.High52Week;
+                        volumedata.Low52Week = pairStastics.Low52Week;
+                        volumedata.UpDownBit = pairStastics.UpDownBit;
 
                         responsedata.Add(volumedata);
                     }
@@ -237,13 +267,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             Amount = model.Amount,
                             ChargeRs = model.ChargeRs,
                             DateTime = model.DateTime.Date,
-                            PairID = model.PairID,
+                            PairName = model.PairName,
                             Price = model.Price,
                             Status = model.Status,
                             StatusText = model.StatusText,
                             TrnNo = model.TrnNo,
                             Type = model.Type,
-                            Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount))
+                            Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount)),
+                            IsCancel=model .IsCancelled
+
                         });
                     }
                 }
@@ -256,24 +288,32 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public List<RecentOrderInfo> GetRecentOrder(long PairId)
+        public List<RecentOrderInfo> GetRecentOrder(long PairId, long MemberID)
         {
             try
             {
-                var list = _frontTrnRepository.GetRecentOrder(PairId);
+                string st = "";
+                var list = _frontTrnRepository.GetRecentOrder(PairId, MemberID);
                 List<RecentOrderInfo> responce = new List<RecentOrderInfo>();
                 if (list != null)
                 {
                     foreach (RecentOrderRespose model in list)
                     {
+                        if (model.Status == Convert.ToInt16(enTransactionStatus.Success))
+                            st = "Success";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                            st = "Hold";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.SystemFail))
+                            st = "Fail";
+
                         responce.Add(new RecentOrderInfo
                         {
                             Qty = model.Qty,
                             DateTime = model.DateTime.Date,
                             Price = model.Price,
-                            Status = model.Status,
                             TrnNo = model.TrnNo,
                             Type = model.Type,
+                            Status = st
                         });
                     }
                 }
@@ -366,20 +406,30 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 {
 
                     var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pairMasterData.Id);
-
                     var baseService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.BaseCurrencyId);
                     var chidService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.SecondaryCurrencyId);
-
-                    GetPairAdditionalVal(pairMasterData.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+                    var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pairMasterData.Id);
+                    //GetPairAdditionalVal(pairMasterData.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
 
                     responsedata.PairId = pairMasterData.Id;
                     responsedata.Pairname = pairMasterData.PairName;
-                    responsedata.Currentrate = pairDetailData.Currentrate;
-                    responsedata.Volume = System.Math.Round(Volume24, 2);
-                    responsedata.Fee = pairDetailData.Fee;
+                    responsedata.Currentrate = pairStastics.CurrentRate;
+                    responsedata.BuyFees = pairDetailData.BuyFees;
+                    responsedata.SellFees = pairDetailData.SellFees;
                     responsedata.ChildCurrency = chidService.Name;
                     responsedata.Abbrevation = chidService.SMSCode;
-                    responsedata.ChangePer = System.Math.Round(ChangePer, 2);
+                    //tradePair.ChangePer = System.Math.Round(ChangePer, 2);
+                    //tradePair.Volume = System.Math.Round(Volume24, 2);
+                    responsedata.ChangePer = pairStastics.ChangePer24;
+                    responsedata.Volume = pairStastics.ChangeVol24;
+                    responsedata.High24Hr = pairStastics.High24Hr;
+                    responsedata.Low24Hr = pairStastics.Low24Hr;
+                    responsedata.HighWeek = pairStastics.HighWeek;
+                    responsedata.LowWeek = pairStastics.LowWeek;
+                    responsedata.High52Week = pairStastics.High52Week;
+                    responsedata.Low52Week = pairStastics.Low52Week;
+                    responsedata.UpDownBit = pairStastics.UpDownBit;
+
                     responsedata.BaseCurrencyId = baseService.Id;
                     responsedata.BaseCurrencyName = baseService.Name;
                     responsedata.BaseAbbrevation = baseService.SMSCode;
@@ -455,7 +505,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 MarketCapData res = new MarketCapData();
                 res = _frontTrnRepository.GetMarketCap(PairId);
                 var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == PairId);
-                GetPairAdditionalVal(PairId, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+                //GetPairAdditionalVal(PairId, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
                 res.Volume24 = Volume24;
                 res.ChangePer = ChangePer;
                 return res;
@@ -466,6 +516,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+
 
         public VolumeDataRespose GetVolumeDataByPair(long PairId)
         {
@@ -481,12 +532,23 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 if (pairMasterData != null)
                 {
                     var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pairMasterData.Id);
-                    GetPairAdditionalVal(pairMasterData.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
+                    var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pairMasterData.Id);
+                    //GetPairAdditionalVal(pairMasterData.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
 
                     responsedata.PairId = pairMasterData.Id;
-                    responsedata.Currentrate = pairDetailData.Currentrate;
-                    responsedata.ChangePer = System.Math.Round(Volume24, 2);
-                    responsedata.Volume24 = System.Math.Round(ChangePer, 2);
+                    responsedata.PairName = pairMasterData.PairName;
+                    responsedata.Currentrate = pairStastics.CurrentRate;
+                    //volumedata.ChangePer = System.Math.Round(Volume24, 2);
+                    //volumedata.Volume24 = System.Math.Round(ChangePer, 2);
+                    responsedata.ChangePer = pairStastics.ChangePer24;
+                    responsedata.Volume24 = pairStastics.ChangeVol24;
+                    responsedata.High24Hr = pairStastics.High24Hr;
+                    responsedata.Low24Hr = pairStastics.Low24Hr;
+                    responsedata.HighWeek = pairStastics.HighWeek;
+                    responsedata.LowWeek = pairStastics.LowWeek;
+                    responsedata.High52Week = pairStastics.High52Week;
+                    responsedata.Low52Week = pairStastics.Low52Week;
+                    responsedata.UpDownBit = pairStastics.UpDownBit;
 
                     return responsedata;
                 }

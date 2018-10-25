@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
@@ -39,6 +40,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<ServiceTypeMapping> _serviceTypeMapping;
         private readonly ICommonRepository<WalletTypeMaster> _walletTypeService;
         private readonly IWalletService _walletService;
+        private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
+        private readonly ICommonRepository<Market> _marketRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -61,7 +64,9 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<Limits> limitRepository,
             ICommonRepository<ServiceTypeMapping> serviceTypeMapping,
             ICommonRepository<WalletTypeMaster> walletTypeService,
-            IWalletService walletService)
+            IWalletService walletService,
+            ICommonRepository<TradePairStastics> tradePairStastics,
+            ICommonRepository<Market> marketRepository)
           {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -84,6 +89,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _serviceTypeMapping = serviceTypeMapping;
             _walletTypeService = walletTypeService;
             _walletService = walletService;
+            _tradePairStastics = tradePairStastics;
+            _marketRepository = marketRepository;
         }
 
         #region Service
@@ -91,8 +98,6 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                int[] AllowTrnType1 = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
-                var walletMaster1 = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode, 1, AllowTrnType1, 1);
                 ServiceMaster serviceMaster = new ServiceMaster()
                 {
                     Name = Request.Name,
@@ -197,8 +202,16 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _serviceMasterRepository.Update(newServiceMaster);
 
                 ////Add Into WalletMaster For Default Organization
-                //int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
-                //var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1);
+                int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
+                var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org " + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1,1);
+
+                //Add BaseCurrency In MarketEntity
+                if (Request.IsBaseCurrency == 1)
+                {
+                    var marketViewModel = new MarketViewModel { CurrencyName = Request.SMSCode, isBaseCurrency = 1, ServiceID = newServiceMaster.Id };
+                    AddMarketData(marketViewModel);
+                }
+
                 return newServiceMaster.Id;
             }
             catch (Exception ex)
@@ -277,6 +290,18 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         _serviceTypeMapping.Update(tranSerMapping);
                     }
 
+                    var walletType = _walletTypeService.GetById(serviceMaster.WalletTypeID);
+                    if(walletType != null)
+                    {
+                        walletType.IsDepositionAllow = Request.IsDeposit;
+                        walletType.IsWithdrawalAllow = Request.IsWithdraw;
+                        walletType.IsTransactionWallet = Request.IsTransaction;
+                        tranSerMapping.UpdatedBy = 1;
+                        tranSerMapping.UpdatedDate = DateTime.UtcNow;
+
+                        _walletTypeService.Update(walletType);
+                    }
+
                     return Request.ServiceId;
                 }
                 else
@@ -337,13 +362,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
                         if (withdrawSerMapping != null)
                         {
-                            response.IsDeposit = withdrawSerMapping.Status;
+                            response.IsWithdraw = withdrawSerMapping.Status;
                         }
 
                         var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
                         if (tranSerMapping != null)
                         {
-                            response.IsDeposit = tranSerMapping.Status;
+                            response.IsTransaction = tranSerMapping.Status;
                         }
 
                         responsedata.Add(response);
@@ -404,13 +429,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
                     if (withdrawSerMapping != null)
                     {
-                        responsedata.IsDeposit = withdrawSerMapping.Status;
+                        responsedata.IsWithdraw = withdrawSerMapping.Status;
                     }
 
                     var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == ServiceId && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
                     if (tranSerMapping != null)
                     {
-                        responsedata.IsDeposit = tranSerMapping.Status;
+                        responsedata.IsTransaction = tranSerMapping.Status;
                     }
 
                     return responsedata;
@@ -459,6 +484,41 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     return 1;
                 }
                 return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public List<ServiceCurrencyData> GetAllServiceConfigurationByBase(String Base)
+        {
+            List<ServiceCurrencyData> responsedata;
+            try
+            {
+                var CheckBase = _marketRepository.GetSingle(m => m.CurrencyName == Base);
+                if (CheckBase == null)
+                    return null;
+                responsedata = new List<ServiceCurrencyData>();
+                var model = _serviceMasterRepository.GetSingle(ser => ser. SMSCode== Base);
+                if (model == null)
+                    return null;
+                var serviceid = model.Id;
+
+                var modellist = _serviceMasterRepository.List();
+                foreach (var modelData in modellist)
+                {
+                    if (modelData.Id == serviceid)
+                        continue;
+                    responsedata.Add(new ServiceCurrencyData()
+                    {
+                        Name = modelData.Name,
+                        ServiceId =modelData.Id,
+                        SMSCode =modelData .SMSCode
+                    });
+                }
+                return responsedata;
             }
             catch (Exception ex)
             {
@@ -1735,7 +1795,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         ResponseFailure = model.ResponseFailure,
                         ResponseHold = model.ResponseHold,
                         ResponseSuccess = model.ResponseSuccess,
-                        SerProConfigurationID = model.SerProConfigurationID,
+                        //SerProConfigurationID = model.SerProConfigurationID,
                         TransactionIdPrefix = model.TransactionIdPrefix
                     });
                 }
@@ -1779,7 +1839,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ResponseFailure =model .ResponseFailure ,
                     ResponseHold =model .ResponseHold ,
                     ResponseSuccess =model .ResponseSuccess,
-                    SerProConfigurationID =model .SerProConfigurationID,
+                    //SerProConfigurationID =model .SerProConfigurationID,
                     TransactionIdPrefix =model .TransactionIdPrefix
                 };
                 return viewmodel;
@@ -1818,7 +1878,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ResponseFailure = request.ResponseFailure,
                     ResponseHold = request.ResponseHold,
                     ResponseSuccess = request.ResponseSuccess,
-                    SerProConfigurationID = request.SerProConfigurationID,
+                    //SerProConfigurationID = request.SerProConfigurationID,
                     TransactionIdPrefix = request.TransactionIdPrefix
                     
                 };
@@ -1860,7 +1920,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 model.ResponseFailure = request.ResponseFailure;
                 model.ResponseHold = request.ResponseHold;
                 model.ResponseSuccess = request.ResponseSuccess;
-                model.SerProConfigurationID = request.SerProConfigurationID;
+                //model.SerProConfigurationID = request.SerProConfigurationID;
                 model.TransactionIdPrefix = request.TransactionIdPrefix;
                 model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedBy = 1;
@@ -2092,9 +2152,13 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
+                var baseCurrency = _serviceMasterRepository.GetById(Request.BaseCurrencyId);
+                var secondCurrency = _serviceMasterRepository.GetById(Request.SecondaryCurrencyId);
+                var pairName = secondCurrency.SMSCode + "_" + baseCurrency.SMSCode;
+
                 var pairMaster = new TradePairMaster()
                 {
-                    PairName = Request.PairName,
+                    PairName = pairName,
                     SecondaryCurrencyId = Request.SecondaryCurrencyId,
                     WalletMasterID = Request.WalletMasterID,
                     BaseCurrencyId = Request.BaseCurrencyId,
@@ -2104,36 +2168,47 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     UpdatedDate = DateTime.UtcNow,
                     UpdatedBy = null
                 };
+
                 var newPairMaster = _tradePairMasterRepository.Add(pairMaster);
 
                 var pairDetail = new TradePairDetail()
                 {
                     PairId = newPairMaster.Id,
-                    Currentrate = Request.Currentrate,
                     BuyMinQty = Request.BuyMinQty,
                     BuyMaxQty = Request.BuyMaxQty,
                     SellMinQty = Request.SellMinQty,
                     SellMaxQty = Request.SellMaxQty,
-                    DailyHigh = Request.DailyHigh,
-                    DailyLow = Request.DailyLow,
-                    CurrencyPrice = Request.CurrencyPrice,
-                    Volume = Request.Volume,
                     SellPrice = Request.SellPrice,
                     BuyPrice = Request.BuyPrice,
                     BuyMinPrice = Request.BuyMinPrice,
                     BuyMaxPrice = Request.BuyMaxPrice,
                     SellMinPrice = Request.SellMinPrice,
                     SellMaxPrice = Request.SellMaxPrice,
-                    Fee = Request.Fee,
-                    FeeType = Request.FeeType,
+                    SellFees = Request.SellFees,
+                    BuyFees = Request.BuyFees,
+                    FeesCurrency = Request.FeesCurrency,
                     Status = Convert.ToInt16(ServiceStatus.Active),
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = 1,
                     UpdatedDate = DateTime.UtcNow,
                     UpdatedBy = null
                 };
-
                 var newPairDetail = _tradePairDetailRepository.Add(pairDetail);
+
+                var pairStastic = new TradePairStastics
+                {
+                    PairId = newPairMaster.Id,
+                    CurrentRate = Request.Currentrate,
+                    ChangeVol24 = Request.Volume,
+                    CurrencyPrice = Request.CurrencyPrice,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newPairStatics = _tradePairStastics.Add(pairStastic);
+
                 return newPairMaster.Id;
             }
             catch (Exception ex)
@@ -2149,7 +2224,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 var pairMaster = _tradePairMasterRepository.GetActiveById(Request.Id);
                 if (pairMaster != null)
                 {
-                    pairMaster.PairName = Request.PairName;
+                    var baseCurrency = _serviceMasterRepository.GetById(Request.BaseCurrencyId);
+                    var secondCurrency = _serviceMasterRepository.GetById(Request.SecondaryCurrencyId);
+                    var pairName = secondCurrency.SMSCode + "_" + baseCurrency.SMSCode;
+
+                    pairMaster.PairName = pairName;
                     pairMaster.SecondaryCurrencyId = Request.SecondaryCurrencyId;
                     pairMaster.WalletMasterID = Request.WalletMasterID;
                     pairMaster.BaseCurrencyId = Request.BaseCurrencyId;
@@ -2160,25 +2239,30 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
 
                     var pairDetail = _tradePairDetailRepository.GetSingle(pair => pair.PairId == Request.Id);
 
-                    pairDetail.Currentrate = Request.Currentrate;
                     pairDetail.BuyMinQty = Request.BuyMinQty;
                     pairDetail.BuyMaxQty = Request.BuyMaxQty;
                     pairDetail.SellMinQty = Request.SellMinQty;
                     pairDetail.SellMaxQty = Request.SellMaxQty;
-                    pairDetail.DailyHigh = Request.DailyHigh;
-                    pairDetail.DailyLow = Request.DailyLow;
-                    pairDetail.CurrencyPrice = Request.CurrencyPrice;
-                    pairDetail.Volume = Request.Volume;
                     pairDetail.SellPrice = Request.SellPrice;
                     pairDetail.BuyPrice = Request.BuyPrice;
                     pairDetail.BuyMinPrice = Request.BuyMinPrice;
                     pairDetail.BuyMaxPrice = Request.BuyMaxPrice;
                     pairDetail.SellMinPrice = Request.SellMinPrice;
                     pairDetail.SellMaxPrice = Request.SellMaxPrice;
-                    pairDetail.Fee = Request.Fee;
-                    pairDetail.FeeType = Request.FeeType;
-                    pairMaster.UpdatedDate = DateTime.UtcNow;
-                    pairMaster.UpdatedBy = 1;
+                    pairDetail.SellFees = Request.SellFees;
+                    pairDetail.BuyFees = Request.BuyFees;
+                    pairDetail.FeesCurrency = Request.FeesCurrency;
+                    pairDetail.UpdatedDate = DateTime.UtcNow;
+                    pairDetail.UpdatedBy = 1;
+                    _tradePairDetailRepository.Update(pairDetail);
+
+                    var pairStastics = _tradePairStastics.GetSingle(pair => pair.PairId == Request.Id);
+                    pairStastics.CurrentRate = Request.Currentrate;
+                    pairStastics.ChangeVol24 = Request.Volume;
+                    pairStastics.CurrencyPrice = Request.CurrencyPrice;
+                    pairStastics.UpdatedDate = DateTime.UtcNow;
+                    pairStastics.UpdatedBy = 1;
+                    _tradePairStastics.Update(pairStastics);
 
                     return Request.Id;
                 }
@@ -2210,23 +2294,24 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
 
                     var pairDetail = _tradePairDetailRepository.GetSingle(pair => pair.PairId == PairId);
 
-                    responsedata.Currentrate = pairDetail.Currentrate;
                     responsedata.BuyMinQty = pairDetail.BuyMinQty;
                     responsedata.BuyMaxQty = pairDetail.BuyMaxQty;
                     responsedata.SellMinQty = pairDetail.SellMinQty;
                     responsedata.SellMaxQty = pairDetail.SellMaxQty;
-                    responsedata.DailyHigh = pairDetail.DailyHigh;
-                    responsedata.DailyLow = pairDetail.DailyLow;
-                    responsedata.CurrencyPrice = pairDetail.CurrencyPrice;
-                    responsedata.Volume = pairDetail.Volume;
                     responsedata.SellPrice = pairDetail.SellPrice;
                     responsedata.BuyPrice = pairDetail.BuyPrice;
                     responsedata.BuyMinPrice = pairDetail.BuyMinPrice;
                     responsedata.BuyMaxPrice = pairDetail.BuyMaxPrice;
                     responsedata.SellMinPrice = pairDetail.SellMinPrice;
                     responsedata.SellMaxPrice = pairDetail.SellMaxPrice;
-                    responsedata.Fee = pairDetail.Fee;
-                    responsedata.FeeType = pairDetail.FeeType;
+                    responsedata.BuyFees = pairDetail.BuyFees;
+                    responsedata.SellFees = pairDetail.SellFees;
+                    responsedata.FeesCurrency = pairDetail.FeesCurrency;
+
+                    var pairStastics = _tradePairStastics.GetSingle(pair => pair.PairId == PairId);
+                    responsedata.Volume = pairStastics.ChangeVol24;
+                    responsedata.Currentrate = pairStastics.CurrentRate;
+                    responsedata.CurrencyPrice = pairStastics.CurrencyPrice;
 
                     return responsedata;
                 }
@@ -2262,23 +2347,24 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
 
                         var pairDetail = _tradePairDetailRepository.GetSingle(x => x.PairId == pair.Id);
 
-                        response.Currentrate = pairDetail.Currentrate;
                         response.BuyMinQty = pairDetail.BuyMinQty;
                         response.BuyMaxQty = pairDetail.BuyMaxQty;
                         response.SellMinQty = pairDetail.SellMinQty;
                         response.SellMaxQty = pairDetail.SellMaxQty;
-                        response.DailyHigh = pairDetail.DailyHigh;
-                        response.DailyLow = pairDetail.DailyLow;
-                        response.CurrencyPrice = pairDetail.CurrencyPrice;
-                        response.Volume = pairDetail.Volume;
                         response.SellPrice = pairDetail.SellPrice;
                         response.BuyPrice = pairDetail.BuyPrice;
                         response.BuyMinPrice = pairDetail.BuyMinPrice;
                         response.BuyMaxPrice = pairDetail.BuyMaxPrice;
                         response.SellMinPrice = pairDetail.SellMinPrice;
                         response.SellMaxPrice = pairDetail.SellMaxPrice;
-                        response.Fee = pairDetail.Fee;
-                        response.FeeType = pairDetail.FeeType;
+                        response.BuyFees = pairDetail.BuyFees;
+                        response.SellFees = pairDetail.SellFees;
+                        response.FeesCurrency = pairDetail.FeesCurrency;
+
+                        var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pair.Id);
+                        response.Volume = pairStastics.ChangeVol24;
+                        response.Currentrate = pairStastics.CurrentRate;
+                        response.CurrencyPrice = pairStastics.CurrencyPrice;
 
                         responsedata.Add(response);
                     }
@@ -2593,6 +2679,84 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
+
+
+        #endregion
+
+        #region Market
+        public MarketViewModel AddMarketData(MarketViewModel viewModel)
+        {
+            try
+            {
+                Market market = new Market
+                {
+                    CurrencyName = viewModel.CurrencyName,
+                    ServiceID = viewModel.ServiceID,
+                    isBaseCurrency = viewModel.isBaseCurrency,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newMarket = _marketRepository.Add(market);
+
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public List<MarketViewModel> GetAllMarketData()
+        {
+            try
+            {
+                List<MarketViewModel> list = new List<MarketViewModel>();
+                var modellist = _marketRepository.List();
+
+                foreach (var model in modellist)
+                {
+                    list.Add(new MarketViewModel()
+                    {
+                        ID = model.Id,
+                        CurrencyName = model.CurrencyName,
+                        ServiceID = model.ServiceID,
+                        isBaseCurrency = model.isBaseCurrency,
+                    });
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public MarketViewModel GetMarketDataByMarket(long Id)
+        {
+            try
+            {
+                MarketViewModel marketView = new MarketViewModel();
+                var model = _marketRepository.GetById(Id);
+                if (model == null)
+                    return null;
+
+                marketView.CurrencyName = model.CurrencyName;
+                marketView.ID = model.Id;
+                marketView.isBaseCurrency = model.isBaseCurrency;
+                marketView.ServiceID = model.ServiceID;
+                return marketView;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         #endregion
     }
 }

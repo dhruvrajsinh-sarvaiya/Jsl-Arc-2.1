@@ -24,5 +24,12 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal LimitPerTransaction { get; set; }
 
         public decimal? LifeTime { get; set; }
+
+        [Required]
+        public TimeSpan StartTime { get; set; }
+
+        [Required]
+        public TimeSpan EndTime { get; set; }
+      
     }
 }

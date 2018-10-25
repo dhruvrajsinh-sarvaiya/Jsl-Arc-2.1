@@ -19,7 +19,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public DateTime DateTime { get; set; }
         public short Status { get; set; }
         public string StatusText { get; set; }
-        public long PairID { get; set; }
+        public String PairName { get; set; }
         public Decimal ChargeRs { get; set; }
         public short  IsCancel { get; set; }
     }

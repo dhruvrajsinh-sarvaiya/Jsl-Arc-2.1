@@ -50,7 +50,9 @@ namespace CleanArchitecture.Core.Enums
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
         public static string SetWalletLimitCreateMsg = "Limit Created Successfully";
+        public static string SetUserPrefSuccessMsg = "User Preference is Successfully Created.";
         public static string SetWalletLimitUpdateMsg = "Limit Updated Successfully";
+        public static string SetUserPrefUpdateMsg = "User Preference Is Updated Successfully";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
         public static string CreateAddressFailMsg = "Failed to generate Address.";
@@ -116,8 +118,8 @@ namespace CleanArchitecture.Core.Enums
         public static string SignUpRole = "This User roles not available.";
         public static string SignUpWithResendEmail = "You have successfully resend Otp in email.";
         public static string SignUpWithResendMobile = "You have successfully resend Otp in mobile.";
-        public static string OTPSendOnMobile = "You have send OTP on mobile";
-        public static string OTPNotSendOnMobile = " Not send OTP on mobile";
+        public static string OTPSendOnMobile = "You have send OTP on mobile.";
+        public static string OTPNotSendOnMobile = "Not send OTP on mobile.";
         public static string LoginUserEmailOTP = "User Login with Email OTP Send Success.";
         public static string LoginEmailOTPNotsend = "User Login with Email OTP not Send Successfully.";
         public static string EmailFail = "Email Address Invalid";
@@ -149,7 +151,7 @@ namespace CleanArchitecture.Core.Enums
         public static string ResetConfirmOldNotMatch = "Old password does not match";
         public static string InvalidUserSelectedIp = "Invalid User Selected IPAddress";
         public static string IpAddressUpdateError = "Ip address status not update.";
-        public static string SuccessDesableIpStatus = "Success full desable ip address.";
+        public static string SuccessDesableIpStatus = "Success full disable ip address.";
         public static string SuccessDeleteIpAddress = "Success full remove ip address.";
         public static string IpAddressdeleteError = "Ip address not remove.";
         public static string SuccessGetIpData = "Success full Get Ip Address.";
@@ -181,6 +183,13 @@ namespace CleanArchitecture.Core.Enums
         public static string UnLockUserError = "User not unlock.";
 
         public static string IpAlreadyExist = "Ip Address already exist.";
-        public static string DeviceIdAlreadyExist = "DeviceId already exisi.";
+        public static string DeviceIdAlreadyExist = "DeviceId already exist.";
+
+        public static string SuccessEnableIpStatus = "Success full enable ip address.";
+        public static string SuccessEnableDeviceId = "Success full enable device Id.";
+        public static string SuccessDisableDeviceId = "Success full disable device id.";
+
+        public static string InvalidFaceBookToken = "Invalid FaceBook access token.";
+        public static string InvalidFaceBookProviderKey = "Invalid FaceBook provider key.";
     }
 }

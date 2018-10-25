@@ -127,10 +127,10 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
             var skip = pageSize * (pageIndex - 1);
 
-            var canPage = skip < total;
+            //var canPage = skip < total;
 
-            if (canPage) // do what you wish if you can page no further
-                return null;
+            //if (canPage) // do what you wish if you can page no further
+            //    return null;
 
             return IpList.Skip(skip).Take(pageSize).ToList();
 
@@ -139,7 +139,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public void UpdateIpAddress(IpMasterViewModel model)
         {
-            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && i.IsDeleted);
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (IpAddress != null)
             {
                 var currentIpAddress = new IpMaster
@@ -161,9 +161,23 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public async Task<long> DesableIpAddress(IpMasterViewModel model)
         {
-            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && i.IsDeleted);
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (IpAddress != null)
-            {              
+            {              // Status False
+                IpAddress.SetAsIsDisabletatus();
+                _ipMasterRepository.Update(IpAddress);
+                //_dbContext.SaveChanges();
+                return IpAddress.Id;
+            }
+            return 0;
+        }
+
+        public async Task<long> EnableIpAddress(IpMasterViewModel model)
+        {
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsEnable && !i.IsDeleted);
+            if (IpAddress != null)
+            {
+                //Status True
                 IpAddress.SetAsIsEnabletatus();
                 _ipMasterRepository.Update(IpAddress);
                 //_dbContext.SaveChanges();

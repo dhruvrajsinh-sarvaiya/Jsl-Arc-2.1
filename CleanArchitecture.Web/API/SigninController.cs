@@ -313,7 +313,7 @@ namespace CleanArchitecture.Web.API
                     if (checkmail != null)
                         await _userManager.AccessFailedAsync(checkmail);
                     //return BadRequest(new ApiError("Login failed : Invalid username or password."));
-                    return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status4032LoginFailed });
                 }
             }
             catch (Exception ex)
@@ -357,13 +357,13 @@ namespace CleanArchitecture.Web.API
                     else
                     {
                         _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpDatanotSend, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpDatanotSend, ErrorCode = enErrorCode.Status4085LoginWithOtpDatanotSend });
                     }
                 }
                 else
                 {
                     //return BadRequest(new ApiError("Login failed: Invalid email."));
-                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                 }
             }
             catch (Exception ex)
@@ -398,6 +398,7 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (checkmail.TwoFactorEnabled)
                                     {
                                         string currenttime = DateTime.UtcNow.ToString();
@@ -430,36 +431,36 @@ namespace CleanArchitecture.Web.API
                                             checkmail.LockoutEnd = DateTime.UtcNow.AddHours(Convert.ToInt64(_configuration["DefaultLockoutTimeSpan"]));
                                             checkmail.AccessFailedCount = 0;
                                             await _userManager.UpdateAsync(checkmail);
-                                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status400BadRequest });
+                                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status4088LoginWithOtpInvalidAttempt });
                                             // return BadRequest(new ApiError("Invalid login attempt."));
                                         }
                                         else
                                         {
                                             await _userManager.UpdateAsync(checkmail);
-                                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status400BadRequest });
+                                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status4088LoginWithOtpInvalidAttempt });
                                         }
                                     }
                                     else
                                     {
-                                        return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status400BadRequest });
+                                        return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status4088LoginWithOtpInvalidAttempt });
                                     }
                                 }
                             }
                             else
                             {
                                 //ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                                return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status400BadRequest });
+                                return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpResendOTP, ErrorCode = enErrorCode.Status4076SignUpReSendOTP });
                             }
                         }
                         else
                         {
-                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                         }
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Error.");
-                        return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                     }
                 }
                 else
@@ -474,7 +475,7 @@ namespace CleanArchitecture.Web.API
                     {
                         //ModelState.AddModelError(string.Empty, "Invalid Email.");
                         //  return BadRequest(new ApiError(ModelState));
-                        return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status423Locked });
+                        return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status4087EmailFail });
                     }
                 }
                 //ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
@@ -526,23 +527,23 @@ namespace CleanArchitecture.Web.API
                             else
                             {
                                 _logger.LogWarning(2, "User Otp Data Not Send.");
-                                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginEmailOTPNotsend, ErrorCode = enErrorCode.Status400BadRequest });
+                                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginEmailOTPNotsend, ErrorCode = enErrorCode.Status4089LoginEmailOTPNotsend });
 
                             }
                         }
                         else
                         {
-                            return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status4087EmailFail });
                         }
                     }
                     else
                     {
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                     }
                 }
                 else
                 {
-                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                 }
             }
             catch (Exception ex)
@@ -584,12 +585,12 @@ namespace CleanArchitecture.Web.API
                     {
 
                         _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status4090OTPSendOnMobile });
                     }
                 }
                 else
                 {
-                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status4091LoginMobileNumberInvalid });
                 }
             }
             catch (Exception ex)
@@ -623,6 +624,7 @@ namespace CleanArchitecture.Web.API
                             {
                                 if (model.OTP == tempotp.OTP)
                                 {
+                                    _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
                                     {
                                         string currenttime = DateTime.UtcNow.ToString();
@@ -638,11 +640,7 @@ namespace CleanArchitecture.Web.API
                                         }
                                         else
                                             return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
-
                                     }
-
-
-
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(result);
@@ -656,30 +654,30 @@ namespace CleanArchitecture.Web.API
                                         result.LockoutEnd = DateTime.UtcNow.AddHours(Convert.ToInt64(_configuration["DefaultLockoutTimeSpan"]));
                                         result.AccessFailedCount = 0;
                                         await _userManager.UpdateAsync(result);
-                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status4091LoginMobileNumberInvalid });
                                     }
                                     else
                                     {
                                         await _userManager.UpdateAsync(result);
-                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status4088LoginWithOtpInvalidAttempt });
                                     }
                                 }
                                 else
                                 {
-                                    return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                                    return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status4088LoginWithOtpInvalidAttempt });
                                 }
                             }
                             else
                             {
                                 ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status4088LoginWithOtpInvalidAttempt });
                             }
                         }
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Error.");
-                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status423Locked });
+                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpInvalidAttempt, ErrorCode = enErrorCode.Status4088LoginWithOtpInvalidAttempt });
                     }
                 }
                 else
@@ -693,11 +691,11 @@ namespace CleanArchitecture.Web.API
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Invalid MobileNo.");
-                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status423Locked });
+                        return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status4091LoginMobileNumberInvalid });
                     }
                 }
                 ModelState.AddModelError(string.Empty, "Resend OTP immediately not valid or expired.");
-                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status400BadRequest });
+                return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status4091LoginMobileNumberInvalid });
             }
             catch (Exception ex)
             {
@@ -744,12 +742,12 @@ namespace CleanArchitecture.Web.API
                             else
                             {
                                 _logger.LogWarning(2, "User Otp Data Not Send.");
-                                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status400BadRequest });
+                                return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status4090OTPSendOnMobile });
                             }
                         }
                         else
                         {
-                            return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+                            return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status4090OTPSendOnMobile });
 
                             //return BadRequest(new ApiError("Invalid Mobileno."));
                             //SendSMSRequest request = new SendSMSRequest();
@@ -765,12 +763,12 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status400BadRequest });
+                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                     }
                 }
                 else
                 {
-                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status4090OTPSendOnMobile });
                 }
             }
             catch (Exception ex)

@@ -14,6 +14,9 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public long SchemeId { get; set; }//fk
 
         [Required]
+        public long WalletId { get; set; }
+
+        [Required]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal StackingAmount { get; set; }
 

@@ -52,6 +52,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         ProcessTransactionCls _TransactionObj;
         ServiceMaster _BaseCurrService;
         ServiceMaster _SecondCurrService;
+        ServiceMaster _TrnService;
         TransactionRequest NewtransactionReq;
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
@@ -61,7 +62,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService,
             ICommonRepository<TradePairDetail> TradePairDetail, IWebApiRepository WebApiRepository,
             ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest,
-            IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj)
+            IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -77,6 +78,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _IGetWebRequest = IGetWebRequest;
             _IWebApiSendRequest = WebApiSendRequest;
             _WebApiParseResponseObj = WebApiParseResponseObj;
+            _IWebApiData = IWebApiData;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -88,7 +90,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 return _Resp;
             }
-            var myResp = new Task(async () => CombineAllInitTransactionAsync());
+            //var myResp = new Task(async () => CombineAllInitTransactionAsync());
+            Task.Run(() => CombineAllInitTransactionAsync());
+
+            //CombineAllInitTransactionAsync();
 
             return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
             //_Resp = await MethodRespTsk;
@@ -242,6 +247,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
                 else
                 {
+                    _TrnService = _ServiceConfi.GetSingle(item => item.SMSCode == Req.SMSCode && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                    if (_TrnService == null)
+                    {
+                        Req.StatusMsg = EnResponseMessage.ProcessTrn_ServiceProductNotAvailableMsg;
+                        return MarkSystemFailTransaction(enErrorCode.ProcessTrn_ServiceProductNotAvailable);
+                    }
                     //Take balance base on @SMSCode and take OrderWalletID,Balance
                 }
                 //if(_TradeTransactionObj.OrderWalletID==0)
@@ -597,7 +608,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         MarkTransactionOperatorFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                         continue;
                     }
-                    ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID);
+                    ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID, Newtransaction);
                     Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
                     //Insert API request Data
                     _TransactionObj.TransactionRequestID = InsertTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody);

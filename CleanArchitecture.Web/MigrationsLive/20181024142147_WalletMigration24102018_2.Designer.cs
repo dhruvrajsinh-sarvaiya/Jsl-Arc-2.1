@@ -4,18 +4,20 @@ using CleanArchitecture.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    partial class CleanArchitectureContextModelSnapshot : ModelSnapshot
+    [Migration("20181024142147_WalletMigration24102018_2")]
+    partial class WalletMigration24102018_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -597,6 +599,31 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ServiceStastics");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Configuration.ServiceTypeMapping", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<long>("ServiceId");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long>("TrnType");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceTypeMapping");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Configuration.StateMaster", b =>
@@ -2034,12 +2061,6 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<string>("AlterNetEmail");
-
-                    b.Property<string>("AlterNetMobile");
-
-                    b.Property<decimal>("Balance");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
@@ -2075,8 +2096,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("PhoneNumber");
 
                     b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<int>("RegTypeId");
 
                     b.Property<string>("SecurityStamp");
 
@@ -2390,6 +2409,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<long>("MemberShadowLimitId");
+
                     b.Property<string>("Remarks");
 
                     b.Property<decimal>("ShadowAmount")
@@ -2402,6 +2423,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<DateTime>("UpdatedDate");
 
                     b.Property<long>("WalletID");
+
+                    b.Property<long>("WalletTypeId");
 
                     b.HasKey("Id");
 
@@ -2425,11 +2448,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("Status");
 
-                    b.Property<long>("Type");
-
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<long>("WalletType");
 
                     b.HasKey("MemberTypeId");
 
@@ -2438,7 +2461,7 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.StckingScheme", b =>
                 {
-                    b.Property<long>("MemberTypeId");
+                    b.Property<long>("WalletType");
 
                     b.Property<long>("CreatedBy");
 
@@ -2448,18 +2471,24 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("LimitAmount")
+                    b.Property<decimal>("MaxLimitAmount")
                         .HasColumnType("decimal(18, 8)");
+
+                    b.Property<decimal>("MinLimitAmount")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<long>("Percent");
 
                     b.Property<short>("Status");
 
-                    b.Property<long>("Type");
+                    b.Property<string>("TimePeriod")
+                        .IsRequired();
 
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime>("UpdatedDate");
 
-                    b.HasKey("MemberTypeId");
+                    b.HasKey("WalletType");
 
                     b.ToTable("StckingScheme");
                 });
@@ -2476,20 +2505,22 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("Remarks");
 
+                    b.Property<long>("SchemeId");
+
                     b.Property<decimal>("StackingAmount")
                         .HasColumnType("decimal(18, 8)");
 
                     b.Property<short>("Status");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime>("UpdatedDate");
 
-                    b.Property<long>("UserId");
+                    b.Property<long>("WalletId");
+
+                    b.Property<string>("WalletType")
+                        .IsRequired()
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 

@@ -40,7 +40,7 @@ namespace CleanArchitecture.Core.Entities
 
         //public string Password { get; set; }
         
-        public long SerProConfigurationID { get; set; }
+        //public long SerProConfigurationID { get; set; } Rita 25-10-2018 already in Provider detail exists
 
         public string ResponseSuccess { get; set; }
 
@@ -63,6 +63,7 @@ namespace CleanArchitecture.Core.Entities
         public short AppType { get; set; }
 
         public long ParsingDataID { get; set; }
+        public string TimeStamp { get; set; }
 
         public void SetActive()
         {

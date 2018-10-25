@@ -11,6 +11,7 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.ViewModels.WalletOperations;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using Microsoft.AspNetCore.Identity;
 using CleanArchitecture.Core.Entities.User;
@@ -159,10 +160,7 @@ namespace CleanArchitecture.Web.API
                 return BadRequest();
             }
         }
-
-
-
-
+                     
         [HttpGet("{AccWalletID}")]
         public async Task<IActionResult> ListWalletAddress(string AccWalletID)
         {
@@ -180,7 +178,6 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-
         [HttpGet("{AccWalletID}")]
         public async Task<IActionResult> GetDefaultWalletAddress(string AccWalletID)
         {
@@ -197,7 +194,6 @@ namespace CleanArchitecture.Web.API
                 return BadRequest();
             }
         }
-
 
         //[HttpGet("{coin}/{walletId}/{addressOrId}")]
         ////[Authorize]
@@ -307,8 +303,6 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-
-
         [HttpPost("{AccWalletID}")]
         public async Task<IActionResult> SetWalletLimit(string AccWalletID, [FromBody]WalletLimitConfigurationReq Request)
         {
@@ -372,6 +366,191 @@ namespace CleanArchitecture.Web.API
                 HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 Response.ReturnCode = enResponseCode.InternalError;
                 return BadRequest(Response);
+            }
+        }
+
+        [HttpPost("{AccWalletID}/{BeneficiaryAddress}")]
+        public async Task<IActionResult> AddBeneficiary(string AccWalletID, string BeneficiaryAddress)
+        {
+            BeneficiaryResponse response = new BeneficiaryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.AddBeneficiary(AccWalletID, BeneficiaryAddress, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBeneficiary([FromBody] BulkBeneUpdateReq[] Request)
+        {
+            BeneficiaryResponse response = new BeneficiaryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.UpdateBulkBeneficiary(Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("{AccWalletID}")]
+        public async Task<IActionResult> GetWhitelistedBeneficiaries(string AccWalletID)
+        {
+            BeneficiaryResponse response = new BeneficiaryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.ListWhitelistedBeneficiary(AccWalletID, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+
+        [HttpGet("{AccWalletID}")]
+        public async Task<IActionResult> GetAllBeneficiaries(string AccWalletID)
+        {
+            BeneficiaryResponse response = new BeneficiaryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.ListBeneficiary(AccWalletID, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetUserPreferences(int? GlobalBit)
+        {
+            UserPreferencesRes response = new UserPreferencesRes();
+            response.BizResponse = new BizResponseClass();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.SetPreferences(user.Id,Convert.ToInt16(GlobalBit));
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserPreferences()
+        {
+            UserPreferencesRes response = new UserPreferencesRes();
+            response.BizResponse = new BizResponseClass();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.GetPreferences(user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
             }
         }
     }

@@ -36,6 +36,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         public short IsTransaction { get; set; }
         public short IsWithdraw { get; set; }
         public short IsDeposit { get; set; }
+        public short IsBaseCurrency { get; set; }
     }
 
     public class ExplorerData

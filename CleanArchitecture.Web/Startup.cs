@@ -188,8 +188,9 @@ namespace CleanArchitecture.Web
                 // added by nirav savariya for common repository on 10-04-2018
                 config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
                 config.For(typeof(ITransactionProcess)).Add(typeof(NewTransaction));
-                               
-                
+                config.For(typeof(IWebApiData)).Add(typeof(TransactionWebAPIConfiguration));
+
+
                 //Populate the container using the service collection
                 config.Populate(services);
                

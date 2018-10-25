@@ -205,7 +205,7 @@ namespace CleanArchitecture.Web.API
                 }
                 await _userManager.SetTwoFactorEnabledAsync(user, true);
                 _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success });
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success,ReturnMsg= EnResponseMessage.EnableTroFactor });
             }
             catch (Exception ex)
             {

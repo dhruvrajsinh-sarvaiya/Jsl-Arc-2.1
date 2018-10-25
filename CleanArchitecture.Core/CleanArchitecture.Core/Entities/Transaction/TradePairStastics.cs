@@ -7,16 +7,25 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Transaction
 {
-    public class TradeGraphDetail : BizBase
+    public class TradePairStastics : BizBase
     {
-        [Key]
         public long PairId { get; set; }
-        [Key]
-        public DateTime DataDate { get; set; }
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
-        public decimal Volume { get; set; }
+        public decimal CurrentRate { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal LTP { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal ChangePer24 { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal ChangeVol24 { get; set; }
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
@@ -25,14 +34,6 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal Low24Hr { get; set; }
-        [Required]
-        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 8)")]
-        public decimal TodayClose { get; set; }
-        [Required]
-        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 8)")]
-        public decimal TodayOpen { get; set; }
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
@@ -49,10 +50,9 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal Low52Week { get; set; }
-        [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
-        public decimal LTP { get; set; }
-
+        public decimal CurrencyPrice { get; set; }
+        public short UpDownBit { get; set; }
     }
 }

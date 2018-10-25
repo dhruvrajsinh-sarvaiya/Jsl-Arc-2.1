@@ -96,10 +96,10 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
             var skip = pageSize * (pageIndex - 1);
 
-            var canPage = skip < total;
+            //var canPage = skip < total;
 
-            if (canPage) // do what you wish if you can page no further
-                return null;
+            //if (canPage) // do what you wish if you can page no further
+            //    return null;
 
             return DeviceList.Skip(skip).Take(pageSize).ToList();
 
@@ -109,7 +109,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public void UpdateDeviceId(DeviceMasterViewModel model)
         {
-            var DeviceIddata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && i.IsDeleted);
+            var DeviceIddata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsDeleted);
             if (DeviceIddata != null)
             {
                 var currentDeviceId = new DeviceMaster
@@ -131,9 +131,25 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public long DesableDeviceId(DeviceMasterViewModel model)
         {
-            var Devicedata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && i.IsDeleted);
+            var Devicedata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsDeleted);
             if (Devicedata != null)
             {
+                // False Status
+                Devicedata.SetAsIsDisabletatus();
+                _deviceMasterRepository.Update(Devicedata);
+                //_dbContext.SaveChanges();
+                return Devicedata.Id;
+            }
+            return 0;
+        }      
+
+        public long EnableDeviceId(DeviceMasterViewModel model)
+        {
+            var Devicedata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsEnable && !i.IsDeleted);
+            
+            if (Devicedata != null)
+            {
+                // True Status
                 Devicedata.SetAsIsEnabletatus();
                 _deviceMasterRepository.Update(Devicedata);
                 //_dbContext.SaveChanges();

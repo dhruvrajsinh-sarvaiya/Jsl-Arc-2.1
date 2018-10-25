@@ -1,4 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +14,8 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
         public string PublicAddress { get; set; }
 
         public string AccWalletID { get; set; }
-
+        //vsolanki 25-10-2018
+        public List<WalletLimitConfigurationRes> Limits { get; set; }
         // public Wallet2 wallet { get; set; }
     }
     //public class Wallet2

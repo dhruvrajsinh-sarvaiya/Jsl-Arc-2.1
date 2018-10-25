@@ -18,6 +18,7 @@ using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Core.Entities.Wallet;
 using System.Linq;
 using CleanArchitecture.Core.ViewModels.WalletConfiguration;
+using System.Collections;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -32,6 +33,8 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<TrnAcBatch> _trnBatch;
         private readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
         private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepo;
+        private readonly ICommonRepository<BeneficiaryMaster> _BeneficiarycommonRepository;
+        private readonly ICommonRepository<UserPreferencesMaster> _UserPreferencescommonRepository;
 
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         private readonly IWalletRepository _walletRepository1;
@@ -56,7 +59,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -76,6 +79,8 @@ namespace CleanArchitecture.Infrastructure.Services
             //_walletLedgerRepository = walletledgerrepo;
             _WalletAllowTrnRepo = WalletAllowTrnRepo;
             _LimitcommonRepository = WalletLimitConfig;
+            _BeneficiarycommonRepository = BeneficiaryMasterRepo;
+            _UserPreferencescommonRepository = UserPreferenceRepo;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -534,7 +539,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 10-10-2018 Insert into WalletMaster table
-        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId)
+        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId,int isBaseService = 0)
         {
             bool IsValid = true;
             decimal Balance = 0;
@@ -580,14 +585,32 @@ namespace CleanArchitecture.Infrastructure.Services
                     _WalletAllowTrnRepository.Add(w);
                 }
                 //genrate address and update in walletmaster
-                var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
-                //walletMaster.PublicAddress = addressClass.address;
-                walletMaster.WalletPublicAddress(addressClass.address);
-                _commonRepository.Update(walletMaster);
+                if (isBaseService == 0)    //uday 25-10-2018 When Service is add create default wallet of org not generate the address
+                {
+                    var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
+                    //walletMaster.PublicAddress = addressClass.address;
+                    walletMaster.WalletPublicAddress(addressClass.address);
+                    _commonRepository.Update(walletMaster);
+                }
 
+                //vsolanki 25-10-2018 add Limit for Wallet
+
+                WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
+                var limitConfig = _LimitcommonRepository.GetSingle(item=>item.WalletId==1);
+                request.EndTime = limitConfig.EndTime;
+                request.StartTime = limitConfig.StartTime;
+                request.LimitPerDay = limitConfig.LimitPerDay;
+                request.LimitPerHour = limitConfig.LimitPerHour;
+                request.LimitPerTransaction = limitConfig.LimitPerTransaction;
+                enWalletLimitType foo = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
+                request.TrnType = foo; //(enWalletLimitType)limitConfig.TrnType;
+                request.EndTime = limitConfig.EndTime;
+
+                CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request, 1);
                 //set the response object value
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
+                createWalletResponse.Limits = _walletRepository1.GetWalletLimitResponse(walletMaster.AccWalletID); 
                 createWalletResponse.ReturnCode = enResponseCode.Success;
                 createWalletResponse.ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg;
                 return createWalletResponse;
@@ -1196,20 +1219,26 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.CreatedDate = UTC_To_IST();
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
+                    newobj.StartTime = request.StartTime;
+                    newobj.EndTime = request.EndTime;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
+                   // Response.WalletLimitConfigurationRes = newobj;
                 }
                 else
                 {
                     IsExist.LimitPerHour = request.LimitPerHour;
                     IsExist.LimitPerDay = request.LimitPerDay;
                     IsExist.LimitPerTransaction = request.LimitPerTransaction;
+                    IsExist.StartTime = request.StartTime;
+                    IsExist.EndTime = request.EndTime;
                     IsExist.UpdatedBy = Userid;
                     IsExist.UpdatedDate = UTC_To_IST();
                     _LimitcommonRepository.Update(IsExist);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
                 }
                 Response.ReturnCode = enResponseCode.Success;
+                
                 return Response;
             }
             catch (Exception ex)
@@ -1275,18 +1304,26 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
         //vsolanki 24-10-2018
-        public ListBalanceResponse GetAvailableBalance(long userid, long walletId)
+        public ListBalanceResponse GetAvailableBalance(long userid, string walletId)
         {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetAvailableBalance(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+                var response = _walletRepository1.GetAvailableBalance(userid, wallet.Id);
                 if (response.Count == 0)
                 {
-                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
                 }
-                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
             }
             catch (Exception ex)
             {
@@ -1294,17 +1331,27 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
-        public ListBalanceResponse GetAllAvailableBalance(long userid)
+        //vsolanki 24-10-2018
+        public TotalBalanceRes GetAllAvailableBalance(long userid)
         {
+            TotalBalanceRes Response = new TotalBalanceRes();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
                 var response = _walletRepository1.GetAllAvailableBalance(userid);
+                decimal total = _walletRepository1.GetTotalAvailbleBal(userid);
                 if (response.Count == 0)
                 {
-                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
                 }
-                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                Response.TotalBalance = total;
+                return Response;
             }
             catch (Exception ex)
             {
@@ -1314,16 +1361,25 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 24-10-2018
-        public ListBalanceResponse GetUnSettledBalance(long userid, long walletId)
+        public ListBalanceResponse GetUnSettledBalance(long userid, string walletId)
         {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetUnSettledBalance(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+                var response = _walletRepository1.GetUnSettledBalance(userid, wallet.Id);
                 if (response.Count == 0)
                 {
-                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
                 }
-                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
             }
             catch (Exception ex)
             {
@@ -1331,17 +1387,25 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
+        //vsolanki 24-10-2018
         public ListBalanceResponse GetAllUnSettledBalance(long userid)
         {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetAllAvailableBalance(userid);
+                var response = _walletRepository1.GetAllUnSettledBalance(userid);
                 if (response.Count == 0)
                 {
-                    return new ListBalanceResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotFound, ErrorCode = enErrorCode.NotFound };
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
                 }
-                return new ListBalanceResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FindRecored, Response = response };
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
             }
             catch (Exception ex)
             {
@@ -1349,15 +1413,178 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
-        public AllBalanceResponse GetAllBalances(long userid, long walletId)
+        //vsolanki 24-10-2018
+        public ListBalanceResponse GetUnClearedBalance(long userid, string walletId)
         {
-            
-              AllBalanceResponse allBalanceResponse = new AllBalanceResponse();
+            ListBalanceResponse Response = new ListBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+                var response = _walletRepository1.GetUnClearedBalance(userid, wallet.Id);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        //vsolanki 24-10-2018
+        public ListBalanceResponse GetAllUnClearedBalance(long userid)
+        {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var response = _walletRepository1.GetUnAllClearedBalance(userid);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        //vsolanki 24-10-2018
+        public ListStackingBalanceRes GetStackingBalance(long userid, string walletId)
+        {
+            ListStackingBalanceRes Response = new ListStackingBalanceRes();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+
+                var response = _walletRepository1.GetStackingBalance(userid, wallet.Id);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        //vsolanki 24-10-2018
+        public ListStackingBalanceRes GetAllStackingBalance(long userid)
+        {
+            ListStackingBalanceRes Response = new ListStackingBalanceRes();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var response = _walletRepository1.GetAllStackingBalance(userid);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        //vsolanki 24-10-2018
+        public ListBalanceResponse GetShadowBalance(long userid, string walletId)
+        {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+
+                var response = _walletRepository1.GetShadowBalance(userid, wallet.Id);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        //vsolanki 24-10-2018
+        public ListBalanceResponse GetAllShadowBalance(long userid)
+        {
+            ListBalanceResponse Response = new ListBalanceResponse();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var response = _walletRepository1.GetAllShadowBalance(userid);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        //vsolanki 24-10-2018
+        public AllBalanceResponse GetAllBalances(long userid, string walletId)
+        {
+
+            AllBalanceResponse allBalanceResponse = new AllBalanceResponse();
             allBalanceResponse.BizResponseObj = new BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetAllBalances(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+
+                var response = _walletRepository1.GetAllBalances(userid, wallet.Id);
                 if (response == null)
                 {
                     allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1368,10 +1595,291 @@ namespace CleanArchitecture.Infrastructure.Services
                 allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Success;
                 allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 allBalanceResponse.Balance = response;
-                allBalanceResponse.WalletType = "btc";
-                allBalanceResponse.WalletName = "Test";
-                allBalanceResponse.IsDefaultWallet = 0;
+               // var wallet = _commonRepository.GetById(walletId);
+                var walletType = _WalletTypeMasterRepository.GetById(wallet.WalletTypeID);
+                allBalanceResponse.WalletType = walletType.WalletTypeName;
+                allBalanceResponse.WalletName = wallet.Walletname;
+                allBalanceResponse.IsDefaultWallet = wallet.IsDefaultWallet;
                 return allBalanceResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId)
+        {
+            BeneficiaryMaster IsExist = new BeneficiaryMaster();
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            try
+            {
+                var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                Response.BizResponse = new BizResponseClass();
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.WalletTypeID && item.Status == 1);
+
+                if (IsExist == null)
+                {
+                    BeneficiaryMaster AddNew = new BeneficiaryMaster();
+                    if (userPreference.IsWhitelisting == 1)
+                    {
+                        AddNew.IsWhiteListed = 1;
+                    }
+                    else
+                    {
+                        AddNew.IsWhiteListed = 0;
+                    }
+                    AddNew.Status = 1;
+                    AddNew.CreatedBy = UserId;
+                    AddNew.CreatedDate = UTC_To_IST();
+                    AddNew.UserID = UserId;
+                    AddNew.Address = BeneficiaryAddress;
+                    AddNew.Name = "System Generated";
+                    AddNew.WalletTypeID = walletMasters.WalletTypeID;
+                    AddNew = _BeneficiarycommonRepository.Add(AddNew);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
+                }
+                else
+                {
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.AlredyExist;
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse ListWhitelistedBeneficiary(string AccWalletID, long UserId)
+        {
+            //BeneficiaryMaster IsExist = new BeneficiaryMaster();
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                //var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
+
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                var BeneficiaryMasterRes = _walletRepository1.GetAllWhitelistedBeneficiaries(walletMasters.WalletTypeID);
+                if (BeneficiaryMasterRes.Count == 0)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                    return Response;
+                }
+                else
+                {
+                    Response.Beneficiaries = BeneficiaryMasterRes;
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                    return Response;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse ListBeneficiary(string AccWalletID, long UserId)
+        {
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
+
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                var BeneficiaryMasterRes = _walletRepository1.GetAllBeneficiaries(walletMasters.WalletTypeID);
+                if (BeneficiaryMasterRes.Count == 0)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                    return Response;
+                }
+                else
+                {
+                    Response.Beneficiaries = BeneficiaryMasterRes;
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                    return Response;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //vsolanki 25-10-2018
+        public TotalBalanceRes GetAvailbleBalTypeWise(long userid)
+        {
+            TotalBalanceRes Response = new TotalBalanceRes();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var response = _walletRepository1.GetAvailbleBalTypeWise(userid);
+                decimal total = _walletRepository1.GetTotalAvailbleBal(userid);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                Response.TotalBalance = total;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //vsolanki 25-10-2018
+        public List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType)
+        {
+            AllBalanceTypeWiseRes a = new AllBalanceTypeWiseRes();
+            List<AllBalanceTypeWiseRes> Response = new List<AllBalanceTypeWiseRes>();
+            a.Wallet = new WalletResponse();
+            a.Wallet.Balance = new Balance();
+            var listWallet = _walletRepository1.GetWalletMasterResponseByCoin(userId, WalletType);
+            for (int i = 0; i <= listWallet.Count-1; i++)
+            {
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == listWallet[i].AccWalletID);
+                var response = _walletRepository1.GetAllBalances(userId, wallet.Id);
+
+                a.Wallet.AccWalletID = listWallet[i].AccWalletID;
+                a.Wallet.PublicAddress = listWallet[i].PublicAddress;
+                a.Wallet.WalletName = listWallet[i].WalletName;
+                a.Wallet.IsDefaultWallet = listWallet[i].IsDefaultWallet;
+                a.Wallet.TypeName = listWallet[i].CoinName;
+                
+                a.Wallet.Balance = response;
+                Response.Add(a);
+            }
+            return Response;
+        }
+
+
+        public UserPreferencesRes SetPreferences(long Userid,int GlobalBit)
+        {
+            UserPreferencesRes Response = new UserPreferencesRes();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                UserPreferencesMaster IsExist = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Userid);
+                if (IsExist == null)
+                {
+                    UserPreferencesMaster newobj = new UserPreferencesMaster();
+                    newobj.UserID = Userid;
+                    newobj.IsWhitelisting = Convert.ToInt16(GlobalBit);
+                    newobj.CreatedBy = Userid;
+                    newobj.CreatedDate = UTC_To_IST();
+                    newobj.Status = Convert.ToInt16(ServiceStatus.Active);
+                    newobj = _UserPreferencescommonRepository.Add(newobj);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefSuccessMsg;
+                }
+                else
+                {
+                    IsExist.IsWhitelisting = Convert.ToInt16(GlobalBit);
+                    IsExist.UpdatedBy = Userid;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _UserPreferencescommonRepository.Update(IsExist);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefUpdateMsg;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public UserPreferencesRes GetPreferences(long Userid)
+        {
+            UserPreferencesRes Response = new UserPreferencesRes();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                UserPreferencesMaster IsExist = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Userid);
+                if (IsExist == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    Response.IsWhitelisting = IsExist.IsWhitelisting;
+                    Response.UserID  = IsExist.UserID;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] Request, long ID)
+        {
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                bool state = _walletRepository1.BeneficiaryBulkEdit(Request);
+                if (state == true)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidBeneficiaryID;
+                }
+                return Response;
             }
             catch (Exception ex)
             {

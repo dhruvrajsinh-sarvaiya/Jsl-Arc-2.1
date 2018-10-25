@@ -22,5 +22,10 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4213")]
         public decimal LimitPerTransaction { get; set; }
 
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4229")]
+        public TimeSpan StartTime { get; set; }
+
+        [Required(ErrorMessage = "1,Please Enter Required Parameters,4230")]
+        public TimeSpan EndTime { get; set; }
     }
 }

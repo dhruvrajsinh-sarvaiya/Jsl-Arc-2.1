@@ -2431,15 +2431,15 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.MemberShadowLimit", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<long>("MemberTypeId");
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<long>("MemberTypeId");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("ShadowLimitAmount")
                         .HasColumnType("decimal(18, 8)");
@@ -2452,20 +2452,22 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long>("WalletType");
 
-                    b.HasKey("Id");
+                    b.HasKey("MemberTypeId");
 
                     b.ToTable("MemberShadowLimit");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.StckingScheme", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<long>("WalletType");
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("MaxLimitAmount")
                         .HasColumnType("decimal(18, 8)");
@@ -2484,9 +2486,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("UpdatedDate");
 
-                    b.Property<long>("WalletType");
-
-                    b.HasKey("Id");
+                    b.HasKey("WalletType");
 
                     b.ToTable("StckingScheme");
                 });
@@ -2513,6 +2513,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<long>("WalletId");
 
                     b.Property<string>("WalletType")
                         .IsRequired()

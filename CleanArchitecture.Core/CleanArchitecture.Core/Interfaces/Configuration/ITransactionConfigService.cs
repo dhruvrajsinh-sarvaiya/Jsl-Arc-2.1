@@ -11,6 +11,7 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         long UpdateServiceConfiguration(ServiceConfigurationRequest Request);
         ServiceConfigurationRequest GetServiceConfiguration(long ServiceId);
         List<ServiceConfigurationRequest> GetAllServiceConfiguration();
+        List<ServiceCurrencyData> GetAllServiceConfigurationByBase(String Base);
         int SetActiveService(long ServiceId);
         int SetInActiveService(long ServiceId);
 
@@ -100,5 +101,10 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         bool UpdateLimitData(LimitRequest Request);
         bool SetActiveLimit(long id);
         bool SetInActiveLimit(long id);
+
+
+        MarketViewModel AddMarketData(MarketViewModel viewModel);
+        List<MarketViewModel> GetAllMarketData();
+        MarketViewModel GetMarketDataByMarket(long Id);
     }
 }

@@ -26,7 +26,7 @@ namespace CleanArchitecture.Core.Interfaces
         //vsolanki 8-10-2018 define the method
         Task<string> SendRequestAsync(string Url, string Request = "", string MethodType = "GET", string ContentType = "application/json", WebHeaderCollection Headers = null, int Timeout = 9000);
         Task<string> SendTCPSocketRequestAsync(string HostName, string Port, string request);
-        string SendJsonRpcAPIRequestAsync(string Url, string RequestStr, string UserName, string Password);
+        string SendJsonRpcAPIRequestAsync(string Url, string RequestStr, string UserName, string Password, WebHeaderCollection headerDictionary = null);
     }
 
     public interface IWebApiParseResponse<TResponse>

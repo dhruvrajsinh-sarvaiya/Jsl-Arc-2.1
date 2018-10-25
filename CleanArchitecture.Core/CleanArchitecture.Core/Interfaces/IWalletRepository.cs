@@ -59,7 +59,21 @@ namespace CleanArchitecture.Core.Interfaces
         List<BalanceResponse> GetAllAvailableBalance(long userid);
         List<BalanceResponse> GetUnSettledBalance(long userid, long walletId);
         List<BalanceResponse> GetAllUnSettledBalance(long userid);
-
+        List<BalanceResponse> GetUnClearedBalance(long userid, long walletId);
+        List<BalanceResponse> GetUnAllClearedBalance(long userid);
+        List<StackingBalanceRes> GetStackingBalance(long userid, long walletId);
+        List<StackingBalanceRes> GetAllStackingBalance(long userid);
+        List<BalanceResponse> GetShadowBalance(long userid, long walletId);
+        List<BalanceResponse> GetAllShadowBalance(long userid);
         Balance GetAllBalances(long userid, long walletid);
+        decimal GetTotalAvailbleBal(long userid);
+
+        List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID);
+
+        List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID);
+        //vsolanki 25-10-2018
+        List<BalanceResponse> GetAvailbleBalTypeWise(long userid);
+
+        bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID);
     }
 }
