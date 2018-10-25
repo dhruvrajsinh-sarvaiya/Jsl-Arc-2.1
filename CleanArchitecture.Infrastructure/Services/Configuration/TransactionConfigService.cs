@@ -42,6 +42,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly IWalletService _walletService;
         private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
         private readonly ICommonRepository<Market> _marketRepository;
+
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
             ICommonRepository<ServiceDetail> serviceDetailRepository,
@@ -480,6 +481,41 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     return 1;
                 }
                 return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public List<ServiceCurrencyData> GetAllServiceConfigurationByBase(String Base)
+        {
+            List<ServiceCurrencyData> responsedata;
+            try
+            {
+                var CheckBase = _marketRepository.GetSingle(m => m.CurrencyName == Base);
+                if (CheckBase == null)
+                    return null;
+                responsedata = new List<ServiceCurrencyData>();
+                var model = _serviceMasterRepository.GetSingle(ser => ser. SMSCode== Base);
+                if (model == null)
+                    return null;
+                var serviceid = model.Id;
+
+                var modellist = _serviceMasterRepository.List();
+                foreach (var modelData in modellist)
+                {
+                    if (modelData.Id == serviceid)
+                        continue;
+                    responsedata.Add(new ServiceCurrencyData()
+                    {
+                        Name = modelData.Name,
+                        ServiceId =modelData.Id,
+                        SMSCode =modelData .SMSCode
+                    });
+                }
+                return responsedata;
             }
             catch (Exception ex)
             {
@@ -2674,6 +2710,18 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 List<MarketViewModel> list = new List<MarketViewModel>();
+                var modellist = _marketRepository.List();
+
+                foreach (var model in modellist)
+                {
+                    list.Add(new MarketViewModel()
+                    {
+                        ID = model.Id,
+                        CurrencyName = model.CurrencyName,
+                        ServiceID = model.ServiceID,
+                        isBaseCurrency = model.isBaseCurrency,
+                    });
+                }
                 return list;
             }
             catch (Exception ex)
@@ -2683,11 +2731,19 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public MarketViewModel GetMarketDataByMarket(string market)
+        public MarketViewModel GetMarketDataByMarket(long Id)
         {
             try
             {
                 MarketViewModel marketView = new MarketViewModel();
+                var model = _marketRepository.GetById(Id);
+                if (model == null)
+                    return null;
+
+                marketView.CurrencyName = model.CurrencyName;
+                marketView.ID = model.Id;
+                marketView.isBaseCurrency = model.isBaseCurrency;
+                marketView.ServiceID = model.ServiceID;
                 return marketView;
             }
             catch (Exception ex)

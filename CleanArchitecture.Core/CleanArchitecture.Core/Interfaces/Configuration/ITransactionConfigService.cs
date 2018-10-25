@@ -11,6 +11,7 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         long UpdateServiceConfiguration(ServiceConfigurationRequest Request);
         ServiceConfigurationRequest GetServiceConfiguration(long ServiceId);
         List<ServiceConfigurationRequest> GetAllServiceConfiguration();
+        List<ServiceCurrencyData> GetAllServiceConfigurationByBase(String Base);
         int SetActiveService(long ServiceId);
         int SetInActiveService(long ServiceId);
 
@@ -104,6 +105,6 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
 
         MarketViewModel AddMarketData(MarketViewModel viewModel);
         List<MarketViewModel> GetAllMarketData();
-        MarketViewModel GetMarketDataByMarket(string market);
+        MarketViewModel GetMarketDataByMarket(long Id);
     }
 }
