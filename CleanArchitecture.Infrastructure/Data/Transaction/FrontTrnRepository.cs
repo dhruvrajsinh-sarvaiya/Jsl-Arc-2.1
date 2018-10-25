@@ -211,7 +211,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             IQueryable<GetBuySellBook> Result = _dbContext.BuyerSellerInfo.FromSql(
                             @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount from
                               TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
-                              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice order by TTQ.AskPrice Order By TTQ.AskPrice", id);
+                              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice order by TTQ.AskPrice", id);
 
             return Result.ToList();
         }
