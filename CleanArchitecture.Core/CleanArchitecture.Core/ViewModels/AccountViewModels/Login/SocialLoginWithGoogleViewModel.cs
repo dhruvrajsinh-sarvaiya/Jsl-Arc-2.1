@@ -13,7 +13,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
         public string Email { get; set; }
         [Required(ErrorMessage = "2,Please Enter ProviderKey,4092")]
         public string ProviderKey { get; set; }
-        [Required(ErrorMessage = "3,Please Enter ProviderName,4092")]
+        [Required(ErrorMessage = "3,Please Enter ProviderName,4093")]
         public string ProviderName { get; set; }
         [Required(ErrorMessage = "4,Please Enter access_token,4094")]
         public string access_token { get; set; }
