@@ -592,10 +592,25 @@ namespace CleanArchitecture.Infrastructure.Services
                     walletMaster.WalletPublicAddress(addressClass.address);
                     _commonRepository.Update(walletMaster);
                 }
-       
+
+                //vsolanki 25-10-2018 add Limit for Wallet
+
+                WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
+                var limitConfig = _LimitcommonRepository.GetSingle(item=>item.WalletId==1);
+                request.EndTime = limitConfig.EndTime;
+                request.StartTime = limitConfig.StartTime;
+                request.LimitPerDay = limitConfig.LimitPerDay;
+                request.LimitPerHour = limitConfig.LimitPerHour;
+                request.LimitPerTransaction = limitConfig.LimitPerTransaction;
+                enWalletLimitType foo = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
+                request.TrnType = foo; //(enWalletLimitType)limitConfig.TrnType;
+                request.EndTime = limitConfig.EndTime;
+
+                CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request, 1);
                 //set the response object value
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
+                createWalletResponse.Limits = _walletRepository1.GetWalletLimitResponse(walletMaster.AccWalletID); 
                 createWalletResponse.ReturnCode = enResponseCode.Success;
                 createWalletResponse.ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg;
                 return createWalletResponse;
@@ -1204,20 +1219,26 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.CreatedDate = UTC_To_IST();
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
+                    newobj.StartTime = request.StartTime;
+                    newobj.EndTime = request.EndTime;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
+                   // Response.WalletLimitConfigurationRes = newobj;
                 }
                 else
                 {
                     IsExist.LimitPerHour = request.LimitPerHour;
                     IsExist.LimitPerDay = request.LimitPerDay;
                     IsExist.LimitPerTransaction = request.LimitPerTransaction;
+                    IsExist.StartTime = request.StartTime;
+                    IsExist.EndTime = request.EndTime;
                     IsExist.UpdatedBy = Userid;
                     IsExist.UpdatedDate = UTC_To_IST();
                     _LimitcommonRepository.Update(IsExist);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
                 }
                 Response.ReturnCode = enResponseCode.Success;
+                
                 return Response;
             }
             catch (Exception ex)
