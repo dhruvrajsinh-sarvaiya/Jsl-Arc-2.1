@@ -820,5 +820,32 @@ namespace CleanArchitecture.Infrastructure.Data
                           }).AsEnumerable().ToList();
             return result;
         }
+
+        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID)
+        {
+            List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
+                                                where b.WalletTypeID == WalletTypeID && b.Status == 1 && b.IsWhiteListed == 1
+                                                select new BeneficiaryMasterRes
+                                                {
+                                                    Name = b.Name,
+                                                    Address = b.Address
+
+                                                }).AsEnumerable().ToList();
+            return items;
+        }
+
+        public List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID)
+        {
+            List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
+                                                where b.WalletTypeID == WalletTypeID && b.Status == 1
+                                                select new BeneficiaryMasterRes
+                                                {
+                                                    Name = b.Name,
+                                                    Address = b.Address,
+                                                    IsWhiteListed = b.IsWhiteListed
+
+                                                }).AsEnumerable().ToList();
+            return items;
+        }
     }
 }

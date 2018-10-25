@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
@@ -40,7 +41,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<WalletTypeMaster> _walletTypeService;
         private readonly IWalletService _walletService;
         private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
-
+        private readonly ICommonRepository<Market> _marketRepository;
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
             ICommonRepository<ServiceDetail> serviceDetailRepository,
@@ -63,7 +64,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<ServiceTypeMapping> serviceTypeMapping,
             ICommonRepository<WalletTypeMaster> walletTypeService,
             IWalletService walletService,
-            ICommonRepository<TradePairStastics> tradePairStastics)
+            ICommonRepository<TradePairStastics> tradePairStastics,
+            ICommonRepository<Market> marketRepository)
           {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -87,6 +89,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _walletTypeService = walletTypeService;
             _walletService = walletService;
             _tradePairStastics = tradePairStastics;
+            _marketRepository = marketRepository;
         }
 
         #region Service
@@ -200,6 +203,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 ////Add Into WalletMaster For Default Organization
                 //int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
                 //var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1);
+
+                //Add BaseCurrency In MarketEntity
+                var marketViewModel = new MarketViewModel { CurrencyName = Request.SMSCode, isBaseCurrency = 1, ServiceID = newServiceMaster.Id };
+                AddMarketData(marketViewModel);
+
                 return newServiceMaster.Id;
             }
             catch (Exception ex)
@@ -2630,6 +2638,64 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
+
+
+        #endregion
+
+        #region Market
+        public MarketViewModel AddMarketData(MarketViewModel viewModel)
+        {
+            try
+            {
+                Market market = new Market
+                {
+                    CurrencyName = viewModel.CurrencyName,
+                    ServiceID = viewModel.ServiceID,
+                    isBaseCurrency = viewModel.isBaseCurrency,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newMarket = _marketRepository.Add(market);
+
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public List<MarketViewModel> GetAllMarketData()
+        {
+            try
+            {
+                List<MarketViewModel> list = new List<MarketViewModel>();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public MarketViewModel GetMarketDataByMarket(string market)
+        {
+            try
+            {
+                MarketViewModel marketView = new MarketViewModel();
+                return marketView;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         #endregion
     }
 }

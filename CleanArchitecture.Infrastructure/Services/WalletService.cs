@@ -33,6 +33,8 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<TrnAcBatch> _trnBatch;
         private readonly ICommonRepository<TradeBitGoDelayAddresses> _bitgoDelayRepository;
         private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepo;
+        private readonly ICommonRepository<BeneficiaryMaster> _BeneficiarycommonRepository;
+        private readonly ICommonRepository<UserPreferencesMaster> _UserPreferencescommonRepository;
 
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         private readonly IWalletRepository _walletRepository1;
@@ -57,7 +59,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -77,6 +79,8 @@ namespace CleanArchitecture.Infrastructure.Services
             //_walletLedgerRepository = walletledgerrepo;
             _WalletAllowTrnRepo = WalletAllowTrnRepo;
             _LimitcommonRepository = WalletLimitConfig;
+            _BeneficiarycommonRepository = BeneficiaryMasterRepo;
+            _UserPreferencescommonRepository = UserPreferenceRepo;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -1564,6 +1568,139 @@ namespace CleanArchitecture.Infrastructure.Services
                 allBalanceResponse.WalletName = wallet.Walletname;
                 allBalanceResponse.IsDefaultWallet = wallet.IsDefaultWallet;
                 return allBalanceResponse;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId)
+        {
+            BeneficiaryMaster IsExist = new BeneficiaryMaster();
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            //Response.BizResponseObj = new BizResponseClass();
+            try
+            {
+                var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                Response.BizResponse = new BizResponseClass();
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.WalletTypeID && item.Status == 1);
+
+                if (IsExist == null)
+                {
+                    BeneficiaryMaster AddNew = new BeneficiaryMaster();
+                    if (userPreference.IsWhitelisting == 1)
+                    {
+                        AddNew.IsWhiteListed = 1;
+                    }
+                    else
+                    {
+                        AddNew.IsWhiteListed = 0;
+                    }
+                    AddNew.Status = 1;
+                    AddNew.CreatedBy = UserId;
+                    AddNew.CreatedDate = UTC_To_IST();
+                    AddNew.UserID = UserId;
+                    AddNew.Address = BeneficiaryAddress;
+                    AddNew.Name = "System Generated";
+                    AddNew.WalletTypeID = walletMasters.WalletTypeID;
+                    AddNew = _BeneficiarycommonRepository.Add(AddNew);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
+                }
+                else
+                {
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.AlredyExist;
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse ListWhitelistedBeneficiary(string AccWalletID, long UserId)
+        {
+            //BeneficiaryMaster IsExist = new BeneficiaryMaster();
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                //var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
+
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                var BeneficiaryMasterRes = _walletRepository1.GetAllWhitelistedBeneficiaries(walletMasters.WalletTypeID);
+                if (BeneficiaryMasterRes.Count == 0)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                    return Response;
+                }
+                else
+                {
+                    Response.Beneficiaries = BeneficiaryMasterRes;
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                    return Response;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse ListBeneficiary(string AccWalletID, long UserId)
+        {
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
+
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                var BeneficiaryMasterRes = _walletRepository1.GetAllBeneficiaries(walletMasters.WalletTypeID);
+                if (BeneficiaryMasterRes.Count == 0)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                    return Response;
+                }
+                else
+                {
+                    Response.Beneficiaries = BeneficiaryMasterRes;
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                    return Response;
+                }
             }
             catch (Exception ex)
             {

@@ -100,5 +100,10 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         bool UpdateLimitData(LimitRequest Request);
         bool SetActiveLimit(long id);
         bool SetInActiveLimit(long id);
+
+
+        MarketViewModel AddMarketData(MarketViewModel viewModel);
+        List<MarketViewModel> GetAllMarketData();
+        MarketViewModel GetMarketDataByMarket(string market);
     }
 }

@@ -97,27 +97,28 @@ namespace CleanArchitecture.Core.Enums
         CommunicationAPI = 2,
         LiquidityProvider = 3,
         PaymentGateway = 4,
-        MarketData = 5
+        MarketData = 5,
+        TradeServiceLocal = 6
 
     }
 
-    public enum enProviderAppType //Provider Apptype-Types of Transaction
-    {
-        DemoCard = 1,
-        WebService = 2,
-        SocketBase = 3,
-        AutoFill = 4,
-        ThirdPartyAPI = 5,
-        CyberPlate = 6,
-        GTalkAPI = 7,
-        DMRJBSPL = 8,
-        DirectTrn = 9,
-        HermesMobileAPI = 10,
-        HermesFlightAPI = 11,
-        HermesBusAPI = 12,
-        LoanAPI = 24,
-        AEPSTopUpCall = 26,
-    }
+    //public enum enProviderAppType //Provider Apptype-Types of Transaction
+    //{
+    //    DemoCard = 1,
+    //    WebService = 2,
+    //    SocketBase = 3,
+    //    AutoFill = 4,
+    //    ThirdPartyAPI = 5,
+    //    CyberPlate = 6,
+    //    GTalkAPI = 7,
+    //    DMRJBSPL = 8,
+    //    DirectTrn = 9,
+    //    HermesMobileAPI = 10,
+    //    HermesFlightAPI = 11,
+    //    HermesBusAPI = 12,
+    //    LoanAPI = 24,
+    //    AEPSTopUpCall = 26,
+    //}
 
     public enum enMessageService
     {
@@ -292,7 +293,8 @@ namespace CleanArchitecture.Core.Enums
         RestAPI = 4,
         HttpApi = 5,
         SocketApi = 6,
-        BitcoinDeamon = 7
+        BitcoinDeamon = 7,
+        COINTTRADINGLocal = 8
     }
 
     public enum enServiceMasterType

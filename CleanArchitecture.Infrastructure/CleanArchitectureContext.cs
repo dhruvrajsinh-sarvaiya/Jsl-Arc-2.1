@@ -79,6 +79,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<MemberShadowLimit> MemberShadowLimit { get; set; }
         public DbSet<StckingScheme> StckingScheme { get; set; }
         public DbSet<BizUserTypeMapping> BizUserTypeMapping { get; set; }
+        public DbSet<UserPreferencesMaster> UserPreferencesMaster { get; set; }
+        public DbSet<BeneficiaryMaster> BeneficiaryMaster { get; set; }
 
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
