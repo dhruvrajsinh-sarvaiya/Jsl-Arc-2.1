@@ -233,7 +233,7 @@ namespace CleanArchitecture.Core.Enums
         Status4087EmailFail=4087,
         Status4088LoginWithOtpInvalidAttempt=4088,
         Status4089LoginEmailOTPNotsend=4089,
-        Status409OTPSendOnMobile=4090,
+        Status4090OTPSendOnMobile=4090,
         Status4091LoginMobileNumberInvalid=4091,
 
         // wallet
