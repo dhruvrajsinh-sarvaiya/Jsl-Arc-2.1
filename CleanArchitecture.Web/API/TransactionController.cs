@@ -157,6 +157,57 @@ namespace CleanArchitecture.Web.API
             return returnDynamicResult(Response);
         }
 
+        [HttpPost("Withdrawal")]
+        //[Authorize]
+        public async Task<ActionResult> Withdrawal([FromBody]WithdrawalRequest Request)
+        {
+            //Do Process for CreateOrder
+            //For Testing Purpose
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            NewTransactionRequestCls Req = new NewTransactionRequestCls();
+            Req.TrnMode = Request.TrnMode;
+            Req.TrnType = enTrnType.Withdraw;
+            //Req.MemberID = user.Id;
+            //Req.MemberMobile = user.Mobile;
+            Req.MemberID = 5;
+            Req.MemberMobile = "1234567890";
+            Req.SMSCode = Request.asset;
+            Req.TransactionAccount = Request.address;
+            Req.Amount = Request.Amount;          
+            Req.DebitWalletID = Request.DebitWalletID;
+
+            //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
+            // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
+
+            CreateTransactionResponse Response = new CreateTransactionResponse();
+            Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
+            BizResponse MethodResp = await MethodRespTsk;
+
+            if (MethodResp.ReturnCode == enResponseCodeService.Success)
+                Response.ReturnCode = enResponseCode.Success;
+            else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
+                Response.ReturnCode = enResponseCode.Fail;
+            else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
+                Response.ReturnCode = enResponseCode.InternalError;
+
+            Response.ReturnMsg = MethodResp.ReturnMsg;
+            Response.ErrorCode = MethodResp.ErrorCode;
+
+            Response.response = new CreateOrderInfo()
+            {
+                TrnID = Req.GUID
+                //order_id = 1000001,
+                //pair_name = "ltcusd",
+                //price = 10,
+                //side = "buy",
+                //type = "stop-loss",
+                //volume = 10
+            };
+
+            //Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
+        }
+
         [HttpGet("GetVolumeData/{BasePair}")]
         public IActionResult GetVolumeData(string BasePair)
         {
