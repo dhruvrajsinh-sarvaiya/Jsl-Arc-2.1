@@ -25,7 +25,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();
 
         //vsolanki 10-10-2018
-        CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId);
+        CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId, int isBaseService = 0);
 
         //ntrivedi 11-10-2018
         BizResponseClass DebitBalance(long userID, long WalletID, decimal amount, int walletTypeID, enWalletTrnType wtrnType, enTrnType trnType, enServiceType serviceType, long trnNo, string smsCode);

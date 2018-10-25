@@ -539,7 +539,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 10-10-2018 Insert into WalletMaster table
-        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId)
+        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId,int isBaseService = 0)
         {
             bool IsValid = true;
             decimal Balance = 0;
@@ -585,11 +585,14 @@ namespace CleanArchitecture.Infrastructure.Services
                     _WalletAllowTrnRepository.Add(w);
                 }
                 //genrate address and update in walletmaster
-                var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
-                //walletMaster.PublicAddress = addressClass.address;
-                walletMaster.WalletPublicAddress(addressClass.address);
-                _commonRepository.Update(walletMaster);
-
+                if (isBaseService == 0)    //uday 25-10-2018 When Service is add create default wallet of org not generate the address
+                {
+                    var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
+                    //walletMaster.PublicAddress = addressClass.address;
+                    walletMaster.WalletPublicAddress(addressClass.address);
+                    _commonRepository.Update(walletMaster);
+                }
+       
                 //set the response object value
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
