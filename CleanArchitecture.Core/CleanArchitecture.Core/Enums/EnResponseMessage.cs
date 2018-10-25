@@ -50,7 +50,9 @@ namespace CleanArchitecture.Core.Enums
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
         public static string SetWalletLimitCreateMsg = "Limit Created Successfully";
+        public static string SetUserPrefSuccessMsg = "User Preference is Successfully Created.";
         public static string SetWalletLimitUpdateMsg = "Limit Updated Successfully";
+        public static string SetUserPrefUpdateMsg = "User Preference Is Updated Successfully";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
         public static string CreateAddressFailMsg = "Failed to generate Address.";

@@ -847,5 +847,31 @@ namespace CleanArchitecture.Infrastructure.Data
                                                 }).AsEnumerable().ToList();
             return items;
         }
+
+        public bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID)
+        {
+            try
+            {
+                _dbContext.Database.BeginTransaction();
+                var arrayObj = (from p in _dbContext.BeneficiaryMaster
+                                  join q in arryTrnID on p.Id equals q.ID
+                                  select new { p, q }).ToList();
+                if(arrayObj.Count != 0)
+                {
+                    arrayObj.ForEach(e => e.p.IsWhiteListed = e.q.WhitelistingBit);
+                    arrayObj.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
+                    _dbContext.SaveChanges();
+                    _dbContext.Database.CommitTransaction();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _dbContext.Database.RollbackTransaction();
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 }

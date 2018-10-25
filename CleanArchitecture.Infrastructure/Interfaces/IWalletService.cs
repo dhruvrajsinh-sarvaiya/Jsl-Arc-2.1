@@ -83,5 +83,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId);
         BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
         BeneficiaryResponse ListBeneficiary(string accWalletID, long id);
+        UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
+        UserPreferencesRes GetPreferences(long Userid);
+        BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] request, long id);
     }
 }

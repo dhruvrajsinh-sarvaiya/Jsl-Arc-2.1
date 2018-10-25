@@ -1580,7 +1580,6 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
-            //Response.BizResponseObj = new BizResponseClass();
             try
             {
                 var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
@@ -1729,6 +1728,99 @@ namespace CleanArchitecture.Infrastructure.Services
                 Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 Response.Response = response;
                 Response.TotalBalance = total;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+
+        public UserPreferencesRes SetPreferences(long Userid,int GlobalBit)
+        {
+            UserPreferencesRes Response = new UserPreferencesRes();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                UserPreferencesMaster IsExist = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Userid);
+                if (IsExist == null)
+                {
+                    UserPreferencesMaster newobj = new UserPreferencesMaster();
+                    newobj.UserID = Userid;
+                    newobj.IsWhitelisting = Convert.ToInt16(GlobalBit);
+                    newobj.CreatedBy = Userid;
+                    newobj.CreatedDate = UTC_To_IST();
+                    newobj.Status = Convert.ToInt16(ServiceStatus.Active);
+                    newobj = _UserPreferencescommonRepository.Add(newobj);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefSuccessMsg;
+                }
+                else
+                {
+                    IsExist.IsWhitelisting = Convert.ToInt16(GlobalBit);
+                    IsExist.UpdatedBy = Userid;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _UserPreferencescommonRepository.Update(IsExist);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefUpdateMsg;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public UserPreferencesRes GetPreferences(long Userid)
+        {
+            UserPreferencesRes Response = new UserPreferencesRes();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                UserPreferencesMaster IsExist = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Userid);
+                if (IsExist == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    Response.IsWhitelisting = IsExist.IsWhitelisting;
+                    Response.UserID  = IsExist.UserID;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] Request, long ID)
+        {
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                bool state = _walletRepository1.BeneficiaryBulkEdit(Request);
+                if (state == true)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidBeneficiaryID;
+                }
                 return Response;
             }
             catch (Exception ex)
