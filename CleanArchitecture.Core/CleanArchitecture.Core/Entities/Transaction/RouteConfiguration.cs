@@ -59,6 +59,10 @@ namespace CleanArchitecture.Core.Entities
         [StringLength(100)]
         public string ProviderWalletID { get; set; }
 
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal ConvertAmount { get; set; }        
+
         public void SetActiveRoute()
         {
             Status = Convert.ToInt16(ServiceStatus.Active);

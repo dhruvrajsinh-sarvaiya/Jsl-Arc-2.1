@@ -1795,7 +1795,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         ResponseFailure = model.ResponseFailure,
                         ResponseHold = model.ResponseHold,
                         ResponseSuccess = model.ResponseSuccess,
-                        SerProConfigurationID = model.SerProConfigurationID,
+                        //SerProConfigurationID = model.SerProConfigurationID,
                         TransactionIdPrefix = model.TransactionIdPrefix
                     });
                 }
@@ -1839,7 +1839,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ResponseFailure =model .ResponseFailure ,
                     ResponseHold =model .ResponseHold ,
                     ResponseSuccess =model .ResponseSuccess,
-                    SerProConfigurationID =model .SerProConfigurationID,
+                    //SerProConfigurationID =model .SerProConfigurationID,
                     TransactionIdPrefix =model .TransactionIdPrefix
                 };
                 return viewmodel;
@@ -1878,7 +1878,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ResponseFailure = request.ResponseFailure,
                     ResponseHold = request.ResponseHold,
                     ResponseSuccess = request.ResponseSuccess,
-                    SerProConfigurationID = request.SerProConfigurationID,
+                    //SerProConfigurationID = request.SerProConfigurationID,
                     TransactionIdPrefix = request.TransactionIdPrefix
                     
                 };
@@ -1920,7 +1920,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 model.ResponseFailure = request.ResponseFailure;
                 model.ResponseHold = request.ResponseHold;
                 model.ResponseSuccess = request.ResponseSuccess;
-                model.SerProConfigurationID = request.SerProConfigurationID;
+                //model.SerProConfigurationID = request.SerProConfigurationID;
                 model.TransactionIdPrefix = request.TransactionIdPrefix;
                 model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedBy = 1;

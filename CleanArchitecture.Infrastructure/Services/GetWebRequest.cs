@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _serviceProviderDetail = serviceProviderDetail;
         }
 
-        public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproDetailID)
+        public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproDetailID,TransactionQueue TQ)
         {
             RouteConfiguration routeConfiguration;
             ThirdPartyAPIConfiguration thirdPartyAPIConfiguration;
@@ -56,8 +57,25 @@ namespace CleanArchitecture.Infrastructure.Services
                 return thirdPartyAPIRequest;
             }
 
-            keyValuePairs.Add("#SMSCODE#", routeConfiguration.OpCode);
-            keyValuePairs.Add("#WALLETID#", routeConfiguration.ProviderWalletID);
+            keyValuePairs.Add("#OPERATORCODE#", routeConfiguration.OpCode);
+            //keyValuePairs.Add("#WALLETID#", routeConfiguration.ProviderWalletID);
+            keyValuePairs.Add("#ORGADDRESS#", routeConfiguration.ProviderWalletID);// Org Wallet Address/ID  
+
+            if (!string.IsNullOrEmpty(thirdPartyAPIConfiguration.TimeStamp))
+                keyValuePairs.Add("#TIMESTAMP#", Helpers.UTC_To_IST().ToString(thirdPartyAPIConfiguration.TimeStamp));
+
+            if (TQ != null)//Rita 25-10-2018 incase of transation
+            {
+                keyValuePairs.Add("#SMSCODE#", TQ.SMSCode);
+                keyValuePairs.Add("#TRANSACTIONID#", TQ.Id.ToString());
+                keyValuePairs.Add("#AMOUNT#", TQ.Amount.ToString());                
+                keyValuePairs.Add("#USERADDRESS#", TQ.TransactionAccount);
+                keyValuePairs.Add("#CONVERTEDAMT#", (routeConfiguration.ConvertAmount * TQ.Amount).ToString());
+            }
+            else//In case of Wallet Operation
+            {
+
+            }
 
             //Rushabh 11-10-2018 For Authorization Header
             if (thirdPartyAPIConfiguration.AuthHeader != string.Empty)

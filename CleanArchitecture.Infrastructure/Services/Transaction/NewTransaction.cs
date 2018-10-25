@@ -597,7 +597,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         MarkTransactionOperatorFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                         continue;
                     }
-                    ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID);
+                    ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID, Newtransaction);
                     Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
                     //Insert API request Data
                     _TransactionObj.TransactionRequestID = InsertTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody);
