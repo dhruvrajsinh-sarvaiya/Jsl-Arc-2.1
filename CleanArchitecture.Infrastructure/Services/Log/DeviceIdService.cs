@@ -109,7 +109,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public void UpdateDeviceId(DeviceMasterViewModel model)
         {
-            var DeviceIddata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && i.IsDeleted);
+            var DeviceIddata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsDeleted);
             if (DeviceIddata != null)
             {
                 var currentDeviceId = new DeviceMaster
@@ -131,7 +131,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public long DesableDeviceId(DeviceMasterViewModel model)
         {
-            var Devicedata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && i.IsDeleted);
+            var Devicedata = _deviceMasterRepository.Table.FirstOrDefault(i => i.DeviceId == model.DeviceId && i.UserId == model.UserId && !i.IsDeleted);
             if (Devicedata != null)
             {
                 Devicedata.SetAsIsEnabletatus();

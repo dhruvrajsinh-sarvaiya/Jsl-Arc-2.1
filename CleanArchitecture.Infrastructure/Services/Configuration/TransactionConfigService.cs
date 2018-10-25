@@ -203,6 +203,11 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 ////Add Into WalletMaster For Default Organization
                 //int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
                 //var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1);
+
+                //Add BaseCurrency In MarketEntity
+                var marketViewModel = new MarketViewModel { CurrencyName = Request.SMSCode, isBaseCurrency = 1, ServiceID = newServiceMaster.Id };
+                AddMarketData(marketViewModel);
+
                 return newServiceMaster.Id;
             }
             catch (Exception ex)
@@ -2642,8 +2647,20 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         {
             try
             {
-                MarketViewModel marketView = new MarketViewModel();
-                return marketView;
+                Market market = new Market
+                {
+                    CurrencyName = viewModel.CurrencyName,
+                    ServiceID = viewModel.ServiceID,
+                    isBaseCurrency = viewModel.isBaseCurrency,
+                    Status = Convert.ToInt16(ServiceStatus.Active),
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedBy = null
+                };
+                var newMarket = _marketRepository.Add(market);
+
+                return viewModel;
             }
             catch (Exception ex)
             {

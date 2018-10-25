@@ -139,7 +139,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public void UpdateIpAddress(IpMasterViewModel model)
         {
-            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && i.IsDeleted);
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (IpAddress != null)
             {
                 var currentIpAddress = new IpMaster
@@ -161,7 +161,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public async Task<long> DesableIpAddress(IpMasterViewModel model)
         {
-            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && i.IsDeleted);
+            var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (IpAddress != null)
             {              
                 IpAddress.SetAsIsEnabletatus();
