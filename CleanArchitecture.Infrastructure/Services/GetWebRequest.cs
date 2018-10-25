@@ -56,8 +56,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 return thirdPartyAPIRequest;
             }
 
-            keyValuePairs.Add("##SMSCODE##", routeConfiguration.OpCode);
-            keyValuePairs.Add("##WALLETID##", routeConfiguration.ProviderWalletID);
+            keyValuePairs.Add("#SMSCODE#", routeConfiguration.OpCode);
+            keyValuePairs.Add("#WALLETID#", routeConfiguration.ProviderWalletID);
 
             //Rushabh 11-10-2018 For Authorization Header
             if (thirdPartyAPIConfiguration.AuthHeader != string.Empty)
@@ -69,6 +69,8 @@ namespace CleanArchitecture.Infrastructure.Services
                     string[] item = mainItem.Split(":");
                     //thirdPartyAPIRequest.RequestURL = thirdPartyAPIRequest.RequestURL.Replace(item[0], item[1]);
                     //thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item[0], item[1]);
+                    string authInfo = ServiceProConfiguration.UserName + ":" + ServiceProConfiguration.Password;
+                    item[1] = item[1].Replace("#BASIC#", Convert.ToBase64String(Encoding.Default.GetBytes(authInfo)));
                     keyValuePairsHeader.Add(item[0], item[1]);
 
                 }
@@ -82,13 +84,14 @@ namespace CleanArchitecture.Infrastructure.Services
                     thirdPartyAPIRequest.RequestBody = thirdPartyAPIRequest.RequestBody.Replace(item.Key, item.Value);
                 }                
             }
-            if(thirdPartyAPIConfiguration.AuthHeader == "RPC")
-            {
-                string authInfo = ServiceProConfiguration.UserName + ":" + ServiceProConfiguration.Password;
-                authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
-                authInfo = "Basic " + authInfo;
-                keyValuePairsHeader.Add("Authorization", authInfo);                
-            }
+            //Rita 25-10-2018 added in common dynamic header part
+            //if(thirdPartyAPIConfiguration.AuthHeader == "RPC")
+            //{
+            //    string authInfo = ServiceProConfiguration.UserName + ":" + ServiceProConfiguration.Password;
+            //    authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+            //    authInfo = "Basic " + authInfo;
+            //    keyValuePairsHeader.Add("Authorization", authInfo);                
+            //}
             thirdPartyAPIRequest.keyValuePairsHeader = keyValuePairsHeader;
 
             thirdPartyAPIRequest.DelayAddress = routeConfiguration.IsDelayAddress;

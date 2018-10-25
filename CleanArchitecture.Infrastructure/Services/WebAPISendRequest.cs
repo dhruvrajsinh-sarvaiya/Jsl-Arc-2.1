@@ -169,18 +169,19 @@ namespace CleanArchitecture.Infrastructure.Services
             return responseFromServer;
         }
 
-        public string SendJsonRpcAPIRequestAsync(string Url,string RequestStr,string UserName,string Password)
+        public string SendJsonRpcAPIRequestAsync(string Url,string RequestStr,string UserName,string Password,WebHeaderCollection headerDictionary = null)
         {
             try
             {
                 string WSResponse = "";
                 try
                 {
-                    var authInfo = UserName + ":" + Password;
-                    authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+                    //var authInfo = UserName + ":" + Password;
+                    //authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
                     var myReqrpc = WebRequest.Create(Url);
-                    myReqrpc.Headers.Add("Authorization", "Basic " + authInfo);
+                    //myReqrpc.Headers.Add("Authorization", "Basic " + authInfo);
+                    myReqrpc.Headers = headerDictionary;
                     myReqrpc.Method = "Post";
 
                     var sw = new StreamWriter(myReqrpc.GetRequestStream());
