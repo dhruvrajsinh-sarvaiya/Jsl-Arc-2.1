@@ -186,5 +186,8 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessEnableIpStatus = "Success full enable ip address.";
         public static string SuccessEnableDeviceId = "Success full enable device Id.";
         public static string SuccessDisableDeviceId = "Success full disable device id.";
+
+        public static string InvalidFaceBookToken = "Invalid FaceBook access token.";
+        public static string InvalidFaceBookProviderKey = "Invalid FaceBook provider key.";
     }
 }
