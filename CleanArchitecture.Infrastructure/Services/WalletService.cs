@@ -539,7 +539,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 10-10-2018 Insert into WalletMaster table
-        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId)
+        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId,int isBaseService = 0)
         {
             bool IsValid = true;
             decimal Balance = 0;
@@ -585,11 +585,14 @@ namespace CleanArchitecture.Infrastructure.Services
                     _WalletAllowTrnRepository.Add(w);
                 }
                 //genrate address and update in walletmaster
-                var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
-                //walletMaster.PublicAddress = addressClass.address;
-                walletMaster.WalletPublicAddress(addressClass.address);
-                _commonRepository.Update(walletMaster);
-
+                if (isBaseService == 0)    //uday 25-10-2018 When Service is add create default wallet of org not generate the address
+                {
+                    var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
+                    //walletMaster.PublicAddress = addressClass.address;
+                    walletMaster.WalletPublicAddress(addressClass.address);
+                    _commonRepository.Update(walletMaster);
+                }
+       
                 //set the response object value
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
@@ -1281,13 +1284,14 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
         //vsolanki 24-10-2018
-        public ListBalanceResponse GetAvailableBalance(long userid, long walletId)
+        public ListBalanceResponse GetAvailableBalance(long userid, string walletId)
         {
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetAvailableBalance(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+                var response = _walletRepository1.GetAvailableBalance(userid, wallet.Id);
                 if (response.Count == 0)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1336,13 +1340,14 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 24-10-2018
-        public ListBalanceResponse GetUnSettledBalance(long userid, long walletId)
+        public ListBalanceResponse GetUnSettledBalance(long userid, string walletId)
         {
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetUnSettledBalance(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+                var response = _walletRepository1.GetUnSettledBalance(userid, wallet.Id);
                 if (response.Count == 0)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1388,13 +1393,14 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
         //vsolanki 24-10-2018
-        public ListBalanceResponse GetUnClearedBalance(long userid, long walletId)    
+        public ListBalanceResponse GetUnClearedBalance(long userid, string walletId)
         {
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetUnClearedBalance(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+                var response = _walletRepository1.GetUnClearedBalance(userid, wallet.Id);
                 if (response.Count == 0)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1440,13 +1446,15 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
         //vsolanki 24-10-2018
-        public ListStackingBalanceRes GetStackingBalance(long userid, long walletId)
+        public ListStackingBalanceRes GetStackingBalance(long userid, string walletId)
         {
             ListStackingBalanceRes Response = new ListStackingBalanceRes();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetStackingBalance(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+
+                var response = _walletRepository1.GetStackingBalance(userid, wallet.Id);
                 if (response.Count == 0)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1492,13 +1500,15 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
         //vsolanki 24-10-2018
-        public ListBalanceResponse GetShadowBalance(long userid, long walletId)
+        public ListBalanceResponse GetShadowBalance(long userid, string walletId)
         {
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetShadowBalance(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+
+                var response = _walletRepository1.GetShadowBalance(userid, wallet.Id);
                 if (response.Count == 0)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1544,14 +1554,16 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
         //vsolanki 24-10-2018
-        public AllBalanceResponse GetAllBalances(long userid, long walletId)
+        public AllBalanceResponse GetAllBalances(long userid, string walletId)
         {
-            
-              AllBalanceResponse allBalanceResponse = new AllBalanceResponse();
+
+            AllBalanceResponse allBalanceResponse = new AllBalanceResponse();
             allBalanceResponse.BizResponseObj = new BizResponseClass();
             try
             {
-                var response = _walletRepository1.GetAllBalances(userid, walletId);
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
+
+                var response = _walletRepository1.GetAllBalances(userid, wallet.Id);
                 if (response == null)
                 {
                     allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1562,7 +1574,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Success;
                 allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 allBalanceResponse.Balance = response;
-                var wallet = _commonRepository.GetById(walletId);
+               // var wallet = _commonRepository.GetById(walletId);
                 var walletType = _WalletTypeMasterRepository.GetById(wallet.WalletTypeID);
                 allBalanceResponse.WalletType = walletType.WalletTypeName;
                 allBalanceResponse.WalletName = wallet.Walletname;
@@ -1735,6 +1747,31 @@ namespace CleanArchitecture.Infrastructure.Services
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+
+        //vsolanki 25-10-2018
+        public List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType)
+        {
+            AllBalanceTypeWiseRes a = new AllBalanceTypeWiseRes();
+            List<AllBalanceTypeWiseRes> Response = new List<AllBalanceTypeWiseRes>();
+            a.Wallet = new WalletResponse();
+            a.Wallet.Balance = new Balance();
+            var listWallet = _walletRepository1.GetWalletMasterResponseByCoin(userId, WalletType);
+            for (int i = 0; i <= listWallet.Count-1; i++)
+            {
+                var wallet = _commonRepository.GetSingle(item => item.AccWalletID == listWallet[i].AccWalletID);
+                var response = _walletRepository1.GetAllBalances(userId, wallet.Id);
+
+                a.Wallet.AccWalletID = listWallet[i].AccWalletID;
+                a.Wallet.PublicAddress = listWallet[i].PublicAddress;
+                a.Wallet.WalletName = listWallet[i].WalletName;
+                a.Wallet.IsDefaultWallet = listWallet[i].IsDefaultWallet;
+                a.Wallet.TypeName = listWallet[i].CoinName;
+                
+                a.Wallet.Balance = response;
+                Response.Add(a);
+            }
+            return Response;
         }
 
 

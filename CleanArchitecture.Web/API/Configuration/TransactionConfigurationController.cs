@@ -144,6 +144,62 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
+
+        [HttpGet("GetBaseMarket")]
+        public IActionResult GetBaseMarket()
+        {
+            MarketResponse Response = new MarketResponse();
+            try
+            {
+                var responsedata = _transactionConfigService.GetAllMarketData();
+                if (responsedata == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+        [HttpGet("GetAllServiceConfigurationByBase/{Base}")]
+        public IActionResult GetAllServiceConfigurationByBase(String Base)
+        {
+            GetServiceByBaseReasponse Response = new GetServiceByBaseReasponse();
+            try
+            {
+
+                var responsedata = _transactionConfigService.GetAllServiceConfigurationByBase(Base);
+                
+                if (responsedata == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
         [HttpPost("SetActiveService/{ServiceId}")]
         public IActionResult SetActiveService(long ServiceId)
         {
@@ -207,6 +263,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 return Ok(Response);
             }
         }
+
 
         #endregion
 

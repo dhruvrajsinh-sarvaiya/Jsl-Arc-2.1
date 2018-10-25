@@ -179,6 +179,7 @@ namespace CleanArchitecture.Core.Enums
         Status423Locked = 423,
         Status4013MobileInvalid = 4013,
         Status4020IpInvalid = 4020,
+        Status4032LoginFailed = 4032,
         Status4033NotFoundRecored = 4033,
         Status4034UnableUpdateUser = 4034,
         Status4035UnableToAddIpAddress = 4035,
@@ -227,7 +228,15 @@ namespace CleanArchitecture.Core.Enums
         Status4083IpAddressExist = 4083,
         Status4084DeviceIdExist = 4084,
         Status4079TwoFAcodeInvalide = 4079,
-
+        Status4085LoginWithOtpDatanotSend = 4085,
+        Status4086LoginWithOtpLoginFailed = 4086,
+        Status4087EmailFail = 4087,
+        Status4088LoginWithOtpInvalidAttempt = 4088,
+        Status4089LoginEmailOTPNotsend = 4089,
+        Status4090OTPSendOnMobile = 4090,
+        Status4091LoginMobileNumberInvalid = 4091,
+        Status4096InvalidFaceBookToken = 4096,
+        Status4097InvalidFaceBookProviderKey = 4097,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -346,8 +355,40 @@ namespace CleanArchitecture.Core.Enums
         GrpMsg = 3,
         Channel = 4
     }
-    public enum SignalRMethodName
+    
+    public enum SubscriptionType
     {
-
+        OneToOne = 1,
+        Broadcast = 2
+    }
+    public enum UserWiseMethodName
+    {
+        OpenOrder=1,
+        OrderHistory=2,
+        TradeHistory=3,
+        ActivityNotification=4
+    }
+    public enum PairWiseMethodName
+    {
+        BuyerBook=5,
+        SellerBook=6,
+        TradingHistory=7,
+        MarketData=8,
+        Price=9,
+        BuyerSideWallet=10,
+        SellerSideWallet=11,
+        ChartData=12
+    }
+    public enum MarketWiseMethodName
+    {
+        PairData=13,
+        MarketTicker=14
+    }
+    public enum GlobalMethodName
+    {
+        Chat=15,
+        News=16,
+        Announcement=17,
+        Time=18
     }
 }

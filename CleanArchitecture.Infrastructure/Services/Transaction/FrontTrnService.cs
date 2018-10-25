@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
@@ -29,6 +30,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<TradeTransactionQueue> _tradeTransactionQueueRepository;
         private readonly ICommonRepository<SettledTradeTransactionQueue> _settelTradeTranQueue;
         private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
+        private readonly ICommonRepository<Market> _marketRepository;
 
         public FrontTrnService(IFrontTrnRepository frontTrnRepository,
             ICommonRepository<TradePairMaster> tradeMasterRepository,
@@ -37,7 +39,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ICommonRepository<ServiceMaster> serviceMasterRepository,
             ICommonRepository<TradeTransactionQueue> tradeTransactionQueueRepository,
             ICommonRepository<SettledTradeTransactionQueue> settelTradeTranQueue,
-            ICommonRepository<TradePairStastics> tradePairStastics)
+            ICommonRepository<TradePairStastics> tradePairStastics,
+            ICommonRepository<Market> marketRepository)
 
         {
             _frontTrnRepository = frontTrnRepository;
@@ -48,6 +51,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _tradeTransactionQueueRepository = tradeTransactionQueueRepository;
             _settelTradeTranQueue = settelTradeTranQueue;
             _tradePairStastics = tradePairStastics;
+            _marketRepository = marketRepository;
         }
 
         #region method
@@ -61,21 +65,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             try
             {
                 responsedata = new List<BasePairResponse>();
-                var basePairData = _tradeMasterRepository.GetAll().GroupBy(x => x.BaseCurrencyId).Select(x => x.FirstOrDefault());
+                var basePairData = _marketRepository.GetAll();
+                //var basePairData = _tradeMasterRepository.GetAll().GroupBy(x => x.BaseCurrencyId).Select(x => x.FirstOrDefault());
 
                 if (basePairData != null)
                 {
                     foreach (var bpair in basePairData)
                     {
                         BasePairResponse basePair = new BasePairResponse();
-                        var baseService = _serviceMasterRepository.GetSingle(x => x.Id == bpair.BaseCurrencyId);
+                        var baseService = _serviceMasterRepository.GetSingle(x => x.Id == bpair.ServiceID);
 
                         basePair.BaseCurrencyId = baseService.Id;
                         basePair.BaseCurrencyName = baseService.Name;
                         basePair.Abbrevation = baseService.SMSCode;
 
                         List<TradePairRespose> pairList = new List<TradePairRespose>();
-                        var pairMasterData = _tradeMasterRepository.FindBy(x => x.BaseCurrencyId == bpair.BaseCurrencyId);
+                        var pairMasterData = _tradeMasterRepository.FindBy(x => x.BaseCurrencyId == bpair.ServiceID);
                         foreach (var pmdata in pairMasterData)
                         {
                             TradePairRespose tradePair = new TradePairRespose();
@@ -283,24 +288,32 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public List<RecentOrderInfo> GetRecentOrder(long PairId)
+        public List<RecentOrderInfo> GetRecentOrder(long PairId, long MemberID)
         {
             try
             {
-                var list = _frontTrnRepository.GetRecentOrder(PairId);
+                string st = "";
+                var list = _frontTrnRepository.GetRecentOrder(PairId, MemberID);
                 List<RecentOrderInfo> responce = new List<RecentOrderInfo>();
                 if (list != null)
                 {
                     foreach (RecentOrderRespose model in list)
                     {
+                        if (model.Status == Convert.ToInt16(enTransactionStatus.Success))
+                            st = "Success";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                            st = "Hold";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.SystemFail))
+                            st = "Fail";
+
                         responce.Add(new RecentOrderInfo
                         {
                             Qty = model.Qty,
                             DateTime = model.DateTime.Date,
                             Price = model.Price,
-                            Status = model.Status,
                             TrnNo = model.TrnNo,
                             Type = model.Type,
+                            Status = st
                         });
                     }
                 }
@@ -393,7 +406,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 {
 
                     var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pairMasterData.Id);
-
                     var baseService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.BaseCurrencyId);
                     var chidService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.SecondaryCurrencyId);
                     var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pairMasterData.Id);

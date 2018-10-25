@@ -42,6 +42,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly IWalletService _walletService;
         private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
         private readonly ICommonRepository<Market> _marketRepository;
+
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
             ICommonRepository<ServiceDetail> serviceDetailRepository,
@@ -201,12 +202,15 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 _serviceMasterRepository.Update(newServiceMaster);
 
                 ////Add Into WalletMaster For Default Organization
-                //int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
-                //var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org" + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1);
+                int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
+                var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org " + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1,1);
 
                 //Add BaseCurrency In MarketEntity
-                var marketViewModel = new MarketViewModel { CurrencyName = Request.SMSCode, isBaseCurrency = 1, ServiceID = newServiceMaster.Id };
-                AddMarketData(marketViewModel);
+                if (Request.IsBaseCurrency == 1)
+                {
+                    var marketViewModel = new MarketViewModel { CurrencyName = Request.SMSCode, isBaseCurrency = 1, ServiceID = newServiceMaster.Id };
+                    AddMarketData(marketViewModel);
+                }
 
                 return newServiceMaster.Id;
             }
@@ -480,6 +484,41 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     return 1;
                 }
                 return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public List<ServiceCurrencyData> GetAllServiceConfigurationByBase(String Base)
+        {
+            List<ServiceCurrencyData> responsedata;
+            try
+            {
+                var CheckBase = _marketRepository.GetSingle(m => m.CurrencyName == Base);
+                if (CheckBase == null)
+                    return null;
+                responsedata = new List<ServiceCurrencyData>();
+                var model = _serviceMasterRepository.GetSingle(ser => ser. SMSCode== Base);
+                if (model == null)
+                    return null;
+                var serviceid = model.Id;
+
+                var modellist = _serviceMasterRepository.List();
+                foreach (var modelData in modellist)
+                {
+                    if (modelData.Id == serviceid)
+                        continue;
+                    responsedata.Add(new ServiceCurrencyData()
+                    {
+                        Name = modelData.Name,
+                        ServiceId =modelData.Id,
+                        SMSCode =modelData .SMSCode
+                    });
+                }
+                return responsedata;
             }
             catch (Exception ex)
             {
@@ -1756,7 +1795,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         ResponseFailure = model.ResponseFailure,
                         ResponseHold = model.ResponseHold,
                         ResponseSuccess = model.ResponseSuccess,
-                        SerProConfigurationID = model.SerProConfigurationID,
+                        //SerProConfigurationID = model.SerProConfigurationID,
                         TransactionIdPrefix = model.TransactionIdPrefix
                     });
                 }
@@ -1800,7 +1839,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ResponseFailure =model .ResponseFailure ,
                     ResponseHold =model .ResponseHold ,
                     ResponseSuccess =model .ResponseSuccess,
-                    SerProConfigurationID =model .SerProConfigurationID,
+                    //SerProConfigurationID =model .SerProConfigurationID,
                     TransactionIdPrefix =model .TransactionIdPrefix
                 };
                 return viewmodel;
@@ -1839,7 +1878,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     ResponseFailure = request.ResponseFailure,
                     ResponseHold = request.ResponseHold,
                     ResponseSuccess = request.ResponseSuccess,
-                    SerProConfigurationID = request.SerProConfigurationID,
+                    //SerProConfigurationID = request.SerProConfigurationID,
                     TransactionIdPrefix = request.TransactionIdPrefix
                     
                 };
@@ -1881,7 +1920,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 model.ResponseFailure = request.ResponseFailure;
                 model.ResponseHold = request.ResponseHold;
                 model.ResponseSuccess = request.ResponseSuccess;
-                model.SerProConfigurationID = request.SerProConfigurationID;
+                //model.SerProConfigurationID = request.SerProConfigurationID;
                 model.TransactionIdPrefix = request.TransactionIdPrefix;
                 model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedBy = 1;
@@ -2267,6 +2306,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     responsedata.SellMaxPrice = pairDetail.SellMaxPrice;
                     responsedata.BuyFees = pairDetail.BuyFees;
                     responsedata.SellFees = pairDetail.SellFees;
+                    responsedata.FeesCurrency = pairDetail.FeesCurrency;
 
                     var pairStastics = _tradePairStastics.GetSingle(pair => pair.PairId == PairId);
                     responsedata.Volume = pairStastics.ChangeVol24;
@@ -2319,6 +2359,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         response.SellMaxPrice = pairDetail.SellMaxPrice;
                         response.BuyFees = pairDetail.BuyFees;
                         response.SellFees = pairDetail.SellFees;
+                        response.FeesCurrency = pairDetail.FeesCurrency;
 
                         var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pair.Id);
                         response.Volume = pairStastics.ChangeVol24;
@@ -2674,6 +2715,18 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 List<MarketViewModel> list = new List<MarketViewModel>();
+                var modellist = _marketRepository.List();
+
+                foreach (var model in modellist)
+                {
+                    list.Add(new MarketViewModel()
+                    {
+                        ID = model.Id,
+                        CurrencyName = model.CurrencyName,
+                        ServiceID = model.ServiceID,
+                        isBaseCurrency = model.isBaseCurrency,
+                    });
+                }
                 return list;
             }
             catch (Exception ex)
@@ -2683,11 +2736,19 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public MarketViewModel GetMarketDataByMarket(string market)
+        public MarketViewModel GetMarketDataByMarket(long Id)
         {
             try
             {
                 MarketViewModel marketView = new MarketViewModel();
+                var model = _marketRepository.GetById(Id);
+                if (model == null)
+                    return null;
+
+                marketView.CurrencyName = model.CurrencyName;
+                marketView.ID = model.Id;
+                marketView.isBaseCurrency = model.isBaseCurrency;
+                marketView.ServiceID = model.ServiceID;
                 return marketView;
             }
             catch (Exception ex)

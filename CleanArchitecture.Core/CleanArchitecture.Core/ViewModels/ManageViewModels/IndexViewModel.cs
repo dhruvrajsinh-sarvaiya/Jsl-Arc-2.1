@@ -17,6 +17,12 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels
         [Phone]
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; }
+
+        [Phone]
+        [Display(Name = "Mobile number")]
+        public string MobileNo { get; set; }
+
+        public bool TwoFactorEnabled { get; set; }
         //public string RedisDBKey { get; set; }
     }
 

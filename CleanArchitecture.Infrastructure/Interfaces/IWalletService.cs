@@ -25,7 +25,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();
 
         //vsolanki 10-10-2018
-        CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId);
+        CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId, int isBaseService = 0);
 
         //ntrivedi 11-10-2018
         BizResponseClass DebitBalance(long userID, long WalletID, decimal amount, int walletTypeID, enWalletTrnType wtrnType, enTrnType trnType, enServiceType serviceType, long trnNo, string smsCode);
@@ -61,22 +61,22 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListWalletAddressResponse GetAddress(string AccWalletID);
 
         //vsolanki 24-10-2018
-        ListBalanceResponse GetAvailableBalance(long userid, long walletId);
+        ListBalanceResponse GetAvailableBalance(long userid, string walletId);
         TotalBalanceRes GetAllAvailableBalance(long userid);
         //vsolanki 24-10-2018
-        ListBalanceResponse GetUnSettledBalance(long userid, long walletId);
+        ListBalanceResponse GetUnSettledBalance(long userid, string walletId);
         ListBalanceResponse GetAllUnSettledBalance(long userid);
         //vsolanki 24-10-2018
-        ListBalanceResponse GetUnClearedBalance(long userid, long walletId);
+        ListBalanceResponse GetUnClearedBalance(long userid, string walletId);
         ListBalanceResponse GetAllUnClearedBalance(long userid);
         //vsolanki 24-10-2018
-        ListStackingBalanceRes GetStackingBalance(long userid, long walletId);
+        ListStackingBalanceRes GetStackingBalance(long userid, string walletId);
         ListStackingBalanceRes GetAllStackingBalance(long userid);
         //vsolanki 24-10-2018
-        ListBalanceResponse GetShadowBalance(long userid, long walletId);
+        ListBalanceResponse GetShadowBalance(long userid, string walletId);
         ListBalanceResponse GetAllShadowBalance(long userid);
         //vsolanki 24-10-2018
-        AllBalanceResponse GetAllBalances(long userid, long walletId);
+        AllBalanceResponse GetAllBalances(long userid, string walletId);
         // vsolanki 25-10-2018
         TotalBalanceRes GetAvailbleBalTypeWise(long userid);
 
@@ -86,5 +86,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
         UserPreferencesRes GetPreferences(long Userid);
         BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] request, long id);
+
+        //vsolanki 25-10-2018
+        List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType);
     }
 }
