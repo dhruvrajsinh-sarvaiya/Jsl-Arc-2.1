@@ -540,7 +540,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
         //vsolanki 24-10-2018
         public List<BalanceResponse> GetAllAvailableBalance(long userid)
-        {         
+        {      
             List<BalanceResponse> items = (from w in _dbContext.WalletMasters
                                            join wt in _dbContext.WalletTypeMasters
                                                    on w.WalletTypeID equals wt.Id
@@ -553,6 +553,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                            }).AsEnumerable().ToList();
             return items;
         }
+
         public decimal GetTotalAvailbleBal(long userid)
         {
             var total = (from w in _dbContext.WalletMasters
@@ -802,6 +803,22 @@ namespace CleanArchitecture.Infrastructure.Data
 
             return new Balance { UnSettledBalance = Unsettled ,AvailableBalance=availble, UnClearedBalance = UnClearedBalance, ShadowBalance = ShadowBalance, StackingBalance = StackingBalance };
 
+        }
+
+        //vsolanki 25-10-2018
+        public List<BalanceResponse> GetAvailbleBalTypeWise(long userid)
+        {
+            var result = (from w in _dbContext.WalletMasters
+                          join wt in _dbContext.WalletTypeMasters
+                          on w.WalletTypeID equals wt.Id
+                          where  w.UserID == userid && w.Status ==1
+                          group w by new { w.Balance,wt.WalletTypeName } into g
+                          select new BalanceResponse
+                          {
+                              Balance = g.Sum(order => order.Balance),
+                              WalletType = g.Key.WalletTypeName,
+                          }).AsEnumerable().ToList();
+            return result;
         }
     }
 }

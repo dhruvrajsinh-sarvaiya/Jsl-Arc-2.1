@@ -67,5 +67,7 @@ namespace CleanArchitecture.Core.Interfaces
         List<BalanceResponse> GetAllShadowBalance(long userid);
         Balance GetAllBalances(long userid, long walletid);
         decimal GetTotalAvailbleBal(long userid);
+        //vsolanki 25-10-2018
+        List<BalanceResponse> GetAvailbleBalTypeWise(long userid);
     }
 }

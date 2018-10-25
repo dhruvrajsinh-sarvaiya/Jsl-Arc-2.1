@@ -77,5 +77,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListBalanceResponse GetAllShadowBalance(long userid);
         //vsolanki 24-10-2018
         AllBalanceResponse GetAllBalances(long userid, long walletId);
+        // vsolanki 25-10-2018
+        TotalBalanceRes GetAvailbleBalTypeWise(long userid);
     }
 }

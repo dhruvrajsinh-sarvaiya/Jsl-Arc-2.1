@@ -1571,5 +1571,34 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
+        //vsolanki 25-10-2018
+        public TotalBalanceRes GetAvailbleBalTypeWise(long userid)
+        {
+            TotalBalanceRes Response = new TotalBalanceRes();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                var response = _walletRepository1.GetAvailbleBalTypeWise(userid);
+                decimal total = _walletRepository1.GetTotalAvailbleBal(userid);
+                if (response.Count == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.Response = response;
+                Response.TotalBalance = total;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 }
