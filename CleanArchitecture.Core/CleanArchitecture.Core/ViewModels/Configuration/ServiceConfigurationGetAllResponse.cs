@@ -11,5 +11,14 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     {
         public List<ServiceConfigurationRequest> response { get; set; }
     }
-
+    public class GetServiceByBaseReasponse : BizResponseClass
+    {
+        public List<ServiceCurrencyData> response { get; set; }
+    }
+    public class ServiceCurrencyData
+    {
+        public long ServiceId { get; set; }
+        public string Name { get; set; }
+        public string SMSCode { get; set; }
+    }
 }
