@@ -374,6 +374,91 @@ namespace CleanArchitecture.Web.API
                 return BadRequest(Response);
             }
         }
+
+        [HttpPost("{AccWalletID}/{BeneficiaryAddress}")]
+        public async Task<IActionResult> AddBeneficiary(string AccWalletID, string BeneficiaryAddress)
+        {
+            BeneficiaryResponse response = new BeneficiaryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.AddBeneficiary(AccWalletID, BeneficiaryAddress, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("{AccWalletID}")]
+        public async Task<IActionResult> GetWhitelistedBeneficiaries(string AccWalletID)
+        {
+            BeneficiaryResponse response = new BeneficiaryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.ListWhitelistedBeneficiary(AccWalletID, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
+
+
+        [HttpGet("{AccWalletID}")]
+        public async Task<IActionResult> GetAllBeneficiaries(string AccWalletID)
+        {
+            BeneficiaryResponse response = new BeneficiaryResponse();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    response.BizResponse.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    response.BizResponse.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    response = _walletService.ListBeneficiary(AccWalletID, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest();
+            }
+        }
     }
 }
 

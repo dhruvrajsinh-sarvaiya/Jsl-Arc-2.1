@@ -77,5 +77,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListBalanceResponse GetAllShadowBalance(long userid);
         //vsolanki 24-10-2018
         AllBalanceResponse GetAllBalances(long userid, long walletId);
+
+        BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId);
+        BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
+        BeneficiaryResponse ListBeneficiary(string accWalletID, long id);
     }
 }
