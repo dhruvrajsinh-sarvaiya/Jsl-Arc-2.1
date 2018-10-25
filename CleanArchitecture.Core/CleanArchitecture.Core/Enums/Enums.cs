@@ -362,4 +362,9 @@ namespace CleanArchitecture.Core.Enums
     {
 
     }
+    public enum SubscriptionType
+    {
+        OneToOne = 1,
+        Broadcast = 2
+    }
 }

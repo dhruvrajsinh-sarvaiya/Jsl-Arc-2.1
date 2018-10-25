@@ -15,7 +15,7 @@ namespace CleanArchitecture.Core.Interfaces
         List<GetTradeHistoryInfo> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll);
         long GetPairIdByName(string pair);
         bool IsValidPairName(string Pair);
-        List<RecentOrderInfo> GetRecentOrder(long PairId);
+        List<RecentOrderInfo> GetRecentOrder(long PairId,long MemberID);
         List<GetBuySellBook> GetBuyerBook(long id);
         List<GetBuySellBook> GetSellerBook(long id);
         bool IsValidDateFormate(string date);
@@ -27,6 +27,6 @@ namespace CleanArchitecture.Core.Interfaces
         GetGraphDetailInfo GetGraphDetail(long PairId);
         MarketCapData GetMarketCap(long PairId);
         VolumeDataRespose GetVolumeDataByPair(long PairId);
-        bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);
+        bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);        
     }
 }

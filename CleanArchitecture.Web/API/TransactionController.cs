@@ -191,7 +191,6 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-
         [HttpPost("GetTradeHistory")]
         [Authorize]
         public async Task<ActionResult> GetTradeHistory([FromBody] TradeHistoryRequest request)
@@ -392,12 +391,14 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetRecentOrder/{Pair}")] //binance https://api.binance.com//api/v1/trades?symbol=LTCBTC
-        public IActionResult GetRecentOrder(string Pair)
+        [HttpPost("GetRecentOrder/{Pair}")] //binance https://api.binance.com//api/v1/trades?symbol=LTCBTC
+        [Authorize]
+        public async Task<IActionResult> GetRecentOrder(string Pair)
         {
             GetRecentTradeResponce Response = new GetRecentTradeResponce();
             try
             {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 if (!_frontTrnService.IsValidPairName(Pair))
                 {
                     Response.ReturnCode = enResponseCode.Fail;
@@ -411,7 +412,8 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.InvalidPairName;
                     return BadRequest(Response);
                 }
-                Response.responce = _frontTrnService.GetRecentOrder(PairId);
+                long MemberID = user.Id;
+                Response.responce = _frontTrnService.GetRecentOrder(PairId,MemberID);
                 if (Response.responce.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;

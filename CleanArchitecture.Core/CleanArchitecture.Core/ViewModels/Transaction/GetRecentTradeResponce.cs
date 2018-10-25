@@ -16,6 +16,6 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public Decimal Price { get; set; }
         public Decimal Qty { get; set; }
         public DateTime DateTime { get; set; }
-        public short Status { get; set; }
+        public string Status { get; set; }
     }
 }
