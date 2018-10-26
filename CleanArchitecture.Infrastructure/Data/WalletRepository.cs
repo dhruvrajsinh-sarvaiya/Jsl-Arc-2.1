@@ -483,7 +483,8 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            LimitPerHour = u.LimitPerHour,
                                                            LimitPerTransaction = u.LimitPerTransaction,
                                                            AccWalletID = c.AccWalletID,
-                                                           //EndTime=c.EndTime
+                                                           EndTime = u.EndTime,
+                                                           StartTime = u.StartTime                                                           
                                                        }).AsEnumerable().ToList();
             return items;
         }
