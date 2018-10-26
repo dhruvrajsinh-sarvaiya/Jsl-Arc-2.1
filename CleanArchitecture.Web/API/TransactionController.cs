@@ -446,28 +446,32 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpPost("GetRecentOrder/{Pair}")] //binance https://api.binance.com//api/v1/trades?symbol=LTCBTC
+        [HttpPost("GetRecentOrder")] //binance https://api.binance.com//api/v1/trades?symbol=LTCBTC
         [Authorize]
-        public async Task<IActionResult> GetRecentOrder(string Pair)
+        public async Task<IActionResult> GetRecentOrder(string Pair="999")
         {
+            long PairId = 999;
             GetRecentTradeResponce Response = new GetRecentTradeResponce();
             try
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                if (!_frontTrnService.IsValidPairName(Pair))
+                if(Pair != "999")
                 {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
+                    if (!_frontTrnService.IsValidPairName(Pair))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    PairId = _frontTrnService.GetPairIdByName(Pair);
+                    if (PairId == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
                 }
-                long PairId = _frontTrnService.GetPairIdByName(Pair);
-                if (PairId == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
-                }
-                long MemberID = user.Id;
+                long MemberID =user.Id;
                 Response.responce = _frontTrnService.GetRecentOrder(PairId,MemberID);
                 if (Response.responce.Count == 0)
                 {
@@ -486,24 +490,28 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("GetOrderhistory/{Pair}")]
-        public ActionResult GetOrderhistory(string Pair)
+        [HttpGet("GetOrderhistory")]
+        public ActionResult GetOrderhistory(string Pair="999")
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
+            long PairId = 999;
             try
             {
-                if (!_frontTrnService.IsValidPairName(Pair))
+                if(Pair != "999")
                 {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
-                }
-                long PairId = _frontTrnService.GetPairIdByName(Pair);
-                if (PairId == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
+                    if (!_frontTrnService.IsValidPairName(Pair))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    PairId = _frontTrnService.GetPairIdByName(Pair);
+                    if (PairId == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
                 }
                 Response.response = _frontTrnService.GetTradeHistory(PairId, "", "", "", 0, 0);
                 Response.ReturnCode = enResponseCode.Success;
@@ -600,7 +608,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetTradePairByName{Pair}")]
+        [HttpGet("GetTradePairByName/{Pair}")]
         public ActionResult GetTradePairByName(string Pair)
         {
             TradePairByNameResponse Response = new TradePairByNameResponse();
@@ -632,7 +640,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetGraphDetail{Pair}")]
+        [HttpGet("GetGraphDetail/{Pair}")]
         public ActionResult GetGraphDetail(string Pair)
         {
             GetGraphDetailReponse Response = new GetGraphDetailReponse();
@@ -672,7 +680,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("GetMarketCap{Pair}")]
+        [HttpGet("GetMarketCap/{Pair}")]
         public ActionResult GetMarketCap(string Pair)
         {
             MarketCapResponse Response = new MarketCapResponse();
