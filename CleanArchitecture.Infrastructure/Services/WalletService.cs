@@ -594,19 +594,19 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
 
                 //vsolanki 25-10-2018 add Limit for Wallet
-
+                var OrgWallet = _commonRepository.GetSingle(item => item.UserID == userId && item.WalletTypeID == walletMasters.Id);
                 WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
-                var limitConfig = _LimitcommonRepository.GetSingle(item=>item.WalletId==1);
+                var limitConfig = _LimitcommonRepository.GetSingle(item=>item.WalletId== OrgWallet.Id);
                 request.EndTime = limitConfig.EndTime;
                 request.StartTime = limitConfig.StartTime;
                 request.LimitPerDay = limitConfig.LimitPerDay;
                 request.LimitPerHour = limitConfig.LimitPerHour;
                 request.LimitPerTransaction = limitConfig.LimitPerTransaction;
-                enWalletLimitType foo = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
-                request.TrnType = foo; //(enWalletLimitType)limitConfig.TrnType;
+                enWalletLimitType trntype = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
+                request.TrnType = trntype;
                 request.EndTime = limitConfig.EndTime;
-
-                CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request, 1);
+                //insert into limit tbl
+                CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request,userId);
                 //set the response object value
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
