@@ -1111,6 +1111,9 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<decimal>("ConvertAmount")
+                        .HasColumnType("decimal(18, 8)");
+
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
@@ -1269,9 +1272,9 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("ResponseSuccess");
 
-                    b.Property<long>("SerProConfigurationID");
-
                     b.Property<short>("Status");
+
+                    b.Property<string>("TimeStamp");
 
                     b.Property<string>("TransactionIdPrefix");
 
@@ -2707,6 +2710,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<TimeSpan>("EndTime");
+
                     b.Property<decimal?>("LifeTime");
 
                     b.Property<decimal>("LimitPerDay");
@@ -2714,6 +2719,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<decimal>("LimitPerHour");
 
                     b.Property<decimal>("LimitPerTransaction");
+
+                    b.Property<TimeSpan>("StartTime");
 
                     b.Property<short>("Status");
 
@@ -2802,6 +2809,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletID");
+
+                    b.Property<int>("WalletTrnType");
 
                     b.Property<string>("WalletType")
                         .IsRequired()
