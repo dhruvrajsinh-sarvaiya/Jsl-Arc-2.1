@@ -16,7 +16,7 @@ namespace CleanArchitecture.Web.Helper
             {
                 if (CheckReq_Res == 1)
                 {
-                    logger.Info(Environment.NewLine +"\nDate:" + Date + ",MethodName:" + MethodName + ", Controllername: " + Controllername + Environment.NewLine+ "AccessToken: " + accessToken + "Request: " + Req_Res + Environment.NewLine+"===================================================================================================================");
+                    logger.Info(Environment.NewLine +"\nDate:" + Date + ",MethodName:" + MethodName + ", Controllername: " + Controllername + Environment.NewLine+ "AccessToken: " + accessToken + Environment.NewLine + "Request: " + Req_Res + Environment.NewLine+"===================================================================================================================");
                 }
                 else //if(CheckReq_Res==2)
                 {
