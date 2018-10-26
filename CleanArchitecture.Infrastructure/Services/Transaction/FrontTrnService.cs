@@ -258,8 +258,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 
                 if (list != null)
                 {
-                    int skip = Helpers.PageSize * (page - 1);
-                    list = list.Skip(skip).Take(Helpers.PageSize).ToList();
+                    if(page > 0)
+                    {
+                        int skip = Helpers.PageSize * (page - 1);
+                        list = list.Skip(skip).Take(Helpers.PageSize).ToList();
+                    }
+                    
                     foreach (TradeHistoryResponce model in list)
                     {
                         responce.Add(new GetTradeHistoryInfo
@@ -333,8 +337,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 List<ActiveOrderInfo> responceData = new List<ActiveOrderInfo>();
                 if (ActiveOrderList != null)
                 {
-                    int skip = Helpers.PageSize * (Page - 1);
-                    ActiveOrderList = ActiveOrderList.Skip(skip).Take(Helpers.PageSize).ToList();
+                    if(Page > 0)
+                    {
+                        int skip = Helpers.PageSize * (Page - 1);
+                        ActiveOrderList = ActiveOrderList.Skip(skip).Take(Helpers.PageSize).ToList();
+                    }
                     foreach (ActiveOrderDataResponse model in ActiveOrderList)
                     {
                         responceData.Add(new ActiveOrderInfo
