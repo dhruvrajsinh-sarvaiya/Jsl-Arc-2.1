@@ -113,7 +113,6 @@ namespace CleanArchitecture.Core.ApiModels
         public string Type { get; set; }
         public Decimal Price { get; set; }
         public Decimal Amount { get; set; }
-        public Decimal Total { get; set; }
         public DateTime DateTime { get; set; }
         public string StatusText { get; set; }
         public long PairID { get; set; }
