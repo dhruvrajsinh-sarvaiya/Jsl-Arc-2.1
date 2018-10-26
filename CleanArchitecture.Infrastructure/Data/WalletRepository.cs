@@ -808,14 +808,14 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsolanki 25-10-2018
-        public List<BalanceResponse> GetAvailbleBalTypeWise(long userid)
+        public List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid)
         {
             var result = (from w in _dbContext.WalletMasters
                           join wt in _dbContext.WalletTypeMasters
                           on w.WalletTypeID equals wt.Id
                           where w.UserID == userid && w.Status == 1
                           group w by new { wt.WalletTypeName } into g
-                          select new BalanceResponse
+                          select new BalanceResponseLimit
                           {
                               Balance = g.Sum(order => order.Balance),
                               WalletType = g.Key.WalletTypeName,

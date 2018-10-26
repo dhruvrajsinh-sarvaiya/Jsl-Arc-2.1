@@ -72,7 +72,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID);
         //vsolanki 25-10-2018
-        List<BalanceResponse> GetAvailbleBalTypeWise(long userid);
+        List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid);
 
         bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID);
 
