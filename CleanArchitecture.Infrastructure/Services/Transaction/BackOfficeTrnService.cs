@@ -35,7 +35,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         Amount = model.Amount,
                         ChargeRs = model.ChargeRs,
                         DateTime = model.DateTime.Date,
-                        MemberID =model .MemberID,
+                        MemberID =Convert.ToInt64 (model .MemberID),
                         PairID =model .PairID,
                         PairName =model .PairName,
                         PostBal =model .PostBal,
