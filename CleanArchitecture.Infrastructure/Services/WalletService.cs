@@ -1195,7 +1195,6 @@ namespace CleanArchitecture.Infrastructure.Services
             int type = Convert.ToInt16(request.TrnType);
             WalletLimitConfiguration IsExist = new WalletLimitConfiguration();
             LimitResponse Response = new LimitResponse();
-            //bool flag = 
             try
             {
                 var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
@@ -1795,7 +1794,6 @@ namespace CleanArchitecture.Infrastructure.Services
             return Response;
         }
 
-
         public UserPreferencesRes SetPreferences(long Userid,int GlobalBit)
         {
             UserPreferencesRes Response = new UserPreferencesRes();
@@ -1881,6 +1879,47 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 return Response;
             }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request,string AccWalletID, long UserID)
+        {
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            BeneficiaryMaster IsExist = new BeneficiaryMaster();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Id == request.BenefifiaryID && item.WalletTypeID == walletMasters.WalletTypeID && item.UserID == UserID);
+                if (IsExist != null)
+                {
+                    IsExist.Name = request.Name;
+                    IsExist.Status = Convert.ToInt16(request.Status);
+                    IsExist.IsWhiteListed = Convert.ToInt16(request.WhitelistingBit);
+                    IsExist.UpdatedBy = UserID;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _BeneficiarycommonRepository.Update(IsExist);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                return Response;
+            }            
             catch (Exception ex)
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
