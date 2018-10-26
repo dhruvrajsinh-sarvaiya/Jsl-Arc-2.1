@@ -59,5 +59,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Column(TypeName = "decimal(18, 8)")]
         [DefaultValue(0)]
         public decimal SettedAmt { get; set; }
+        
+        public enWalletTrnType WalletTrnType { get; set; }
     }
 }
