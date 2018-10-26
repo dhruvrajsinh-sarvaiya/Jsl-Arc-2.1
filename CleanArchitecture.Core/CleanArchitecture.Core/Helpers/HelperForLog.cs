@@ -14,7 +14,7 @@ namespace CleanArchitecture.Core.Helpers
             var logger = NLog.LogManager.GetCurrentClassLogger();
             try
             {
-                logger.Info("\nDateTime:" + Helpers.UTC_To_IST() + "\nMethodName:" + MethodName + ", Controllername: " + Controllername + "\nLogData: " + LogData + "\n===================================================================================================================");
+                logger.Info("DateTime:" + Helpers.UTC_To_IST() + "##MethodName:" + MethodName + "##Controllername: " + Controllername + Environment.NewLine + "LogData: " + LogData + Environment.NewLine + "===================================================================================================================");
             }
             catch (Exception ex)
             {
@@ -26,7 +26,7 @@ namespace CleanArchitecture.Core.Helpers
             var logger = NLog.LogManager.GetCurrentClassLogger();
             try
             {
-                logger.Error("\nDateTime:" + Helpers.UTC_To_IST() + "\nMethodName:" + MethodName + ",Controllername: " + Controllername + "\nError: " + Error + "\n===================================================================================================================");
+                logger.Error("DateTime:" + Helpers.UTC_To_IST() + "##MethodName:" + MethodName + "##Controllername: " + Controllername + Environment.NewLine + "Error: " + Error + Environment.NewLine + "===================================================================================================================");
             }
             catch (Exception ex)
             {
