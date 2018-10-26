@@ -180,7 +180,7 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
             modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
             modelBuilder.Entity<DepositCounterMaster>().HasKey(e => new {e.WalletTypeID, e.SerProId}); // Rita 22-10-2018 composite primary key
-            modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.PairId, e.DataDate }); // Uday 22-10-2018 composite primary key
+            modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.TranNo }); // Uday 22-10-2018 composite primary key
             modelBuilder.Entity<DepositHistory>().HasKey(e => new { e.TrnID, e.Address }); // ntrivedi 23-10-2018 composite primary key
             modelBuilder.Entity<BizUserTypeMapping>().Property(p =>p.UserID).ValueGeneratedNever(); // ntrivedi 
             modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 

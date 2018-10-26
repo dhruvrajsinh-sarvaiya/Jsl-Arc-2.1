@@ -565,12 +565,13 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 25-10-2018
+        //[AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAvailbleBalTypeWise()
         {
-            // ApplicationUser user = new ApplicationUser(); user.Id = 35;
-            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
-            TotalBalanceRes Response = new TotalBalanceRes();
+            // ApplicationUser user = new ApplicationUser(); user.Id = 2;
+           ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            BalanceResponseWithLimit Response = new BalanceResponseWithLimit();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {

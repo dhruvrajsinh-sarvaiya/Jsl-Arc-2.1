@@ -660,9 +660,9 @@ namespace CleanArchitecture.Web.API
                     return Ok(Response);
                 }
                 var responsedata = _frontTrnService.GetGraphDetail(id);
-                if (responsedata != null && responsedata.GraphData.Count != 0)
+                if (responsedata != null && responsedata.Count != 0)
                 {
-                    Response.response = _frontTrnService.GetGraphDetail(id);
+                    Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
                 }
                 else

@@ -114,11 +114,11 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public bool WalletBalanceCheck(decimal amount, long walletid)
+        public bool WalletBalanceCheck(decimal amount, string walletid)
         {
             try
             {
-                var obj = _commonRepository.GetById(walletid);
+                var obj = _commonRepository.GetSingle(item=>item.AccWalletID== walletid);
                 if (obj.Balance < amount)
                 {
                     return false;
@@ -1762,14 +1762,45 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 25-10-2018
-        public TotalBalanceRes GetAvailbleBalTypeWise(long userid)
+        public BalanceResponseWithLimit GetAvailbleBalTypeWise(long userid)
         {
-            TotalBalanceRes Response = new TotalBalanceRes();
+            BalanceResponseWithLimit Response = new BalanceResponseWithLimit();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
                 var response = _walletRepository1.GetAvailbleBalTypeWise(userid);
                 decimal total = _walletRepository1.GetTotalAvailbleBal(userid);
+
+                //vsolanki 26-10-2018
+                var walletType = _WalletTypeMasterRepository.GetSingle(item => item.IsDefaultWallet==1);
+                if (walletType==null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                var wallet = _commonRepository.GetSingle(item => item.IsDefaultWallet == 1 && item.WalletTypeID== walletType.Id);
+                if (wallet==null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+
+                var limit = _LimitcommonRepository.GetSingle(item=>item.TrnType==9 && item.WalletId== wallet.Id);//for withdraw
+
+                if (limit==null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                //get amt from  tq
+                var amt = _walletRepository1.GetTodayAmountOfTQ(userid, wallet.Id);
+
                 if (response.Count == 0)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1780,6 +1811,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 Response.BizResponseObj.ReturnCode = enResponseCode.Success;
                 Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 Response.Response = response;
+                Response.DailyLimit = limit.LimitPerDay;
+                Response.UsedLimit = amt;
                 Response.TotalBalance = total;
                 return Response;
             }
@@ -1947,5 +1980,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
+        //vsolanki 26-10-2018
+        public void CreateDefaulWallet(long UserID)
+        {
+
+        }
     }
+
 }
