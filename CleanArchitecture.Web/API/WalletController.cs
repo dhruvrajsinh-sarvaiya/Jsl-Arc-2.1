@@ -21,7 +21,7 @@ using CleanArchitecture.Web.Helper;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]/[action]")]
-    //[Authorize]
+    [Authorize]
     public class WalletController : Controller
     {
         private readonly IWalletService _walletService;
@@ -80,8 +80,8 @@ namespace CleanArchitecture.Web.API
         [HttpPost("{Coin}")]
         public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string Coin)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-           //  ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+          //  ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             var accessToken = await HttpContext.GetTokenAsync("access_token");
             HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Request), accessToken);
             CreateWalletResponse Response = new CreateWalletResponse();
