@@ -113,11 +113,11 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public bool WalletBalanceCheck(decimal amount, long walletid)
+        public bool WalletBalanceCheck(decimal amount, string walletid)
         {
             try
             {
-                var obj = _commonRepository.GetById(walletid);
+                var obj = _commonRepository.GetSingle(item=>item.AccWalletID== walletid);
                 if (obj.Balance < amount)
                 {
                     return false;

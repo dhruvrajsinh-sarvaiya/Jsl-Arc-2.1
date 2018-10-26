@@ -15,7 +15,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
     {
         decimal GetUserBalance(long walletId);
 
-        bool WalletBalanceCheck(decimal amount, long walletId);
+        bool WalletBalanceCheck(decimal amount, string walletId);
 
         bool IsValidWallet(long walletId);
 
