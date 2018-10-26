@@ -819,6 +819,7 @@ namespace CleanArchitecture.Infrastructure.Data
                               Balance = g.Sum(order => order.Balance),
                               WalletType = g.Key.WalletTypeName,
                           }).AsEnumerable().ToList();
+
             return result;
         }
 
@@ -905,6 +906,53 @@ namespace CleanArchitecture.Infrastructure.Data
             _dbContext.WalletLimitConfiguration.AddRange(fadd);
             _dbContext.SaveChanges();
 
+        }
+
+        public void CreateDefaulWallet()
+        {
+
+        }
+
+        //vsolanki 26-10-2018
+        public DateTime UTC_To_IST(DateTime dateTime)
+        {
+            try
+            {
+                // DateTime myUTC = DateTime.UtcNow;
+                // 'Dim utcdate As DateTime = DateTime.ParseExact(DateTime.UtcNow, "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                // Dim utcdate As DateTime = DateTime.ParseExact(myUTC, "M/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+                // 'Dim utcdate As DateTime = DateTime.ParseExact("11/09/2016 6:31:00 PM", "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                DateTime istdate = TimeZoneInfo.ConvertTimeFromUtc(dateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                // MsgBox(myUTC & " - " & utcdate & " - " & istdate)
+                return istdate;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public decimal GetTodayAmountOfTQ(long userId, long WalletId)
+        {
+            DateTime startDateTime = UTC_To_IST(DateTime.UtcNow); //Today at 12:00:00
+            DateTime endDateTime = UTC_To_IST(DateTime.UtcNow.AddDays(-1).AddTicks(-1));
+            //var d = startDateTime.Date;
+            //var amt = (from tq in _dbContext.WalletTransactionQueues
+            //          where tq.Status == enTransactionStatus.Success && tq.TrnDate >= startDateTime &&
+            //          tq.TrnDate <= endDateTime && tq.WalletID== WalletId && tq.MemberID==userId
+            //          group tq by new { tq.TrnDate } into g
+            //          select
+            //          g.Sum(order => order.Amount));
+
+
+            var total = (from tq in _dbContext.WalletTransactionQueues
+                         where tq.Status == enTransactionStatus.Success && tq.TrnDate <= startDateTime.Date &&
+                     tq.TrnDate >= endDateTime.Date && tq.WalletID == WalletId && tq.MemberID == userId
+                         select tq.Amount
+         ).Sum();
+            return total;
+
+            //return Convert.ToDecimal(amt);
         }
     }
 }

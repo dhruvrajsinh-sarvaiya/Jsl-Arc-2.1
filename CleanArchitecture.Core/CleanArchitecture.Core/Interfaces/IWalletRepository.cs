@@ -77,5 +77,8 @@ namespace CleanArchitecture.Core.Interfaces
         bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID);
 
         void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long WalletId);
+
+        //vsolanki 24-10-2018 
+        decimal GetTodayAmountOfTQ(long userId, long WalletId);
     }
 }
