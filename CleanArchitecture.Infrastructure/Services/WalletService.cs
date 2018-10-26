@@ -27,6 +27,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ILogger<WalletService> _log;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
         private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
+        private readonly ICommonRepository<WalletLimitConfigurationMaster> _WalletLimitConfigurationMasterRepository; 
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
         private readonly ICommonRepository<AddressMaster> _addressMstRepository;
@@ -592,22 +593,28 @@ namespace CleanArchitecture.Infrastructure.Services
                     walletMaster.WalletPublicAddress(addressClass.address);
                     _commonRepository.Update(walletMaster);
                 }
+                //vsolanki 26-10-2018 insert and limitConfigration
+                _walletRepository1.GetSetLimitConfigurationMaster(AllowTrnType,userId,walletMaster.Id);
 
                 //vsolanki 25-10-2018 add Limit for Wallet
+                //var OrgWallet = _commonRepository.GetSingle(item => item.UserID == userId && item.WalletTypeID == walletMasters.Id);
+                //WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
+                //var limitConfig = _LimitcommonRepository.GetSingle(item => item.WalletId == 1);
+                //get record from limitmaster 
+                //var limitConfig= _WalletLimitConfigurationMasterRepository.GetSingle(item=>item.TrnType== AllowTrnType[0]);
 
-                WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
-                var limitConfig = _LimitcommonRepository.GetSingle(item=>item.WalletId==1);
-                request.EndTime = limitConfig.EndTime;
-                request.StartTime = limitConfig.StartTime;
-                request.LimitPerDay = limitConfig.LimitPerDay;
-                request.LimitPerHour = limitConfig.LimitPerHour;
-                request.LimitPerTransaction = limitConfig.LimitPerTransaction;
-                enWalletLimitType foo = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
-                request.TrnType = foo; //(enWalletLimitType)limitConfig.TrnType;
-                request.EndTime = limitConfig.EndTime;
-
-                CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request, 1);
+                //request.EndTime = limitConfig.EndTime;
+                //request.StartTime = limitConfig.StartTime;
+                //request.LimitPerDay = limitConfig.LimitPerDay;
+                //request.LimitPerHour = limitConfig.LimitPerHour;
+                //request.LimitPerTransaction = limitConfig.LimitPerTransaction;
+                //enWalletLimitType trntype = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
+                //request.TrnType = trntype;
+                //request.EndTime = limitConfig.EndTime;
+                ////insert into limit tbl
+                //CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request,userId);
                 //set the response object value
+
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
                 createWalletResponse.Limits = _walletRepository1.GetWalletLimitResponse(walletMaster.AccWalletID); 
@@ -867,7 +874,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         public WalletTransactionQueue InsertIntoWalletTransactionQueue(Guid Guid, enWalletTranxOrderType TrnType, decimal Amount, long TrnRefNo, DateTime TrnDate, DateTime? UpdatedDate,
-            long WalletID, string WalletType, long MemberID, string TimeStamp, enTransactionStatus Status, string StatusMsg)
+            long WalletID, string WalletType, long MemberID, string TimeStamp, enTransactionStatus Status, string StatusMsg,enWalletTrnType enWalletTrnType)
         {
             WalletTransactionQueue walletTransactionQueue = new WalletTransactionQueue();
             // walletTransactionQueue.TrnNo = TrnNo;
@@ -883,6 +890,7 @@ namespace CleanArchitecture.Infrastructure.Services
             walletTransactionQueue.TimeStamp = TimeStamp;
             walletTransactionQueue.Status = Status;
             walletTransactionQueue.StatusMsg = StatusMsg;
+            walletTransactionQueue.WalletTrnType = enWalletTrnType;
             return walletTransactionQueue;
         }
 
@@ -914,7 +922,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (dWalletobj.Status != 1 || dWalletobj.IsValid == false)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidWallet);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidWallet, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -922,7 +930,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (orderType != enWalletTranxOrderType.Debit) // sell 13-10-2018
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTrnType);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTrnType, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTrnType, ErrorCode = enErrorCode.InvalidTrnType, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -930,7 +938,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (TrnRefNo == 0) // sell 13-10-2018
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -938,7 +946,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (amount <= 0)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidAmt, ErrorCode = enErrorCode.InvalidAmount, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -946,7 +954,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (dWalletobj.Balance < amount)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InsufficantBal);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InsufficantBal, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -955,13 +963,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (count != 0)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.AlredyExist);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.AlredyExist, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
 
-                objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 0, "Inserted");
+                objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 0, "Inserted", trnType);
                 objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
                 TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
                 remarks = "Debit for TrnNo:" + objTQ.TrnNo;
@@ -1030,21 +1038,21 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 if (TotalAmount <= 0)
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt);
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt, trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
                 }
                 int count = CheckTrnRefNoForCredit(TrnRefNo, enWalletTranxOrderType.Debit); // check whether for this refno wallet is pre decuted or not
                 if (count == 0)
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo);
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo,trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist };
                 }
                 bool checkArray = CheckarryTrnID(arryTrnID, coinName);// check whether all array dtrnrefno of same wallet and they are hold (not assigned to other order)
                 if (checkArray == true)
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, 0, "Inserted");
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, 0, "Inserted",trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
                     for (int w = 0; w <= arryTrnID.Length - 1; w++)
                     {
@@ -1055,7 +1063,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else if (checkArray == false)//fail
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, "Amount and DebitRefNo matching failure");
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, "Amount and DebitRefNo matching failure",trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };

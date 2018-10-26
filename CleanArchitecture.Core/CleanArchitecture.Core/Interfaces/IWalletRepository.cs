@@ -75,5 +75,7 @@ namespace CleanArchitecture.Core.Interfaces
         List<BalanceResponse> GetAvailbleBalTypeWise(long userid);
 
         bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID);
+
+        void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long WalletId);
     }
 }
