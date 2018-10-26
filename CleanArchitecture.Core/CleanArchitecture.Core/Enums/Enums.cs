@@ -325,7 +325,8 @@ namespace CleanArchitecture.Core.Enums
         Dr_Freeze = 13,
         Dr_Stacking = 14,
         Dr_ESCROW = 15,
-        Cr_Bonus = 16
+        Cr_Bonus = 16,
+        Dr_Debit = 17 //ntrivedi for admin wallet deduct when deposition done 
     }
 
     public enum enTransactionMarketType
