@@ -86,7 +86,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
         UserPreferencesRes GetPreferences(long Userid);
         BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] request, long id);
-
+        BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request,string AccWalletID, long id);
         //vsolanki 25-10-2018
         List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType);
     }
