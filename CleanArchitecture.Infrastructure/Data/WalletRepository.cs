@@ -825,11 +825,13 @@ namespace CleanArchitecture.Infrastructure.Data
         public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.WalletTypeID == WalletTypeID && b.Status == 1 && b.IsWhiteListed == 1
+                                                where b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,
-                                                    Address = b.Address
+                                                    BeneficiaryID = b.Id,
+                                                    Address = b.Address,
+                                                    Status = b.Status
 
                                                 }).AsEnumerable().ToList();
             return items;
@@ -838,12 +840,14 @@ namespace CleanArchitecture.Infrastructure.Data
         public List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.WalletTypeID == WalletTypeID && b.Status == 1
+                                                where b.WalletTypeID == WalletTypeID
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,
+                                                    BeneficiaryID = b.Id,
                                                     Address = b.Address,
-                                                    IsWhiteListed = b.IsWhiteListed
+                                                    IsWhiteListed = b.IsWhiteListed,
+                                                    Status = b.Status
 
                                                 }).AsEnumerable().ToList();
             return items;
