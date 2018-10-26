@@ -23,7 +23,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     }
     public class GetActiveOrderRequest
     {
-        [Required]
+        
         public string Pair { get; set; }
 
         public string OrderType { get; set; }

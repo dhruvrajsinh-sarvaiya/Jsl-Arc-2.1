@@ -109,7 +109,7 @@ namespace CleanArchitecture.Core.ApiModels
     public class GetTradingSummary
     {
         public long TrnNo { get; set; }
-        public long MemberID { get; set; }
+        public Int32 MemberID { get; set; }
         public string Type { get; set; }
         public Decimal Price { get; set; }
         public Decimal Amount { get; set; }
