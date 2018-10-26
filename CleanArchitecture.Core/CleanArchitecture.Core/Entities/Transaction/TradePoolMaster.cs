@@ -43,5 +43,7 @@ namespace CleanArchitecture.Core.Entities.Transaction
         public short TPSPickupStatus { get; set; }
         [Required]
         public short IsSleepMode { get; set;}
+        public Guid GUID { get; set; }
+        public long PairId { get; set; }
     }
 }
