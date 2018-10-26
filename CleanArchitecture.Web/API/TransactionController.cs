@@ -330,12 +330,12 @@ namespace CleanArchitecture.Web.API
                     status = Convert.ToInt16(request.Status);
                 }
 
-                if (request.Page == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InValidPageNo;
-                    return BadRequest(Response);
-                }
+                //if (request.Page == 0)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ErrorCode = enErrorCode.InValidPageNo;
+                //    return BadRequest(Response);
+                //}
 
                 long MemberID =user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, sCondition, request.FromDate, request.ToDate, request.Page, status);
@@ -364,30 +364,34 @@ namespace CleanArchitecture.Web.API
             GetActiveOrderResponse Response = new GetActiveOrderResponse();
             Int16 trnType = 999;
             string sCondition = "1=1";
+            long PairId = 999;
             try
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
 
-                if (!_frontTrnService.IsValidPairName(request.Pair))
+                if (!string.IsNullOrEmpty(request.Pair))
                 {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
+                    if (!_frontTrnService.IsValidPairName(request.Pair))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    PairId = _frontTrnService.GetPairIdByName(request.Pair);
+                    if (PairId == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    sCondition += " And TTQ.PairID=" + PairId;
                 }
-
-                long PairId = _frontTrnService.GetPairIdByName(request.Pair);
-                if (PairId == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
-                }
-                if (request.Page == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InValidPageNo;
-                    return BadRequest(Response);
-                }
+                //if (request.Page == 0)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ErrorCode = enErrorCode.InValidPageNo;
+                //    return BadRequest(Response);
+                //}
                 if (!string.IsNullOrEmpty(request.OrderType))
                 {
                     trnType = _frontTrnService.IsValidTradeType(request.OrderType);
@@ -420,7 +424,7 @@ namespace CleanArchitecture.Web.API
                         return BadRequest(Response);
                     }
                     //sCondition += " AND TTQ.TrnDate Between '" + fDate  + " AND '" + tDate  + "' ";
-                    sCondition += "AND TTQ.TrnDate Between {3} AND {4} ";
+                    sCondition += "AND TTQ.TrnDate Between {2} AND {3} ";
                 }
                 long MemberID =user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, sCondition,request .FromDate,request .ToDate, PairId, request.Page);
