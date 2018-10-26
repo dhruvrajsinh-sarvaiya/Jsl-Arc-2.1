@@ -393,4 +393,9 @@ namespace CleanArchitecture.Core.Enums
         Announcement=17,
         Time=18
     }
+    public enum enValidateWalletLimit
+    {
+        Success = 1,
+        Fail = 2
+    }
 }
