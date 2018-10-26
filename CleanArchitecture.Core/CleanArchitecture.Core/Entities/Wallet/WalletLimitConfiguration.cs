@@ -25,11 +25,11 @@ namespace CleanArchitecture.Core.Entities.Wallet
 
         public decimal? LifeTime { get; set; }
 
-        [Required]
-        public TimeSpan StartTime { get; set; }
+        //[Required]
+        public TimeSpan? StartTime { get; set; }
 
-        [Required]
-        public TimeSpan EndTime { get; set; }
+        //[Required]
+        public TimeSpan? EndTime { get; set; }
       
     }
 }

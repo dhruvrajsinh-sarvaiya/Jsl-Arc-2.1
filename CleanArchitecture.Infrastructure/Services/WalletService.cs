@@ -19,6 +19,7 @@ using CleanArchitecture.Core.Entities.Wallet;
 using System.Linq;
 using CleanArchitecture.Core.ViewModels.WalletConfiguration;
 using System.Collections;
+using System.Globalization;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -1229,6 +1230,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
                     newobj.StartTime = request.StartTime;
+                    newobj.LifeTime = 99;
                     newobj.EndTime = request.EndTime;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
