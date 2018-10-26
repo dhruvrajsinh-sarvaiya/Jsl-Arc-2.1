@@ -99,6 +99,41 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+        //Rushabh 26-10-2018
+        public long GetWalletID(string AccWalletID)
+        {
+            try
+            {
+                var obj = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                return obj.Id;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        //Rushabh 26-10-2018
+        public enValidateWalletLimit ValidateWalletLimit(enTrnType TranType,decimal PerDayAmt,decimal PerHourAmt,decimal PerTranAmt, long WalletID)
+        {
+            try
+            {
+                var obj = _LimitcommonRepository.GetSingle(item => item.Id == WalletID && item.TrnType == Convert.ToInt16(TranType));
+                if((PerDayAmt <= obj.LimitPerDay) && (PerHourAmt <= obj.LimitPerHour) && (PerTranAmt <= obj.LimitPerTransaction))
+                {
+                    return enValidateWalletLimit.Success;
+                }
+                else
+                {
+                    return enValidateWalletLimit.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
 
         public bool IsValidWallet(long walletId)
         {
