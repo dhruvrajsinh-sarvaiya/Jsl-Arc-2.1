@@ -569,7 +569,7 @@ namespace CleanArchitecture.Infrastructure.Data
 
             var result = (from w in _dbContext.WalletTransactionQueues
                           where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
-                          group w by new { w.Amount, w.WalletType } into g
+                          group w by new { w.WalletType } into g
                           select new BalanceResponse
                           {
                               Balance = g.Sum(order => order.Amount),
@@ -584,7 +584,7 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             var result = (from w in _dbContext.WalletTransactionQueues
                           where w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
-                          group w by new { w.Amount, w.WalletType, w.WalletID } into g
+                          group w by new { w.WalletType, w.WalletID } into g
                           select new BalanceResponse
                           {
                               Balance = g.Sum(order => order.Amount),
@@ -813,7 +813,7 @@ namespace CleanArchitecture.Infrastructure.Data
                           join wt in _dbContext.WalletTypeMasters
                           on w.WalletTypeID equals wt.Id
                           where w.UserID == userid && w.Status == 1
-                          group w by new { w.Balance, wt.WalletTypeName } into g
+                          group w by new { wt.WalletTypeName } into g
                           select new BalanceResponse
                           {
                               Balance = g.Sum(order => order.Balance),
@@ -873,6 +873,34 @@ namespace CleanArchitecture.Infrastructure.Data
                 _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+
+
+        public void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long WalletId)
+        {
+            var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
+                            join q in AllowTrnType on p.TrnType equals q
+                            select p).ToList();
+
+            var fadd = from array in arrayObj
+                       select new WalletLimitConfiguration
+                       {
+                           CreatedBy = userid,
+                           CreatedDate = UTC_To_IST(),
+                           WalletId = WalletId,
+                           TrnType = array.TrnType,
+                           LimitPerDay = array.LimitPerDay,
+                           LimitPerHour = array.LimitPerHour,
+                           LimitPerTransaction = array.LimitPerTransaction,
+                           Status = Convert.ToInt16(ServiceStatus.Active),
+                           StartTime = array.StartTime,
+                           EndTime = array.EndTime,
+                           LifeTime = null,
+                           UpdatedDate = UTC_To_IST()
+                       };
+            _dbContext.WalletLimitConfiguration.AddRange(fadd);
+            _dbContext.SaveChanges();
+
         }
     }
 }

@@ -27,6 +27,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ILogger<WalletService> _log;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
         private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
+        private readonly ICommonRepository<WalletLimitConfigurationMaster> _WalletLimitConfigurationMasterRepository; 
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
         private readonly ICommonRepository<AddressMaster> _addressMstRepository;
@@ -592,22 +593,28 @@ namespace CleanArchitecture.Infrastructure.Services
                     walletMaster.WalletPublicAddress(addressClass.address);
                     _commonRepository.Update(walletMaster);
                 }
+                //vsolanki 26-10-2018 insert and limitConfigration
+                _walletRepository1.GetSetLimitConfigurationMaster(AllowTrnType,userId,walletMaster.Id);
 
                 //vsolanki 25-10-2018 add Limit for Wallet
-                var OrgWallet = _commonRepository.GetSingle(item => item.UserID == userId && item.WalletTypeID == walletMasters.Id);
-                WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
-                var limitConfig = _LimitcommonRepository.GetSingle(item=>item.WalletId== OrgWallet.Id);
-                request.EndTime = limitConfig.EndTime;
-                request.StartTime = limitConfig.StartTime;
-                request.LimitPerDay = limitConfig.LimitPerDay;
-                request.LimitPerHour = limitConfig.LimitPerHour;
-                request.LimitPerTransaction = limitConfig.LimitPerTransaction;
-                enWalletLimitType trntype = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
-                request.TrnType = trntype;
-                request.EndTime = limitConfig.EndTime;
-                //insert into limit tbl
-                CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request,userId);
+                //var OrgWallet = _commonRepository.GetSingle(item => item.UserID == userId && item.WalletTypeID == walletMasters.Id);
+                //WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
+                //var limitConfig = _LimitcommonRepository.GetSingle(item => item.WalletId == 1);
+                //get record from limitmaster 
+                //var limitConfig= _WalletLimitConfigurationMasterRepository.GetSingle(item=>item.TrnType== AllowTrnType[0]);
+
+                //request.EndTime = limitConfig.EndTime;
+                //request.StartTime = limitConfig.StartTime;
+                //request.LimitPerDay = limitConfig.LimitPerDay;
+                //request.LimitPerHour = limitConfig.LimitPerHour;
+                //request.LimitPerTransaction = limitConfig.LimitPerTransaction;
+                //enWalletLimitType trntype = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
+                //request.TrnType = trntype;
+                //request.EndTime = limitConfig.EndTime;
+                ////insert into limit tbl
+                //CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request,userId);
                 //set the response object value
+
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
                 createWalletResponse.Limits = _walletRepository1.GetWalletLimitResponse(walletMaster.AccWalletID); 

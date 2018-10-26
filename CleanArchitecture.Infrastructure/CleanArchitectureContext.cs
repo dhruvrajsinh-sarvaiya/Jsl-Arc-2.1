@@ -73,15 +73,17 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletLimitConfiguration> WalletLimitConfiguration { get; set; }
         public DbSet<DepositCounterLog> DepositCounterLog { get; set; }
         public DbSet<DepositCounterMaster> DepositCounterMaster { get; set; }
-        //vsolnkki 24-10-2018
+        //vsolnki 24-10-2018
         public DbSet<UserStacking> UserStacking { get; set; }
         public DbSet<MemberShadowBalance> MemberShadowBalance { get; set; }
         public DbSet<MemberShadowLimit> MemberShadowLimit { get; set; }
         public DbSet<StckingScheme> StckingScheme { get; set; }
+
         public DbSet<BizUserTypeMapping> BizUserTypeMapping { get; set; }
         public DbSet<UserPreferencesMaster> UserPreferencesMaster { get; set; }
         public DbSet<BeneficiaryMaster> BeneficiaryMaster { get; set; }
-
+        public DbSet<WalletLimitConfigurationMaster> WalletLimitConfigurationMaster { get; set; }
+        
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
         public DbSet<TradePairMaster> TradePairMaster { get; set; }
@@ -183,7 +185,7 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<BizUserTypeMapping>().Property(p =>p.UserID).ValueGeneratedNever(); // ntrivedi 
             modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
             modelBuilder.Entity<StckingScheme>().Property(p => p.WalletType).ValueGeneratedNever(); // ntrivedi 
-
+            modelBuilder.Entity<WalletLimitConfigurationMaster>().Property(p => p.TrnType).ValueGeneratedNever();
 
         }
 
