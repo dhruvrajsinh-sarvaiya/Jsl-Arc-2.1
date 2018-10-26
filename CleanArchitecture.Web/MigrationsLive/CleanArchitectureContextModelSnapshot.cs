@@ -1892,6 +1892,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<Guid>("GUID");
+
                     b.Property<short>("IsSleepMode");
 
                     b.Property<decimal>("Landing")
@@ -1899,6 +1901,8 @@ namespace CleanArchitecture.Web.Migrations
                         .HasColumnType("decimal(37, 16)");
 
                     b.Property<short>("OnProcessing");
+
+                    b.Property<long>("PairId");
 
                     b.Property<string>("PairName")
                         .IsRequired()
@@ -2715,7 +2719,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<TimeSpan>("EndTime");
+                    b.Property<TimeSpan?>("EndTime");
 
                     b.Property<decimal?>("LifeTime");
 
@@ -2725,7 +2729,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal>("LimitPerTransaction");
 
-                    b.Property<TimeSpan>("StartTime");
+                    b.Property<TimeSpan?>("StartTime");
 
                     b.Property<short>("Status");
 

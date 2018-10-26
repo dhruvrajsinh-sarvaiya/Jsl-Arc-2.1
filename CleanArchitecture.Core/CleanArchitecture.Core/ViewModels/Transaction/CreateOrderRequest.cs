@@ -58,7 +58,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public string address { get; set; }//Timestamp
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]
-        public long DebitWalletID { get; set; }        
+        public string DebitWalletID { get; set; }        
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]
         public short TrnMode { get; set; }      
