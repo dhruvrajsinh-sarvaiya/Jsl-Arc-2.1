@@ -63,7 +63,7 @@ namespace CleanArchitecture.Core.Enums
         public static string RecordAdded = "Recored Added Successfully!";
         public static string RecordUpdated = "Recored Updated Successfully!";
         public static string RecordDisable = "Recored Disable Successfully!";
-
+        public static string InvalidLimit = "Invalid Limit.";
 
         public static string InvalidAmt = "Invalid Amount.";
         public static string InsufficientBal = "Insufficient Balance.";

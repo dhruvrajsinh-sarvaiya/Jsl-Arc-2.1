@@ -60,7 +60,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo , ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -82,6 +82,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _LimitcommonRepository = WalletLimitConfig;
             _BeneficiarycommonRepository = BeneficiaryMasterRepo;
             _UserPreferencescommonRepository = UserPreferenceRepo;
+            _WalletLimitConfigurationMasterRepository = WalletConfigMasterRepo;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -1202,6 +1203,7 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             int type = Convert.ToInt16(request.TrnType);
             WalletLimitConfiguration IsExist = new WalletLimitConfiguration();
+            WalletLimitConfigurationMaster MasterConfig = new WalletLimitConfigurationMaster();
             LimitResponse Response = new LimitResponse();
             try
             {
@@ -1234,18 +1236,27 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else
                 {
-                    IsExist.LimitPerHour = request.LimitPerHour;
-                    IsExist.LimitPerDay = request.LimitPerDay;
-                    IsExist.LimitPerTransaction = request.LimitPerTransaction;
-                    IsExist.StartTime = request.StartTime;
-                    IsExist.EndTime = request.EndTime;
-                    IsExist.UpdatedBy = Userid;
-                    IsExist.UpdatedDate = UTC_To_IST();
-                    _LimitcommonRepository.Update(IsExist);
-                    Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
+                    MasterConfig = _WalletLimitConfigurationMasterRepository.GetSingle(item => item.TrnType == IsExist.TrnType);
+                    if((request.LimitPerDay <= MasterConfig.LimitPerDay) && (request.LimitPerHour <= MasterConfig.LimitPerHour) && (request.LimitPerTransaction <= MasterConfig.LimitPerTransaction))
+                    {
+                        IsExist.LimitPerHour = request.LimitPerHour;
+                        IsExist.LimitPerDay = request.LimitPerDay;
+                        IsExist.LimitPerTransaction = request.LimitPerTransaction;
+                        IsExist.StartTime = request.StartTime;
+                        IsExist.EndTime = request.EndTime;
+                        IsExist.UpdatedBy = Userid;
+                        IsExist.UpdatedDate = UTC_To_IST();
+                        _LimitcommonRepository.Update(IsExist);
+                        Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
+                    }
+                    else
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ReturnMsg = EnResponseMessage.InvalidLimit;
+                        Response.ErrorCode = enErrorCode.InvalidLimit;
+                    }
                 }
-                Response.ReturnCode = enResponseCode.Success;
-                
+                Response.ReturnCode = enResponseCode.Success;                
                 return Response;
             }
             catch (Exception ex)

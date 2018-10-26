@@ -24,7 +24,7 @@ namespace CleanArchitecture.Core.Interfaces
         Int16 IsValidStatus(string status);
         long GetBasePairIdByName(string BasePair);
         GetTradePairByName GetTradePairByName(long id);
-        GetGraphDetailInfo GetGraphDetail(long PairId);
+        List<GetGraphDetailInfo> GetGraphDetail(long PairId);
         MarketCapData GetMarketCap(long PairId);
         VolumeDataRespose GetVolumeDataByPair(long PairId);
         bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);        
