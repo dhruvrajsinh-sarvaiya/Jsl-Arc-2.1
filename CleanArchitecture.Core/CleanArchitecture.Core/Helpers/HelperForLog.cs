@@ -21,7 +21,7 @@ namespace CleanArchitecture.Core.Helpers
                 logger.Error(ex);
             }
         }
-        public static void WriteErrorLog(string MethodName, string Controllername, string Error, string accessToken = null)
+        public static void WriteErrorLog(string MethodName, string Controllername, Exception Error, string accessToken = null)
         {
             var logger = NLog.LogManager.GetCurrentClassLogger();
             try
