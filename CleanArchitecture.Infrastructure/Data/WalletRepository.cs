@@ -6,6 +6,7 @@ using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
@@ -484,7 +485,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            LimitPerTransaction = u.LimitPerTransaction,
                                                            AccWalletID = c.AccWalletID,
                                                            EndTime = u.EndTime,
-                                                           StartTime = u.StartTime                                                           
+                                                           StartTime = u.StartTime
                                                        }).AsEnumerable().ToList();
             return items;
         }
@@ -955,5 +956,29 @@ namespace CleanArchitecture.Infrastructure.Data
 
             //return Convert.ToDecimal(amt);
         }
+
+        //vsoalnki 26-10-2018
+        public List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId,int page)
+        {
+            //int skip = Helpers.PageSize * (page - 1);
+            List<WalletLedgerRes> wl = (from w in _dbContext.WalletLedgers
+                                        where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                        select new WalletLedgerRes
+                                        {
+                                            LedgerId = w.Id,
+                                            PreBal = w.PreBal,
+                                            PostBal = w.PostBal,
+                                            Remarks = w.Remarks,
+                                            Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt
+                                        }).ToList();
+
+            if (page > 0)
+            {
+                int skip = Helpers.PageSize * (page - 1);
+                wl = wl.Skip(skip).Take(Helpers.PageSize).ToList();
+            }
+            return wl;
+        }
+
     }
 }

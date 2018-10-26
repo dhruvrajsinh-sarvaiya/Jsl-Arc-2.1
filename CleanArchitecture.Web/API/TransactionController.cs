@@ -122,8 +122,8 @@ namespace CleanArchitecture.Web.API
             Req.PairID = Request.CurrencyPairID;
             Req.Price = Request.Price;
             Req.Qty = Request.Amount;
-            Req.DebitWalletID = Request.DebitWalletID;
-            Req.CreditWalletID = Request.CreditWalletID;
+            Req.DebitAccountID = Request.DebitWalletID;
+            Req.CreditAccountID = Request.CreditWalletID;
 
             //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
            // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));

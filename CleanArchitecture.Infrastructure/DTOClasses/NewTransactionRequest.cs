@@ -51,8 +51,12 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         //public long WalletID { get; set; }
         //public long DeliveryWalletID { get; set; } //use only in case of Trading
        
-        public long DebitWalletID { get; set; }
+        public string DebitAccountID { get; set; }
        
+        public string CreditAccountID { get; set; }
+
+        public long DebitWalletID { get; set; }
+
         public long CreditWalletID { get; set; }
 
         public enServiceType ServiceType { get; set; }

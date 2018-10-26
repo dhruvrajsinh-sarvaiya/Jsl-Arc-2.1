@@ -89,5 +89,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request,string AccWalletID, long id);
         //vsolanki 25-10-2018
         List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType);
+
+        ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page);
     }
 }
