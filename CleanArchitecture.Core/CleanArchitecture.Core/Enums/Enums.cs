@@ -75,7 +75,8 @@ namespace CleanArchitecture.Core.Enums
         DMRSERVICE = 13,
         CAB = 14,
         WalletService = 15,
-        LoanAPI = 16
+        LoanAPI = 16,
+        Trading = 17
         //Buy_Trade = 4,
         //Sell_Trade = 5,
         //Withdraw = 6,

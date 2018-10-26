@@ -5,17 +5,12 @@ using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
-using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services.Transaction
@@ -54,6 +49,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         ServiceMaster _SecondCurrService;
         ServiceMaster _TrnService;
         TransactionRequest NewtransactionReq;
+        private string ControllerName = "TradingTransaction";
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
             EFCommonRepository<TransactionQueue> TransactionRepository,
@@ -88,6 +84,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _Resp = CreateTransaction();
             if (_Resp.ReturnCode != enResponseCodeService.Success)
             {
+                HelperForLog.WriteLogIntoFile(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
                 return _Resp;
             }
             //var myResp = new Task(async () => CombineAllInitTransactionAsync());
@@ -116,7 +113,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                     return _Resp;
                 }
-                var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitWalletID); //DI of Wallet for balance check
+                var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitAccountID); //DI of Wallet for balance check
                 if (!BalResult) //validation and balance check success
                 {
                     _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_InsufficientBalanceMsg;
@@ -126,8 +123,30 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     return _Resp;
                 }
                 //Deduct balance here
-                if(_WalletService.GetWalletDeductionNew(Req.SMSCode, "", enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
-                    Req.DebitWalletID.ToString(), Req.TrnNo, enServiceType.Recharge, enWalletTrnType.Dr_Sell_Trade).ReturnCode!=enResponseCode.Fail)
+                if(Req.TrnType == enTrnType.Transaction)
+                {
+                    //ServiceType
+                    Req.ServiceType = (enServiceType)_TrnService.ServiceType;
+                    //Req.WalletTrnType = enWalletTrnType.;
+
+                }
+                else if (Req.TrnType == enTrnType.Withdraw)
+                {
+                    //ServiceType
+                    Req.ServiceType = (enServiceType)_TrnService.ServiceType;
+                    Req.WalletTrnType = enWalletTrnType.Dr_Withdrawal;
+
+                }
+                else//trading
+                {
+                    Req.ServiceType = enServiceType.Trading;
+                    Req.WalletTrnType = enWalletTrnType.Dr_Sell_Trade;
+                }
+
+                var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode, "", enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
+                    Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType);
+
+                if (DebitResult.ReturnCode==enResponseCode.Fail)
                 {
                     _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_WalletDebitFailMsg;
                     _Resp.ReturnCode = enResponseCodeService.Fail;
@@ -152,7 +171,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog("CombineAllInitTransactionAsync", ControllerName, ex);                
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionProcessInternalError });
             }            
         }
@@ -176,6 +196,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 {
                     _TradeTransactionObj.TrnTypeName = "SELL";
                 }
+                Req.DebitWalletID = Convert.ToInt64(Req.DebitAccountID);//Assign from wallet team
+                Req.CreditWalletID = Convert.ToInt64(Req.CreditAccountID);
                 //IF @PairID <> 0 ntrivedi 18-04-2018  check inside @TrnType (4,5) @TradeWalletMasterID will be 0 or null
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
@@ -305,7 +327,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
 
@@ -326,7 +348,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
         }
@@ -352,7 +374,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     TrnRefNo = Req.TrnRefNo,
                     AdditionalInfo = Req.AdditionalInfo
                 };
-                _TransactionRepository.Add(Newtransaction);
+                Newtransaction = _TransactionRepository.Add(Newtransaction);
                 Req.TrnNo = Newtransaction.Id;
                 Req.GUID = Newtransaction.GUID;
 
@@ -360,7 +382,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -400,7 +422,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -420,7 +442,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -518,7 +540,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);                
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 return Task.FromResult(false);
             }
 
@@ -542,7 +564,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch(Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 throw ex;
             } 
         }
@@ -558,7 +580,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 throw ex;
             }
         }
@@ -578,11 +600,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 CreditWalletDrArryTrnIDObj[0].Amount = Req.Amount;
 
                 _WalletService.GetWalletCreditNew(Req.SMSCode, "", enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
-                Req.DebitWalletID.ToString(), CreditWalletDrArryTrnIDObj, Req.TrnNo,1, enWalletTranxOrderType.Credit, enServiceType.Recharge);
+                Req.DebitAccountID, CreditWalletDrArryTrnIDObj, Req.TrnNo,1, enWalletTranxOrderType.Credit, enServiceType.Recharge);
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 throw ex;
             }
         }
@@ -682,7 +704,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
 
             }
         }
@@ -705,7 +727,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch(Exception ex)
             {
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
                 return 0;
             }
         }       
