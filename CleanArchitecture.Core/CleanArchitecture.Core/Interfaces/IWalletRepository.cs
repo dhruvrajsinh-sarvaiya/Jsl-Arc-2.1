@@ -80,5 +80,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         //vsolanki 24-10-2018 
         decimal GetTodayAmountOfTQ(long userId, long WalletId);
+
+        List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page);
     }
 }

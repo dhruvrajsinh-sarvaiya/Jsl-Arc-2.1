@@ -625,6 +625,37 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        //vsolanki 2018-10-26
+        [AllowAnonymous]
+        [HttpGet("{FromDate}/{ToDate}/{WalletId}")]
+        public async Task<IActionResult> GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int Page)
+        {
+             ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            ListWalletLedgerRes Response = new ListWalletLedgerRes();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                if (user == null)
+                {
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.BizResponseObj.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetWalletLedger(FromDate, ToDate, WalletId,Page);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+
         /// <summary>
         /// vsolanki 8-10-2018 Get the coin list 
         /// </summary>
