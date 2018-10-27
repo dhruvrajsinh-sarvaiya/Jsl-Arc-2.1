@@ -36,9 +36,9 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 //Take Regex for response parsing
                 _txnWebAPIParsingData = _webapiDataRepository.GetDataForParsingAPI(ThirPartyAPIID);
-                _txnWebAPIParsingData.ResponseSuccess = "";
-                _txnWebAPIParsingData.ResponseHold = "";
-                _txnWebAPIParsingData.ResponseFailure = "";
+                //_txnWebAPIParsingData.ResponseSuccess = "";
+                //_txnWebAPIParsingData.ResponseHold = "";
+                //_txnWebAPIParsingData.ResponseFailure = "";
                 WebAPIParseResponseCls _webapiParseResponse = ParseResponseViaRegex(TransactionResponse, _txnWebAPIParsingData);
 
                 return _webapiParseResponse;

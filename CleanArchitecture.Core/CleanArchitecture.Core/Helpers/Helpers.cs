@@ -42,6 +42,26 @@ namespace CleanArchitecture.Core.Helpers
                 throw ex;
             }
         }
+
+        public static string GetUTCTime()
+        {
+            try
+            {
+                TimeZone CurrentZone = TimeZone.CurrentTimeZone;
+                DateTime CurrentDate = DateTime.Now;
+                DateTime CurrentUTC = CurrentZone.ToUniversalTime(CurrentDate);
+                //TimeZoneInfo selectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById(countryZone);
+                //DateTime currentDateTime = TimeZoneInfo.ConvertTimeFromUtc(currentUTC, selectedTimeZone);
+                //_chatHubContext.Clients.Caller.setTime(currentDateTime.ToString("h:mm:ss tt"));
+                //_chatHubContext.Clients.Caller.SendAsync("SetTime",currentUTC.ToLongTimeString());
+                string Data = Convert.ToInt64((CurrentUTC - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds * 1000).ToString();
+                return Data;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         public static long GenerateBatch()
         {
             //Method 1
@@ -51,6 +71,26 @@ namespace CleanArchitecture.Core.Helpers
             //Method 2
             string UniqNo = UTC_To_IST().ToString("yyyyMMddHHmmssf");
             return Convert.ToInt64(UniqNo);
+        }
+
+        public static List<KeyValuePair<string, int>> GetEnumList<T>()
+        {
+            var list = new List<KeyValuePair<string, int>>();
+            foreach (var e in Enum.GetValues(typeof(T)))
+            {
+                list.Add(new KeyValuePair<string, int>(e.ToString(), (int)e));
+            }
+            return list;
+        }
+
+        public static List<int> GetEnumValue<T>()
+        {
+            var list = new List<int>();
+            foreach (var e in Enum.GetValues(typeof(T)))
+            {
+                list.Add((int)e);
+            }
+            return list;
         }
 
     }

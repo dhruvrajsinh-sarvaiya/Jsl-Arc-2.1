@@ -245,8 +245,9 @@ namespace CleanArchitecture.Core.Enums
         Status4101InputProvider = 4101,
         Status4102SignUpUserRegisterError = 4102,
 
-        Status4103TempUserEmailExist = 4103,
+        // Status4103BizUserNameAs_a_MobileExist = 4103,
         Status4104TempUserNameExist = 4104,
+        Status4105TempUserMobileExist = 4105,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -265,7 +266,9 @@ namespace CleanArchitecture.Core.Enums
         InsufficantBal = 4038,
         UserIDWalletIDDidNotMatch = 4039,
         InvalidBeneficiaryID = 4227,
-        InvalidLimit = 4233
+        InvalidLimit = 4233,
+        InternalError=9,
+        NotFoundLimit=4280
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -360,25 +363,42 @@ namespace CleanArchitecture.Core.Enums
         DepositLimit = 3,
         APICallLimit = 4
     }
-    public enum SignalREventType
+    public enum enSignalREventType
     {
         Alert = 1,
         Nofification = 2,
         GrpMsg = 3,
         Channel = 4
     }
-
-    public enum SubscriptionType
+    
+    public enum enSubscriptionType
     {
         OneToOne = 1,
         Broadcast = 2
     }
-    public enum UserWiseMethodName
+    public enum enMethodName
     {
         OpenOrder = 1,
         OrderHistory = 2,
         TradeHistory = 3,
-        ActivityNotification = 4
+        ActivityNotification = 4,
+        //PairWise
+        BuyerBook = 5,
+        SellerBook = 6,
+        TradeHistoryByPair = 7,
+        MarketData = 8,
+        Price = 9,
+        BuyerSideWallet = 10,
+        SellerSideWallet = 11,
+        ChartData = 12,
+        //Market wise
+        PairData = 13,
+        MarketTicker = 14,
+        //Global 
+        Chat = 15,
+        News = 16,
+        Announcement = 17,
+        Time = 18
     }
     public enum PairWiseMethodName
     {
@@ -407,6 +427,28 @@ namespace CleanArchitecture.Core.Enums
     {
         Success = 1,
         Fail = 2
+    }
+    public enum enSignalRParmType
+    {
+        PairName = 1,
+        Base = 2,
+        AccessToken = 3
+    }
+    public enum enReturnMethod
+    {
+        //user specific
+        RecieveOpenOrder = 1,
+        RecieveOrderHistory = 2,
+        RecieveTradeHistory = 3,
+        RecieveBuyerSideWalletBal = 4,
+        RecieveSellerSideWalletBal = 5,
+
+        //pair wise
+        RecieveBuyerBook = 6,
+        RecieveSellerBook = 7,
+        RecieveTradingHistory = 8,
+        RecieveMarketData = 9,
+        RecieveChartData = 10
     }
     public enum enCheckWithdrawalBene
     {

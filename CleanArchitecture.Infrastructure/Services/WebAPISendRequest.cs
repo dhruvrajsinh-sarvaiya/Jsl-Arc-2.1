@@ -169,7 +169,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return responseFromServer;
         }
 
-        public string SendJsonRpcAPIRequestAsync(string Url,string RequestStr,string UserName,string Password,WebHeaderCollection headerDictionary = null)
+        public string SendJsonRpcAPIRequestAsync(string Url,string RequestStr,WebHeaderCollection headerDictionary = null)
         {
             try
             {

@@ -84,31 +84,31 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _Resp = CreateTransaction();
             if (_Resp.ReturnCode != enResponseCodeService.Success)
             {
-                HelperForLog.WriteLogIntoFile(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
+                HelperForLog.WriteLogIntoFile("ProcessNewTransactionAsync", ControllerName, _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
                 return _Resp;
             }
             //var myResp = new Task(async () => CombineAllInitTransactionAsync());
-            Task.Run(() => CombineAllInitTransactionAsync());
+            await Task.Run(() => CombineAllInitTransactionAsync());
 
             //CombineAllInitTransactionAsync();
 
-            return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
-            //_Resp = await MethodRespTsk;
-            // return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
-            //return Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //_Resp = await MethodRespTsk;            
+            return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess };
             //return _Resp;
         }
 
-        public async Task<BizResponse> CombineAllInitTransactionAsync()
+        public BizResponse CombineAllInitTransactionAsync()
         {
             _Resp = new BizResponse();
             try
-            {               
+            {
+                //Helpers.JsonSerialize(null);
                 //=========================PROCESS
                 //Check balance here
-                var Validation = ValidateTransaction(_Resp);
+                var Validation = ValidateTransaction(_Resp);                
 
-                if (!await Validation) //validation and balance check success
+                if (!Validation.Result) //validation and balance check success
                 {
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                     return _Resp;
@@ -123,7 +123,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     return _Resp;
                 }
                 //Deduct balance here
-                if(Req.TrnType == enTrnType.Transaction)
+                if (Req.TrnType == enTrnType.Transaction)
                 {
                     //ServiceType
                     Req.ServiceType = (enServiceType)_TrnService.ServiceType;
@@ -146,7 +146,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode, "", enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
                     Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType);
 
-                if (DebitResult.ReturnCode==enResponseCode.Fail)
+                if (DebitResult.ReturnCode == enResponseCode.Fail)
                 {
                     _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_WalletDebitFailMsg;
                     _Resp.ReturnCode = enResponseCodeService.Fail;
@@ -327,7 +327,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("CreateTransaction", ControllerName, ex);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
 
@@ -348,7 +348,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkSystemFailTransaction", ControllerName, ex);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
         }
@@ -382,7 +382,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTransactionInQueue", ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -417,12 +417,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     StatusCode = Req.StatusCode,
                     StatusMsg = Req.StatusMsg
                 };
-                _TradeTransactionRepository.Add(NewTradetransaction);
+                NewTradetransaction=_TradeTransactionRepository.Add(NewTradetransaction);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTradeTransactionInQueue", ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -442,7 +442,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTradeStopLoss", ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -540,7 +540,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("ValidateTransaction", ControllerName, ex);
                 return Task.FromResult(false);
             }
 
@@ -564,7 +564,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch(Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkTransactionSystemFail", ControllerName, ex);
                 throw ex;
             } 
         }
@@ -580,13 +580,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkTransactionHold", ControllerName, ex);
                 throw ex;
             }
         }
         public void MarkTransactionOperatorFail(string StatusMsg, enErrorCode ErrorCode)
         {
             CreditWalletDrArryTrnID[] CreditWalletDrArryTrnIDObj = new CreditWalletDrArryTrnID[1];
+            List<CreditWalletDrArryTrnID> CreditWalletDrArryTrnIDList = new List<CreditWalletDrArryTrnID>();
             try
             {
                 //var Txn = _TransactionRepository.GetById(Req.TrnNo);
@@ -596,15 +597,17 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _TransactionRepository.Update(Newtransaction);
 
                 //Cr Amount to member back
-                CreditWalletDrArryTrnIDObj[0].DrTrnRefNo = Req.TrnNo;
-                CreditWalletDrArryTrnIDObj[0].Amount = Req.Amount;
+                //CreditWalletDrArryTrnIDObj[0].DrTrnRefNo = Req.TrnNo;
+                //CreditWalletDrArryTrnIDObj[0].Amount = Req.Amount;
+                CreditWalletDrArryTrnIDList.Add(new CreditWalletDrArryTrnID { DrTrnRefNo = Req.TrnNo, Amount = Req.Amount });
+
 
                 _WalletService.GetWalletCreditNew(Req.SMSCode, "", enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
                 Req.DebitAccountID, CreditWalletDrArryTrnIDObj, Req.TrnNo,1, enWalletTranxOrderType.Credit, enServiceType.Recharge);
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkTransactionOperatorFail", ControllerName, ex);
                 throw ex;
             }
         }
@@ -640,7 +643,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         case (long)enAppType.WebSocket:
 
                         case (long)enAppType.JsonRPC:
-                            //_IWebApiSendRequest.SendJsonRpcAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL,);
+                            _TransactionObj.APIResponse = _IWebApiSendRequest.SendJsonRpcAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL, ThirdPartyAPIRequestOnj.RequestBody, ThirdPartyAPIRequestOnj.keyValuePairsHeader);
                                  break;
                         case (long)enAppType.TCPSocket:
 
@@ -704,7 +707,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("CallWebAPI", ControllerName, ex);
 
             }
         }
@@ -721,13 +724,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     CreatedDate = Helpers.UTC_To_IST(),
                     RequestData = Request
                 };
-                _TransactionRequest.Add(NewtransactionReq);
+                NewtransactionReq =_TransactionRequest.Add(NewtransactionReq);
                 return NewtransactionReq.Id;
 
             }
             catch(Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTransactionRequest", ControllerName, ex);
                 return 0;
             }
         }       

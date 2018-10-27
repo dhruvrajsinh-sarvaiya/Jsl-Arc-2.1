@@ -254,7 +254,7 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
         }
 
-        public void SaveToHash(string key, T obj, string Tag)
+        public void SaveToHash(string key, T obj, string Tag1, string Tag2)
         {
             try
             {
@@ -262,7 +262,24 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
                 {
                     var hash = this.GenerateHash(obj);
                     //RedisContext context = new RedisContext();
-                    this.Context.Cache.SetObject(key, obj, new[] { Tag });
+                    this.Context.Cache.SetObject(key, obj, new[] { Tag1,Tag2 });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void SaveToHash(string key, T obj, string Tag1)
+        {
+            try
+            {
+                if (obj != null)
+                {
+                    var hash = this.GenerateHash(obj);
+                    //RedisContext context = new RedisContext();
+                    this.Context.Cache.SetObject(key, obj, new[] { Tag1 });
                 }
             }
             catch (Exception ex)

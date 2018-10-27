@@ -1754,7 +1754,13 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
-
+                if(wallet==null)
+                {
+                    allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.InvalidWallet;
+                    allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    return allBalanceResponse;
+                }
                 var response = _walletRepository1.GetAllBalances(userid, wallet.Id);
                 if (response == null)
                 {
@@ -1766,6 +1772,17 @@ namespace CleanArchitecture.Infrastructure.Services
                 allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Success;
                 allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 allBalanceResponse.Balance = response;
+                //vsolanki 2018-10-27 //for withdraw limit
+                var limit = _LimitcommonRepository.GetSingle(item => item.TrnType == 2 && item.WalletId == wallet.Id);
+                if(limit==null)
+                {
+                    allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.NotFoundLimit;
+                    allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.NotFoundLimit;
+                    return allBalanceResponse;
+                }
+                allBalanceResponse.WithdrawalDailyLimit = limit.LimitPerDay;
+
                 // var wallet = _commonRepository.GetById(walletId);
                 var walletType = _WalletTypeMasterRepository.GetById(wallet.WalletTypeID);
                 allBalanceResponse.WalletType = walletType.WalletTypeName;
@@ -2132,11 +2149,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        //vsolanki 26-10-2018
-        public void CreateDefaulWallet(long UserID)
-        {
-
-        }
         //vsoalnki 26-10-2018
         public ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page)
         {
@@ -2155,6 +2167,51 @@ namespace CleanArchitecture.Infrastructure.Services
             Response.BizResponseObj.ReturnCode = enResponseCode.Success;
             Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
             return Response;
+        }
+
+
+        //vsolanki 27-10-2018
+        public BizResponseClass CreateDefaulWallet(long UserID)
+        {
+         var res=   _walletRepository1.CreateDefaulWallet(UserID);
+            if(res !=1)
+            {
+                return new BizResponseClass
+                {
+                    ErrorCode = enErrorCode.InternalError,
+                    ReturnMsg = EnResponseMessage.CreateWalletFailMsg,
+                    ReturnCode = enResponseCode.InternalError
+                };
+            }
+            return new BizResponseClass
+            {
+                ErrorCode = enErrorCode.Success,
+                ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg,
+                ReturnCode = enResponseCode.Success
+            };
+        }
+
+        //vsolanki 27-10-2018
+        public BizResponseClass CreateWalletForAllUser_NewService(string WalletType)
+        {
+            //var walletType = _WalletTypeMasterRepository.GetSingle(item=>item.WalletTypeName==WalletType);
+            //var wallet = _commonRepository.GetSingle(item=>item.WalletTypeID== walletType.Id && item.IsDefaultWallet==1);
+            var res = _walletRepository1.CreateWalletForAllUser_NewService(WalletType);
+            if (res != 1)
+            {
+                return new BizResponseClass
+                {
+                    ErrorCode = enErrorCode.InternalError,
+                    ReturnMsg = EnResponseMessage.CreateWalletFailMsg,
+                    ReturnCode = enResponseCode.InternalError
+                };
+            }
+            return new BizResponseClass
+            {
+                ErrorCode = enErrorCode.Success,
+                ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg,
+                ReturnCode = enResponseCode.Success
+            };
         }
     }
 

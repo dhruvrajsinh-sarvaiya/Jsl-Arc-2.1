@@ -64,6 +64,7 @@ namespace CleanArchitecture.Core.Enums
         public static string RecordUpdated = "Recored Updated Successfully!";
         public static string RecordDisable = "Recored Disable Successfully!";
         public static string InvalidLimit = "Invalid Limit.";
+        public static string NotFoundLimit = "Not Found Limit.";
 
         public static string InvalidAmt = "Invalid Amount.";
         public static string InsufficientBal = "Insufficient Balance.";
@@ -93,8 +94,8 @@ namespace CleanArchitecture.Core.Enums
         public static string StandardSignUp = "Your account has been created, please verify it by clicking the activation link that has been send to your email.";
         public static string SignUpValidation = "This username or email is already registered.";
         public static string SignUpUser = "This user data not available.";
-        public static string SignWithEmail = "Please verify it by clicking the otp that has been send to your email.";
-        public static string SignUpEmailValidation = "This email is already registered.";
+        public static string SignWithEmail = "Successfull send otp on your register email.";
+        public static string SignUpEmailValidation = "This email id already exist input other emai id.";
         public static string SignUpUserNotRegister = "User not register and verifay.";
         public static string SignUpEmailConfirm = "Your account has been activated, you can now login.";
         public static string SignUpEmailExpired = "Reset links immediately not valid or expired.";
@@ -110,11 +111,11 @@ namespace CleanArchitecture.Core.Enums
         public static string LoginWithOtpInvalidAttempt = "Invalid login attempt.";
         public static string LoginWithOtpDatanotSend = "User Otp Data Not Send.";
         public static string SignUPMobileValidation = "This mobile number is already registered.";
-        public static string SignUpWithMobile = "Please verify it by clicking the otp that has been send to your mobile.";
+        public static string SignUpWithMobile = "Successfull send otp on your register mobile.";
         public static string SignUpWithMobileValid = "This mobile number is not valid.";
         public static string SignUPVerification = "You have successfully verified.";
-        public static string SignUpOTP = "Invalid OTP or expired, resend OTP immediately.";
-        public static string SignUpResendOTP = "Resend OTP immediately not valid or expired.";
+        public static string SignUpOTP = "Invalid OTP ,resend OTP immediately.";
+        public static string SignUpResendOTP = "Resend OTP immediately , this opt is expired.";
         public static string SignUpRole = "This User roles not available.";
         public static string SignUpWithResendEmail = "You have successfully resend Otp in email.";
         public static string SignUpWithResendMobile = "You have successfully resend Otp in mobile.";
@@ -134,7 +135,7 @@ namespace CleanArchitecture.Core.Enums
         public static string IpAddressInsertError = "Ip address not inserted.";
         public static string Verificationpending = "User register verification pending.";
 
-       
+
         public static string ResetConfirmedLink = "Reset password link send on your email, please click that link and confirmed.";
         public static string ResetResendEmail = "You have successfully resend New password in email.";
         public static string ChangePassword = "User changed their password successfully.";
@@ -208,5 +209,8 @@ namespace CleanArchitecture.Core.Enums
 
         public static string InputProvider = "Please input provider name.";
 
+
+        public static string SignUpTempUserMobileExist = "This mobile number already exist input other mobile number.";
+        public static string SignUpTempUserMobileExistAndVerificationPending = "This mobile number already exist and verify pending.";
     }
 }

@@ -96,7 +96,7 @@ namespace CleanArchitecture.Web.API
                 {
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardSignUpPhonevalid, ErrorCode = enErrorCode.Status4013MobileInvalid });
                 }
-                
+
                 //////////////////// Check bizUser  table in Email Exist or not
                 var result = await _userManager.FindByEmailAsync(model.Email);
                 if (!string.IsNullOrEmpty(result?.Email))
@@ -123,8 +123,9 @@ namespace CleanArchitecture.Web.API
                         return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserEmailVerifyPending, ErrorCode = enErrorCode.Status4036VerifyPending });
                     }
 
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserEmailExist, ErrorCode = enErrorCode.Status4103TempUserEmailExist });
-                }               
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status4062UseralreadRegister });
+                    //return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserEmailExist, ErrorCode = enErrorCode.Status4103TempUserEmailExist });
+                }
 
                 ////////////////// check TempUser  table in username Exist or not
                 bool IsSignUserNameCheck = _tempUserRegisterService.GetUserNameCheckExist(model.Username);
@@ -134,7 +135,7 @@ namespace CleanArchitecture.Web.API
                     bool IsSignUserName = _tempUserRegisterService.GetUserName(model.Username);
                     if (!IsSignUserName)
                     {
-                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserNameVerifyPending, ErrorCode = enErrorCode.Status4036VerifyPending });
+                        return Ok(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserNameVerifyPending, ErrorCode = enErrorCode.Status4036VerifyPending });
                     }
 
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserNameExist, ErrorCode = enErrorCode.Status4104TempUserNameExist });
@@ -145,55 +146,55 @@ namespace CleanArchitecture.Web.API
                 //{
                 byte[] passwordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
-                    var tempcurrentUser = new TempUserRegisterViewModel
+                var tempcurrentUser = new TempUserRegisterViewModel
+                {
+                    UserName = model.Username,
+                    Email = model.Email,
+                    FirstName = model.Firstname,
+                    LastName = model.Lastname,
+                    Mobile = model.Mobile,
+                    PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes),
+                    RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Standerd)
+                };
+                var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                if (resultdata != null)
+                {
+                    LinkTokenViewModel linkToken = new LinkTokenViewModel();
+                    linkToken.Id = resultdata.Id;
+                    linkToken.Username = model.Username;
+                    linkToken.Email = model.Email;
+                    linkToken.Firstname = model.Firstname;
+                    linkToken.Lastname = model.Lastname;
+                    linkToken.Mobile = model.Mobile;
+                    linkToken.CurrentTime = DateTime.UtcNow;
+                    linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
+                    //linkToken.Password = tempcurrentUser.PasswordHash;
+
+                    string UserDetails = JsonConvert.SerializeObject(linkToken);
+                    string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
+                    string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
                     {
-                        UserName = model.Username,
-                        Email = model.Email,
-                        FirstName = model.Firstname,
-                        LastName = model.Lastname,
-                        Mobile = model.Mobile,
-                        PasswordHash = EncyptedDecrypted.Encrypt(model.Password, passwordBytes),
-                        RegTypeId = await _registerTypeService.GetRegisterId(Core.Enums.enRegisterType.Standerd)
-                    };
-                    var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
-                    if (resultdata != null)
-                    {
-                        LinkTokenViewModel linkToken = new LinkTokenViewModel();
-                        linkToken.Id = resultdata.Id;
-                        linkToken.Username = model.Username;
-                        linkToken.Email = model.Email;
-                        linkToken.Firstname = model.Firstname;
-                        linkToken.Lastname = model.Lastname;
-                        linkToken.Mobile = model.Mobile;
-                        linkToken.CurrentTime = DateTime.UtcNow;
-                        linkToken.Expirytime = DateTime.UtcNow + TimeSpan.FromHours(2);
-                        //linkToken.Password = tempcurrentUser.PasswordHash;
+                        //userId = currentUser.Id,
+                        emailConfirmCode = SubScriptionKey
+                    }, protocol: HttpContext.Request.Scheme);
 
-                        string UserDetails = JsonConvert.SerializeObject(linkToken);
-                        string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
-                        string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
-                        {
-                            //userId = currentUser.Id,
-                            emailConfirmCode = SubScriptionKey
-                        }, protocol: HttpContext.Request.Scheme);
+                    var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 
-                        var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
+                    SendEmailRequest request = new SendEmailRequest();
+                    request.Recepient = model.Email;
+                    request.Subject = EnResponseMessage.SendMailSubject;
+                    request.Body = confirmationLink;
 
-                        SendEmailRequest request = new SendEmailRequest();
-                        request.Recepient = model.Email;
-                        request.Subject = EnResponseMessage.SendMailSubject;
-                        request.Body = confirmationLink;
+                    await _mediator.Send(request);
+                    _logger.LogInformation(3, "User created a new account with password.");
+                    //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
 
-                        await _mediator.Send(request);
-                        _logger.LogInformation(3, "User created a new account with password.");
-                        //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-
-                        return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardSignUp });
-                    }
-                    else
-                    {
-                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUserRegisterError, ErrorCode = enErrorCode.Status4102SignUpUserRegisterError });
-                    }               
+                    return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardSignUp });
+                }
+                else
+                {
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUserRegisterError, ErrorCode = enErrorCode.Status4102SignUpUserRegisterError });
+                }
             }
             catch (Exception ex)
             {
@@ -397,49 +398,55 @@ namespace CleanArchitecture.Web.API
 
                 }
 
+                //////////////////// Check bizUser  table in Email Exist or not
                 var result = await _userManager.FindByEmailAsync(model.Email);
-                if (string.IsNullOrEmpty(result?.Email))
+                if (!string.IsNullOrEmpty(result?.Email))
                 {
-                    bool IsTempSignEmail = _tempUserRegisterService.GetEmail(model.Email);
-                    if (IsTempSignEmail)
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserEmailExist, ErrorCode = enErrorCode.Status4098BizUserEmailExist });
+                }
+
+
+                ///////////////// check Tempuser table in email exist or not
+                bool IsSignEmailCheck = _tempUserRegisterService.GetEmailCheckExist(model.Email);
+                if (!IsSignEmailCheck)
+                {
+                    ////////////////////// check Tempuser table in Email verfy pending
+                    bool IsSignEmailVerifyPending = _tempUserRegisterService.GetEmail(model.Email);
+                    if (!IsSignEmailVerifyPending)
                     {
-                        var tempcurrentUser = new TempUserRegisterViewModel
-                        {
-                            UserName = model.Email,
-                            Email = model.Email,
-                            RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Email)
-                        };
-
-                        var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
-                        if (resultdata != null)
-                        {
-                            var resultotp = await _tempOtpService.GetTempData(Convert.ToInt32(resultdata.Id));
-                            SendEmailRequest request = new SendEmailRequest();
-                            request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.SendMailSubject;
-                            //request.Body = "use this code:" + resultotp.OTP + "";
-                            request.Body = EnResponseMessage.SendMailBody + resultotp.OTP;
-
-                            await _mediator.Send(request);
-
-                            //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
-                            //return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been send to your email.");
-                            return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignWithEmail });
-                        }
-                        else
-                        {
-                            return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
-                        }
+                        return Ok(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserEmailVerifyPending, ErrorCode = enErrorCode.Status4036VerifyPending });
                     }
-                    else
-                    {
-                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.Verificationpending, ErrorCode = enErrorCode.Status4036VerifyPending });
-                    }
+
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status4062UseralreadRegister });
+                }
+             
+                var tempcurrentUser = new TempUserRegisterViewModel
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Email)
+                };
+
+                var resultdata = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                if (resultdata != null)
+                {
+                    var resultotp = await _tempOtpService.GetTempData(Convert.ToInt32(resultdata.Id));
+                    SendEmailRequest request = new SendEmailRequest();
+                    request.Recepient = model.Email;
+                    request.Subject = EnResponseMessage.SendMailSubject;
+                    //request.Body = "use this code:" + resultotp.OTP + "";
+                    request.Body = EnResponseMessage.SendMailBody + resultotp.OTP;
+
+                    await _mediator.Send(request);
+
+                    //await _emailSender.SendEmailAsync(model.Email, "Registration confirmation email", confirmationLink);
+                    //return AppUtils.StanderdSignUp("Please verify it by clicking the otp that has been send to your email.");
+                    return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignWithEmail });
                 }
                 else
                 {
-                    return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status4062UseralreadRegister });
-                }
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUserRegisterError, ErrorCode = enErrorCode.Status4102SignUpUserRegisterError });
+                }                
             }
             catch (Exception ex)
             {
@@ -649,10 +656,37 @@ namespace CleanArchitecture.Web.API
 
 
                 bool isValidNumber = await _userdata.IsValidPhoneNumber(model.Mobile, CountryCode);
-
                 if (!isValidNumber)
                 {
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardSignUpPhonevalid, ErrorCode = enErrorCode.Status4013MobileInvalid });
+                }
+
+                ///////////////// Check bizUser  table in username  Exist or not
+                var resultUserName = await _userManager.FindByNameAsync(model.Mobile);
+                if (!string.IsNullOrEmpty(resultUserName?.UserName))
+                {
+                    //return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameAs_a_MobileExist, ErrorCode = enErrorCode.Status4103BizUserNameAs_a_MobileExist });
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
+                }
+
+                ///////////////// Check bizUser  table in mobile number  Exist or not
+                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                if (!IsSignMobile)
+                {
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
+                }
+
+                ///////////////// Check TempUser  table in mobile number  Exist or not
+                bool IsSignTempMobileChek = _tempUserRegisterService.GetMobileNumberCheck(model.Mobile);
+                if (!IsSignTempMobileChek)
+                {
+                    ///////////////// Check TempUser  table in mobile number  Exist  and verification pending or not
+                    bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
+                    if (!IsSignTempMobile)
+                    {
+                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpTempUserMobileExistAndVerificationPending, ErrorCode = enErrorCode.Status4036VerifyPending });
+                    }
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserMobileExist, ErrorCode = enErrorCode.Status4105TempUserMobileExist });
                 }
 
                 var tempcurrentUser = new TempUserRegisterViewModel
@@ -660,40 +694,24 @@ namespace CleanArchitecture.Web.API
                     UserName = model.Mobile,
                     Mobile = model.Mobile,
                     RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Mobile),
-                };
-
-                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
-                if (IsSignMobile)
+                };              
+                
+                var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
+                if (result != null)
                 {
-                    bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
-                    if (IsSignTempMobile)
-                    {
-                        var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
-                        if (result != null)
-                        {
-                            var tempotp = await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
+                    var tempotp = await _tempOtpService.GetTempData(Convert.ToInt32(result.Id));
 
-                            SendSMSRequest request = new SendSMSRequest();
-                            request.MobileNo = Convert.ToInt64(model.Mobile);
-                            request.Message = EnResponseMessage.SendMailBody + tempotp.OTP;
-                            await _mediator.Send(request);
-                            return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithMobile });
-                        }
-                        else
-                        {
-                            return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
-                        }
-                    }
-                    else
-                    {
-                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.Verificationpending, ErrorCode = enErrorCode.Status4036VerifyPending });
-                    }
+                    SendSMSRequest request = new SendSMSRequest();
+                    request.MobileNo = Convert.ToInt64(model.Mobile);
+                    request.Message = EnResponseMessage.SendMailBody + tempotp.OTP;
+                    await _mediator.Send(request);
+                    return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithMobile });
                 }
                 else
-                {
-                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
+                {                    
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUserRegisterError, ErrorCode = enErrorCode.Status4102SignUpUserRegisterError });
                 }
-
+                
             }
             catch (Exception ex)
             {

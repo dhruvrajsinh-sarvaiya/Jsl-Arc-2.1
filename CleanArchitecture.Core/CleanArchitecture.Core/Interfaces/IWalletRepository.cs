@@ -83,6 +83,10 @@ namespace CleanArchitecture.Core.Interfaces
 
         List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page);
 
+        int CreateDefaulWallet(long UserId);
+
+        int CreateWalletForAllUser_NewService(string WalletType);
+
         object GetTypeMappingObj(long userid);
         
     }

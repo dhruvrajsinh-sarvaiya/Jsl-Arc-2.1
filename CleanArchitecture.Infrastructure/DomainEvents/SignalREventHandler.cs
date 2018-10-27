@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.DomainEvents
 {
-    public class SinalREventHandler : IRequestHandler<SignalRData>
+    public class SignalREventHandler : IRequestHandler<SignalRData>
     {
         private readonly IMessageRepository<NotificationQueue> _MessageRepository;
         private readonly IMessageConfiguration _MessageConfiguration;
@@ -31,7 +31,7 @@ namespace CleanArchitecture.Infrastructure.DomainEvents
         private SocketHub _chat;
 
 
-        public SinalREventHandler(IMessageRepository<NotificationQueue> MessageRepository, 
+        public SignalREventHandler(IMessageRepository<NotificationQueue> MessageRepository, 
             MessageConfiguration MessageConfiguration, 
             MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, 
             WebApiParseResponse WebApiParseResponse, WebAPIParseResponseCls GenerateResponse, SocketHub chat)
@@ -50,16 +50,20 @@ namespace CleanArchitecture.Infrastructure.DomainEvents
             try
             {
                 
-                if(request.Method == enPairWiseMethodName.BuyerBook)
+                if(request.Method == enMethodName.BuyerBook)
                     _chat.BuyerBook(request.Parameter, request.Data);
-                else if (request.Method == enPairWiseMethodName.SellerBook)
+                else if (request.Method == enMethodName.SellerBook)
                     _chat.SellerBook(request.Parameter, request.Data);
-                else if(request.Method == enPairWiseMethodName.TradeHistoryByPair)
+                else if(request.Method == enMethodName.TradeHistoryByPair)
                     _chat.TradeHistoryByPair(request.Parameter, request.Data);
-                else if (request.Method == enPairWiseMethodName.ChartData)
+                else if (request.Method == enMethodName.ChartData)
                     _chat.ChartData(request.Parameter, request.Data);
-                else if (request.Method == enPairWiseMethodName.MarketData)
+                else if (request.Method == enMethodName.MarketData)
                     _chat.MarketData(request.Parameter, request.Data);
+                else if (request.Method == enMethodName.OpenOrder)
+                    _chat.MarketData(request.Parameter, request.Data);
+
+                
 
                 return Task.FromResult(new Unit());
             }

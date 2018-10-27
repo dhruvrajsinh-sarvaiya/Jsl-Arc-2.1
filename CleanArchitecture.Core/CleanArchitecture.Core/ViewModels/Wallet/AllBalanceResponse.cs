@@ -11,6 +11,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
         public string WalletType { get; set; }
         public string WalletName { get; set; }
         public byte IsDefaultWallet { get; set; }
+        public decimal WithdrawalDailyLimit { get; set; }
         public BizResponseClass BizResponseObj { get; set; }
     }
     public class Balance
