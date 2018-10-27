@@ -658,12 +658,12 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateDefaulWallet()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             BizResponseClass Response = new BizResponseClass();          
             try
             {
