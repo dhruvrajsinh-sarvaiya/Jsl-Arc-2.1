@@ -92,23 +92,23 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
             //CombineAllInitTransactionAsync();
 
-            return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
-            //_Resp = await MethodRespTsk;
-            // return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
-            //return Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
+            //_Resp = await MethodRespTsk;            
+            return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess };
             //return _Resp;
         }
 
-        public async Task<BizResponse> CombineAllInitTransactionAsync()
+        public BizResponse CombineAllInitTransactionAsync()
         {
             _Resp = new BizResponse();
             try
-            {               
+            {
+                //Helpers.JsonSerialize(null);
                 //=========================PROCESS
                 //Check balance here
-                var Validation = ValidateTransaction(_Resp);
+                var Validation = ValidateTransaction(_Resp);                
 
-                if (!await Validation) //validation and balance check success
+                if (!Validation.Result) //validation and balance check success
                 {
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                     return _Resp;
@@ -146,7 +146,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode, "", enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
                     Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType);
 
-                if (DebitResult.ReturnCode==enResponseCode.Fail)
+                if (DebitResult.ReturnCode == enResponseCode.Fail)
                 {
                     _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_WalletDebitFailMsg;
                     _Resp.ReturnCode = enResponseCodeService.Fail;
