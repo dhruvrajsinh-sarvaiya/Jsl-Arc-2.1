@@ -38,6 +38,8 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<BeneficiaryMaster> _BeneficiarycommonRepository;
         private readonly ICommonRepository<UserPreferencesMaster> _UserPreferencescommonRepository;
         private readonly ICommonRepository<WalletLedger> _WalletLedgersRepo;
+        private readonly ICommonRepository<MemberShadowBalance> _ShadowBalRepo;
+        private readonly ICommonRepository<MemberShadowLimit> _ShadowLimitRepo;
 
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         private readonly IWalletRepository _walletRepository1;
@@ -62,7 +64,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo,ICommonRepository<MemberShadowLimit>ShadowLimitRepo,ICommonRepository<MemberShadowBalance>ShadowBalRepo ,ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -85,6 +87,8 @@ namespace CleanArchitecture.Infrastructure.Services
             _BeneficiarycommonRepository = BeneficiaryMasterRepo;
             _UserPreferencescommonRepository = UserPreferenceRepo;
             _WalletLimitConfigurationMasterRepository = WalletConfigMasterRepo;
+            _ShadowBalRepo = ShadowBalRepo;
+            _ShadowLimitRepo = ShadowLimitRepo;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -132,26 +136,97 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //Rushabh 27-10-2018
-        //public bool GetBeneWhitelistingBit(long WalletID, string DestinationAddress)
-        //{
-        //    try
-        //    {
-        //        var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == 1);
-        //        var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Walletobj.UserID);
-        //        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == 1);
-        //        if(UserPrefobj.IsWhitelisting == 1)
-        //        {
+        public enCheckWithdrawalBene CheckWithdrawalBene(long WalletID, string DestinationAddress,short WhitelistingBit)
+        {
+            try
+            {
+                var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == 1);
+                if(Walletobj != null)
+                {
+                    var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Walletobj.UserID);
+                    if(UserPrefobj != null)
+                    {
+                        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == 1);
+                        if (UserPrefobj.IsWhitelisting == 1)
+                        {
+                            if (Beneobj != null)
+                            {
+                                if (Beneobj.Address == DestinationAddress && Beneobj.IsWhiteListed == 1)
+                                {
+                                    return enCheckWithdrawalBene.Success;
+                                }
+                                else
+                                {
+                                    return enCheckWithdrawalBene.AddressNotFoundOrWhitelistingBitIsOff;
+                                }
+                            }
+                            return enCheckWithdrawalBene.BeneficiaryNotFound;
+                        }
+                        else
+                        {
+                            if (Beneobj != null)
+                            {
+                                if (Beneobj.Address == DestinationAddress)
+                                {
+                                    Beneobj.IsWhiteListed = WhitelistingBit;
+                                    Beneobj.UpdatedBy = Walletobj.UserID;
+                                    Beneobj.UpdatedDate = UTC_To_IST();
+                                    _BeneficiarycommonRepository.Update(Beneobj);
+                                    return enCheckWithdrawalBene.Success;
+                                }
+                                return enCheckWithdrawalBene.AddressNotMatch;
+                            }
+                            else
+                            {
+                                BeneficiaryMaster AddNew = new BeneficiaryMaster();
+                                AddNew.IsWhiteListed = 0;
+                                AddNew.Status = 1;
+                                AddNew.CreatedBy = Walletobj.UserID;
+                                AddNew.CreatedDate = UTC_To_IST();
+                                AddNew.UserID = Walletobj.UserID;
+                                AddNew.Address = DestinationAddress;
+                                AddNew.Name = "System Generated";
+                                AddNew.WalletTypeID = Walletobj.WalletTypeID;
+                                AddNew = _BeneficiarycommonRepository.Add(AddNew);
+                                return enCheckWithdrawalBene.Success;
+                            }
+                        }
+                    }
+                    return enCheckWithdrawalBene.GlobalBitNotFound;
+                }
+                return enCheckWithdrawalBene.WalletNotFound;               
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }        
 
+        //public bool CheckShadowLimit(long WalletID, decimal Amount)
+        //{
+        //    var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID);
+        //    if(Walletobj != null)
+        //    {
+        //        var Balobj = _ShadowBalRepo.GetSingle(item => item.WalletID == WalletID);
+        //        if (Balobj != null)
+        //        {
+        //            if((Balobj.ShadowAmount + Amount) < Walletobj.Balance)
+        //            {
+        //                return true;
+        //            }
+        //            return false;
+        //        }
+        //        else
+        //        {
+        //            var typeobj = _walletRepository1
         //        }
         //    }
-        //    catch (Exception ex)
-        //    {
-        //        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-        //        throw ex;
-        //    }
+            
         //}
 
         //Rushabh 26-10-2018
+
         public enValidateWalletLimit ValidateWalletLimit(enTrnType TranType,decimal PerDayAmt,decimal PerHourAmt,decimal PerTranAmt, long WalletID)
         {
             try
@@ -1705,7 +1780,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse AddBeneficiary(string CoinName, string BeneficiaryAddress, long UserId)
+        public BeneficiaryResponse AddBeneficiary(string CoinName,string Name ,string BeneficiaryAddress, long UserId)
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
@@ -1739,7 +1814,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddNew.CreatedDate = UTC_To_IST();
                     AddNew.UserID = UserId;
                     AddNew.Address = BeneficiaryAddress;
-                    AddNew.Name = "System Generated";
+                    AddNew.Name = Name;
                     AddNew.WalletTypeID = walletMasters.Id;
                     AddNew = _BeneficiarycommonRepository.Add(AddNew);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;

@@ -367,7 +367,7 @@ namespace CleanArchitecture.Core.Enums
         GrpMsg = 3,
         Channel = 4
     }
-    
+
     public enum SubscriptionType
     {
         OneToOne = 1,
@@ -375,37 +375,46 @@ namespace CleanArchitecture.Core.Enums
     }
     public enum UserWiseMethodName
     {
-        OpenOrder=1,
-        OrderHistory=2,
-        TradeHistory=3,
-        ActivityNotification=4
+        OpenOrder = 1,
+        OrderHistory = 2,
+        TradeHistory = 3,
+        ActivityNotification = 4
     }
     public enum PairWiseMethodName
     {
-        BuyerBook=5,
-        SellerBook=6,
-        TradingHistory=7,
-        MarketData=8,
-        Price=9,
-        BuyerSideWallet=10,
-        SellerSideWallet=11,
-        ChartData=12
+        BuyerBook = 5,
+        SellerBook = 6,
+        TradingHistory = 7,
+        MarketData = 8,
+        Price = 9,
+        BuyerSideWallet = 10,
+        SellerSideWallet = 11,
+        ChartData = 12
     }
     public enum MarketWiseMethodName
     {
-        PairData=13,
-        MarketTicker=14
+        PairData = 13,
+        MarketTicker = 14
     }
     public enum GlobalMethodName
     {
-        Chat=15,
-        News=16,
-        Announcement=17,
-        Time=18
+        Chat = 15,
+        News = 16,
+        Announcement = 17,
+        Time = 18
     }
     public enum enValidateWalletLimit
     {
         Success = 1,
         Fail = 2
+    }
+    public enum enCheckWithdrawalBene
+    {
+        Success = 1,
+        WalletNotFound = 2,
+        GlobalBitNotFound = 3,
+        BeneficiaryNotFound = 4,
+        AddressNotFoundOrWhitelistingBitIsOff = 5,
+        AddressNotMatch = 6
     }
 }

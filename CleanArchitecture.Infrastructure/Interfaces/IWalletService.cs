@@ -80,7 +80,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         // vsolanki 25-10-2018
         BalanceResponseWithLimit GetAvailbleBalTypeWise(long userid);
 
-        BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId);
+        BeneficiaryResponse AddBeneficiary(string AccWalletID,string Name ,string BeneficiaryAddress, long UserId);
         BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
         BeneficiaryResponse ListBeneficiary(long id);
         UserPreferencesRes SetPreferences(long Userid, int GlobalBit);

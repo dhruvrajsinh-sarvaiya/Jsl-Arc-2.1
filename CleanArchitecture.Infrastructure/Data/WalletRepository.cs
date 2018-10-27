@@ -849,6 +849,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                     Name = b.Name,
                                                     BeneficiaryID = b.Id,
                                                     Address = b.Address,
+                                                    WalletTypeID = b.WalletTypeID,
                                                     IsWhiteListed = b.IsWhiteListed,
                                                     Status = b.Status
 
@@ -996,5 +997,16 @@ namespace CleanArchitecture.Infrastructure.Data
             return wl;
         }
 
+        //public object GetTypeMappingObj(long userid)
+        //{
+        //    var items = (from b in _dbContext.BizUserTypeMapping
+        //               where b.UserID == userid
+        //               select new BizUserTypeMapping
+        //               {
+        //                   I
+
+        //               }).AsEnumerable().ToList();
+        //    return items;
+        //}
     }
 }

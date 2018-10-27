@@ -82,5 +82,8 @@ namespace CleanArchitecture.Core.Interfaces
         decimal GetTodayAmountOfTQ(long userId, long WalletId);
 
         List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page);
+
+        object GetTypeMappingObj(long userid);
+        
     }
 }
