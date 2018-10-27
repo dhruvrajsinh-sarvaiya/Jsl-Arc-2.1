@@ -166,5 +166,39 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 throw;
             }
         }
+
+        /// <summary>
+        /// User 2FA Custome Token Create and insert
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
+        public async Task<string> Get2FACustomToken(long UserId)
+        {
+            // Status Old Custom Password UpdateStatus
+            var custompassword = await GetPassword(UserId);
+            if (custompassword != null)
+            {
+                UpdateOtp(custompassword.Id);
+            }
+            // End Old Custom Password UpdateStatus
+
+            //Start New Create Custome Password
+            string OtpValue = string.Empty;
+            OtpValue = _userService.GenerateRandomOTPWithPassword().ToString();
+            //End New Create Custome Password
+
+            //Start New Insert Custome Password
+            CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+            data.Password = OtpValue;
+            data.UserId = UserId;
+            data.EnableStatus = false;
+            var CustomtokenViewModel = await AddPassword(data);
+            //End New Insert Custome Password
+
+            if (CustomtokenViewModel != null)
+                return OtpValue;
+            else
+                return null;
+        }
     }
 }
