@@ -186,8 +186,8 @@ namespace CleanArchitecture.Infrastructure.Data
                 //wl1.TrnNo = wtq.TrnNo;
                 _dbContext.Set<WalletLedger>().Add(wl1);
                 _dbContext.Set<TransactionAccount>().Add(ta1);
-                _dbContext.Entry(wm2).State = EntityState.Modified;
-                _dbContext.Entry(wtq).State = EntityState.Modified;
+                //_dbContext.Entry(wm2).State = EntityState.Modified;
+                //_dbContext.Entry(wtq).State = EntityState.Modified;
                 _dbContext.SaveChanges();
                 _dbContext.Database.CommitTransaction();
                 return true;
