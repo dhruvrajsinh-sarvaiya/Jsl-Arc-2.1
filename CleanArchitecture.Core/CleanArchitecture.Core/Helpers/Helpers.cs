@@ -42,6 +42,26 @@ namespace CleanArchitecture.Core.Helpers
                 throw ex;
             }
         }
+
+        public static string GetUTCTime()
+        {
+            try
+            {
+                TimeZone CurrentZone = TimeZone.CurrentTimeZone;
+                DateTime CurrentDate = DateTime.Now;
+                DateTime CurrentUTC = CurrentZone.ToUniversalTime(CurrentDate);
+                //TimeZoneInfo selectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById(countryZone);
+                //DateTime currentDateTime = TimeZoneInfo.ConvertTimeFromUtc(currentUTC, selectedTimeZone);
+                //_chatHubContext.Clients.Caller.setTime(currentDateTime.ToString("h:mm:ss tt"));
+                //_chatHubContext.Clients.Caller.SendAsync("SetTime",currentUTC.ToLongTimeString());
+                string Data = Convert.ToInt64((CurrentUTC - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds * 1000).ToString();
+                return Data;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         public static long GenerateBatch()
         {
             //Method 1
