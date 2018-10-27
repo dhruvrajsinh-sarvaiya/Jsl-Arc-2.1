@@ -2057,11 +2057,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        //vsolanki 26-10-2018
-        public void CreateDefaulWallet(long UserID)
-        {
-
-        }
         //vsoalnki 26-10-2018
         public ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page)
         {
@@ -2080,6 +2075,28 @@ namespace CleanArchitecture.Infrastructure.Services
             Response.BizResponseObj.ReturnCode = enResponseCode.Success;
             Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
             return Response;
+        }
+
+
+        //vsolanki 27-10-2018
+        public BizResponseClass CreateDefaulWallet(long UserID)
+        {
+         var res=   _walletRepository1.CreateDefaulWallet(UserID);
+            if(res !=1)
+            {
+                return new BizResponseClass
+                {
+                    ErrorCode = enErrorCode.InternalError,
+                    ReturnMsg = EnResponseMessage.CreateWalletFailMsg,
+                    ReturnCode = enResponseCode.InternalError
+                };
+            }
+            return new BizResponseClass
+            {
+                ErrorCode = enErrorCode.Success,
+                ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg,
+                ReturnCode = enResponseCode.Success
+            };
         }
     }
 
