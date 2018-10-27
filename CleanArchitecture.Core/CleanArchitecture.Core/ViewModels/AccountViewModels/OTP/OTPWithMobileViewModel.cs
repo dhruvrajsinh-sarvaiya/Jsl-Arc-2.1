@@ -25,4 +25,10 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.OTP
     {
 
     }
+
+    public class OtpWithMobile2FAResponse : BizResponseClass
+    {
+        //public string appkey { get; set; }
+        public string TwoFAToken { get; set; }
+    }
 }

@@ -118,7 +118,16 @@ namespace CleanArchitecture.Infrastructure.Services.User
             }
         }
 
-        public async Task<bool> GetEmail(string Email)
+        public bool GetEmailCheckExist(string Email)
+        {
+            var userdata = _dbContext.TempUserRegister.Where(i => i.Email == Email).FirstOrDefault();
+            if (userdata?.Email == Email)
+                return false;
+            else
+                return true;
+        }
+
+        public bool GetEmail(string Email)
         {
             var userdata = _dbContext.TempUserRegister.Where(i => i.Email == Email && i.RegisterStatus == false).FirstOrDefault();
             if (userdata?.Email == Email)
@@ -126,6 +135,26 @@ namespace CleanArchitecture.Infrastructure.Services.User
             else
                 return true;
         }
+
+
+        public bool GetUserNameCheckExist(string UserName)
+        {
+            var userdata = _dbContext.TempUserRegister.Where(i => i.UserName == UserName).FirstOrDefault();
+            if (userdata?.UserName == UserName)
+                return false;
+            else
+                return true;
+        }
+
+        public bool GetUserName(string UserName)
+        {
+            var userdata = _dbContext.TempUserRegister.Where(i => i.UserName == UserName && i.RegisterStatus == false).FirstOrDefault();
+            if (userdata?.UserName == UserName)
+                return false;
+            else
+                return true;
+        }
+
 
         public async Task<TempUserRegisterViewModel> GetMobileNo(string MobileNo)
         {
