@@ -197,6 +197,13 @@ namespace CleanArchitecture.Core.SignalR
             //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOpenOrder", Order);
             var Redis = new RadisServices<ConnetedClientToken>(this._fact);
             IEnumerable<string> str =  Redis.GetKey(Token);
+            foreach(string s in str.ToList())
+            {
+                var key = s;
+                key = key.Split(":")[1].ToString();
+                _chatHubContext.Clients.Client(key).SendAsync("RecieveOpenOrder", Order);
+            }
+            // _chatHubContext.Clients.Client(str.ToList().AsReadOnly()).SendAsync("RecieveOpenOrder", Order);
             return Task.FromResult(0);
         }
 
