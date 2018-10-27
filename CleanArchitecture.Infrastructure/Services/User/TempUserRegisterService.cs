@@ -30,6 +30,15 @@ namespace CleanArchitecture.Infrastructure.Services.User
             _tempRepository = tempRepository;
         }
 
+        public bool GetMobileNumberCheck(string MobileNumber)
+        {
+            var userdata = _dbContext.TempUserRegister.Where(i => i.Mobile == MobileNumber).FirstOrDefault();
+            if (userdata?.Mobile == MobileNumber)
+                return false;
+            else
+                return true;
+        }
+
         public bool GetMobileNumber(string MobileNumber)
         {
             var userdata = _dbContext.TempUserRegister.Where(i => i.Mobile == MobileNumber && i.RegisterStatus == false).FirstOrDefault();
