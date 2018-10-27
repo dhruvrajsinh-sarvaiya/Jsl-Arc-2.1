@@ -122,8 +122,8 @@ namespace CleanArchitecture.Web.API
             Req.PairID = Request.CurrencyPairID;
             Req.Price = Request.Price;
             Req.Qty = Request.Amount;
-            Req.DebitWalletID = Request.DebitWalletID;
-            Req.CreditWalletID = Request.CreditWalletID;
+            Req.DebitAccountID = Request.DebitWalletID;
+            Req.CreditAccountID = Request.CreditWalletID;
 
             //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
            // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
@@ -169,12 +169,12 @@ namespace CleanArchitecture.Web.API
             Req.TrnType = enTrnType.Withdraw;
             //Req.MemberID = user.Id;
             //Req.MemberMobile = user.Mobile;
-            Req.MemberID = 5;
+            Req.MemberID = 16;
             Req.MemberMobile = "1234567890";
             Req.SMSCode = Request.asset;
             Req.TransactionAccount = Request.address;
-            Req.Amount = Request.Amount;          
-            Req.DebitWalletID = Request.DebitWalletID;
+            Req.Amount = Request.Amount;
+            Req.DebitAccountID = Request.DebitWalletID;
 
             //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
             // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
@@ -660,9 +660,9 @@ namespace CleanArchitecture.Web.API
                     return Ok(Response);
                 }
                 var responsedata = _frontTrnService.GetGraphDetail(id);
-                if (responsedata != null && responsedata.GraphData.Count != 0)
+                if (responsedata != null && responsedata.Count != 0)
                 {
-                    Response.response = _frontTrnService.GetGraphDetail(id);
+                    Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
                 }
                 else

@@ -6,6 +6,7 @@ using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
@@ -484,7 +485,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            LimitPerTransaction = u.LimitPerTransaction,
                                                            AccWalletID = c.AccWalletID,
                                                            EndTime = u.EndTime,
-                                                           StartTime = u.StartTime                                                           
+                                                           StartTime = u.StartTime
                                                        }).AsEnumerable().ToList();
             return items;
         }
@@ -808,18 +809,19 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsolanki 25-10-2018
-        public List<BalanceResponse> GetAvailbleBalTypeWise(long userid)
+        public List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid)
         {
             var result = (from w in _dbContext.WalletMasters
                           join wt in _dbContext.WalletTypeMasters
                           on w.WalletTypeID equals wt.Id
                           where w.UserID == userid && w.Status == 1
                           group w by new { wt.WalletTypeName } into g
-                          select new BalanceResponse
+                          select new BalanceResponseLimit
                           {
                               Balance = g.Sum(order => order.Balance),
                               WalletType = g.Key.WalletTypeName,
                           }).AsEnumerable().ToList();
+
             return result;
         }
 
@@ -907,5 +909,92 @@ namespace CleanArchitecture.Infrastructure.Data
             _dbContext.SaveChanges();
 
         }
+
+        public void CreateDefaulWallet()
+        {
+
+        }
+
+        //vsolanki 26-10-2018
+        public DateTime UTC_To_IST(DateTime dateTime)
+        {
+            try
+            {
+                // DateTime myUTC = DateTime.UtcNow;
+                // 'Dim utcdate As DateTime = DateTime.ParseExact(DateTime.UtcNow, "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                // Dim utcdate As DateTime = DateTime.ParseExact(myUTC, "M/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+                // 'Dim utcdate As DateTime = DateTime.ParseExact("11/09/2016 6:31:00 PM", "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                DateTime istdate = TimeZoneInfo.ConvertTimeFromUtc(dateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                // MsgBox(myUTC & " - " & utcdate & " - " & istdate)
+                return istdate;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public decimal GetTodayAmountOfTQ(long userId, long WalletId)
+        {
+            DateTime startDateTime = UTC_To_IST(DateTime.UtcNow); //Today at 12:00:00
+            DateTime endDateTime = UTC_To_IST(DateTime.UtcNow.AddDays(-1).AddTicks(-1));
+            //var d = startDateTime.Date;
+            //var amt = (from tq in _dbContext.WalletTransactionQueues
+            //          where tq.Status == enTransactionStatus.Success && tq.TrnDate >= startDateTime &&
+            //          tq.TrnDate <= endDateTime && tq.WalletID== WalletId && tq.MemberID==userId
+            //          group tq by new { tq.TrnDate } into g
+            //          select
+            //          g.Sum(order => order.Amount));
+
+
+            var total = (from tq in _dbContext.WalletTransactionQueues
+                         where tq.Status == enTransactionStatus.Success && tq.TrnDate <= startDateTime.Date &&
+                     tq.TrnDate >= endDateTime.Date && tq.WalletID == WalletId && tq.MemberID == userId
+                         select tq.Amount
+         ).Sum();
+            return total;
+
+            //return Convert.ToDecimal(amt);
+        }
+
+        //vsoalnki 26-10-2018
+        public List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId,int page)
+        {
+            //int skip = Helpers.PageSize * (page - 1);
+            List<WalletLedgerRes> wl = (from w in _dbContext.WalletLedgers
+                                        where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                        orderby w.TrnDate ascending
+                                        select new WalletLedgerRes
+                                        {
+                                            LedgerId = w.Id,
+                                            PreBal = w.PreBal,
+                                            PostBal = w.PreBal,
+                                            Remarks = "Opening Balance",
+                                            Amount = 0,
+                                            CrAmount=0,
+                                            DrAmount=0,
+                                           TrnDate=w.TrnDate
+                                        }).Take(1).Union((from w in _dbContext.WalletLedgers
+                                                  where w.WalletId == WalletId && w.TrnDate >= FromDate                        && w.TrnDate <= ToDate
+                                                  select new WalletLedgerRes
+                                                  {
+                                                      LedgerId = w.Id,
+                                                      PreBal = w.PreBal,
+                                                      PostBal = w.PostBal,
+                                                      Remarks = w.Remarks,
+                                                      Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt,
+                                                      CrAmount = w.CrAmt,
+                                                      DrAmount = w.DrAmt,
+                                                      TrnDate = w.TrnDate
+                                                  })).ToList();
+
+            if (page > 0)
+            {
+                int skip = Helpers.PageSize * (page - 1);
+                wl = wl.Skip(skip).Take(Helpers.PageSize).ToList();
+            }
+            return wl;
+        }
+
     }
 }

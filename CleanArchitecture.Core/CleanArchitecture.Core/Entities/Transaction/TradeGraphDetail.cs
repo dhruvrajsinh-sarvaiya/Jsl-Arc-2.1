@@ -9,14 +9,20 @@ namespace CleanArchitecture.Core.Entities.Transaction
 {
     public class TradeGraphDetail : BizBase
     {
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
         public long PairId { get; set; }
-        [Key]
         public DateTime DataDate { get; set; }
+        [Key]
+        public long TranNo { get; set; }
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal Volume { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal ChangePer { get; set; }
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]

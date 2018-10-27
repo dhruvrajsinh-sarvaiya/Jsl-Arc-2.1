@@ -1670,13 +1670,16 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("PairId");
+                    b.Property<long>("TranNo");
 
-                    b.Property<DateTime>("DataDate");
+                    b.Property<decimal>("ChangePer")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
+
+                    b.Property<DateTime>("DataDate");
 
                     b.Property<decimal>("High24Hr")
                         .HasColumnType("decimal(18, 8)");
@@ -1699,6 +1702,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<decimal>("LowWeek")
                         .HasColumnType("decimal(18, 8)");
 
+                    b.Property<long>("PairId");
+
                     b.Property<short>("Status");
 
                     b.Property<decimal>("TodayClose")
@@ -1714,9 +1719,9 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<decimal>("Volume")
                         .HasColumnType("decimal(18, 8)");
 
-                    b.HasKey("Id", "PairId", "DataDate");
+                    b.HasKey("Id", "TranNo");
 
-                    b.HasAlternateKey("DataDate", "Id", "PairId");
+                    b.HasAlternateKey("TranNo");
 
                     b.ToTable("TradeGraphDetail");
                 });
@@ -1887,6 +1892,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
+                    b.Property<Guid>("GUID");
+
                     b.Property<short>("IsSleepMode");
 
                     b.Property<decimal>("Landing")
@@ -1894,6 +1901,8 @@ namespace CleanArchitecture.Web.Migrations
                         .HasColumnType("decimal(37, 16)");
 
                     b.Property<short>("OnProcessing");
+
+                    b.Property<long>("PairId");
 
                     b.Property<string>("PairName")
                         .IsRequired()
@@ -2710,7 +2719,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<TimeSpan>("EndTime");
+                    b.Property<TimeSpan?>("EndTime");
 
                     b.Property<decimal?>("LifeTime");
 
@@ -2720,7 +2729,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal>("LimitPerTransaction");
 
-                    b.Property<TimeSpan>("StartTime");
+                    b.Property<TimeSpan?>("StartTime");
 
                     b.Property<short>("Status");
 
@@ -2735,6 +2744,41 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WalletLimitConfiguration");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.WalletLimitConfigurationMaster", b =>
+                {
+                    b.Property<int>("TrnType");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<TimeSpan>("EndTime");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal?>("LifeTime");
+
+                    b.Property<decimal>("LimitPerDay");
+
+                    b.Property<decimal>("LimitPerHour");
+
+                    b.Property<decimal>("LimitPerTransaction");
+
+                    b.Property<TimeSpan>("StartTime");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.HasKey("TrnType");
+
+                    b.ToTable("WalletLimitConfigurationMaster");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.WalletTransactionOrder", b =>
@@ -2972,6 +3016,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("Discription")
                         .IsRequired()
                         .HasMaxLength(100);
+
+                    b.Property<short?>("IsDefaultWallet");
 
                     b.Property<short>("IsDepositionAllow");
 

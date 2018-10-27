@@ -72,10 +72,15 @@ namespace CleanArchitecture.Core.Interfaces
 
         List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID);
         //vsolanki 25-10-2018
-        List<BalanceResponse> GetAvailbleBalTypeWise(long userid);
+        List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid);
 
         bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID);
 
         void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long WalletId);
+
+        //vsolanki 24-10-2018 
+        decimal GetTodayAmountOfTQ(long userId, long WalletId);
+
+        List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page);
     }
 }

@@ -477,24 +477,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public GetGraphDetailInfo GetGraphDetail(long PairId)
+        public List<GetGraphDetailInfo> GetGraphDetail(long PairId)
         {
             try
             {
-                GetGraphDetailInfo responseData = new GetGraphDetailInfo();
+                List<GetGraphDetailInfo> responseData = new List<GetGraphDetailInfo>();
                 var list = _frontTrnRepository.GetGraphData(PairId);
-                List<decimal[]> chartDataList = new List<decimal[]>();
-                chartDataList = (from GetGraphResponse dr in list
-                                 select new decimal[]
-                                 {
-                                      Convert.ToInt64(dr.DataDate)*1000,
-                                      Convert.ToDecimal(dr.Volume),
-                                      Convert.ToDecimal(dr.High),
-                                      Convert.ToDecimal(dr.Low),
-                                      Convert.ToDecimal(dr.TodayClose),
-                                      Convert.ToDecimal(dr.TodayOpen)
-                                 }).ToList();
-                responseData.GraphData = chartDataList;
+                responseData = list.Select(a => new GetGraphDetailInfo()
+                {
+                    DataDate = a.DataDate,
+                    High = a.High,
+                    Low = a.Low,
+                    TodayClose = a.TodayOpen,
+                    TodayOpen = a.TodayOpen,
+                    Volume = a.Volume,
+                    ChangePer = a.ChangePer
+                }).ToList();
                 return responseData;
             }
             catch (Exception ex)
