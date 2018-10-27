@@ -188,11 +188,23 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
         }
 
-        public IEnumerable<T> GetConnectionID1(string Token)
+        public IEnumerable<T> GetConnectionIDForTest(string Token)
         {
             try
             {
                 return this.Context.Cache.GetObjectsByTag<T>(Token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IEnumerable<string> GetKey(string Tag)
+        {
+            try
+            {
+                return this.Context.Cache.GetKeysByTag(new[] { Tag });
             }
             catch (Exception ex)
             {
