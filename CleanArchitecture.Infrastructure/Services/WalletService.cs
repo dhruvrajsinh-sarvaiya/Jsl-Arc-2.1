@@ -100,6 +100,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
         //Rushabh 26-10-2018
         public long GetWalletID(string AccWalletID)
         {
@@ -114,6 +115,42 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
+        //Rushabh 27-10-2018
+        public string GetAccWalletID(long WalletID)
+        {
+            try
+            {
+                var obj = _commonRepository.GetSingle(item => item.Id == WalletID);
+                return obj.AccWalletID;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //Rushabh 27-10-2018
+        //public bool GetBeneWhitelistingBit(long WalletID, string DestinationAddress)
+        //{
+        //    try
+        //    {
+        //        var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == 1);
+        //        var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Walletobj.UserID);
+        //        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == 1);
+        //        if(UserPrefobj.IsWhitelisting == 1)
+        //        {
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        throw ex;
+        //    }
+        //}
+
         //Rushabh 26-10-2018
         public enValidateWalletLimit ValidateWalletLimit(enTrnType TranType,decimal PerDayAmt,decimal PerHourAmt,decimal PerTranAmt, long WalletID)
         {
@@ -843,7 +880,9 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var walletResponse = _walletRepository1.GetWalletMasterResponseByCoin(userid, coin);
-                if (walletResponse.Count == 0)
+                var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == userid && item.Status == 1);
+                //if(UserPrefobj == null )
+                if (walletResponse.Count == 0 && UserPrefobj == null)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
                     listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;
@@ -852,6 +891,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     listWalletResponse.Wallets = walletResponse;
+                    listWalletResponse.IsWhitelisting = UserPrefobj.IsWhitelisting;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }

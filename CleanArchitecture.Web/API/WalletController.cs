@@ -114,7 +114,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{Coin}")]
-        public async Task<IActionResult> GetWalletByCoin(string Coin)
+        public async Task<IActionResult> GetWalletByType(string Coin)
         {
             //ApplicationUser user = new ApplicationUser(); user.Id = 1;
             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
