@@ -6,6 +6,7 @@ namespace CleanArchitecture.Core.Interfaces.User
 {
     public interface ITempUserRegisterService
     {
+        bool GetMobileNumberCheck(string MobileNumber);
         bool GetMobileNumber(string MobileNumber);
         Task<TempUserRegisterViewModel> AddTempRegister(TempUserRegisterViewModel model);
         Task<TempUserRegisterViewModel> FindById(long Id);

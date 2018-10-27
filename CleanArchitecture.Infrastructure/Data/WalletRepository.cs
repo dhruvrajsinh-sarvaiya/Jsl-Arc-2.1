@@ -1105,6 +1105,8 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             try
             {
+                //var wallet = _commonRepository.GetSingle(item => item.WalletTypeID == walletType.Id && item.IsDefaultWallet == 1);
+
                 var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
                                      where p.Status == 1 && p.WalletTypeName == WalletType
                                      select p);
@@ -1113,8 +1115,13 @@ namespace CleanArchitecture.Infrastructure.Data
                              where p.IsEnabled == true
                              select p).ToList();
 
+                //var ISExistWallet = (from item in _dbContext.WalletMasters
+                //                     from WalletTypearray in WalletTypeObj
+                //                     from ui in Users
+                //                     where item.WalletTypeID == WalletTypearray.Id && item.IsDefaultWallet == 1 && item.UserID==ui.Id
+                //                     select item);
                 var Wallets = from WalletTypearray in WalletTypeObj
-                              from U in Users
+                              from U in Users                              
                               select new WalletMaster
                               {
                                   CreatedBy = U.Id,
