@@ -626,12 +626,12 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 2018-10-26
-        [AllowAnonymous]
+       // [AllowAnonymous]
         [HttpGet("{FromDate}/{ToDate}/{WalletId}")]
         public async Task<IActionResult> GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int Page)
         {
-             ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListWalletLedgerRes Response = new ListWalletLedgerRes();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try

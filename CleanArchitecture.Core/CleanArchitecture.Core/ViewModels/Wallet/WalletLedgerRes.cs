@@ -13,9 +13,15 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
 
         public decimal PostBal { get; set; }
 
+        public decimal CrAmount { get; set; }
+
+        public decimal DrAmount { get; set; }
+
         public string Remarks { get; set; }
 
         public decimal Amount { get; set; }
+
+        public DateTime TrnDate { get; set; }
     }
     public class ListWalletLedgerRes
     {

@@ -26,7 +26,7 @@ using CleanArchitecture.Infrastructure.Services.Configuration;
 using CleanArchitecture.Infrastructure.Services.Transaction;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.Services.Session;
-using CleanArchitecture.Web.SignalR;
+using CleanArchitecture.Core.SignalR;
 using Newtonsoft.Json.Serialization;
 
 namespace CleanArchitecture.Web
@@ -253,7 +253,7 @@ namespace CleanArchitecture.Web
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<Chat>("/chathub");
+                routes.MapHub<SocketHub>("/chathub");
             });
 
             app.UseSession();
