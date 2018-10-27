@@ -20,6 +20,8 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
         public string Remarks { get; set; }
 
         public decimal Amount { get; set; }
+
+        public DateTime TrnDate { get; set; }
     }
     public class ListWalletLedgerRes
     {

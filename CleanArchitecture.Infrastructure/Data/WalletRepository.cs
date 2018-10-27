@@ -963,18 +963,19 @@ namespace CleanArchitecture.Infrastructure.Data
             //int skip = Helpers.PageSize * (page - 1);
             List<WalletLedgerRes> wl = (from w in _dbContext.WalletLedgers
                                         where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
-                                        orderby w.TrnDate descending
+                                        orderby w.TrnDate ascending
                                         select new WalletLedgerRes
                                         {
                                             LedgerId = w.Id,
-                                            PreBal = 0,
+                                            PreBal = w.PreBal,
                                             PostBal = w.PreBal,
                                             Remarks = "Opening Balance",
                                             Amount = 0,
                                             CrAmount=0,
-                                            DrAmount=0
+                                            DrAmount=0,
+                                           TrnDate=w.TrnDate
                                         }).Take(1).Union((from w in _dbContext.WalletLedgers
-                                                  where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                                  where w.WalletId == WalletId && w.TrnDate >= FromDate                        && w.TrnDate <= ToDate
                                                   select new WalletLedgerRes
                                                   {
                                                       LedgerId = w.Id,
@@ -983,7 +984,8 @@ namespace CleanArchitecture.Infrastructure.Data
                                                       Remarks = w.Remarks,
                                                       Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt,
                                                       CrAmount = w.CrAmt,
-                                                      DrAmount = w.DrAmt
+                                                      DrAmount = w.DrAmt,
+                                                      TrnDate = w.TrnDate
                                                   })).ToList();
 
             if (page > 0)
