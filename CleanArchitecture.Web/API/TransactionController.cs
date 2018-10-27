@@ -751,6 +751,45 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        [HttpGet("GetPairRates/{Pair}")]
+        public IActionResult GetPairRates(string Pair)
+        {
+            GetPairRatesResponse Response = new GetPairRatesResponse();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(Response);
+                }
+                var responsedata = _frontTrnService.GetPairRates(id);
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
         #endregion
 
 
