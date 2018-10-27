@@ -44,8 +44,8 @@ namespace CleanArchitecture.Web.API
 
                 SignalRData modelData = new SignalRData();
                 modelData.Type =enSignalREventType.Channel;
-                modelData.Method = enPairWiseMethodName.BuyerBook;
-                modelData.ReturnMethod = enPairWiseMethodName.BuyerBook;
+                modelData.Method = enMethodName.BuyerBook;
+                modelData.ReturnMethod = enReturnMethod.RecieveBuyerBook;
                 modelData.Subscription = enSubscriptionType.OneToOne;
                 modelData .Data= JsonConvert.SerializeObject(model);
                 modelData.ParamType =enSignalRParmType.PairName;
@@ -75,8 +75,8 @@ namespace CleanArchitecture.Web.API
 
                 SignalRData modelData = new SignalRData();
                 modelData.Type = enSignalREventType.Channel;
-                modelData.Method = enPairWiseMethodName.SellerBook;
-                modelData.ReturnMethod = enPairWiseMethodName.SellerBook;
+                modelData.Method = enMethodName.SellerBook;
+                modelData.ReturnMethod = enReturnMethod.RecieveSellerBook;
                 modelData.Subscription = enSubscriptionType.OneToOne;
                 modelData.Data = JsonConvert.SerializeObject(model);
                 modelData.ParamType = enSignalRParmType.PairName;
@@ -113,8 +113,8 @@ namespace CleanArchitecture.Web.API
 
                 SignalRData modelData = new SignalRData();
                 modelData.Type = enSignalREventType.Channel;
-                modelData.Method = enPairWiseMethodName.TradeHistoryByPair;
-                modelData.ReturnMethod = enPairWiseMethodName.TradeHistoryByPair;
+                modelData.Method = enMethodName.TradeHistoryByPair;
+                modelData.ReturnMethod = enReturnMethod.RecieveTradingHistory;
                 modelData.Subscription = enSubscriptionType.OneToOne;
                 modelData.Data = JsonConvert.SerializeObject(model);
                 modelData.ParamType = enSignalRParmType.PairName;
@@ -148,8 +148,8 @@ namespace CleanArchitecture.Web.API
 
                 SignalRData modelData = new SignalRData();
                 modelData.Type = enSignalREventType.Channel;
-                modelData.Method = enPairWiseMethodName.ChartData;
-                modelData.ReturnMethod = enPairWiseMethodName.ChartData;
+                modelData.Method = enMethodName.ChartData;
+                modelData.ReturnMethod = enReturnMethod.RecieveChartData;
                 modelData.Subscription = enSubscriptionType.OneToOne;
                 modelData.Data = JsonConvert.SerializeObject(model);
                 modelData.ParamType = enSignalRParmType.PairName;
@@ -182,8 +182,8 @@ namespace CleanArchitecture.Web.API
 
                 SignalRData modelData = new SignalRData();
                 modelData.Type = enSignalREventType.Channel;
-                modelData.Method = enPairWiseMethodName.MarketData;
-                modelData.ReturnMethod = enPairWiseMethodName.MarketData;
+                modelData.Method = enMethodName.MarketData;
+                modelData.ReturnMethod = enReturnMethod.RecieveMarketData;
                 modelData.Subscription = enSubscriptionType.OneToOne;
                 modelData.Data = JsonConvert.SerializeObject(model);
                 modelData.ParamType = enSignalRParmType.PairName;
