@@ -363,8 +363,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost("{AccWalletID}/{BeneficiaryAddress}")]
-        public async Task<IActionResult> AddBeneficiary(string AccWalletID, string BeneficiaryAddress)
+        [HttpPost("{CoinName}/{BeneficiaryAddress}")]
+        public async Task<IActionResult> AddBeneficiary(string CoinName, string BeneficiaryAddress)
         {
             BeneficiaryResponse response = new BeneficiaryResponse();
             try
@@ -378,7 +378,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.AddBeneficiary(AccWalletID, BeneficiaryAddress, user.Id);
+                    response = _walletService.AddBeneficiary(CoinName, BeneficiaryAddress, user.Id);
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -476,8 +476,8 @@ namespace CleanArchitecture.Web.API
         }
 
 
-        [HttpGet("{AccWalletID}")]
-        public async Task<IActionResult> GetAllBeneficiaries(string AccWalletID)
+        [HttpGet]
+        public async Task<IActionResult> GetAllBeneficiaries()
         {
             BeneficiaryResponse response = new BeneficiaryResponse();
             try
@@ -491,7 +491,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.ListBeneficiary(AccWalletID, user.Id);
+                    response = _walletService.ListBeneficiary(user.Id);
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
