@@ -361,7 +361,7 @@ namespace CleanArchitecture.Core.Enums
         DepositLimit = 3,
         APICallLimit = 4
     }
-    public enum SignalREventType
+    public enum enSignalREventType
     {
         Alert = 1,
         Nofification = 2,
@@ -369,35 +369,35 @@ namespace CleanArchitecture.Core.Enums
         Channel = 4
     }
     
-    public enum SubscriptionType
+    public enum enSubscriptionType
     {
         OneToOne = 1,
         Broadcast = 2
     }
-    public enum UserWiseMethodName
+    public enum enUserWiseMethodName
     {
         OpenOrder=1,
         OrderHistory=2,
         TradeHistory=3,
         ActivityNotification=4
     }
-    public enum PairWiseMethodName
+    public enum enPairWiseMethodName
     {
         BuyerBook=5,
         SellerBook=6,
-        TradingHistory=7,
+        TradeHistoryByPair = 7,
         MarketData=8,
         Price=9,
         BuyerSideWallet=10,
         SellerSideWallet=11,
         ChartData=12
     }
-    public enum MarketWiseMethodName
+    public enum enMarketWiseMethodName
     {
         PairData=13,
         MarketTicker=14
     }
-    public enum GlobalMethodName
+    public enum enGlobalMethodName
     {
         Chat=15,
         News=16,
@@ -408,5 +408,11 @@ namespace CleanArchitecture.Core.Enums
     {
         Success = 1,
         Fail = 2
+    }
+    public enum enSignalRParmType
+    {
+        PairName = 1,
+        Base = 2,
+        AccessToken = 3
     }
 }
