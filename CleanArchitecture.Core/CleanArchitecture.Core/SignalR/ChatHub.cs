@@ -78,8 +78,11 @@ namespace CleanArchitecture.Core.SignalR
 
         public void OnConnected(string Token, string Username)
         {
-            var Redis = new RadisServices<ConnetedClientList>(this._fact);
-            Redis.SaveToHash(Context.ConnectionId, new ConnetedClientList { ConnectionId = Context.ConnectionId }, Token);
+            // var Redis = new RadisServices<ConnetedClientList>(this._fact);
+            // Redis.SaveToHash(Context.ConnectionId, new ConnetedClientList { ConnectionId = Context.ConnectionId }, Token);
+
+            var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+            Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = Token }, Token,Context.ConnectionId);
         }
 
         public override Task OnDisconnectedAsync(System.Exception exception)
@@ -89,7 +92,8 @@ namespace CleanArchitecture.Core.SignalR
             
             var Redis = new RadisServices<ConnetedClientList>(this._fact);            
             string Pair = Redis.GetPair(Context.ConnectionId,":");
-            GetConnectedClient(Pair);
+            //GetConnectedClient(Pair);
+            Redis.DeleteHash("Users:"+Context.ConnectionId);
             Redis.RemoveSetMember("Pairs:" + Pair, Context.ConnectionId);
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "BuyerBook:" + Pair).Wait();
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "SellerBook:" + Pair).Wait();
@@ -180,73 +184,79 @@ namespace CleanArchitecture.Core.SignalR
         }
 
         //User Specific Updates
-        public void OpenOrder(string Token, ActiveOrderInfo Order)
+        public void OpenOrder(string Token, string Order)
         {
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
             User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOpenOrder", Helpers.Helpers.JsonSerialize(Order));
+            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOpenOrder", Order);
         }
 
-        public void OrderHistory(string Token, GetTradeHistoryResponse Order)
+        public void OrderHistory(string Token, string Order)
         {
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
             User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOrderHistory", Helpers.Helpers.JsonSerialize(Order));
+            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOrderHistory", Order);
         }
 
-        public void TradeHistory(string Token, GetTradeHistoryResponse Order)
+        public void TradeHistory(string Token, string Order)
         {
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
             User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveTradeHistory", Helpers.Helpers.JsonSerialize(Order));
+            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveTradeHistory", Order);
         }
         
-        public void BuyerSideWalletBal(string Token, BalanceResponse Data)
+        public void BuyerSideWalletBal(string Token, string Data)
         {
             //var Name= Context.User.Identity.Name;
             //_chatHubContext.Clients.Group("BuyerSideWalletBal:" + Pair).SendAsync("RecieveBuyerSideWalletBal", Data);
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
             User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveBuyerSideWalletBal", Helpers.Helpers.JsonSerialize(Data));
+            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveBuyerSideWalletBal", Data);
         }
 
-        public void SellerSideWalletBal(string Token, BalanceResponse Data)
+        public void SellerSideWalletBal(string Token, string Data)
         {
             //_chatHubContext.Clients.Group("SellerSideWalletBal:" + Pair).SendAsync("RecieveSellerSideWalletBal", Data);
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
             User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveSellerSideWalletBal", Helpers.Helpers.JsonSerialize(Data));
+            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveSellerSideWalletBal", Data);
         }
 
         // Global Updates
-        public void BuyerBook(string Pair, GetBuySellBook Data)
+        public void BuyerBook(string Pair, string Data)
         {
-            _chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Data);
+            //_chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Helpers.Helpers.JsonSerialize(Data));
             _chatHubContext.Clients.Group("BuyerBook:" + Pair).SendAsync("RecieveBuyerBook", Data);
         }
 
-        public void SellerBook(string Pair, GetBuySellBook Data)
+        // For Demo get Connections Topic wise subscription using Redis // Too SLow for Output 
+        public void BuyerBookWithRedis(string Pair, string Data)
         {
-            Clients.Group("SellerBook:" + Pair).SendAsync("RecieveSellerBook", Data);
+            _chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Data);
+        }
+
+        public void SellerBook(string Pair, string Data)
+        {
+            _chatHubContext.Clients.Group("SellerBook:" + Pair).SendAsync("RecieveSellerBook", Data);
         }
 
         // Global Trades settelment
-        public void TradingHistory(string Pair, TradeHistoryResponce Data)
+        public void TradingHistory(string Pair, string Data)
         {
             _chatHubContext.Clients.Group("TradingHistory:" + Pair).SendAsync("RecieveTradingHistory", Data);
         }
 
-        public void MarketData(string Pair, MarketCapData Data)
+        public void MarketData(string Pair, string Data)
         {
             _chatHubContext.Clients.Group("MarketData:" + Pair).SendAsync("RecieveMarketData", Data);
         }        
 
-        public void ChartData(string Pair, GetGraphResponse Data)
+        public void ChartData(string Pair, string Data)
         {
             _chatHubContext.Clients.Group("ChartData:" + Pair).SendAsync("RecieveChartData", Data);
         }

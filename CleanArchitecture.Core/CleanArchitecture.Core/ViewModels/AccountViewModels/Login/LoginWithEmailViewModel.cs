@@ -15,8 +15,14 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
         //public bool RememberMe { get; set; }
 
     }
-    public class LoginWithEmailresponse : BizResponseClass
+    public class LoginWithEmailResponse : BizResponseClass
     {
         public string appkey { get; set; }
+    }
+
+    public class LoginWithEmail2FAResponse : BizResponseClass
+    {
+        //public string appkey { get; set; }
+        public string TwoFAToken { get; set; }
     }
 }

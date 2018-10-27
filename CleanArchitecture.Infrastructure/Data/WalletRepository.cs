@@ -843,10 +843,10 @@ namespace CleanArchitecture.Infrastructure.Data
             return items;
         }
 
-        public List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID)
+        public List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.WalletTypeID == WalletTypeID
+                                                where b.UserID == UserID
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,

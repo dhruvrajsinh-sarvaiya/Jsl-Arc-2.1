@@ -584,6 +584,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+        public PairRatesResponse GetPairRates(long PairId)
+        {
+            try
+            {
+                PairRatesResponse responseData = new PairRatesResponse();
+
+                responseData = _frontTrnRepository.GetPairRates(PairId);
+               
+                return responseData;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
         #endregion
 
         #region parameterValidation
@@ -678,7 +694,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
         }
 
-        
         #endregion
     }
 }

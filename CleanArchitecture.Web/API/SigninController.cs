@@ -48,6 +48,10 @@ namespace CleanArchitecture.Web.API
         private readonly IBasePage _basePage;
         private readonly EncyptedDecrypted _encdecAEC;
         private readonly ICustomPassword _custompassword;
+        private readonly Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>> _tokenProviders =
+            new Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>>();
+        public static readonly string ProviderName = "TotpSoftwareAuthenticator";
+
         #endregion
 
         #region Ctore
@@ -189,8 +193,25 @@ namespace CleanArchitecture.Web.API
             //  var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
             try
             {
+                
+
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+                //var Key = await _custompassword.GetPassword(user.Id);
+
+                //if(Key.Password != model.TwoFAKey)
+                //    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
+
+                //// Valid Key and status Disable
+                //_custompassword.UpdateOtp(Key.Id);
+
                 var authenticatorCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+                //string tokenProvider = ProviderName;
+                ////// Make sure the token is valid
+                //////var result = await _tokenProviders[tokenProvider].ValidateAsync("TwoFactor", authenticatorCode, _userManager, user);
+
+                ////return null;
 
                 var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, false, false);
                 if (result.Succeeded)
@@ -201,22 +222,21 @@ namespace CleanArchitecture.Web.API
                 }
                 else if (result.IsLockedOut)
                 {
-                    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status400BadRequest });
+                    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
                 }
                 else
-
                 {
                     return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
 
                 }
 
 
-                //if (result.IsLockedOut)
-                //{
-                //    _logger.LogWarning(7, "User account locked out.");
-                //    return View("Lockout");
-                //}
-                //return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status400BadRequest });
+                // //if (result.IsLockedOut)
+                // //{
+                // //    _logger.LogWarning(7, "User account locked out.");
+                // //    return View("Lockout");
+                // //}
+                // //return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status400BadRequest });
 
             }
             catch (Exception ex)
@@ -290,7 +310,7 @@ namespace CleanArchitecture.Web.API
             {
                 //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, lockoutOnFailure: false);
-                var checkmail = await _userManager.FindByEmailAsync(model.Username);
+               // var checkmail = await _userManager.FindByEmailAsync(model.Username);
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
@@ -300,7 +320,14 @@ namespace CleanArchitecture.Web.API
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+
+                    //// Start 2FA in Custome token Create 
+                    //var user = await _userManager.FindByNameAsync(model.Username);
+                    //string TwoFAToken = await _custompassword.Get2FACustomToken(user.Id);
+                    //// End 2FA in Custome token Create 
+                    //return Ok(new StandardLogin2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
+
+                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod});
                 }
                 if (result.IsLockedOut)
                 {
@@ -308,13 +335,13 @@ namespace CleanArchitecture.Web.API
 
                     return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
                 }
-                else
-                {
-                    if (checkmail != null)
-                        await _userManager.AccessFailedAsync(checkmail);
-                    //return BadRequest(new ApiError("Login failed : Invalid username or password."));
+                //else
+                //{
+                //    if (checkmail != null)
+                //        await _userManager.AccessFailedAsync(checkmail);
+                //    //return BadRequest(new ApiError("Login failed : Invalid username or password."));
                     return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status4032LoginFailed });
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -352,25 +379,26 @@ namespace CleanArchitecture.Web.API
 
 
                         _logger.LogWarning(1, "User Login with Email Send Success.");
-                        return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
+                        return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
                     }
                     else
-                    {
+                    {                       
+
                         _logger.LogWarning(2, "User Otp Data Not Send.");
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpDatanotSend, ErrorCode = enErrorCode.Status4085LoginWithOtpDatanotSend });
+                        return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpDatanotSend, ErrorCode = enErrorCode.Status4085LoginWithOtpDatanotSend });
                     }
                 }
                 else
                 {
                     //return BadRequest(new ApiError("Login failed: Invalid email."));
-                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
+                    return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
                 //return BadRequest();
-                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -408,8 +436,14 @@ namespace CleanArchitecture.Web.API
                                         var res = await _userManager.UpdateAsync(checkmail);
                                         if (res.Succeeded)
                                         {
-                                            var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
-                                            return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFaVerification });
+                                            //var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
+                                            //// Start 2FA in Custome token Create 
+                                            //var user = await _userManager.FindByEmailAsync(model.Email);
+                                            //string TwoFAToken = await _custompassword.Get2FACustomToken(user.Id);
+                                            //// End 2FA in Custome token Create 
+
+                                            //return Ok(new LoginWithEmail2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
+                                            return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod});                                          
                                         }
                                         else
                                             return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
@@ -521,35 +555,35 @@ namespace CleanArchitecture.Web.API
                                 data.EnableStatus = false;
                                 await _custompassword.AddPassword(data);
                                 _logger.LogWarning(1, "User Login with Email OTP Send Success.");
-                                return Ok(new LoginWithEmailresponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP, appkey = otpData.appkey });
+                                return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP, appkey = otpData.appkey });
 
                             }
                             else
                             {
                                 _logger.LogWarning(2, "User Otp Data Not Send.");
-                                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginEmailOTPNotsend, ErrorCode = enErrorCode.Status4089LoginEmailOTPNotsend });
+                                return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginEmailOTPNotsend, ErrorCode = enErrorCode.Status4089LoginEmailOTPNotsend });
 
                             }
                         }
                         else
                         {
-                            return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status4087EmailFail });
+                            return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.EmailFail, ErrorCode = enErrorCode.Status4087EmailFail });
                         }
                     }
                     else
                     {
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
+                        return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                     }
                 }
                 else
                 {
-                    return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
+                    return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
-                return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -636,7 +670,12 @@ namespace CleanArchitecture.Web.API
                                         {
                                             var resultdata = await _signInManager.PasswordSignInAsync(result.UserName, currenttime, false, lockoutOnFailure: false);
 
-                                            return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFaVerification });
+                                            //// Start 2FA in Custome token Create                                            
+                                            //string TwoFAToken = await _custompassword.Get2FACustomToken(logindata.Id);
+                                            //// End 2FA in Custome token Create 
+                                            //return Ok(new OtpWithMobile2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
+
+                                            return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod});                                           
                                         }
                                         else
                                             return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
@@ -763,7 +802,7 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        return BadRequest(new LoginWithEmailresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
+                        return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
                     }
                 }
                 else
@@ -822,8 +861,20 @@ namespace CleanArchitecture.Web.API
                             //_logger.LogInformation(
                             //    "{Name} logged in with {LoginProvider} provider.",
                             //    info.Principal.Identity.Name, info.LoginProvider);
+                            SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+                            if (socialCustomPasswordViewMoel != null)
+                            {
+                                CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                data.Password = socialCustomPasswordViewMoel.Password;
+                                data.UserId = user.Id;
+                                data.EnableStatus = false;
+                                await _custompassword.AddPassword(data);
+
+                            }
                             _logger.LogInformation(1, "User logged in with social using.");
-                            return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                            return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess, Appkey = socialCustomPasswordViewMoel.AppKey });
+
                         }
                         if (result.RequiresTwoFactor)
                         {
@@ -858,8 +909,22 @@ namespace CleanArchitecture.Web.API
                                     //_logger.LogInformation(
                                     //    "User created an account using {Name} provider.",
                                     //    info.LoginProvider);
+
+                                    SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+                                    if (socialCustomPasswordViewMoel != null)
+                                    {
+                                        CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                        data.Password = socialCustomPasswordViewMoel.Password;
+                                        data.UserId = user.Id;
+                                        data.EnableStatus = false;
+                                        await _custompassword.AddPassword(data);
+
+                                    }
+
+
                                     _logger.LogInformation(1, "User logged in with social using.");
-                                    return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                                    return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess, Appkey = socialCustomPasswordViewMoel.AppKey });
                                 }
                                 else
                                 {
@@ -889,6 +954,145 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        /// <summary>
+        /// This method created by pankaj for user perform to  External login with facebook.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("ExternalLoginForFacebook")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginForFacebook([FromBody] SocialLoginWithfacebookViewModel model)
+        {
+            try
+            {
+                var appAccessTokenResponse = (dynamic)null;
+                var httpClient = new HttpClient();
+
+                try
+                {
+                    appAccessTokenResponse = await httpClient.GetStringAsync(_configuration["SocialFacebookToken"].ToString()
+                        + _configuration["Authentication:Facebook:AppId"].ToString() + "&client_secret=" + _configuration["Authentication:Facebook:AppSecret"].ToString() +
+                        "&grant_type=client_credentials");
+                    var appAccessToken = JsonConvert.DeserializeObject<FacebookAppAccessTokenViewModel>(appAccessTokenResponse);
+
+                    string userAccessTokenValidationResponse = await httpClient.GetStringAsync($"https://graph.facebook.com/debug_token?input_token={model.access_token}&access_token=" + appAccessToken.access_token);
+                    //var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookUserAccessTokenValidation>(userAccessTokenValidationResponse);
+
+                    var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookUserAccessTokenValidationViewModel>(userAccessTokenValidationResponse);
+
+                    if (!userAccessTokenValidation.data.is_valid)
+                    {
+                        return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidFaceBookToken, ErrorCode = enErrorCode.Status4096InvalidFaceBookToken });
+
+                    }
+
+                    appAccessTokenResponse = await httpClient.GetStringAsync(_configuration["SocialFacebook"].ToString() + model.access_token);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                    return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidFaceBookToken, ErrorCode = enErrorCode.Status4096InvalidFaceBookToken });
+                }
+                if (appAccessTokenResponse != null)
+                {
+                    var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookSocial>(appAccessTokenResponse);
+
+
+                    var result = await _signInManager.ExternalLoginSignInAsync(model.ProviderName, model.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+                    if (result.Succeeded)
+                    {
+                        var user = await _userManager.FindByLoginAsync(model.ProviderName, model.ProviderKey);
+
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+                        if (socialCustomPasswordViewMoel != null)
+                        {
+                            CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                            data.Password = socialCustomPasswordViewMoel.Password;
+                            data.UserId = user.Id;
+                            data.EnableStatus = false;
+                            await _custompassword.AddPassword(data);
+
+                        }
+                        _logger.LogInformation(1, "User logged in with social using.");
+                        return Ok(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Success, Appkey = socialCustomPasswordViewMoel.AppKey, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+
+
+
+                    }
+                    if (result.RequiresTwoFactor)
+                    {
+                        return Ok(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+                    }
+                    if (result.IsLockedOut)
+                    {
+                        return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
+                    }
+                    else
+                    {
+
+                        var user =
+                        new ApplicationUser
+                        {
+                            UserName = userAccessTokenValidation.first_name,
+                            Email = userAccessTokenValidation.email,
+                            FirstName = userAccessTokenValidation.first_name,
+                            LastName = userAccessTokenValidation.last_name
+                        };   /// Here email address not set bacause of user can login with mobile number as well as email so.
+
+
+                        var userdet = await _userManager.CreateAsync(user);
+
+
+                        var infodet = new UserLoginInfo(model.ProviderName, model.ProviderKey, model.ProviderName);
+                        if (userdet.Succeeded)
+                        {
+                            var userlogin = await _userManager.AddLoginAsync(user, infodet);
+
+                            if (userlogin.Succeeded)
+                            {
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                                _logger.LogInformation(1, "User logged in with social using.");
+                                SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+
+                                if (socialCustomPasswordViewMoel != null)
+                                {
+                                    CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                    data.Password = socialCustomPasswordViewMoel.Password;
+                                    data.UserId = user.Id;
+                                    data.EnableStatus = false;
+                                    await _custompassword.AddPassword(data);
+                                }
+                                return Ok(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Success, Appkey = socialCustomPasswordViewMoel.AppKey, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                            }
+                            else
+                            {
+                                return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SocialUserInsertError, ErrorCode = enErrorCode.Status4070SocialUserInsertError });
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SocialUserInsertError, ErrorCode = enErrorCode.Status4070SocialUserInsertError });
+                        }
+                    }
+
+
+                }
+                else
+                {
+                    return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidGoogleToken, ErrorCode = enErrorCode.Status4068InvalidGoogleToken });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
         #endregion
 
         [HttpPost("ForgotPassword")]

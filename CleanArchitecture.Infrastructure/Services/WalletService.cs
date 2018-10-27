@@ -100,6 +100,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
         //Rushabh 26-10-2018
         public long GetWalletID(string AccWalletID)
         {
@@ -114,6 +115,42 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
+        //Rushabh 27-10-2018
+        public string GetAccWalletID(long WalletID)
+        {
+            try
+            {
+                var obj = _commonRepository.GetSingle(item => item.Id == WalletID);
+                return obj.AccWalletID;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //Rushabh 27-10-2018
+        //public bool GetBeneWhitelistingBit(long WalletID, string DestinationAddress)
+        //{
+        //    try
+        //    {
+        //        var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == 1);
+        //        var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Walletobj.UserID);
+        //        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == 1);
+        //        if(UserPrefobj.IsWhitelisting == 1)
+        //        {
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        throw ex;
+        //    }
+        //}
+
         //Rushabh 26-10-2018
         public enValidateWalletLimit ValidateWalletLimit(enTrnType TranType,decimal PerDayAmt,decimal PerHourAmt,decimal PerTranAmt, long WalletID)
         {
@@ -843,7 +880,9 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var walletResponse = _walletRepository1.GetWalletMasterResponseByCoin(userid, coin);
-                if (walletResponse.Count == 0)
+                var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == userid && item.Status == 1);
+                //if(UserPrefobj == null )
+                if (walletResponse.Count == 0 && UserPrefobj == null)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
                     listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;
@@ -852,6 +891,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     listWalletResponse.Wallets = walletResponse;
+                    listWalletResponse.IsWhitelisting = UserPrefobj.IsWhitelisting;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
@@ -1665,14 +1705,14 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId)
+        public BeneficiaryResponse AddBeneficiary(string CoinName, string BeneficiaryAddress, long UserId)
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
             try
             {
                 var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
-                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                var walletMasters = _WalletTypeMasterRepository.GetSingle(item => item.WalletTypeName == CoinName);
                 Response.BizResponse = new BizResponseClass();
                 if (walletMasters == null)
                 {
@@ -1681,7 +1721,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
                     return Response;
                 }
-                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.WalletTypeID && item.Status == 1);
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.Id && item.Status == 1);
 
                 if (IsExist == null)
                 {
@@ -1700,7 +1740,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddNew.UserID = UserId;
                     AddNew.Address = BeneficiaryAddress;
                     AddNew.Name = "System Generated";
-                    AddNew.WalletTypeID = walletMasters.WalletTypeID;
+                    AddNew.WalletTypeID = walletMasters.Id;
                     AddNew = _BeneficiarycommonRepository.Add(AddNew);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
                 }
@@ -1759,22 +1799,22 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse ListBeneficiary(string AccWalletID, long UserId)
+        public BeneficiaryResponse ListBeneficiary(long UserId)
         {
             BeneficiaryResponse Response = new BeneficiaryResponse();
             Response.BizResponse = new BizResponseClass();
             try
             {
-                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
+                //var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
 
-                if (walletMasters == null)
-                {
-                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
-                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
-                    return Response;
-                }
-                var BeneficiaryMasterRes = _walletRepository1.GetAllBeneficiaries(walletMasters.WalletTypeID);
+                //if (walletMasters == null)
+                //{
+                //    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                //    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                //    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                //    return Response;
+                //}
+                var BeneficiaryMasterRes = _walletRepository1.GetAllBeneficiaries(UserId);
                 if (BeneficiaryMasterRes.Count == 0)
                 {
                     Response.BizResponse.ReturnCode = enResponseCode.Fail;

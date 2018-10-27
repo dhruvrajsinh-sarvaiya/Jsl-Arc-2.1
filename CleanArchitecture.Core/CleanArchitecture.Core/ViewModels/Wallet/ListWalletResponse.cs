@@ -10,6 +10,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
     {
         // public List<Wallet> wallets { get; set; }
          public List<WalletMasterResponse> Wallets { get; set; }
+         public short? IsWhitelisting { get; set; }
     }
     //public class ListWalletResponse
     //{

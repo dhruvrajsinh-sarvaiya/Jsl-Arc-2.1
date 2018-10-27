@@ -28,4 +28,9 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
     {
 
     }
+
+    public class StandardLogin2FAResponse : BizResponseClass
+    {
+        public string TwoFAToken { get; set; }
+    }
 }

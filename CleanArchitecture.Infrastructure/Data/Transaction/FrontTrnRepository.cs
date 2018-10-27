@@ -220,8 +220,10 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetBuySellBook> GetBuyerBook(long id)
         {
             IQueryable<GetBuySellBook> Result = _dbContext.BuyerSellerInfo.FromSql(
-                              @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount
-                            From TradeTransactionQueue TTQ  where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group By TTQ.BidPrice Order By TTQ.BidPrice desc", id);
+                              @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
+                                Count(TTQ.BidPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.BidPrice And TPM.PairId = TTQ.PairID) As OrderId
+                                From TradeTransactionQueue TTQ  Where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.PairID = {0}
+                                AND TTQ.IsCancelled = 0 Group By TTQ.BidPrice,PairID Order By TTQ.BidPrice desc", id);
 
             return Result.ToList();
         }
@@ -229,9 +231,10 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetBuySellBook> GetSellerBook(long id)
         {
             IQueryable<GetBuySellBook> Result = _dbContext.BuyerSellerInfo.FromSql(
-                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount from
-                              TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
-                              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice order by TTQ.AskPrice", id);
+                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
+                              Count(TTQ.AskPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.AskPrice And TPM.PairId = TTQ.PairID) As OrderId
+                              from TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
+                              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id);
 
             return Result.ToList();
         }
@@ -239,7 +242,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         public List<GetGraphResponse> GetGraphData(long id)
         {
             IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(
-                           @"select CONVERT(BIGINT,DATEDIFF(ss,'01-01-1970 00:00:00',CAST(FORMAT(DataDate,'yyyy-MM-dd HH:mm:0') AS datetime))) As DataDate,
+                           @"select CONVERT(BIGINT,DATEDIFF(ss,'01-01-1970 00:00:00',CAST(FORMAT(DataDate,'yyyy-MM-dd HH:mm:0') AS datetime))) * 1000 As DataDate,
                             Low24Hr As Low,High24Hr As High,TodayOpen,TodayClose,Volume,ChangePer
                             from TradeGraphDetail where TranNo in(
                             SELECT MAX(TranNo) FROM TradeGraphDetail Where  PairId = {0}
@@ -288,6 +291,69 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 res.LastPrice = lastPrice;
                 res.Change24 = Hig24 - Low24;
                 return res;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public PairRatesResponse GetPairRates(long PairId)
+        {
+            try
+            {
+                decimal BuyPrice = 0;
+                decimal SellPrice = 0;
+                PairRatesResponse response = new PairRatesResponse();
+
+                var BidPriceRes = _dbContext.TradeTransactionQueue.Where(e => e.TrnType == Convert.ToInt16(enTrnType.Buy_Trade) && e.Status == Convert.ToInt16(enTransactionStatus.Hold) && e.PairID == PairId).OrderByDescending(e => e.TrnNo).FirstOrDefault();
+                if(BidPriceRes != null)
+                {
+                    BuyPrice = BidPriceRes.BidPrice;
+                }
+                else
+                {
+                    BuyPrice = 0;
+                }
+
+                var AskPriceRes = _dbContext.TradeTransactionQueue.Where(e => e.TrnType == Convert.ToInt16(enTrnType.Sell_Trade) && e.Status == Convert.ToInt16(enTransactionStatus.Hold) && e.PairID == PairId).OrderByDescending(e => e.TrnNo).FirstOrDefault();
+                if (AskPriceRes != null)
+                {
+                    SellPrice = AskPriceRes.AskPrice;
+                }
+                else
+                {
+                    SellPrice = 0;
+                }
+
+                var PairResponse = _dbContext.TradePairDetail.Where(e => e.PairId == PairId).FirstOrDefault();
+                
+                if(PairResponse != null)
+                {
+                    if(BuyPrice == 0)
+                    {
+                        response.BuyPrice = PairResponse.BuyPrice;
+                    }
+                    else
+                    {
+                        response.BuyPrice = BuyPrice;
+                    }
+                    if (SellPrice == 0)
+                    {
+                        response.SellPrice = PairResponse.SellPrice;
+                    }
+                    else
+                    {
+                        response.SellPrice = SellPrice;
+                    }
+                    response.BuyMaxPrice = PairResponse.BuyMaxPrice;
+                    response.BuyMinPrice = PairResponse.BuyMinPrice;
+                    response.SellMaxPrice = PairResponse.SellMaxPrice;
+                    response.SellMinPrice = PairResponse.SellMinPrice;
+                }
+
+                return response;
             }
             catch (Exception ex)
             {

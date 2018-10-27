@@ -203,7 +203,62 @@ namespace CleanArchitecture.Infrastructure.Services.User
             }
         }
 
+        public SocialCustomPasswordViewMoel GenerateRamdomSocialPassword(string ProvideKey)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(ProvideKey))
+                {
+                    string str64 = GenerateRandomOTPWithPassword();
+                    string alpha = string.Empty; string numeric = string.Empty, password = string.Empty;
+                    foreach (char str in str64)
+                    {
+                        if (char.IsDigit(str))
+                        {
+                            if (numeric.Length < 6)
+                                numeric += str.ToString();
+                            else
+                                alpha += str.ToString();
+                        }
+                        else
+                            alpha += str.ToString();
+                    }
+                    if (ProvideKey.Length > 12)
+                    {
+                        string _Pass1 = alpha.Substring(0, 20);
+                        string _Pass11 = _Pass1 + ProvideKey.Substring(1, 2);
+                        string _Pass2 = alpha.Substring(20, 10);
+                        string _Pass22 = _Pass2 + ProvideKey.Substring(6, 3);
+                        string _Pass3 = alpha.Substring(30, 28);
+                        string _Pass33 = _Pass3 + ProvideKey.Substring(10, 1);
+                        password = _Pass11 + _Pass22 + _Pass33;
+                    }
+                    else
+                    {
+                        string _Pass1 = alpha.Substring(0, 20);   // If the provider key length is less then  then provide key combination is skip 2 and then add 6 to password.
+                        string _Pass11 = _Pass1 + ProvideKey.Substring(1, 6);
+                        string _Pass2 = alpha.Substring(20, 10);
+                        string _Pass3 = alpha.Substring(30, 28);
+                        password = _Pass11 + _Pass2 + _Pass3;
+                    }
 
+                    return new SocialCustomPasswordViewMoel()
+                    {
+                        Password = password,
+                        AppKey = alpha
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                throw ex;
+            }
+            return null;
+        }
         public async Task<bool> IsValidPhoneNumber(string Mobilenumber, string CountryCode)
         {
             try

@@ -70,7 +70,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID);
 
-        List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID);
+        List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID);
         //vsolanki 25-10-2018
         List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid);
 
