@@ -193,7 +193,7 @@ namespace CleanArchitecture.Web.API
             //  var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
             try
             {
-                
+
 
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
@@ -310,7 +310,7 @@ namespace CleanArchitecture.Web.API
             {
                 //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, lockoutOnFailure: false);
-               // var checkmail = await _userManager.FindByEmailAsync(model.Username);
+                // var checkmail = await _userManager.FindByEmailAsync(model.Username);
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
@@ -327,7 +327,7 @@ namespace CleanArchitecture.Web.API
                     //// End 2FA in Custome token Create 
                     //return Ok(new StandardLogin2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
 
-                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod});
+                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
                 }
                 if (result.IsLockedOut)
                 {
@@ -340,7 +340,7 @@ namespace CleanArchitecture.Web.API
                 //    if (checkmail != null)
                 //        await _userManager.AccessFailedAsync(checkmail);
                 //    //return BadRequest(new ApiError("Login failed : Invalid username or password."));
-                    return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status4032LoginFailed });
+                return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status4032LoginFailed });
                 //}
             }
             catch (Exception ex)
@@ -382,7 +382,7 @@ namespace CleanArchitecture.Web.API
                         return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
                     }
                     else
-                    {                       
+                    {
 
                         _logger.LogWarning(2, "User Otp Data Not Send.");
                         return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpDatanotSend, ErrorCode = enErrorCode.Status4085LoginWithOtpDatanotSend });
@@ -443,7 +443,7 @@ namespace CleanArchitecture.Web.API
                                             //// End 2FA in Custome token Create 
 
                                             //return Ok(new LoginWithEmail2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
-                                            return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod});                                          
+                                            return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
                                         }
                                         else
                                             return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
@@ -675,7 +675,7 @@ namespace CleanArchitecture.Web.API
                                             //// End 2FA in Custome token Create 
                                             //return Ok(new OtpWithMobile2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
 
-                                            return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod});                                           
+                                            return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
                                         }
                                         else
                                             return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
@@ -1354,7 +1354,61 @@ namespace CleanArchitecture.Web.API
             }
         }
         #endregion
+        [HttpPost("GetSocailkey")]
+        [AllowAnonymous]
+        public IActionResult GetSocailkey(string Providername)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(Providername))
+                {
+                    return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InputProvider, ErrorCode = enErrorCode.Status4101InputProvider });
+                }
+                SocialKeyDetailViewModel socialKeyDetailViewModel = new SocialKeyDetailViewModel();
+                if (Providername == "Facebook")
+                {
+                    socialKeyDetailViewModel.ProviderName = Providername;
+                    socialKeyDetailViewModel.ClientId = _configuration["Authentication:Facebook:AppId"].ToString();
+                    socialKeyDetailViewModel.ClientSecret = _configuration["Authentication:Facebook:AppSecret"].ToString();
 
+                }
+                else if (Providername == "Google")
+                {
+                    socialKeyDetailViewModel.ProviderName = Providername;
+                    socialKeyDetailViewModel.ClientId = _configuration["Authentication:Google:ClientId"].ToString();
+                    socialKeyDetailViewModel.ClientSecret = _configuration["Authentication:Google:ClientSecret"].ToString();
+                }
+
+                else if (Providername == "Twitter")
+                {
+                    socialKeyDetailViewModel.ProviderName = Providername;
+                    socialKeyDetailViewModel.ClientId = _configuration["Authentication:Twitter:ConsumerKey"].ToString();
+                    socialKeyDetailViewModel.ClientSecret = _configuration["Authentication:Twitter:ConsumerSecret"].ToString();
+
+                }
+                else if (Providername == "Microsoft")
+                {
+                    socialKeyDetailViewModel.ProviderName = Providername;
+                    socialKeyDetailViewModel.ClientId = _configuration["Authentication:Microsoft:ClientId"].ToString();
+                    socialKeyDetailViewModel.ClientSecret = _configuration["Authentication:Microsoft:ClientSecret"].ToString();
+
+                }
+                else
+                {
+                    return BadRequest(new SocialKeyDetailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.provideDetailNotAvailable, ErrorCode = enErrorCode.Status4100provideDetailNotAvailable });
+                }
+                return Ok(new SocialKeyDetailResponse { ReturnCode = enResponseCode.Success, socialKeyDetailViewModel = socialKeyDetailViewModel, ReturnMsg = EnResponseMessage.SocialLoginKey });
+
+
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+
+                return BadRequest(new SocialKeyDetailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
 
         #endregion
     }
