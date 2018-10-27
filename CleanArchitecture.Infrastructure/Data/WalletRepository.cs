@@ -1020,15 +1020,17 @@ namespace CleanArchitecture.Infrastructure.Data
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
-                 _dbContext.SaveChanges();
+                // _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
               //  Array val = Enum.GetValues(typeof(enWalletLimitType));
 
-                int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
-            Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
-            Convert.ToInt32(enWalletLimitType.DepositLimit) ,
-            Convert.ToInt32(enWalletLimitType.TradingLimit) };
+            //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
+            //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
+            //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
+            //Convert.ToInt32(enWalletLimitType.TradingLimit) };
+
+                List<int> AllowTrnType = Helpers.GetEnumValue<enWalletLimitType>();
 
                 var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
                                 join q in AllowTrnType on p.TrnType equals q
@@ -1039,7 +1041,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                  select wm).ToList();
 
                 var fadd = from array in arrayObj
-                           from ww in walletObj
+                           from ww in Wallets
                            select new WalletLimitConfiguration
                            {
                                CreatedBy = UserId,
@@ -1056,11 +1058,11 @@ namespace CleanArchitecture.Infrastructure.Data
                                UpdatedDate = UTC_To_IST()
                            };
                 _dbContext.WalletLimitConfiguration.AddRange(fadd);
-                 _dbContext.SaveChanges();
+                 ///_dbContext.SaveChanges();
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
-                                 from ww in walletObj
+                                 from ww in Wallets
                                  select new WalletAllowTrn
                                  {
                                      CreatedDate = UTC_To_IST(),
@@ -1128,15 +1130,17 @@ namespace CleanArchitecture.Infrastructure.Data
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
-                 _dbContext.SaveChanges();
+                // _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
                 //  Array val = Enum.GetValues(typeof(enWalletLimitType));
 
-                int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
-            Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
-            Convert.ToInt32(enWalletLimitType.DepositLimit) ,
-            Convert.ToInt32(enWalletLimitType.TradingLimit) };
+                //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
+                //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
+                //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
+                //Convert.ToInt32(enWalletLimitType.TradingLimit) };
+                List<int> AllowTrnType = Helpers.GetEnumValue<enWalletLimitType>();
+
 
                 var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
                                 join q in AllowTrnType on p.TrnType equals q
@@ -1148,7 +1152,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                  select wm).ToList();
 
                 var fadd = from array in arrayObj
-                           from ww in walletObj
+                           from ww in Wallets
                            from U in Users
                            select new WalletLimitConfiguration
                            {
@@ -1166,11 +1170,11 @@ namespace CleanArchitecture.Infrastructure.Data
                                UpdatedDate = UTC_To_IST()
                            };
                 _dbContext.WalletLimitConfiguration.AddRange(fadd);
-                //  _dbContext.SaveChanges();
+               //  _dbContext.SaveChanges();
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
-                                 from ww in walletObj
+                                 from ww in Wallets
                                  from U in Users
                                  select new WalletAllowTrn
                                  {
