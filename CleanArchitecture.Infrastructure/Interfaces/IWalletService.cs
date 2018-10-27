@@ -91,5 +91,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType);
 
         ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page);
+
+        BizResponseClass CreateDefaulWallet(long UserID);
     }
 }

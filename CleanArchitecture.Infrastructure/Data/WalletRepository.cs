@@ -11,8 +11,11 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Core.ViewModels.WalletOperations;
+using CleanArchitecture.Core.ViewModels.WalletOpnAdvanced;
 using CleanArchitecture.Infrastructure.Data;
+using CleanArchitecture.Infrastructure.DTOClasses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 
 
@@ -910,11 +913,6 @@ namespace CleanArchitecture.Infrastructure.Data
 
         }
 
-        public void CreateDefaulWallet()
-        {
-
-        }
-
         //vsolanki 26-10-2018
         public DateTime UTC_To_IST(DateTime dateTime)
         {
@@ -958,7 +956,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsoalnki 26-10-2018
-        public List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId,int page)
+        public List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page)
         {
             //int skip = Helpers.PageSize * (page - 1);
             List<WalletLedgerRes> wl = (from w in _dbContext.WalletLedgers
@@ -971,22 +969,22 @@ namespace CleanArchitecture.Infrastructure.Data
                                             PostBal = w.PreBal,
                                             Remarks = "Opening Balance",
                                             Amount = 0,
-                                            CrAmount=0,
-                                            DrAmount=0,
-                                           TrnDate=w.TrnDate
+                                            CrAmount = 0,
+                                            DrAmount = 0,
+                                            TrnDate = w.TrnDate
                                         }).Take(1).Union((from w in _dbContext.WalletLedgers
-                                                  where w.WalletId == WalletId && w.TrnDate >= FromDate                        && w.TrnDate <= ToDate
-                                                  select new WalletLedgerRes
-                                                  {
-                                                      LedgerId = w.Id,
-                                                      PreBal = w.PreBal,
-                                                      PostBal = w.PostBal,
-                                                      Remarks = w.Remarks,
-                                                      Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt,
-                                                      CrAmount = w.CrAmt,
-                                                      DrAmount = w.DrAmt,
-                                                      TrnDate = w.TrnDate
-                                                  })).ToList();
+                                                          where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                                          select new WalletLedgerRes
+                                                          {
+                                                              LedgerId = w.Id,
+                                                              PreBal = w.PreBal,
+                                                              PostBal = w.PostBal,
+                                                              Remarks = w.Remarks,
+                                                              Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt,
+                                                              CrAmount = w.CrAmt,
+                                                              DrAmount = w.DrAmt,
+                                                              TrnDate = w.TrnDate
+                                                          })).ToList();
 
             if (page > 0)
             {
@@ -994,6 +992,110 @@ namespace CleanArchitecture.Infrastructure.Data
                 wl = wl.Skip(skip).Take(Helpers.PageSize).ToList();
             }
             return wl;
+        }
+
+        //vsolanki 2018-10-27
+        public int CreateDefaulWallet(long UserId)
+        {
+            try
+            {
+                //Craete wallet
+                var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
+                                     where p.Status == 1
+                                     select p).ToList();
+
+                var Wallets = from WalletTypearray in WalletTypeObj
+                              select new WalletMaster
+                              {
+                                  CreatedBy = UserId,
+                                  CreatedDate = UTC_To_IST(),
+                                  Status = Convert.ToInt16(ServiceStatus.Active),
+                                  UpdatedDate = UTC_To_IST(),
+                                  Balance = 0,
+                                  WalletTypeID = WalletTypearray.Id,
+                                  UserID = UserId,
+                                  Walletname = WalletTypearray.WalletTypeName + "DefaultWallet",
+                                  AccWalletID = RandomGenerateWalletId(UserId, 1),
+                                  IsDefaultWallet = 1,
+                                  PublicAddress = ""
+                              };
+                _dbContext.WalletMasters.AddRange(Wallets);
+                // _dbContext.SaveChanges();
+
+                //Add limit for following wallet Id           
+
+                int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
+            Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
+            Convert.ToInt32(enWalletLimitType.DepositLimit) ,
+            Convert.ToInt32(enWalletLimitType.TradingLimit) };
+
+                var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
+                                join q in AllowTrnType on p.TrnType equals q
+                                select p).ToList();
+
+                var walletObj = (from wm in _dbContext.WalletMasters
+                                 where wm.UserID == UserId && wm.IsDefaultWallet == 1
+                                 select wm).ToList();
+
+                var fadd = from array in arrayObj
+                           from ww in walletObj
+                           select new WalletLimitConfiguration
+                           {
+                               CreatedBy = UserId,
+                               CreatedDate = UTC_To_IST(),
+                               WalletId = ww.Id,
+                               TrnType = array.TrnType,
+                               LimitPerDay = array.LimitPerDay,
+                               LimitPerHour = array.LimitPerHour,
+                               LimitPerTransaction = array.LimitPerTransaction,
+                               Status = Convert.ToInt16(ServiceStatus.Active),
+                               StartTime = array.StartTime,
+                               EndTime = array.EndTime,
+                               LifeTime = null,
+                               UpdatedDate = UTC_To_IST()
+                           };
+                _dbContext.WalletLimitConfiguration.AddRange(fadd);
+                //  _dbContext.SaveChanges();
+
+                //add WalletAllowTrn
+                var trntypeObj = from type in AllowTrnType
+                                 from ww in walletObj
+                                 select new WalletAllowTrn
+                                 {
+                                     CreatedDate = UTC_To_IST(),
+                                     CreatedBy = UserId,
+                                     Status = Convert.ToInt16(ServiceStatus.Active),
+                                     WalletId = ww.Id,
+                                     TrnType = Convert.ToByte(type),
+                                 };
+                _dbContext.WalletAllowTrns.AddRange(trntypeObj);
+                _dbContext.SaveChanges();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        private static Random random = new Random((int)DateTime.Now.Ticks);
+
+        public string RandomGenerateWalletId(long userID, byte isDefaultWallet)
+        {
+            try
+            {
+                long maxValue = 9999999999;
+                long minValue = 1000000000;
+                long x = (long)Math.Round(random.NextDouble() * (maxValue - minValue - 1)) + minValue;
+                string userIDStr = x.ToString() + userID.ToString().PadLeft(5, '0') + isDefaultWallet.ToString();
+                return userIDStr;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
 
     }
