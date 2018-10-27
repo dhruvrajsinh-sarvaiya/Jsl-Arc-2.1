@@ -2115,6 +2115,27 @@ namespace CleanArchitecture.Infrastructure.Services
                 ReturnCode = enResponseCode.Success
             };
         }
+
+        //vsolanki 27-10-2018
+        public BizResponseClass CreateWalletForAllUser_NewService(string WalletType)
+        {
+            var res = _walletRepository1.CreateWalletForAllUser_NewService(WalletType);
+            if (res != 1)
+            {
+                return new BizResponseClass
+                {
+                    ErrorCode = enErrorCode.InternalError,
+                    ReturnMsg = EnResponseMessage.CreateWalletFailMsg,
+                    ReturnCode = enResponseCode.InternalError
+                };
+            }
+            return new BizResponseClass
+            {
+                ErrorCode = enErrorCode.Success,
+                ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg,
+                ReturnCode = enResponseCode.Success
+            };
+        }
     }
 
 }

@@ -1020,7 +1020,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
-                // _dbContext.SaveChanges();
+                 _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
               //  Array val = Enum.GetValues(typeof(enWalletLimitType));
@@ -1056,7 +1056,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                UpdatedDate = UTC_To_IST()
                            };
                 _dbContext.WalletLimitConfiguration.AddRange(fadd);
-                //  _dbContext.SaveChanges();
+                 _dbContext.SaveChanges();
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
@@ -1099,5 +1099,96 @@ namespace CleanArchitecture.Infrastructure.Data
             }
         }
 
+        public int CreateWalletForAllUser_NewService(string WalletType)
+        {
+            try
+            {
+                var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
+                                     where p.Status == 1 && p.WalletTypeName == WalletType
+                                     select p);
+
+                var Users = (from p in _dbContext.Users
+                             where p.IsEnabled == true
+                             select p).ToList();
+
+                var Wallets = from WalletTypearray in WalletTypeObj
+                              from U in Users
+                              select new WalletMaster
+                              {
+                                  CreatedBy = U.Id,
+                                  CreatedDate = UTC_To_IST(),
+                                  Status = Convert.ToInt16(ServiceStatus.Active),
+                                  UpdatedDate = UTC_To_IST(),
+                                  Balance = 0,
+                                  WalletTypeID = WalletTypearray.Id,
+                                  UserID = U.Id,
+                                  Walletname = WalletTypearray.WalletTypeName + "DefaultWallet",
+                                  AccWalletID = RandomGenerateWalletId(U.Id, 1),
+                                  IsDefaultWallet = 1,
+                                  PublicAddress = ""
+                              };
+                _dbContext.WalletMasters.AddRange(Wallets);
+                 _dbContext.SaveChanges();
+
+                //Add limit for following wallet Id           
+                //  Array val = Enum.GetValues(typeof(enWalletLimitType));
+
+                int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
+            Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
+            Convert.ToInt32(enWalletLimitType.DepositLimit) ,
+            Convert.ToInt32(enWalletLimitType.TradingLimit) };
+
+                var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
+                                join q in AllowTrnType on p.TrnType equals q
+                                select p).ToList();
+
+                var walletObj = (from wm in _dbContext.WalletMasters
+                                 from U in Users
+                                 where wm.UserID == U.Id && wm.IsDefaultWallet == 1
+                                 select wm).ToList();
+
+                var fadd = from array in arrayObj
+                           from ww in walletObj
+                           from U in Users
+                           select new WalletLimitConfiguration
+                           {
+                               CreatedBy = U.Id,
+                               CreatedDate = UTC_To_IST(),
+                               WalletId = ww.Id,
+                               TrnType = array.TrnType,
+                               LimitPerDay = array.LimitPerDay,
+                               LimitPerHour = array.LimitPerHour,
+                               LimitPerTransaction = array.LimitPerTransaction,
+                               Status = Convert.ToInt16(ServiceStatus.Active),
+                               StartTime = array.StartTime,
+                               EndTime = array.EndTime,
+                               LifeTime = null,
+                               UpdatedDate = UTC_To_IST()
+                           };
+                _dbContext.WalletLimitConfiguration.AddRange(fadd);
+                //  _dbContext.SaveChanges();
+
+                //add WalletAllowTrn
+                var trntypeObj = from type in AllowTrnType
+                                 from ww in walletObj
+                                 from U in Users
+                                 select new WalletAllowTrn
+                                 {
+                                     CreatedDate = UTC_To_IST(),
+                                     CreatedBy = U.Id,
+                                     Status = Convert.ToInt16(ServiceStatus.Active),
+                                     WalletId = ww.Id,
+                                     TrnType = Convert.ToByte(type),
+                                 };
+                _dbContext.WalletAllowTrns.AddRange(trntypeObj);
+                _dbContext.SaveChanges();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 }

@@ -93,5 +93,6 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page);
 
         BizResponseClass CreateDefaulWallet(long UserID);
+        BizResponseClass CreateWalletForAllUser_NewService(string WalletType);
     }
 }
