@@ -266,7 +266,8 @@ namespace CleanArchitecture.Core.Enums
         UserIDWalletIDDidNotMatch = 4039,
         InvalidBeneficiaryID = 4227,
         InvalidLimit = 4233,
-        InternalError=9
+        InternalError=9,
+        NotFoundLimit=4280
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

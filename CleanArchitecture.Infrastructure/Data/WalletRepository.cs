@@ -1023,6 +1023,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 // _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
+              //  Array val = Enum.GetValues(typeof(enWalletLimitType));
 
                 int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
             Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,

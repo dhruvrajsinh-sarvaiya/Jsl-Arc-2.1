@@ -1679,7 +1679,13 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var wallet = _commonRepository.GetSingle(item => item.AccWalletID == walletId);
-
+                if(wallet==null)
+                {
+                    allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.InvalidWallet;
+                    allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    return allBalanceResponse;
+                }
                 var response = _walletRepository1.GetAllBalances(userid, wallet.Id);
                 if (response == null)
                 {
@@ -1691,6 +1697,17 @@ namespace CleanArchitecture.Infrastructure.Services
                 allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Success;
                 allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 allBalanceResponse.Balance = response;
+                //vsolanki 2018-10-27 //for withdraw limit
+                var limit = _LimitcommonRepository.GetSingle(item => item.TrnType == 2 && item.WalletId == wallet.Id);
+                if(limit==null)
+                {
+                    allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.NotFoundLimit;
+                    allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.NotFoundLimit;
+                    return allBalanceResponse;
+                }
+                allBalanceResponse.WithdrawalDailyLimit = limit.LimitPerDay;
+
                 // var wallet = _commonRepository.GetById(walletId);
                 var walletType = _WalletTypeMasterRepository.GetById(wallet.WalletTypeID);
                 allBalanceResponse.WalletType = walletType.WalletTypeName;
