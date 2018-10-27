@@ -88,7 +88,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 return _Resp;
             }
             //var myResp = new Task(async () => CombineAllInitTransactionAsync());
-            Task.Run(() => CombineAllInitTransactionAsync());
+            await Task.Run(() => CombineAllInitTransactionAsync());
 
             //CombineAllInitTransactionAsync();
 
@@ -123,7 +123,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     return _Resp;
                 }
                 //Deduct balance here
-                if(Req.TrnType == enTrnType.Transaction)
+                if (Req.TrnType == enTrnType.Transaction)
                 {
                     //ServiceType
                     Req.ServiceType = (enServiceType)_TrnService.ServiceType;
@@ -640,7 +640,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         case (long)enAppType.WebSocket:
 
                         case (long)enAppType.JsonRPC:
-                            //_IWebApiSendRequest.SendJsonRpcAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL,);
+                            _TransactionObj.APIResponse = _IWebApiSendRequest.SendJsonRpcAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL,);
                                  break;
                         case (long)enAppType.TCPSocket:
 
