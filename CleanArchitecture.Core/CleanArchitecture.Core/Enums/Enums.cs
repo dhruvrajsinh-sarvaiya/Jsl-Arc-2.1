@@ -416,4 +416,20 @@ namespace CleanArchitecture.Core.Enums
         Base = 2,
         AccessToken = 3
     }
+    public enum enReturnMethod
+    {
+        //user specific
+        RecieveOpenOrder = 1,
+        RecieveOrderHistory = 2,
+        RecieveTradeHistory = 3,
+        RecieveBuyerSideWalletBal = 4,
+        RecieveSellerSideWalletBal = 5,
+
+        //pair wise
+        RecieveBuyerBook = 6,
+        RecieveSellerBook = 7,
+        RecieveTradingHistory = 8,
+        RecieveMarketData = 9,
+        RecieveChartData = 10
+    }
 }
