@@ -75,7 +75,8 @@ namespace CleanArchitecture.Core.Enums
         DMRSERVICE = 13,
         CAB = 14,
         WalletService = 15,
-        LoanAPI = 16
+        LoanAPI = 16,
+        Trading = 17
         //Buy_Trade = 4,
         //Sell_Trade = 5,
         //Withdraw = 6,
@@ -137,18 +138,18 @@ namespace CleanArchitecture.Core.Enums
         InvalidThirdpartyID = 2255,
         AddressGenerationFailed = 2256,
         //====================Transactional
-        TransactionProcessSuccess = 1,
-        TransactionInsertSuccess = 1,
-        TransactionInsertFail = 1,
-        TransactionInsertInternalError = 1,
-        CreateTrn_NoPairSelected = 1,
-        CreateTrnInvalidQtyPrice = 1,
-        CreateTrnInvalidQtyNAmount = 1,
-        CreateTrn_NoCreditAccountFound = 1,
-        CreateTrn_NoDebitAccountFound = 1,
-        CreateTrnInvalidAmount = 1,
-        CreateTrnDuplicateTrn = 1,
-        CreateTrn_NoSelfAddressWithdrawAllow = 1,
+        TransactionProcessSuccess = 4566,
+        TransactionInsertSuccess = 4567,
+        TransactionInsertFail = 4568,
+        TransactionInsertInternalError = 4569,
+        CreateTrn_NoPairSelected = 4570,
+        CreateTrnInvalidQtyPrice = 4571,
+        CreateTrnInvalidQtyNAmount = 4572,
+        CreateTrn_NoCreditAccountFound = 4573,
+        CreateTrn_NoDebitAccountFound = 4574,
+        CreateTrnInvalidAmount = 4575,
+        CreateTrnDuplicateTrn = 4576,
+        CreateTrn_NoSelfAddressWithdrawAllow = 4577,
         InvalidPairName = 4500,
         NoDataFound = 4501,
         InvalidStatusType = 4502,
@@ -159,19 +160,19 @@ namespace CleanArchitecture.Core.Enums
         InValidPageNo = 4507,
         InValid_ID = 4565,
 
-        ProcessTrn_InsufficientBalance = 1,
-        ProcessTrn_AmountBetweenMinMax = 1,
-        ProcessTrn_PriceBetweenMinMax = 1,
-        ProcessTrn_InvalidBidPriceValue = 1,
-        ProcessTrn_PoolOrderCreateFail = 1,
-        ProcessTrn_Initialize = 1,
-        TransactionProcessInternalError = 1,
-        ProcessTrn_ServiceProductNotAvailable = 1,
-        ProcessTrn_WalletDebitFail = 1,
-        ProcessTrn_Hold = 1,
-        ProcessTrn_ThirdPartyDataNotFound = 1,
-        ProcessTrn_GettingResponseBlank = 1,
-        ProcessTrn_OprFail = 1,
+        ProcessTrn_InsufficientBalance = 4578,
+        ProcessTrn_AmountBetweenMinMax = 4579,
+        ProcessTrn_PriceBetweenMinMax = 4580,
+        ProcessTrn_InvalidBidPriceValue = 4581,
+        ProcessTrn_PoolOrderCreateFail = 4582,
+        ProcessTrn_Initialize = 4583,
+        TransactionProcessInternalError = 4584,
+        ProcessTrn_ServiceProductNotAvailable = 4585,
+        ProcessTrn_WalletDebitFail = 4586,
+        ProcessTrn_Hold = 4587,
+        ProcessTrn_ThirdPartyDataNotFound = 4588,
+        ProcessTrn_GettingResponseBlank = 4589,
+        ProcessTrn_OprFail = 4590,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -179,7 +180,7 @@ namespace CleanArchitecture.Core.Enums
         Status423Locked = 423,
         Status4013MobileInvalid = 4013,
         Status4020IpInvalid = 4020,
-        Status4032LoginFailed=4032,
+        Status4032LoginFailed = 4032,
         Status4033NotFoundRecored = 4033,
         Status4034UnableUpdateUser = 4034,
         Status4035UnableToAddIpAddress = 4035,
@@ -228,14 +229,15 @@ namespace CleanArchitecture.Core.Enums
         Status4083IpAddressExist = 4083,
         Status4084DeviceIdExist = 4084,
         Status4079TwoFAcodeInvalide = 4079,
-        Status4085LoginWithOtpDatanotSend =4085,
-        Status4086LoginWithOtpLoginFailed=4086,
-        Status4087EmailFail=4087,
-        Status4088LoginWithOtpInvalidAttempt=4088,
-        Status4089LoginEmailOTPNotsend=4089,
-        Status4090OTPSendOnMobile=4090,
-        Status4091LoginMobileNumberInvalid=4091,
-
+        Status4085LoginWithOtpDatanotSend = 4085,
+        Status4086LoginWithOtpLoginFailed = 4086,
+        Status4087EmailFail = 4087,
+        Status4088LoginWithOtpInvalidAttempt = 4088,
+        Status4089LoginEmailOTPNotsend = 4089,
+        Status4090OTPSendOnMobile = 4090,
+        Status4091LoginMobileNumberInvalid = 4091,
+        Status4096InvalidFaceBookToken = 4096,
+        Status4097InvalidFaceBookProviderKey = 4097,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -252,12 +254,9 @@ namespace CleanArchitecture.Core.Enums
         InvalidTradeRefNo = 4036,
         AlredyExist = 4037,
         InsufficantBal = 4038,
-        UserIDWalletIDDidNotMatch = 4039
-
-
-
-
-
+        UserIDWalletIDDidNotMatch = 4039,
+        InvalidBeneficiaryID = 4227,
+        InvalidLimit = 4233
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -328,7 +327,8 @@ namespace CleanArchitecture.Core.Enums
         Dr_Freeze = 13,
         Dr_Stacking = 14,
         Dr_ESCROW = 15,
-        Cr_Bonus = 16
+        Cr_Bonus = 16,
+        Dr_Debit = 17 //ntrivedi for admin wallet deduct when deposition done 
     }
 
     public enum enTransactionMarketType
@@ -358,8 +358,45 @@ namespace CleanArchitecture.Core.Enums
         GrpMsg = 3,
         Channel = 4
     }
-    public enum SignalRMethodName
+    
+    public enum SubscriptionType
     {
-
+        OneToOne = 1,
+        Broadcast = 2
+    }
+    public enum UserWiseMethodName
+    {
+        OpenOrder=1,
+        OrderHistory=2,
+        TradeHistory=3,
+        ActivityNotification=4
+    }
+    public enum PairWiseMethodName
+    {
+        BuyerBook=5,
+        SellerBook=6,
+        TradingHistory=7,
+        MarketData=8,
+        Price=9,
+        BuyerSideWallet=10,
+        SellerSideWallet=11,
+        ChartData=12
+    }
+    public enum MarketWiseMethodName
+    {
+        PairData=13,
+        MarketTicker=14
+    }
+    public enum GlobalMethodName
+    {
+        Chat=15,
+        News=16,
+        Announcement=17,
+        Time=18
+    }
+    public enum enValidateWalletLimit
+    {
+        Success = 1,
+        Fail = 2
     }
 }

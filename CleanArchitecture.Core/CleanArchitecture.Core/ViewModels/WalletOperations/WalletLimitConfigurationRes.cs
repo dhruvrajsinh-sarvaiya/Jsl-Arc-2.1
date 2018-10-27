@@ -17,6 +17,10 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         public decimal LimitPerDay { get; set; }
 
         public decimal LimitPerTransaction { get; set; }
+
+        public TimeSpan? StartTime { get; set; }
+
+        public TimeSpan? EndTime { get; set; }
     }
     public class LimitResponse : BizResponseClass
     {

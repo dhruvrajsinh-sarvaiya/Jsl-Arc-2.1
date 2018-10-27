@@ -19,6 +19,7 @@ using CleanArchitecture.Core.Entities.Wallet;
 using System.Linq;
 using CleanArchitecture.Core.ViewModels.WalletConfiguration;
 using System.Collections;
+using System.Globalization;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -27,6 +28,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ILogger<WalletService> _log;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
         private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
+        private readonly ICommonRepository<WalletLimitConfigurationMaster> _WalletLimitConfigurationMasterRepository;
         private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
         private readonly ICommonRepository<AddressMaster> _addressMstRepository;
@@ -35,6 +37,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepo;
         private readonly ICommonRepository<BeneficiaryMaster> _BeneficiarycommonRepository;
         private readonly ICommonRepository<UserPreferencesMaster> _UserPreferencescommonRepository;
+        private readonly ICommonRepository<WalletLedger> _WalletLedgersRepo;
 
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         private readonly IWalletRepository _walletRepository1;
@@ -59,7 +62,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -81,6 +84,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _LimitcommonRepository = WalletLimitConfig;
             _BeneficiarycommonRepository = BeneficiaryMasterRepo;
             _UserPreferencescommonRepository = UserPreferenceRepo;
+            _WalletLimitConfigurationMasterRepository = WalletConfigMasterRepo;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -89,6 +93,78 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 var obj = _commonRepository.GetById(walletId);
                 return obj.Balance;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //Rushabh 26-10-2018
+        public long GetWalletID(string AccWalletID)
+        {
+            try
+            {
+                var obj = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                return obj.Id;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //Rushabh 27-10-2018
+        public string GetAccWalletID(long WalletID)
+        {
+            try
+            {
+                var obj = _commonRepository.GetSingle(item => item.Id == WalletID);
+                return obj.AccWalletID;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //Rushabh 27-10-2018
+        //public bool GetBeneWhitelistingBit(long WalletID, string DestinationAddress)
+        //{
+        //    try
+        //    {
+        //        var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == 1);
+        //        var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Walletobj.UserID);
+        //        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == 1);
+        //        if(UserPrefobj.IsWhitelisting == 1)
+        //        {
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        throw ex;
+        //    }
+        //}
+
+        //Rushabh 26-10-2018
+        public enValidateWalletLimit ValidateWalletLimit(enTrnType TranType,decimal PerDayAmt,decimal PerHourAmt,decimal PerTranAmt, long WalletID)
+        {
+            try
+            {
+                var obj = _LimitcommonRepository.GetSingle(item => item.Id == WalletID && item.TrnType == Convert.ToInt16(TranType));
+                if((PerDayAmt <= obj.LimitPerDay) && (PerHourAmt <= obj.LimitPerHour) && (PerTranAmt <= obj.LimitPerTransaction))
+                {
+                    return enValidateWalletLimit.Success;
+                }
+                else
+                {
+                    return enValidateWalletLimit.Fail;
+                }
             }
             catch (Exception ex)
             {
@@ -111,11 +187,11 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public bool WalletBalanceCheck(decimal amount, long walletid)
+        public bool WalletBalanceCheck(decimal amount, string walletid)
         {
             try
             {
-                var obj = _commonRepository.GetById(walletid);
+                var obj = _commonRepository.GetSingle(item => item.AccWalletID == walletid);
                 if (obj.Balance < amount)
                 {
                     return false;
@@ -539,7 +615,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 10-10-2018 Insert into WalletMaster table
-        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId,int isBaseService = 0)
+        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId, int isBaseService = 0)
         {
             bool IsValid = true;
             decimal Balance = 0;
@@ -592,10 +668,31 @@ namespace CleanArchitecture.Infrastructure.Services
                     walletMaster.WalletPublicAddress(addressClass.address);
                     _commonRepository.Update(walletMaster);
                 }
-       
+                //vsolanki 26-10-2018 insert and limitConfigration
+                _walletRepository1.GetSetLimitConfigurationMaster(AllowTrnType, userId, walletMaster.Id);
+
+                //vsolanki 25-10-2018 add Limit for Wallet
+                //var OrgWallet = _commonRepository.GetSingle(item => item.UserID == userId && item.WalletTypeID == walletMasters.Id);
+                //WalletLimitConfigurationReq request = new WalletLimitConfigurationReq();
+                //var limitConfig = _LimitcommonRepository.GetSingle(item => item.WalletId == 1);
+                //get record from limitmaster 
+                //var limitConfig= _WalletLimitConfigurationMasterRepository.GetSingle(item=>item.TrnType== AllowTrnType[0]);
+
+                //request.EndTime = limitConfig.EndTime;
+                //request.StartTime = limitConfig.StartTime;
+                //request.LimitPerDay = limitConfig.LimitPerDay;
+                //request.LimitPerHour = limitConfig.LimitPerHour;
+                //request.LimitPerTransaction = limitConfig.LimitPerTransaction;
+                //enWalletLimitType trntype = (enWalletLimitType)Enum.ToObject(typeof(enWalletLimitType), limitConfig.TrnType);
+                //request.TrnType = trntype;
+                //request.EndTime = limitConfig.EndTime;
+                ////insert into limit tbl
+                //CleanArchitecture.Core.ViewModels.WalletOperations.LimitResponse limits = SetWalletLimitConfig(walletMaster.AccWalletID, request,userId);
                 //set the response object value
+
                 createWalletResponse.AccWalletID = walletMaster.AccWalletID;
                 createWalletResponse.PublicAddress = walletMaster.PublicAddress;
+                createWalletResponse.Limits = _walletRepository1.GetWalletLimitResponse(walletMaster.AccWalletID);
                 createWalletResponse.ReturnCode = enResponseCode.Success;
                 createWalletResponse.ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg;
                 return createWalletResponse;
@@ -783,7 +880,9 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var walletResponse = _walletRepository1.GetWalletMasterResponseByCoin(userid, coin);
-                if (walletResponse.Count == 0)
+                var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == userid && item.Status == 1);
+                //if(UserPrefobj == null )
+                if (walletResponse.Count == 0 && UserPrefobj == null)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
                     listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;
@@ -792,6 +891,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     listWalletResponse.Wallets = walletResponse;
+                    listWalletResponse.IsWhitelisting = UserPrefobj.IsWhitelisting;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
@@ -852,7 +952,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         public WalletTransactionQueue InsertIntoWalletTransactionQueue(Guid Guid, enWalletTranxOrderType TrnType, decimal Amount, long TrnRefNo, DateTime TrnDate, DateTime? UpdatedDate,
-            long WalletID, string WalletType, long MemberID, string TimeStamp, enTransactionStatus Status, string StatusMsg)
+            long WalletID, string WalletType, long MemberID, string TimeStamp, enTransactionStatus Status, string StatusMsg, enWalletTrnType enWalletTrnType)
         {
             WalletTransactionQueue walletTransactionQueue = new WalletTransactionQueue();
             // walletTransactionQueue.TrnNo = TrnNo;
@@ -868,6 +968,7 @@ namespace CleanArchitecture.Infrastructure.Services
             walletTransactionQueue.TimeStamp = TimeStamp;
             walletTransactionQueue.Status = Status;
             walletTransactionQueue.StatusMsg = StatusMsg;
+            walletTransactionQueue.WalletTrnType = enWalletTrnType;
             return walletTransactionQueue;
         }
 
@@ -899,7 +1000,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (dWalletobj.Status != 1 || dWalletobj.IsValid == false)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidWallet);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidWallet, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -907,7 +1008,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (orderType != enWalletTranxOrderType.Debit) // sell 13-10-2018
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTrnType);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTrnType, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTrnType, ErrorCode = enErrorCode.InvalidTrnType, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -915,7 +1016,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (TrnRefNo == 0) // sell 13-10-2018
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -923,7 +1024,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (amount <= 0)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidAmt, ErrorCode = enErrorCode.InvalidAmount, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -931,7 +1032,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (dWalletobj.Balance < amount)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InsufficantBal);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InsufficantBal, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
@@ -940,13 +1041,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (count != 0)
                 {
                     // insert with status=2 system failed
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.AlredyExist);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.AlredyExist, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
 
-                objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 0, "Inserted");
+                objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 0, "Inserted", trnType);
                 objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
                 TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
                 remarks = "Debit for TrnNo:" + objTQ.TrnNo;
@@ -1015,21 +1116,21 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 if (TotalAmount <= 0)
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt);
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt, trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
                 }
                 int count = CheckTrnRefNoForCredit(TrnRefNo, enWalletTranxOrderType.Debit); // check whether for this refno wallet is pre decuted or not
                 if (count == 0)
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo);
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidTradeRefNo, trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist };
                 }
                 bool checkArray = CheckarryTrnID(arryTrnID, coinName);// check whether all array dtrnrefno of same wallet and they are hold (not assigned to other order)
                 if (checkArray == true)
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, 0, "Inserted");
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, 0, "Inserted", trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
                     for (int w = 0; w <= arryTrnID.Length - 1; w++)
                     {
@@ -1040,7 +1141,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else if (checkArray == false)//fail
                 {
-                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, "Amount and DebitRefNo matching failure");
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, "Amount and DebitRefNo matching failure", trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
@@ -1179,8 +1280,8 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             int type = Convert.ToInt16(request.TrnType);
             WalletLimitConfiguration IsExist = new WalletLimitConfiguration();
+            WalletLimitConfigurationMaster MasterConfig = new WalletLimitConfigurationMaster();
             LimitResponse Response = new LimitResponse();
-            //bool flag = 
             try
             {
                 var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
@@ -1204,18 +1305,34 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.CreatedDate = UTC_To_IST();
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
+                    newobj.StartTime = request.StartTime;
+                    newobj.LifeTime = 99;
+                    newobj.EndTime = request.EndTime;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
+                    // Response.WalletLimitConfigurationRes = newobj;
                 }
                 else
                 {
-                    IsExist.LimitPerHour = request.LimitPerHour;
-                    IsExist.LimitPerDay = request.LimitPerDay;
-                    IsExist.LimitPerTransaction = request.LimitPerTransaction;
-                    IsExist.UpdatedBy = Userid;
-                    IsExist.UpdatedDate = UTC_To_IST();
-                    _LimitcommonRepository.Update(IsExist);
-                    Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
+                    MasterConfig = _WalletLimitConfigurationMasterRepository.GetSingle(item => item.TrnType == IsExist.TrnType);
+                    if ((request.LimitPerDay <= MasterConfig.LimitPerDay) && (request.LimitPerHour <= MasterConfig.LimitPerHour) && (request.LimitPerTransaction <= MasterConfig.LimitPerTransaction))
+                    {
+                        IsExist.LimitPerHour = request.LimitPerHour;
+                        IsExist.LimitPerDay = request.LimitPerDay;
+                        IsExist.LimitPerTransaction = request.LimitPerTransaction;
+                        IsExist.StartTime = request.StartTime;
+                        IsExist.EndTime = request.EndTime;
+                        IsExist.UpdatedBy = Userid;
+                        IsExist.UpdatedDate = UTC_To_IST();
+                        _LimitcommonRepository.Update(IsExist);
+                        Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
+                    }
+                    else
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ReturnMsg = EnResponseMessage.InvalidLimit;
+                        Response.ErrorCode = enErrorCode.InvalidLimit;
+                    }
                 }
                 Response.ReturnCode = enResponseCode.Success;
                 return Response;
@@ -1574,7 +1691,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Success;
                 allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 allBalanceResponse.Balance = response;
-               // var wallet = _commonRepository.GetById(walletId);
+                // var wallet = _commonRepository.GetById(walletId);
                 var walletType = _WalletTypeMasterRepository.GetById(wallet.WalletTypeID);
                 allBalanceResponse.WalletType = walletType.WalletTypeName;
                 allBalanceResponse.WalletName = wallet.Walletname;
@@ -1592,7 +1709,6 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
-            //Response.BizResponseObj = new BizResponseClass();
             try
             {
                 var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
@@ -1722,14 +1838,45 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 25-10-2018
-        public TotalBalanceRes GetAvailbleBalTypeWise(long userid)
+        public BalanceResponseWithLimit GetAvailbleBalTypeWise(long userid)
         {
-            TotalBalanceRes Response = new TotalBalanceRes();
+            BalanceResponseWithLimit Response = new BalanceResponseWithLimit();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
                 var response = _walletRepository1.GetAvailbleBalTypeWise(userid);
                 decimal total = _walletRepository1.GetTotalAvailbleBal(userid);
+
+                //vsolanki 26-10-2018
+                var walletType = _WalletTypeMasterRepository.GetSingle(item => item.IsDefaultWallet == 1);
+                if (walletType == null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                var wallet = _commonRepository.GetSingle(item => item.IsDefaultWallet == 1 && item.WalletTypeID == walletType.Id);
+                if (wallet == null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+
+                var limit = _LimitcommonRepository.GetSingle(item => item.TrnType == 9 && item.WalletId == wallet.Id);//for withdraw
+
+                if (limit == null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                //get amt from  tq
+                var amt = _walletRepository1.GetTodayAmountOfTQ(userid, wallet.Id);
+
                 if (response.Count == 0)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -1740,6 +1887,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 Response.BizResponseObj.ReturnCode = enResponseCode.Success;
                 Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 Response.Response = response;
+                Response.DailyLimit = limit.LimitPerDay;
+                Response.UsedLimit = amt;
                 Response.TotalBalance = total;
                 return Response;
             }
@@ -1758,7 +1907,7 @@ namespace CleanArchitecture.Infrastructure.Services
             a.Wallet = new WalletResponse();
             a.Wallet.Balance = new Balance();
             var listWallet = _walletRepository1.GetWalletMasterResponseByCoin(userId, WalletType);
-            for (int i = 0; i <= listWallet.Count-1; i++)
+            for (int i = 0; i <= listWallet.Count - 1; i++)
             {
                 var wallet = _commonRepository.GetSingle(item => item.AccWalletID == listWallet[i].AccWalletID);
                 var response = _walletRepository1.GetAllBalances(userId, wallet.Id);
@@ -1768,11 +1917,170 @@ namespace CleanArchitecture.Infrastructure.Services
                 a.Wallet.WalletName = listWallet[i].WalletName;
                 a.Wallet.IsDefaultWallet = listWallet[i].IsDefaultWallet;
                 a.Wallet.TypeName = listWallet[i].CoinName;
-                
+
                 a.Wallet.Balance = response;
                 Response.Add(a);
             }
             return Response;
         }
+
+        public UserPreferencesRes SetPreferences(long Userid, int GlobalBit)
+        {
+            UserPreferencesRes Response = new UserPreferencesRes();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                UserPreferencesMaster IsExist = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Userid);
+                if (IsExist == null)
+                {
+                    UserPreferencesMaster newobj = new UserPreferencesMaster();
+                    newobj.UserID = Userid;
+                    newobj.IsWhitelisting = Convert.ToInt16(GlobalBit);
+                    newobj.CreatedBy = Userid;
+                    newobj.CreatedDate = UTC_To_IST();
+                    newobj.Status = Convert.ToInt16(ServiceStatus.Active);
+                    newobj = _UserPreferencescommonRepository.Add(newobj);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefSuccessMsg;
+                }
+                else
+                {
+                    IsExist.IsWhitelisting = Convert.ToInt16(GlobalBit);
+                    IsExist.UpdatedBy = Userid;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _UserPreferencescommonRepository.Update(IsExist);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefUpdateMsg;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public UserPreferencesRes GetPreferences(long Userid)
+        {
+            UserPreferencesRes Response = new UserPreferencesRes();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                UserPreferencesMaster IsExist = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Userid);
+                if (IsExist == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                else
+                {
+                    Response.IsWhitelisting = IsExist.IsWhitelisting;
+                    Response.UserID = IsExist.UserID;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] Request, long ID)
+        {
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                bool state = _walletRepository1.BeneficiaryBulkEdit(Request);
+                if (state == true)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidBeneficiaryID;
+                }
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request, string AccWalletID, long UserID)
+        {
+            BeneficiaryResponse Response = new BeneficiaryResponse();
+            BeneficiaryMaster IsExist = new BeneficiaryMaster();
+            Response.BizResponse = new BizResponseClass();
+            try
+            {
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                if (walletMasters == null)
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                    return Response;
+                }
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Id == request.BenefifiaryID && item.WalletTypeID == walletMasters.WalletTypeID && item.UserID == UserID);
+                if (IsExist != null)
+                {
+                    IsExist.Name = request.Name;
+                    IsExist.Status = Convert.ToInt16(request.Status);
+                    IsExist.IsWhiteListed = Convert.ToInt16(request.WhitelistingBit);
+                    IsExist.UpdatedBy = UserID;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _BeneficiarycommonRepository.Update(IsExist);
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponse.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.BizResponse.ErrorCode = enErrorCode.NotFound;
+                }
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //vsolanki 26-10-2018
+        public void CreateDefaulWallet(long UserID)
+        {
+
+        }
+        //vsoalnki 26-10-2018
+        public ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page)
+        {
+            var wallet = _commonRepository.GetSingle(item=>item.AccWalletID== WalletId);
+            ListWalletLedgerRes Response = new ListWalletLedgerRes();
+            Response.BizResponseObj = new BizResponseClass();
+            var wl = _walletRepository1.GetWalletLedger(FromDate, ToDate, wallet.Id,page);
+            if (wl.Count() == 0)
+            {
+                Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                return Response;
+            }
+            Response.WalletLedgers = wl;
+            Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+            Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            return Response;
+        }
     }
+
 }

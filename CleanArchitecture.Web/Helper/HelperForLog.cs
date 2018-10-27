@@ -16,11 +16,11 @@ namespace CleanArchitecture.Web.Helper
             {
                 if (CheckReq_Res == 1)
                 {
-                    logger.Info("\nDate:" + Date + "\nMethodName:" + MethodName + ", Controllername: " + Controllername + "\nAccessToken: " + accessToken + "\nRequest: " + Req_Res + "\n===================================================================================================================");
+                    logger.Info(Environment.NewLine +"\nDate:" + Date + ",MethodName:" + MethodName + ", Controllername: " + Controllername + Environment.NewLine+ "AccessToken: " + accessToken + Environment.NewLine + "Request: " + Req_Res + Environment.NewLine+"===================================================================================================================");
                 }
                 else //if(CheckReq_Res==2)
                 {
-                    logger.Info("\nDate:" + Date + "\nMethodName:" + MethodName + ", Controllername: " + Controllername + "\nResponse: " + Req_Res + "\n===================================================================================================================");
+                    logger.Info(Environment.NewLine+"Date:" + Date + ", MethodName:" + MethodName + ", Controllername: " + Controllername + Environment.NewLine+"Response: " + Req_Res + Environment.NewLine+"===================================================================================================================");
                 }
             }
             catch (Exception ex)
@@ -33,7 +33,7 @@ namespace CleanArchitecture.Web.Helper
             var logger = NLog.LogManager.GetCurrentClassLogger();
             try
             {
-                logger.Error("\nDate:" + Date + "\nMethodName:" + MethodName + ",Controllername: " + Controllername + "\nError: " + Error + "\n===================================================================================================================");
+                logger.Error(Environment.NewLine+ "Date:" + Date + ", MethodName:" + MethodName + ",Controllername: " + Controllername + "\nError: " + Error + Environment.NewLine+"===================================================================================================================");
             }
             catch (Exception ex)
             {

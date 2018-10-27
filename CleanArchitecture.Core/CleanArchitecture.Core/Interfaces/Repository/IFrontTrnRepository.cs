@@ -11,10 +11,11 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<ActiveOrderDataResponse> GetActiveOrder(long MemberID, string sCondition, string FromDate, string TodDate, long PairId);
         List<TradeHistoryResponce> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll);
         long GetPairIdByName(string pair);
-        List<RecentOrderRespose> GetRecentOrder(long PairId);
+        List<RecentOrderRespose> GetRecentOrder(long PairId, long MemberID);
         List<GetBuySellBook> GetBuyerBook(long id);
         List<GetBuySellBook> GetSellerBook(long id);
         List<GetGraphResponse> GetGraphData(long id);
         MarketCapData GetMarketCap(long PairId);
+        PairRatesResponse GetPairRates(long PairId);
     }
 }

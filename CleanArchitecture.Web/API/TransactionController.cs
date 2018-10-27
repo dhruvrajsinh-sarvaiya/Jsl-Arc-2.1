@@ -122,8 +122,8 @@ namespace CleanArchitecture.Web.API
             Req.PairID = Request.CurrencyPairID;
             Req.Price = Request.Price;
             Req.Qty = Request.Amount;
-            Req.DebitWalletID = Request.DebitWalletID;
-            Req.CreditWalletID = Request.CreditWalletID;
+            Req.DebitAccountID = Request.DebitWalletID;
+            Req.CreditAccountID = Request.CreditWalletID;
 
             //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
            // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
@@ -145,6 +145,57 @@ namespace CleanArchitecture.Web.API
             Response.response = new CreateOrderInfo()
             {
                 TrnID=Req.GUID
+                //order_id = 1000001,
+                //pair_name = "ltcusd",
+                //price = 10,
+                //side = "buy",
+                //type = "stop-loss",
+                //volume = 10
+            };
+
+            //Response.ReturnCode = enResponseCode.Success;
+            return returnDynamicResult(Response);
+        }
+
+        [HttpPost("Withdrawal")]
+        //[Authorize]
+        public async Task<ActionResult> Withdrawal([FromBody]WithdrawalRequest Request)
+        {
+            //Do Process for CreateOrder
+            //For Testing Purpose
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            NewTransactionRequestCls Req = new NewTransactionRequestCls();
+            Req.TrnMode = Request.TrnMode;
+            Req.TrnType = enTrnType.Withdraw;
+            //Req.MemberID = user.Id;
+            //Req.MemberMobile = user.Mobile;
+            Req.MemberID = 16;
+            Req.MemberMobile = "1234567890";
+            Req.SMSCode = Request.asset;
+            Req.TransactionAccount = Request.address;
+            Req.Amount = Request.Amount;
+            Req.DebitAccountID = Request.DebitWalletID;
+
+            //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
+            // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
+
+            CreateTransactionResponse Response = new CreateTransactionResponse();
+            Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
+            BizResponse MethodResp = await MethodRespTsk;
+
+            if (MethodResp.ReturnCode == enResponseCodeService.Success)
+                Response.ReturnCode = enResponseCode.Success;
+            else if (MethodResp.ReturnCode == enResponseCodeService.Fail)
+                Response.ReturnCode = enResponseCode.Fail;
+            else if (MethodResp.ReturnCode == enResponseCodeService.InternalError)
+                Response.ReturnCode = enResponseCode.InternalError;
+
+            Response.ReturnMsg = MethodResp.ReturnMsg;
+            Response.ErrorCode = MethodResp.ErrorCode;
+
+            Response.response = new CreateOrderInfo()
+            {
+                TrnID = Req.GUID
                 //order_id = 1000001,
                 //pair_name = "ltcusd",
                 //price = 10,
@@ -190,7 +241,6 @@ namespace CleanArchitecture.Web.API
                 return Ok(Response);
             }
         }
-
 
         [HttpPost("GetTradeHistory")]
         [Authorize]
@@ -280,12 +330,12 @@ namespace CleanArchitecture.Web.API
                     status = Convert.ToInt16(request.Status);
                 }
 
-                if (request.Page == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InValidPageNo;
-                    return BadRequest(Response);
-                }
+                //if (request.Page == 0)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ErrorCode = enErrorCode.InValidPageNo;
+                //    return BadRequest(Response);
+                //}
 
                 long MemberID =user.Id;
                 Response.response = _frontTrnService.GetTradeHistory(MemberID, sCondition, request.FromDate, request.ToDate, request.Page, status);
@@ -314,30 +364,34 @@ namespace CleanArchitecture.Web.API
             GetActiveOrderResponse Response = new GetActiveOrderResponse();
             Int16 trnType = 999;
             string sCondition = "1=1";
+            long PairId = 999;
             try
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
 
-                if (!_frontTrnService.IsValidPairName(request.Pair))
+                if (!string.IsNullOrEmpty(request.Pair))
                 {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
+                    if (!_frontTrnService.IsValidPairName(request.Pair))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    PairId = _frontTrnService.GetPairIdByName(request.Pair);
+                    if (PairId == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    sCondition += " And TTQ.PairID=" + PairId;
                 }
-
-                long PairId = _frontTrnService.GetPairIdByName(request.Pair);
-                if (PairId == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
-                }
-                if (request.Page == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InValidPageNo;
-                    return BadRequest(Response);
-                }
+                //if (request.Page == 0)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ErrorCode = enErrorCode.InValidPageNo;
+                //    return BadRequest(Response);
+                //}
                 if (!string.IsNullOrEmpty(request.OrderType))
                 {
                     trnType = _frontTrnService.IsValidTradeType(request.OrderType);
@@ -370,7 +424,7 @@ namespace CleanArchitecture.Web.API
                         return BadRequest(Response);
                     }
                     //sCondition += " AND TTQ.TrnDate Between '" + fDate  + " AND '" + tDate  + "' ";
-                    sCondition += "AND TTQ.TrnDate Between {3} AND {4} ";
+                    sCondition += "AND TTQ.TrnDate Between {2} AND {3} ";
                 }
                 long MemberID =user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, sCondition,request .FromDate,request .ToDate, PairId, request.Page);
@@ -392,26 +446,33 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetRecentOrder/{Pair}")] //binance https://api.binance.com//api/v1/trades?symbol=LTCBTC
-        public IActionResult GetRecentOrder(string Pair)
+        [HttpPost("GetRecentOrder")] //binance https://api.binance.com//api/v1/trades?symbol=LTCBTC
+        [Authorize]
+        public async Task<IActionResult> GetRecentOrder(string Pair="999")
         {
+            long PairId = 999;
             GetRecentTradeResponce Response = new GetRecentTradeResponce();
             try
             {
-                if (!_frontTrnService.IsValidPairName(Pair))
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if(Pair != "999")
                 {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
+                    if (!_frontTrnService.IsValidPairName(Pair))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    PairId = _frontTrnService.GetPairIdByName(Pair);
+                    if (PairId == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
                 }
-                long PairId = _frontTrnService.GetPairIdByName(Pair);
-                if (PairId == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
-                }
-                Response.responce = _frontTrnService.GetRecentOrder(PairId);
+                long MemberID =user.Id;
+                Response.responce = _frontTrnService.GetRecentOrder(PairId,MemberID);
                 if (Response.responce.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;
@@ -429,24 +490,28 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("GetOrderhistory/{Pair}")]
-        public ActionResult GetOrderhistory(string Pair)
+        [HttpGet("GetOrderhistory")]
+        public ActionResult GetOrderhistory(string Pair="999")
         {
             GetTradeHistoryResponse Response = new GetTradeHistoryResponse();
+            long PairId = 999;
             try
             {
-                if (!_frontTrnService.IsValidPairName(Pair))
+                if(Pair != "999")
                 {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
-                }
-                long PairId = _frontTrnService.GetPairIdByName(Pair);
-                if (PairId == 0)
-                {
-                    Response.ReturnCode = enResponseCode.Fail;
-                    Response.ErrorCode = enErrorCode.InvalidPairName;
-                    return BadRequest(Response);
+                    if (!_frontTrnService.IsValidPairName(Pair))
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
+                    PairId = _frontTrnService.GetPairIdByName(Pair);
+                    if (PairId == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ErrorCode = enErrorCode.InvalidPairName;
+                        return BadRequest(Response);
+                    }
                 }
                 Response.response = _frontTrnService.GetTradeHistory(PairId, "", "", "", 0, 0);
                 Response.ReturnCode = enResponseCode.Success;
@@ -543,7 +608,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetTradePairByName{Pair}")]
+        [HttpGet("GetTradePairByName/{Pair}")]
         public ActionResult GetTradePairByName(string Pair)
         {
             TradePairByNameResponse Response = new TradePairByNameResponse();
@@ -575,7 +640,7 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetGraphDetail{Pair}")]
+        [HttpGet("GetGraphDetail/{Pair}")]
         public ActionResult GetGraphDetail(string Pair)
         {
             GetGraphDetailReponse Response = new GetGraphDetailReponse();
@@ -595,9 +660,9 @@ namespace CleanArchitecture.Web.API
                     return Ok(Response);
                 }
                 var responsedata = _frontTrnService.GetGraphDetail(id);
-                if (responsedata != null && responsedata.GraphData.Count != 0)
+                if (responsedata != null && responsedata.Count != 0)
                 {
-                    Response.response = _frontTrnService.GetGraphDetail(id);
+                    Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
                 }
                 else
@@ -615,7 +680,7 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("GetMarketCap{Pair}")]
+        [HttpGet("GetMarketCap/{Pair}")]
         public ActionResult GetMarketCap(string Pair)
         {
             MarketCapResponse Response = new MarketCapResponse();
@@ -686,6 +751,45 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        [HttpGet("GetPairRates/{Pair}")]
+        public IActionResult GetPairRates(string Pair)
+        {
+            GetPairRatesResponse Response = new GetPairRatesResponse();
+            try
+            {
+                if (!_frontTrnService.IsValidPairName(Pair))
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.InvalidPairName;
+                    return Ok(Response);
+                }
+                long id = _frontTrnService.GetPairIdByName(Pair);
+                if (id == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                    return Ok(Response);
+                }
+                var responsedata = _frontTrnService.GetPairRates(id);
+                if (responsedata != null)
+                {
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.response = responsedata;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
         #endregion
 
 

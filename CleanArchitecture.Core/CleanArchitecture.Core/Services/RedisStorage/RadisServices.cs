@@ -4,6 +4,7 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace CleanArchitecture.Core.Services.RadisDatabase
 {
@@ -114,6 +115,52 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
         }
 
+        public IReadOnlyList<T> GetSetList(string Tag)
+        {
+            try
+            {
+                //IEnumerable<TagMember> members = this.Context.Cache.GetMembersByTag(Tag);
+                //foreach (TagMember member in members)
+                //{
+                //    if (string.IsNullOrWhiteSpace(member.Key) || member.Key.Contains(":"))
+                //    {
+                //        var key = member.Key;
+                //        var type = member.MemberType;
+                //        var user = member.GetMemberAs<string>();
+                //        return user;
+                //    }
+                //}
+                IReadOnlyList<T> Members = this.Context.Cache.GetObjectsByTag<T>(new[] { Tag }).ToList().AsReadOnly();
+                return Members;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public string GetPair(string Value,string keySplitString)
+        {
+            try
+            {
+                IEnumerable<TagMember> members = this.Context.Cache.GetMembersByTag(Value);
+                foreach (TagMember member in members)
+                {
+                    var Key = member.Key;
+                    if (string.IsNullOrWhiteSpace(Key) || Key.Contains(keySplitString))
+                    {
+                        Key = Key.Split(keySplitString)[1];
+                    }
+                    return Key;
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public string GetSetData(string key)
         {
             try
@@ -141,6 +188,18 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
         }
 
+        public IEnumerable<T> GetConnectionID1(string Token)
+        {
+            try
+            {
+                return this.Context.Cache.GetObjectsByTag<T>(Token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public void SaveToSet(string key, T obj, string Tag)
         {
             try
@@ -157,6 +216,42 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
                 throw ex;
             }
 
+        }
+
+        public void SaveTagsToSetMember(string Key, string Value, string Tag)
+        {
+            try
+            {
+                if (Value != null)
+                {
+                    //var hash = this.GenerateHash(obj);
+                    //RedisContext context = new RedisContext();
+                    //this.Context.Cache.AddToSet(key, obj, new[] { Tag });                    
+                    this.Context.Cache.AddToSet(Key, Value, new[] { Tag , Value });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void RemoveSetMember(string Key, string Value)
+        {
+            try
+            {
+                if (Value != null)
+                {
+                    //var hash = this.GenerateHash(obj);
+                    //RedisContext context = new RedisContext();
+                    //this.Context.Cache.AddToSet(key, obj, new[] { Tag });
+                    this.Context.Cache.RemoveFromSet(Key, Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void SaveToHash(string key, T obj, string Tag)

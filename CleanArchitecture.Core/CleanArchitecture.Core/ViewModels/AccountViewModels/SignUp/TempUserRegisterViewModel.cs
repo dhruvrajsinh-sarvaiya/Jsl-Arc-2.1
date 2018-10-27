@@ -11,6 +11,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
         public int RegTypeId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
+        public string AlternetEmail { get; set; }
         public string PasswordHash { get; set; }
         public string SecurityStemp { get; set; }
         public string ConcurrencyStamp { get; set; }
@@ -18,6 +19,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Mobile { get; set; }
+        public string AlternetMobile { get; set; }
         public bool RegisterStatus { get; set; }
         public bool IsDeleted { get; set; }
         //[DataType(DataType.DateTime)]

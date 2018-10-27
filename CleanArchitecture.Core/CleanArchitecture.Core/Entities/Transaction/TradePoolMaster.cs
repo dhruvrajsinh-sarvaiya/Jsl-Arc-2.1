@@ -20,7 +20,9 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Key]
         public long BuyServiceID { get; set; }
         [Key]
-        public long BidPrice { get; set; }
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal BidPrice { get; set; }
         [Key]
         public long CountPerPrice { get; set; }
 
@@ -43,5 +45,7 @@ namespace CleanArchitecture.Core.Entities.Transaction
         public short TPSPickupStatus { get; set; }
         [Required]
         public short IsSleepMode { get; set;}
+        public Guid GUID { get; set; }
+        public long PairId { get; set; }
     }
 }

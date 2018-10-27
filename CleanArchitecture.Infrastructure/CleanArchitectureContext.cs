@@ -73,15 +73,17 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletLimitConfiguration> WalletLimitConfiguration { get; set; }
         public DbSet<DepositCounterLog> DepositCounterLog { get; set; }
         public DbSet<DepositCounterMaster> DepositCounterMaster { get; set; }
-        //vsolnkki 24-10-2018
+        //vsolnki 24-10-2018
         public DbSet<UserStacking> UserStacking { get; set; }
         public DbSet<MemberShadowBalance> MemberShadowBalance { get; set; }
         public DbSet<MemberShadowLimit> MemberShadowLimit { get; set; }
         public DbSet<StckingScheme> StckingScheme { get; set; }
+
         public DbSet<BizUserTypeMapping> BizUserTypeMapping { get; set; }
         public DbSet<UserPreferencesMaster> UserPreferencesMaster { get; set; }
         public DbSet<BeneficiaryMaster> BeneficiaryMaster { get; set; }
-
+        public DbSet<WalletLimitConfigurationMaster> WalletLimitConfigurationMaster { get; set; }
+        
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
         public DbSet<TradePairMaster> TradePairMaster { get; set; }
@@ -178,12 +180,12 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
             modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
             modelBuilder.Entity<DepositCounterMaster>().HasKey(e => new {e.WalletTypeID, e.SerProId}); // Rita 22-10-2018 composite primary key
-            modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.PairId, e.DataDate }); // Uday 22-10-2018 composite primary key
+            modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.TranNo }); // Uday 22-10-2018 composite primary key
             modelBuilder.Entity<DepositHistory>().HasKey(e => new { e.TrnID, e.Address }); // ntrivedi 23-10-2018 composite primary key
             modelBuilder.Entity<BizUserTypeMapping>().Property(p =>p.UserID).ValueGeneratedNever(); // ntrivedi 
-          /*  modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); */// ntrivedi 
-            //modelBuilder.Entity<StckingScheme>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
-
+            modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
+            modelBuilder.Entity<StckingScheme>().Property(p => p.WalletType).ValueGeneratedNever(); // ntrivedi 
+            modelBuilder.Entity<WalletLimitConfigurationMaster>().Property(p => p.TrnType).ValueGeneratedNever();
 
         }
 

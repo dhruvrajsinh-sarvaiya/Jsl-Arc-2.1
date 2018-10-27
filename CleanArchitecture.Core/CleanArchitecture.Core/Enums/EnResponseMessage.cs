@@ -50,7 +50,9 @@ namespace CleanArchitecture.Core.Enums
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
         public static string SetWalletLimitCreateMsg = "Limit Created Successfully";
+        public static string SetUserPrefSuccessMsg = "User Preference is Successfully Created.";
         public static string SetWalletLimitUpdateMsg = "Limit Updated Successfully";
+        public static string SetUserPrefUpdateMsg = "User Preference Is Updated Successfully";
         public static string CreateWalletFailMsg = "Fail";
         public static string CreateAddressSuccessMsg = "Address is Successfully Created.";
         public static string CreateAddressFailMsg = "Failed to generate Address.";
@@ -61,7 +63,7 @@ namespace CleanArchitecture.Core.Enums
         public static string RecordAdded = "Recored Added Successfully!";
         public static string RecordUpdated = "Recored Updated Successfully!";
         public static string RecordDisable = "Recored Disable Successfully!";
-
+        public static string InvalidLimit = "Invalid Limit.";
 
         public static string InvalidAmt = "Invalid Amount.";
         public static string InsufficientBal = "Insufficient Balance.";
@@ -186,5 +188,8 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessEnableIpStatus = "Success full enable ip address.";
         public static string SuccessEnableDeviceId = "Success full enable device Id.";
         public static string SuccessDisableDeviceId = "Success full disable device id.";
+
+        public static string InvalidFaceBookToken = "Invalid FaceBook access token.";
+        public static string InvalidFaceBookProviderKey = "Invalid FaceBook provider key.";
     }
 }

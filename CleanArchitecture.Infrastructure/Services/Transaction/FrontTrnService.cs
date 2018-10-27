@@ -258,8 +258,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 
                 if (list != null)
                 {
-                    int skip = Helpers.PageSize * (page - 1);
-                    list = list.Skip(skip).Take(Helpers.PageSize).ToList();
+                    if(page > 0)
+                    {
+                        int skip = Helpers.PageSize * (page - 1);
+                        list = list.Skip(skip).Take(Helpers.PageSize).ToList();
+                    }
+                    
                     foreach (TradeHistoryResponce model in list)
                     {
                         responce.Add(new GetTradeHistoryInfo
@@ -288,24 +292,32 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public List<RecentOrderInfo> GetRecentOrder(long PairId)
+        public List<RecentOrderInfo> GetRecentOrder(long PairId, long MemberID)
         {
             try
             {
-                var list = _frontTrnRepository.GetRecentOrder(PairId);
+                string st = "";
+                var list = _frontTrnRepository.GetRecentOrder(PairId, MemberID);
                 List<RecentOrderInfo> responce = new List<RecentOrderInfo>();
                 if (list != null)
                 {
                     foreach (RecentOrderRespose model in list)
                     {
+                        if (model.Status == Convert.ToInt16(enTransactionStatus.Success))
+                            st = "Success";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                            st = "Hold";
+                        else if (model.Status == Convert.ToInt16(enTransactionStatus.SystemFail))
+                            st = "Fail";
+
                         responce.Add(new RecentOrderInfo
                         {
                             Qty = model.Qty,
                             DateTime = model.DateTime.Date,
                             Price = model.Price,
-                            Status = model.Status,
                             TrnNo = model.TrnNo,
                             Type = model.Type,
+                            Status = st
                         });
                     }
                 }
@@ -325,8 +337,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 List<ActiveOrderInfo> responceData = new List<ActiveOrderInfo>();
                 if (ActiveOrderList != null)
                 {
-                    int skip = Helpers.PageSize * (Page - 1);
-                    ActiveOrderList = ActiveOrderList.Skip(skip).Take(Helpers.PageSize).ToList();
+                    if(Page > 0)
+                    {
+                        int skip = Helpers.PageSize * (Page - 1);
+                        ActiveOrderList = ActiveOrderList.Skip(skip).Take(Helpers.PageSize).ToList();
+                    }
                     foreach (ActiveOrderDataResponse model in ActiveOrderList)
                     {
                         responceData.Add(new ActiveOrderInfo
@@ -462,24 +477,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public GetGraphDetailInfo GetGraphDetail(long PairId)
+        public List<GetGraphDetailInfo> GetGraphDetail(long PairId)
         {
             try
             {
-                GetGraphDetailInfo responseData = new GetGraphDetailInfo();
+                List<GetGraphDetailInfo> responseData = new List<GetGraphDetailInfo>();
                 var list = _frontTrnRepository.GetGraphData(PairId);
-                List<decimal[]> chartDataList = new List<decimal[]>();
-                chartDataList = (from GetGraphResponse dr in list
-                                 select new decimal[]
-                                 {
-                                      Convert.ToInt64(dr.DataDate)*1000,
-                                      Convert.ToDecimal(dr.Volume),
-                                      Convert.ToDecimal(dr.High),
-                                      Convert.ToDecimal(dr.Low),
-                                      Convert.ToDecimal(dr.TodayClose),
-                                      Convert.ToDecimal(dr.TodayOpen)
-                                 }).ToList();
-                responseData.GraphData = chartDataList;
+                responseData = list.Select(a => new GetGraphDetailInfo()
+                {
+                    DataDate = a.DataDate,
+                    High = a.High,
+                    Low = a.Low,
+                    TodayClose = a.TodayOpen,
+                    TodayOpen = a.TodayOpen,
+                    Volume = a.Volume,
+                    ChangePer = a.ChangePer
+                }).ToList();
                 return responseData;
             }
             catch (Exception ex)
@@ -564,6 +577,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     return true;
                 else
                     return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public PairRatesResponse GetPairRates(long PairId)
+        {
+            try
+            {
+                PairRatesResponse responseData = new PairRatesResponse();
+
+                responseData = _frontTrnRepository.GetPairRates(PairId);
+               
+                return responseData;
             }
             catch (Exception ex)
             {
@@ -665,7 +694,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
         }
 
-        
         #endregion
     }
 }

@@ -26,7 +26,7 @@ using CleanArchitecture.Infrastructure.Services.Configuration;
 using CleanArchitecture.Infrastructure.Services.Transaction;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.Services.Session;
-using CleanArchitecture.Web.SignalR;
+using CleanArchitecture.Core.SignalR;
 using Newtonsoft.Json.Serialization;
 
 namespace CleanArchitecture.Web
@@ -188,8 +188,9 @@ namespace CleanArchitecture.Web
                 // added by nirav savariya for common repository on 10-04-2018
                 config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
                 config.For(typeof(ITransactionProcess)).Add(typeof(NewTransaction));
-                               
-                
+                config.For(typeof(IWebApiData)).Add(typeof(TransactionWebAPIConfiguration));
+
+
                 //Populate the container using the service collection
                 config.Populate(services);
                
@@ -240,11 +241,19 @@ namespace CleanArchitecture.Web
                 // Do logging or other work that doesn't write to the Response.
             });
 
-            app.UseCors("CorsPolicy");
+            //app.UseCors("CorsPolicy");
+
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .WithMethods("GET", "POST")
+                    .AllowCredentials();
+            });
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<Chat>("/chathub");
+                routes.MapHub<SocketHub>("/chathub");
             });
 
             app.UseSession();

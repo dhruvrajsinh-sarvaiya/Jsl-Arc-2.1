@@ -80,8 +80,8 @@ namespace CleanArchitecture.Web.API
         [HttpPost("{Coin}")]
         public async Task<IActionResult> CreateWallet([FromBody]CreateWalletRequest Request, string Coin)
         {
-           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
-             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+          //  ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             var accessToken = await HttpContext.GetTokenAsync("access_token");
             HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Request), accessToken);
             CreateWalletResponse Response = new CreateWalletResponse();
@@ -95,7 +95,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, Coin, Request.IsDefaultWallet, Request.AllowTrnType, Convert.ToInt64(user.Id));
+                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, Coin, Request.IsDefaultWallet, Request.AllowTrnType, Convert.ToInt64(user.Id),1);
                 }
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
@@ -114,7 +114,7 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
         [HttpGet("{Coin}")]
-        public async Task<IActionResult> GetWalletByCoin(string Coin)
+        public async Task<IActionResult> GetWalletByType(string Coin)
         {
             //ApplicationUser user = new ApplicationUser(); user.Id = 1;
             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
@@ -565,12 +565,13 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 25-10-2018
+        //[AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAvailbleBalTypeWise()
         {
-            // ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
-            TotalBalanceRes Response = new TotalBalanceRes();
+            // ApplicationUser user = new ApplicationUser(); user.Id = 2;
+           ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            BalanceResponseWithLimit Response = new BalanceResponseWithLimit();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
             {
@@ -613,6 +614,37 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     Response.Wallets = _walletService.GetAllBalancesTypeWise(user.Id, WalletType);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+
+        //vsolanki 2018-10-26
+       // [AllowAnonymous]
+        [HttpGet("{FromDate}/{ToDate}/{WalletId}")]
+        public async Task<IActionResult> GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int Page)
+        {
+            // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            ListWalletLedgerRes Response = new ListWalletLedgerRes();
+            Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
+            try
+            {
+                if (user == null)
+                {
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.BizResponseObj.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.GetWalletLedger(FromDate, ToDate, WalletId,Page);
                 }
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
