@@ -53,6 +53,26 @@ namespace CleanArchitecture.Core.Helpers
             return Convert.ToInt64(UniqNo);
         }
 
+        public static List<KeyValuePair<string, int>> GetEnumList<T>()
+        {
+            var list = new List<KeyValuePair<string, int>>();
+            foreach (var e in Enum.GetValues(typeof(T)))
+            {
+                list.Add(new KeyValuePair<string, int>(e.ToString(), (int)e));
+            }
+            return list;
+        }
+
+        public static List<int> GetEnumValue<T>()
+        {
+            var list = new List<int>();
+            foreach (var e in Enum.GetValues(typeof(T)))
+            {
+                list.Add((int)e);
+            }
+            return list;
+        }
+
     }
 
     public class CopyClass
