@@ -226,29 +226,35 @@ namespace CleanArchitecture.Core.SignalR
         // Global Updates
         public void BuyerBook(string Pair, GetBuySellBook Data)
         {
-            _chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Data);
-            _chatHubContext.Clients.Group("BuyerBook:" + Pair).SendAsync("RecieveBuyerBook", Data);
+            _chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Helpers.Helpers.JsonSerialize(Data));
+            _chatHubContext.Clients.Group("BuyerBook:" + Pair).SendAsync("RecieveBuyerBook", Helpers.Helpers.JsonSerialize(Data));
+        }
+
+        // For Demo get Connections Topic wise subscription using Redis // Too SLow for Output 
+        public void BuyerBookWithRedis(string Pair, GetBuySellBook Data)
+        {
+            _chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Helpers.Helpers.JsonSerialize(Data));
         }
 
         public void SellerBook(string Pair, GetBuySellBook Data)
         {
-            Clients.Group("SellerBook:" + Pair).SendAsync("RecieveSellerBook", Data);
+            Clients.Group("SellerBook:" + Pair).SendAsync("RecieveSellerBook", Helpers.Helpers.JsonSerialize(Data));
         }
 
         // Global Trades settelment
         public void TradingHistory(string Pair, TradeHistoryResponce Data)
         {
-            _chatHubContext.Clients.Group("TradingHistory:" + Pair).SendAsync("RecieveTradingHistory", Data);
+            _chatHubContext.Clients.Group("TradingHistory:" + Pair).SendAsync("RecieveTradingHistory", Helpers.Helpers.JsonSerialize(Data));
         }
 
         public void MarketData(string Pair, MarketCapData Data)
         {
-            _chatHubContext.Clients.Group("MarketData:" + Pair).SendAsync("RecieveMarketData", Data);
+            _chatHubContext.Clients.Group("MarketData:" + Pair).SendAsync("RecieveMarketData", Helpers.Helpers.JsonSerialize(Data));
         }        
 
         public void ChartData(string Pair, GetGraphResponse Data)
         {
-            _chatHubContext.Clients.Group("ChartData:" + Pair).SendAsync("RecieveChartData", Data);
+            _chatHubContext.Clients.Group("ChartData:" + Pair).SendAsync("RecieveChartData", Helpers.Helpers.JsonSerialize(Data));
         }
 
         //public void BlockedUser(string UserID)
