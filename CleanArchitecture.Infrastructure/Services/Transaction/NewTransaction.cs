@@ -640,7 +640,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         case (long)enAppType.WebSocket:
 
                         case (long)enAppType.JsonRPC:
-                            _TransactionObj.APIResponse = _IWebApiSendRequest.SendJsonRpcAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL,);
+                            _TransactionObj.APIResponse = _IWebApiSendRequest.SendJsonRpcAPIRequestAsync(ThirdPartyAPIRequestOnj.RequestURL, ThirdPartyAPIRequestOnj.RequestBody);
                                  break;
                         case (long)enAppType.TCPSocket:
 
