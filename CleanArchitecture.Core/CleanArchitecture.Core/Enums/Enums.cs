@@ -376,28 +376,29 @@ namespace CleanArchitecture.Core.Enums
         OneToOne = 1,
         Broadcast = 2
     }
-    public enum enUserWiseMethodName
+    public enum enMethodName
     {
-        OpenOrder=1,
-        OrderHistory=2,
-        TradeHistory=3,
-        ActivityNotification=4
-    }
-    public enum enPairWiseMethodName
-    {
-        BuyerBook=5,
-        SellerBook=6,
+        OpenOrder = 1,
+        OrderHistory = 2,
+        TradeHistory = 3,
+        ActivityNotification = 4,
+        //PairWise
+        BuyerBook = 5,
+        SellerBook = 6,
         TradeHistoryByPair = 7,
-        MarketData=8,
-        Price=9,
-        BuyerSideWallet=10,
-        SellerSideWallet=11,
-        ChartData=12
-    }
-    public enum enMarketWiseMethodName
-    {
-        PairData=13,
-        MarketTicker=14
+        MarketData = 8,
+        Price = 9,
+        BuyerSideWallet = 10,
+        SellerSideWallet = 11,
+        ChartData = 12,
+        //Market wise
+        PairData = 13,
+        MarketTicker = 14,
+        //Global 
+        Chat = 15,
+        News = 16,
+        Announcement = 17,
+        Time = 18
     }
     public enum enGlobalMethodName
     {
