@@ -16,8 +16,8 @@ namespace CleanArchitecture.Core.Entities.User
         public string UserName { get; set; }
         [EmailAddress]
         public string Email { get; set; }
-        [EmailAddress]
-        public string AlternetEmail { get; set; }
+        //[EmailAddress]
+        //public string AlternetEmail { get; set; }
         public string PasswordHash { get; set; }
         public string SecurityStemp { get; set; }
         public string ConcurrencyStamp { get; set; }
@@ -27,7 +27,7 @@ namespace CleanArchitecture.Core.Entities.User
         [StringLength(250)]
         public string LastName { get; set; }
         public string Mobile { get; set; }
-        public string AlternetMobile { get; set; }
+        //public string AlternetMobile { get; set; }
         public bool RegisterStatus { get; set; }
         public bool IsDeleted { get; set; }
 

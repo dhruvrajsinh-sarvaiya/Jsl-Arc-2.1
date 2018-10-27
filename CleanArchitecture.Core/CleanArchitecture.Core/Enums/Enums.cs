@@ -241,8 +241,8 @@ namespace CleanArchitecture.Core.Enums
 
         Status4098BizUserEmailExist = 4098,
         Status4099BizUserNameExist = 4099,
-        Status4100TempUserEmailExistVerifyPending = 4100,
-        Status4101TempUserNameExistVerifyPending = 4101,
+        Status4100provideDetailNotAvailable = 4100,
+        Status4101InputProvider = 4101,
         Status4102SignUpUserRegisterError = 4102,
 
         Status4103TempUserEmailExist = 4103,

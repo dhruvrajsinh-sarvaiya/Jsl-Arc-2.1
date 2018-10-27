@@ -202,5 +202,11 @@ namespace CleanArchitecture.Core.Enums
         public static string SignUpTempUserNameVerifyPending = "This Uaser name already exist and verify pending.";
         public static string SignUpUserRegisterError = "User not register.";
 
+        public static string SocialLoginKey = "Successfully get social provider detail";
+
+        public static string provideDetailNotAvailable = "Provider detail not available.";
+
+        public static string InputProvider = "Please input provider name.";
+
     }
 }
