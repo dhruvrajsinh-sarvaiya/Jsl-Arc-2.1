@@ -200,7 +200,7 @@ namespace CleanArchitecture.Core.SignalR
             _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOrderHistory", Order);
         }
 
-        public void TradeHistory(string Token, string Order)
+        public void TradeHistoryByUser(string Token, string Order)
         {
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
@@ -246,7 +246,7 @@ namespace CleanArchitecture.Core.SignalR
         }
 
         // Global Trades settelment
-        public void TradingHistory(string Pair, string Data)
+        public void TradeHistoryByPair(string Pair, string Data)
         {
             _chatHubContext.Clients.Group("TradingHistory:" + Pair).SendAsync("RecieveTradingHistory", Data);
         }
