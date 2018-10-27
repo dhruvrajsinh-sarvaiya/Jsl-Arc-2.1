@@ -2119,6 +2119,8 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 27-10-2018
         public BizResponseClass CreateWalletForAllUser_NewService(string WalletType)
         {
+            //var walletType = _WalletTypeMasterRepository.GetSingle(item=>item.WalletTypeName==WalletType);
+            //var wallet = _commonRepository.GetSingle(item=>item.WalletTypeID== walletType.Id && item.IsDefaultWallet==1);
             var res = _walletRepository1.CreateWalletForAllUser_NewService(WalletType);
             if (res != 1)
             {
