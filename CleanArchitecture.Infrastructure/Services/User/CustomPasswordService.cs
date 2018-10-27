@@ -96,13 +96,37 @@ namespace CleanArchitecture.Infrastructure.Services.User
             {
                 if (!string.IsNullOrEmpty(appkey) && !string.IsNullOrEmpty(otp))
                 {
-                    string _Pass1 = appkey.Substring(0, 20);
-                    string _Pass11 = _Pass1 + otp.Substring(0, 3);
-                    string _Pass2 = appkey.Substring(20, 10);
-                    string _Pass22 = _Pass2 + otp.Substring(3, 3);
-                    string _Pass3 = appkey.Substring(30, 28);
-                    string password = _Pass11 + _Pass22 + _Pass3;
-
+                    string password = string.Empty;
+                    if (otp.Length > 6)
+                    {
+                        if (otp.Length > 12)
+                        {
+                            string _Pass1 = appkey.Substring(0, 20);
+                            string _Pass11 = _Pass1 + otp.Substring(1, 2);
+                            string _Pass2 = appkey.Substring(20, 10);
+                            string _Pass22 = _Pass2 + otp.Substring(6, 3);
+                            string _Pass3 = appkey.Substring(30, 28);
+                            string _Pass33 = _Pass3 + otp.Substring(10, 1);
+                            password = _Pass11 + _Pass22 + _Pass33;
+                        }
+                        else
+                        {
+                            string _Pass1 = appkey.Substring(0, 20);   // If the provider key length is less then  then provide key combination is skip 2 and then add 6 to password.
+                            string _Pass11 = _Pass1 + otp.Substring(1, 6);
+                            string _Pass2 = appkey.Substring(20, 10);
+                            string _Pass3 = appkey.Substring(30, 28);
+                            password = _Pass11 + _Pass2 + _Pass3;
+                        }
+                    }
+                    else
+                    {
+                        string _Pass1 = appkey.Substring(0, 20);
+                        string _Pass11 = _Pass1 + otp.Substring(0, 3);
+                        string _Pass2 = appkey.Substring(20, 10);
+                        string _Pass22 = _Pass2 + otp.Substring(3, 3);
+                        string _Pass3 = appkey.Substring(30, 28);
+                        password = _Pass11 + _Pass22 + _Pass3;
+                    }
                     var data = _customRepository.Table.Where(i => i.Password == password && i.EnableStatus == false).FirstOrDefault();
                     if (data != null)
                     {

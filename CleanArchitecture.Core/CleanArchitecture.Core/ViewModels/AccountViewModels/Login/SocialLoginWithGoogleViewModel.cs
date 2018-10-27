@@ -25,7 +25,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
 
     public class SocialLoginGoogleResponse : BizResponseClass
     {
-
+        public string Appkey { get; set; }
     }
 
 }

@@ -822,8 +822,20 @@ namespace CleanArchitecture.Web.API
                             //_logger.LogInformation(
                             //    "{Name} logged in with {LoginProvider} provider.",
                             //    info.Principal.Identity.Name, info.LoginProvider);
+                            SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+                            if (socialCustomPasswordViewMoel != null)
+                            {
+                                CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                data.Password = socialCustomPasswordViewMoel.Password;
+                                data.UserId = user.Id;
+                                data.EnableStatus = false;
+                                await _custompassword.AddPassword(data);
+
+                            }
                             _logger.LogInformation(1, "User logged in with social using.");
-                            return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                            return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess, Appkey = socialCustomPasswordViewMoel.AppKey });
+
                         }
                         if (result.RequiresTwoFactor)
                         {
@@ -858,8 +870,22 @@ namespace CleanArchitecture.Web.API
                                     //_logger.LogInformation(
                                     //    "User created an account using {Name} provider.",
                                     //    info.LoginProvider);
+
+                                    SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+                                    if (socialCustomPasswordViewMoel != null)
+                                    {
+                                        CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                        data.Password = socialCustomPasswordViewMoel.Password;
+                                        data.UserId = user.Id;
+                                        data.EnableStatus = false;
+                                        await _custompassword.AddPassword(data);
+
+                                    }
+
+
                                     _logger.LogInformation(1, "User logged in with social using.");
-                                    return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                                    return Ok(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess, Appkey = socialCustomPasswordViewMoel.AppKey });
                                 }
                                 else
                                 {
@@ -889,6 +915,145 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        /// <summary>
+        /// This method created by pankaj for user perform to  External login with facebook.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("ExternalLoginForFacebook")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginForFacebook([FromBody] SocialLoginWithfacebookViewModel model)
+        {
+            try
+            {
+                var appAccessTokenResponse = (dynamic)null;
+                var httpClient = new HttpClient();
+
+                try
+                {
+                    appAccessTokenResponse = await httpClient.GetStringAsync(_configuration["SocialFacebookToken"].ToString()
+                        + _configuration["Authentication:Facebook:AppId"].ToString() + "&client_secret=" + _configuration["Authentication:Facebook:AppSecret"].ToString() +
+                        "&grant_type=client_credentials");
+                    var appAccessToken = JsonConvert.DeserializeObject<FacebookAppAccessTokenViewModel>(appAccessTokenResponse);
+
+                    string userAccessTokenValidationResponse = await httpClient.GetStringAsync($"https://graph.facebook.com/debug_token?input_token={model.access_token}&access_token=" + appAccessToken.access_token);
+                    //var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookUserAccessTokenValidation>(userAccessTokenValidationResponse);
+
+                    var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookUserAccessTokenValidationViewModel>(userAccessTokenValidationResponse);
+
+                    if (!userAccessTokenValidation.data.is_valid)
+                    {
+                        return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidFaceBookToken, ErrorCode = enErrorCode.Status4096InvalidFaceBookToken });
+
+                    }
+
+                    appAccessTokenResponse = await httpClient.GetStringAsync(_configuration["SocialFacebook"].ToString() + model.access_token);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                    return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidFaceBookToken, ErrorCode = enErrorCode.Status4096InvalidFaceBookToken });
+                }
+                if (appAccessTokenResponse != null)
+                {
+                    var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookSocial>(appAccessTokenResponse);
+
+
+                    var result = await _signInManager.ExternalLoginSignInAsync(model.ProviderName, model.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+                    if (result.Succeeded)
+                    {
+                        var user = await _userManager.FindByLoginAsync(model.ProviderName, model.ProviderKey);
+
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+                        if (socialCustomPasswordViewMoel != null)
+                        {
+                            CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                            data.Password = socialCustomPasswordViewMoel.Password;
+                            data.UserId = user.Id;
+                            data.EnableStatus = false;
+                            await _custompassword.AddPassword(data);
+
+                        }
+                        _logger.LogInformation(1, "User logged in with social using.");
+                        return Ok(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Success, Appkey = socialCustomPasswordViewMoel.AppKey, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+
+
+
+                    }
+                    if (result.RequiresTwoFactor)
+                    {
+                        return Ok(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+                    }
+                    if (result.IsLockedOut)
+                    {
+                        return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
+                    }
+                    else
+                    {
+
+                        var user =
+                        new ApplicationUser
+                        {
+                            UserName = userAccessTokenValidation.first_name,
+                            Email = userAccessTokenValidation.email,
+                            FirstName = userAccessTokenValidation.first_name,
+                            LastName = userAccessTokenValidation.last_name
+                        };   /// Here email address not set bacause of user can login with mobile number as well as email so.
+
+
+                        var userdet = await _userManager.CreateAsync(user);
+
+
+                        var infodet = new UserLoginInfo(model.ProviderName, model.ProviderKey, model.ProviderName);
+                        if (userdet.Succeeded)
+                        {
+                            var userlogin = await _userManager.AddLoginAsync(user, infodet);
+
+                            if (userlogin.Succeeded)
+                            {
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                                _logger.LogInformation(1, "User logged in with social using.");
+                                SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+
+
+                                if (socialCustomPasswordViewMoel != null)
+                                {
+                                    CustomtokenViewModel data = new CustomtokenViewModel(); // added by nirav savariya for login with mobile and email on 16-10-2018
+                                    data.Password = socialCustomPasswordViewMoel.Password;
+                                    data.UserId = user.Id;
+                                    data.EnableStatus = false;
+                                    await _custompassword.AddPassword(data);
+                                }
+                                return Ok(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Success, Appkey = socialCustomPasswordViewMoel.AppKey, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                            }
+                            else
+                            {
+                                return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SocialUserInsertError, ErrorCode = enErrorCode.Status4070SocialUserInsertError });
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new SocialLoginfacebookResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SocialUserInsertError, ErrorCode = enErrorCode.Status4070SocialUserInsertError });
+                        }
+                    }
+
+
+                }
+                else
+                {
+                    return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidGoogleToken, ErrorCode = enErrorCode.Status4068InvalidGoogleToken });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new SocialLoginGoogleResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
         #endregion
 
         [HttpPost("ForgotPassword")]
