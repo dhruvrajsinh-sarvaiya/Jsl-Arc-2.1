@@ -1705,14 +1705,14 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId)
+        public BeneficiaryResponse AddBeneficiary(string CoinName, string BeneficiaryAddress, long UserId)
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
             try
             {
                 var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
-                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
+                var walletMasters = _WalletTypeMasterRepository.GetSingle(item => item.WalletTypeName == CoinName);
                 Response.BizResponse = new BizResponseClass();
                 if (walletMasters == null)
                 {
@@ -1721,7 +1721,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
                     return Response;
                 }
-                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.WalletTypeID && item.Status == 1);
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.Id && item.Status == 1);
 
                 if (IsExist == null)
                 {
@@ -1740,7 +1740,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddNew.UserID = UserId;
                     AddNew.Address = BeneficiaryAddress;
                     AddNew.Name = "System Generated";
-                    AddNew.WalletTypeID = walletMasters.WalletTypeID;
+                    AddNew.WalletTypeID = walletMasters.Id;
                     AddNew = _BeneficiarycommonRepository.Add(AddNew);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
                 }
@@ -1799,22 +1799,22 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse ListBeneficiary(string AccWalletID, long UserId)
+        public BeneficiaryResponse ListBeneficiary(long UserId)
         {
             BeneficiaryResponse Response = new BeneficiaryResponse();
             Response.BizResponse = new BizResponseClass();
             try
             {
-                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
+                //var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
 
-                if (walletMasters == null)
-                {
-                    Response.BizResponse.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
-                    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
-                    return Response;
-                }
-                var BeneficiaryMasterRes = _walletRepository1.GetAllBeneficiaries(walletMasters.WalletTypeID);
+                //if (walletMasters == null)
+                //{
+                //    Response.BizResponse.ReturnCode = enResponseCode.Fail;
+                //    Response.BizResponse.ReturnMsg = EnResponseMessage.InvalidWallet;
+                //    Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
+                //    return Response;
+                //}
+                var BeneficiaryMasterRes = _walletRepository1.GetAllBeneficiaries(UserId);
                 if (BeneficiaryMasterRes.Count == 0)
                 {
                     Response.BizResponse.ReturnCode = enResponseCode.Fail;
@@ -2057,11 +2057,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        //vsolanki 26-10-2018
-        public void CreateDefaulWallet(long UserID)
-        {
-
-        }
         //vsoalnki 26-10-2018
         public ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page)
         {
@@ -2080,6 +2075,28 @@ namespace CleanArchitecture.Infrastructure.Services
             Response.BizResponseObj.ReturnCode = enResponseCode.Success;
             Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
             return Response;
+        }
+
+
+        //vsolanki 27-10-2018
+        public BizResponseClass CreateDefaulWallet(long UserID)
+        {
+         var res=   _walletRepository1.CreateDefaulWallet(UserID);
+            if(res !=1)
+            {
+                return new BizResponseClass
+                {
+                    ErrorCode = enErrorCode.InternalError,
+                    ReturnMsg = EnResponseMessage.CreateWalletFailMsg,
+                    ReturnCode = enResponseCode.InternalError
+                };
+            }
+            return new BizResponseClass
+            {
+                ErrorCode = enErrorCode.Success,
+                ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg,
+                ReturnCode = enResponseCode.Success
+            };
         }
     }
 

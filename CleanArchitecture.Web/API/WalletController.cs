@@ -15,6 +15,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using CleanArchitecture.Web.Helper;
+using CleanArchitecture.Infrastructure.DTOClasses;
+using CleanArchitecture.Core.ApiModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -645,6 +647,35 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     Response = _walletService.GetWalletLedger(FromDate, ToDate, WalletId,Page);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+
+        //[AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> CreateDefaulWallet()
+        {
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            BizResponseClass Response = new BizResponseClass();          
+            try
+            {
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response= _walletService.CreateDefaulWallet(user.Id);
                 }
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);

@@ -82,7 +82,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId);
         BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
-        BeneficiaryResponse ListBeneficiary(string accWalletID, long id);
+        BeneficiaryResponse ListBeneficiary(long id);
         UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
         UserPreferencesRes GetPreferences(long Userid);
         BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] request, long id);
@@ -91,5 +91,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType);
 
         ListWalletLedgerRes GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int page);
+
+        BizResponseClass CreateDefaulWallet(long UserID);
     }
 }

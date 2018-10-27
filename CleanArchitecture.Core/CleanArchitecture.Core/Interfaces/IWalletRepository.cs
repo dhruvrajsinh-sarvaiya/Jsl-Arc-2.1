@@ -70,7 +70,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID);
 
-        List<BeneficiaryMasterRes> GetAllBeneficiaries(long WalletTypeID);
+        List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID);
         //vsolanki 25-10-2018
         List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid);
 
@@ -82,5 +82,7 @@ namespace CleanArchitecture.Core.Interfaces
         decimal GetTodayAmountOfTQ(long userId, long WalletId);
 
         List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page);
+
+        int CreateDefaulWallet(long UserId);
     }
 }
