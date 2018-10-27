@@ -12,5 +12,6 @@ namespace CleanArchitecture.Core.Interfaces.User
         Task<CustomtokenViewModel> GetPassword(long userid);
         Task<CustomtokenViewModel> IsValidPassword(string appkey, string otp);
         void UpdateOtp(long Id);
+        Task<string> Get2FACustomToken(long UserId);
     }
 }

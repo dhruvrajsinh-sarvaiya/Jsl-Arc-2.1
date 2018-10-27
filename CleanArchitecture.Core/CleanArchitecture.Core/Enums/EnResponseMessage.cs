@@ -191,5 +191,22 @@ namespace CleanArchitecture.Core.Enums
 
         public static string InvalidFaceBookToken = "Invalid FaceBook access token.";
         public static string InvalidFaceBookProviderKey = "Invalid FaceBook provider key.";
+
+        public static string SignUpBizUserEmailExist = "This email id already registered.";
+        public static string SignUpBizUserNameExist = "This Uaser name already registered.";
+
+        public static string SignUpTempUserEmailExist = "This email id already exist input other emai id.";
+        public static string SignUpTempUserNameExist = "This Uaser name already exist input other user name.";
+
+        public static string SignUpTempUserEmailVerifyPending = "This email id already exist and  verify pending.";
+        public static string SignUpTempUserNameVerifyPending = "This Uaser name already exist and verify pending.";
+        public static string SignUpUserRegisterError = "User not register.";
+
+        public static string SocialLoginKey = "Successfully get social provider detail";
+
+        public static string provideDetailNotAvailable = "Provider detail not available.";
+
+        public static string InputProvider = "Please input provider name.";
+
     }
 }

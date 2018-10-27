@@ -252,28 +252,42 @@ namespace CleanArchitecture.Web.Extensions
                    options.ClientId = Startup.Configuration["Authentication:Google:ClientId"];
                    options.ClientSecret = Startup.Configuration["Authentication:Google:ClientSecret"];
 
-                   // added by nirav savariya for created token with soical login on 10-22-2018
-                   options.Scope.Add("https://www.googleapis.com/auth/plus.login");
-                   options.ClaimActions.MapJsonKey(ClaimTypes.Gender, "gender");
-                   options.SaveTokens = true;
-                   options.Events.OnCreatingTicket = ctx =>
-                   {
-                       List<AuthenticationToken> tokens = ctx.Properties.GetTokens()
-                           as List<AuthenticationToken>;
-                       tokens.Add(new AuthenticationToken()
-                       {
-                           Name = "TicketCreated",
-                           Value = DateTime.UtcNow.ToString()
-                       });
-                       ctx.Properties.StoreTokens(tokens);
-                       return Task.CompletedTask;
-                   };
+                   //// added by nirav savariya for created token with soical login on 10-22-2018
+                   //options.Scope.Add("https://www.googleapis.com/auth/plus.login");
+                   //options.ClaimActions.MapJsonKey(ClaimTypes.Gender, "gender");
+                   //options.SaveTokens = true;
+                   //options.Events.OnCreatingTicket = ctx =>
+                   //{
+                   //    List<AuthenticationToken> tokens = ctx.Properties.GetTokens()
+                   //        as List<AuthenticationToken>;
+                   //    tokens.Add(new AuthenticationToken()
+                   //    {
+                   //        Name = "TicketCreated",
+                   //        Value = DateTime.UtcNow.ToString()
+                   //    });
+                   //    ctx.Properties.StoreTokens(tokens);
+                   //    return Task.CompletedTask;
+                   //};
                })
                // https://developers.facebook.com/apps
                .AddFacebook(options =>
                {
                    options.AppId = Startup.Configuration["Authentication:Facebook:AppId"];
                    options.AppSecret = Startup.Configuration["Authentication:Facebook:AppSecret"];
+                   //options.ClaimActions.MapJsonKey(ClaimTypes.Gender, "gender");
+                   //options.SaveTokens = true;
+                   //options.Events.OnCreatingTicket = ctx =>
+                   //{
+                   //    List<AuthenticationToken> tokens = ctx.Properties.GetTokens()
+                   //        as List<AuthenticationToken>;
+                   //    tokens.Add(new AuthenticationToken()
+                   //    {
+                   //        Name = "TicketCreated",
+                   //        Value = DateTime.UtcNow.ToString()
+                   //    });
+                   //    ctx.Properties.StoreTokens(tokens);
+                   //    return Task.CompletedTask;
+                   //};
                })
                // https://apps.twitter.com/
                .AddTwitter(options =>
@@ -385,6 +399,8 @@ namespace CleanArchitecture.Web.Extensions
 
             //Custom password Service
             services.AddScoped<ICustomPassword, CustomPasswordService>();
+
+            services.AddScoped<IUserConfiguration, UserConfigurationService>();
             return services;
         }
     }

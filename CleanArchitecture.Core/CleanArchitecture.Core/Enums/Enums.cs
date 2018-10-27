@@ -238,6 +238,15 @@ namespace CleanArchitecture.Core.Enums
         Status4091LoginMobileNumberInvalid = 4091,
         Status4096InvalidFaceBookToken = 4096,
         Status4097InvalidFaceBookProviderKey = 4097,
+
+        Status4098BizUserEmailExist = 4098,
+        Status4099BizUserNameExist = 4099,
+        Status4100provideDetailNotAvailable = 4100,
+        Status4101InputProvider = 4101,
+        Status4102SignUpUserRegisterError = 4102,
+
+        Status4103TempUserEmailExist = 4103,
+        Status4104TempUserNameExist = 4104,
         // wallet
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

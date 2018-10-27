@@ -27,6 +27,7 @@ namespace CleanArchitecture.Core.Interfaces
         List<GetGraphDetailInfo> GetGraphDetail(long PairId);
         MarketCapData GetMarketCap(long PairId);
         VolumeDataRespose GetVolumeDataByPair(long PairId);
-        bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);        
+        bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);
+        PairRatesResponse GetPairRates(long PairId);
     }
 }
