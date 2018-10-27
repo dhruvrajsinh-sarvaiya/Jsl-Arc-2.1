@@ -1884,7 +1884,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long>("BuyServiceID");
 
-                    b.Property<long>("BidPrice");
+                    b.Property<decimal>("BidPrice")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("CountPerPrice");
 
@@ -2104,6 +2105,46 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TransactionQueue");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.TransactionRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("OprTrnID");
+
+                    b.Property<string>("RequestData")
+                        .IsRequired();
+
+                    b.Property<string>("ResponseData");
+
+                    b.Property<DateTime>("ResponseTime");
+
+                    b.Property<long>("SerProDetailID");
+
+                    b.Property<long>("SerProID");
+
+                    b.Property<long>("ServiceID");
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("TrnID");
+
+                    b.Property<long>("TrnNo");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TransactionRequest");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.TrnAcBatch", b =>
