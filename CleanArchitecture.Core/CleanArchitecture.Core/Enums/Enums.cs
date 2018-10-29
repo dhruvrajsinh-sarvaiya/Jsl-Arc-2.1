@@ -488,7 +488,9 @@ namespace CleanArchitecture.Core.Enums
     public enum EnuserChangeLog
     {
         UserProfile = 1,
-        TwofactoreChange = 2
+        TwofactoreChange = 2,
+        ChangePassword = 3,
+        SetPassword = 4
 
     }
 }
