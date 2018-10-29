@@ -69,7 +69,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -104,7 +104,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 Response.ReturnCode = enResponseCode.InternalError;
                 return BadRequest(Response);
             }
@@ -138,7 +138,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -171,7 +171,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -201,7 +201,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-               HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+               //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -231,7 +231,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -261,7 +261,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -289,7 +289,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -320,7 +320,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -349,7 +349,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -375,12 +375,12 @@ namespace CleanArchitecture.Web.API
                     Response = _walletService.GetUnClearedBalance(user.Id, WalletId);
                 }
               
-                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                //HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -410,7 +410,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -441,7 +441,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -471,7 +471,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -502,7 +502,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -532,7 +532,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -564,7 +564,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -596,7 +596,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -628,7 +628,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+               // HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -659,7 +659,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -688,7 +688,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+               // HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -717,7 +717,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+               // HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -746,7 +746,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
@@ -776,7 +776,7 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+               // HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 return BadRequest();
             }
         }
