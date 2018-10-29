@@ -37,6 +37,8 @@ using CleanArchitecture.Core.Interfaces.Log;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.Interfaces.UserChangeLog;
+using CleanArchitecture.Infrastructure.Services.UserChangeLog;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -399,7 +401,7 @@ namespace CleanArchitecture.Web.Extensions
 
             //Custom password Service
             services.AddScoped<ICustomPassword, CustomPasswordService>();
-
+            services.AddScoped<IUserChangeLog, UserChangeLogServices>();
             services.AddScoped<IUserConfiguration, UserConfigurationService>();
             return services;
         }

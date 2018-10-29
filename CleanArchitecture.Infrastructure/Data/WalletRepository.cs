@@ -187,7 +187,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 _dbContext.Set<WalletLedger>().Add(wl1);
                 _dbContext.Set<TransactionAccount>().Add(ta1);
                 _dbContext.Entry(wtq).State = EntityState.Modified;
-                _dbContext.Entry(wm2).State = EntityState.Modified;               
+                _dbContext.Entry(wm2).State = EntityState.Modified;
                 _dbContext.SaveChanges();
                 _dbContext.Database.CommitTransaction();
                 return true;
@@ -839,7 +839,7 @@ namespace CleanArchitecture.Infrastructure.Data
             return result;
         }
 
-        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID,long UserID)
+        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID, long UserID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
                                                 where b.UserID == UserID && b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
@@ -1246,6 +1246,9 @@ namespace CleanArchitecture.Infrastructure.Data
         //vsolanki 2018-10-29
         public List<IncomingTrnRes> GetIncomingTransaction(long Userid)
         {
+            //    var myResult = _dbContext.DepositHistory.Where(r => r.Status == 0)
+            //.Select((r, i) => new {idx = i, TrnID = r.TrnID });
+
             var trns = (from trn in _dbContext.DepositHistory
                         where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid
                         select new IncomingTrnRes
@@ -1257,7 +1260,16 @@ namespace CleanArchitecture.Infrastructure.Data
                             Amount = trn.Amount,
                             Address = trn.Address
                         }).ToList();
-            return trns;
+            var test = trns.Select((r, i) => new IncomingTrnRes
+            {
+                AutoNo = i+1,
+                TrnID = r.TrnID,
+                WalletType = r.WalletType,
+                Confirmations = r.Confirmations,
+                Amount = r.Amount,
+                Address = r.Address
+            }).ToList();
+            return test;
         }
 
         public long getOrgID()
@@ -1320,19 +1332,27 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
+
+        public long GetTypeMappingObj(long userid)
+        {
+            try
+            {
+                var UserTypeObj = _dbContext.BizUserTypeMapping.Where(u => u.UserID == userid).SingleOrDefault();
+                if (UserTypeObj == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return UserTypeObj.UserType;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 
 }
-//public object GetTypeMappingObj(long userid)
-//{
-//    var items = (from b in _dbContext.BizUserTypeMapping
-//               where b.UserID == userid
-//               select new BizUserTypeMapping
-//               {
-//                   I
-
-//               }).AsEnumerable().ToList();
-//    return items;
-//}
-//    }
-//}

@@ -145,12 +145,17 @@ namespace CleanArchitecture.Web.API
                     Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
                     Response.ErrorCode = enErrorCode.StandardLoginfailed;
                 }
-
                 if (request.TranNo == 0)
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ReturnMsg = EnResponseMessage.TradeRecon_InvalidTransactionNo;
                     Response.ErrorCode = enErrorCode.TradeRecon_InvalidTransactionNo;
+                }
+                if(request.ActionType != enTradeReconActionType.Cancel)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.TradeRecon_InvalidActionType;
+                    Response.ErrorCode = enErrorCode.TradeRecon_InvalidActionType;
                 }
                 else
                 {

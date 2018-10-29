@@ -90,7 +90,7 @@ namespace CleanArchitecture.Core.Interfaces
         //vsolanki 2018-10-29
         int AddBizUserTypeMapping(BizUserTypeMapping bizUser);
 
-        //object GetTypeMappingObj(long userid);
+        long GetTypeMappingObj(long userid);
         //vsolanki 2018-10-29
         List<IncomingTrnRes> GetIncomingTransaction(long Userid);
 
@@ -102,5 +102,6 @@ namespace CleanArchitecture.Core.Interfaces
 
         // ntrivedi 29102018
         bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1, WalletTransactionQueue wtq1, WalletTransactionQueue wtq2, WalletTransactionOrder order);
+        //List<BalanceResponseLimit> (long userid);
     }
 }
