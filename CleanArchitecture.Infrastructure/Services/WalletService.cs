@@ -1116,7 +1116,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
-                int count = CheckTrnRefNo(TrnRefNo, orderType);
+                int count = CheckTrnRefNo(TrnRefNo, orderType, trnType);
                 if (count != 0)
                 {
                     // insert with status=2 system failed
@@ -1148,9 +1148,9 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
 
-        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType)
+        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType, enWalletTrnType wType)
         {
-            var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType);
+            var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType, wType);
             return count;
         }
 
@@ -2260,6 +2260,63 @@ namespace CleanArchitecture.Infrastructure.Services
             Response.BizResponseObj.ReturnCode = enResponseCode.Success;
             Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
             return Response;
+        }
+
+        public WalletLedger GetWalletLedgerObj(long WalletID, long toWalletID, decimal drAmount, decimal crAmount, enWalletTrnType trnType, enServiceType serviceType, long trnNo, string remarks, decimal currentBalance, byte status)
+        {
+            try
+            {
+                var walletLedger2 = new WalletLedger();
+                walletLedger2.ServiceTypeID = serviceType;
+                walletLedger2.TrnType = trnType;
+                walletLedger2.CrAmt = crAmount;
+                walletLedger2.CreatedBy = WalletID;
+                walletLedger2.CreatedDate = UTC_To_IST();
+                walletLedger2.DrAmt = drAmount;
+                walletLedger2.TrnNo = trnNo;
+                walletLedger2.Remarks = remarks;
+                walletLedger2.Status = status;
+                walletLedger2.TrnDate = UTC_To_IST();
+                walletLedger2.UpdatedBy = WalletID;
+                walletLedger2.WalletId = WalletID;
+                walletLedger2.ToWalletId = toWalletID;
+                if (drAmount > 0)
+                {
+                    walletLedger2.PreBal = currentBalance;
+                    walletLedger2.PostBal = currentBalance - drAmount;
+                }
+                else
+                {
+                    walletLedger2.PreBal = currentBalance;
+                    walletLedger2.PostBal = currentBalance + drAmount;
+                }
+                return walletLedger2;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public long GetWalletByAddress(string address)
+        {
+            try
+            {
+                var addressObj = _addressMstRepository.FindBy(e => e.Address == address).FirstOrDefault();
+                if (addressObj == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return addressObj.WalletId;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
 

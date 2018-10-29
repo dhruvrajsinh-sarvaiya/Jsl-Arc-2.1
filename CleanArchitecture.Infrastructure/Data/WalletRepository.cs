@@ -256,11 +256,22 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
 
-        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType)
+        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType, enWalletTrnType walletTrnType)
         {
-            int response = (from u in _dbContext.WalletTransactionQueues
+            int response;
+            if (walletTrnType != enWalletTrnType.Dr_Debit)
+            {
+                response = (from u in _dbContext.WalletTransactionQueues
+                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
+                            && u.WalletTrnType == walletTrnType
+                            select u).Count();
+            }
+            else
+            {
+                response = (from u in _dbContext.WalletTransactionQueues
                             where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
                             select u).Count();
+            }
             return response;
         }
 
@@ -1248,7 +1259,69 @@ namespace CleanArchitecture.Infrastructure.Data
                         }).ToList();
             return trns;
         }
+
+        public long getOrgID()
+        {
+            try
+            {
+                var orgObj = _dbContext.BizUserTypeMapping.Where(u => u.UserType == 0).SingleOrDefault();
+                if (orgObj == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return orgObj.UserID;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public WalletTransactionQueue GetTransactionQueue(long TrnNo)
+        {
+            try
+            {
+                WalletTransactionQueue tq = _dbContext.WalletTransactionQueues.Where(u => u.TrnNo == TrnNo).SingleOrDefault();
+                return tq;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1, WalletTransactionQueue wtq1, WalletTransactionQueue wtq2, WalletTransactionOrder order)
+        {
+            try
+            { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
+
+                _dbContext.Set<WalletLedger>().Add(wl1);
+                _dbContext.Set<WalletLedger>().Add(wl2);
+                _dbContext.Set<TransactionAccount>().Add(ta1);
+                _dbContext.Set<TransactionAccount>().Add(ta2);
+                _dbContext.Entry(wm1).State = EntityState.Modified;
+                _dbContext.Entry(wm2).State = EntityState.Modified;
+                _dbContext.Entry(wtq1).State = EntityState.Modified;
+                _dbContext.Entry(wtq2).State = EntityState.Modified;
+                _dbContext.Entry(order).State = EntityState.Modified;
+                _dbContext.SaveChanges();
+                _dbContext.Database.CommitTransaction();
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                _dbContext.Database.RollbackTransaction();
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
+
 }
 //public object GetTypeMappingObj(long userid)
 //{
