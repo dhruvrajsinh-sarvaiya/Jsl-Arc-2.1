@@ -20,7 +20,6 @@ namespace CleanArchitecture.Web.Migrations
                     UpdatedDate = table.Column<DateTime>(nullable: false),
                     Status = table.Column<short>(nullable: false),
                     UserId = table.Column<long>(nullable: false),
-                    Type = table.Column<string>(nullable: true),
                     Oldvalue = table.Column<string>(nullable: true),
                     Newvalue = table.Column<string>(nullable: true)
                 },
