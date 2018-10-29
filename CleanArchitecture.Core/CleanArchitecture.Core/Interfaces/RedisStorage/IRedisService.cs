@@ -26,7 +26,7 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
 
         IReadOnlyList<T> GetSetList(string Tag);
 
-        string GetPair(string Value, string keySplitString);
+        string GetPairOrMarketData(string Value, string keySplitString,int i);
 
         IEnumerable<T> GetConnectionIDForTest(string Token);
 

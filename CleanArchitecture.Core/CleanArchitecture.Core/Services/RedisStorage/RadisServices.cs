@@ -165,7 +165,7 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
         }
 
-        public string GetPair(string Value,string keySplitString)
+        public string GetPairOrMarketData(string Value,string keySplitString,int i)
         {
             try
             {
