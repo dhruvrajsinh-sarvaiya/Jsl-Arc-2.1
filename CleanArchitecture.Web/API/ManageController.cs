@@ -27,6 +27,9 @@ using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.Log;
+using CleanArchitecture.Core.Interfaces.UserChangeLog;
+using CleanArchitecture.Core.ViewModels.ManageViewModels.UserChangeLog;
+using Newtonsoft.Json;
 
 namespace CleanArchitecture.Web.API
 {
@@ -48,6 +51,7 @@ namespace CleanArchitecture.Web.API
         private readonly IipAddressService _ipAddressService;
         private readonly IDeviceIdService _iDeviceIdService;
         private readonly IBasePage _basePage;
+        private readonly IUserChangeLog _iuserChangeLog;
         #endregion
 
         #region Ctore
@@ -63,7 +67,7 @@ namespace CleanArchitecture.Web.API
         IUserService userdata,
         IipAddressService ipAddressService,
          IBasePage basePage,
-         IDeviceIdService iDeviceIdService)
+         IDeviceIdService iDeviceIdService, IUserChangeLog userChangeLog)
         {
             _context = context;
             _userManager = userManager;
@@ -77,6 +81,7 @@ namespace CleanArchitecture.Web.API
             _ipAddressService = ipAddressService;
             _basePage = basePage;
             _iDeviceIdService = iDeviceIdService;
+            _iuserChangeLog = userChangeLog;
         }
         #endregion
 
@@ -152,10 +157,34 @@ namespace CleanArchitecture.Web.API
             {
 
                 var user = await GetCurrentUserAsync();
+                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                if (!IsSignMobile)
+                {
+                    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
+                }
+                var resultUserName = await _userManager.FindByNameAsync(model.UserName);
+                if (!string.IsNullOrEmpty(resultUserName?.UserName))
+                {
+                    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameExist, ErrorCode = enErrorCode.Status4099BizUserNameExist });
+                }
+                var EmailAddressIsExist = await _userManager.FindByEmailAsync(model.Email);
+                if (!string.IsNullOrEmpty(EmailAddressIsExist?.Email))
+                {
+                    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserEmailExist, ErrorCode = enErrorCode.Status4098BizUserEmailExist });
+                }
+                //////////////////// Check bizUser  table in Email Exist or not
+                string Oldvalue = JsonConvert.SerializeObject(user);  
                 if (!string.IsNullOrEmpty(model.FirstName))
                     user.FirstName = model.FirstName;
                 if (!string.IsNullOrEmpty(model.LastName))
                     user.LastName = model.LastName;
+                if (!string.IsNullOrEmpty(model.UserName))
+                    user.UserName = model.UserName;
+                if (!string.IsNullOrEmpty(model.Email))
+                    user.Email = model.Email;
+                if (!string.IsNullOrEmpty(model.Mobile))
+                    user.Mobile = model.Mobile;
+
                 //user.UserName = string.IsNullOrEmpty(model.Username) ? user.UserName : model.Username;
                 //user.Email = string.IsNullOrEmpty(model.Email) ? user.Email : model.Email;
                 //if (!string.IsNullOrEmpty(model.PhoneNumber))
@@ -164,6 +193,15 @@ namespace CleanArchitecture.Web.API
                 var result = await _userManager.UpdateAsync(user);
                 if (result == IdentityResult.Success)
                 {
+                    string Newvalue = JsonConvert.SerializeObject(user);
+                  
+                    UserChangeLogViewModel userChangeLogViewModel = new UserChangeLogViewModel();
+                    userChangeLogViewModel.Id = user.Id;
+                    userChangeLogViewModel.Newvalue = Newvalue;
+                    userChangeLogViewModel.Type = EnuserChangeLog.UserProfile.ToString();
+                    userChangeLogViewModel.Oldvalue = Oldvalue;
+                
+                  long userlog = _iuserChangeLog.AddPassword(userChangeLogViewModel);
                     var UserData = new IndexViewModel
                     {
                         FirstName = user.FirstName,
@@ -663,10 +701,24 @@ namespace CleanArchitecture.Web.API
                 }
                 var user = await GetCurrentUserAsync();
 
+                string oldvalue = JsonConvert.SerializeObject(user);
+
+               
                 var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
                 if (result.Succeeded)
                 {
+                     user = await GetCurrentUserAsync();
+
+                    string Newvalue = JsonConvert.SerializeObject(user);
+                    UserChangeLogViewModel userChangeLogViewModel = new UserChangeLogViewModel();
+                    userChangeLogViewModel.Id = user.Id;
+                    userChangeLogViewModel.Newvalue = Newvalue;
+                    userChangeLogViewModel.Type = EnuserChangeLog.ChangePassword.ToString();
+                    userChangeLogViewModel.Oldvalue = oldvalue;
+
+                    long userlog = _iuserChangeLog.AddPassword(userChangeLogViewModel);
+
                     _logger.LogInformation(3, "User changed their password successfully.");
                     return Ok(new ChangePasswordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ChangePassword });
 
@@ -691,9 +743,20 @@ namespace CleanArchitecture.Web.API
         {
 
             var user = await GetCurrentUserAsync();
+
+            string oldvalue = JsonConvert.SerializeObject(user);
             var result = await _userManager.AddPasswordAsync(user, model.NewPassword);
             if (result.Succeeded)
             {
+                user = await GetCurrentUserAsync();
+                string Newvalue = JsonConvert.SerializeObject(user);
+                UserChangeLogViewModel userChangeLogViewModel = new UserChangeLogViewModel();
+                userChangeLogViewModel.Id = user.Id;
+                userChangeLogViewModel.Newvalue = Newvalue;
+                userChangeLogViewModel.Type = EnuserChangeLog.SetPassword.ToString();
+                userChangeLogViewModel.Oldvalue = oldvalue;
+
+                long userlog = _iuserChangeLog.AddPassword(userChangeLogViewModel);
                 return NoContent();
             }
             return BadRequest(new ApiError("Unable to set password"));
