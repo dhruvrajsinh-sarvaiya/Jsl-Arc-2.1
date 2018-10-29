@@ -136,31 +136,31 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //Rushabh 27-10-2018
-        public enCheckWithdrawalBene CheckWithdrawalBene(long WalletID,string Name ,string DestinationAddress,short WhitelistingBit)
+        public enErrorCode CheckWithdrawalBene(long WalletID,string Name ,string DestinationAddress,enWhiteListingBit bit)
         {
             try
             {
-                var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == 1);
+                var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == Convert.ToInt16(ServiceStatus.Active));
                 if(Walletobj != null)
                 {
                     var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Walletobj.UserID);
                     if(UserPrefobj != null)
                     {
-                        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == 1);
-                        if (UserPrefobj.IsWhitelisting == 1)
+                        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                        if (UserPrefobj.IsWhitelisting == Convert.ToInt16(enWhiteListingBit.ON))
                         {
                             if (Beneobj != null)
                             {
-                                if (Beneobj.Address == DestinationAddress && Beneobj.IsWhiteListed == 1)
+                                if (Beneobj.Address == DestinationAddress && Beneobj.IsWhiteListed == Convert.ToInt16(enWhiteListingBit.ON))
                                 {
-                                    return enCheckWithdrawalBene.Success;
+                                    return enErrorCode.Success;
                                 }
                                 else
                                 {
-                                    return enCheckWithdrawalBene.AddressNotFoundOrWhitelistingBitIsOff;
+                                    return enErrorCode.AddressNotFoundOrWhitelistingBitIsOff;
                                 }
                             }
-                            return enCheckWithdrawalBene.BeneficiaryNotFound;
+                            return enErrorCode.BeneficiaryNotFound;
                         }
                         else
                         {
@@ -168,18 +168,18 @@ namespace CleanArchitecture.Infrastructure.Services
                             {
                                 if (Beneobj.Address == DestinationAddress)
                                 {
-                                    Beneobj.IsWhiteListed = WhitelistingBit;
+                                    Beneobj.IsWhiteListed = Convert.ToInt16(bit);
                                     Beneobj.UpdatedBy = Walletobj.UserID;
                                     Beneobj.UpdatedDate = UTC_To_IST();
                                     _BeneficiarycommonRepository.Update(Beneobj);
-                                    return enCheckWithdrawalBene.Success;
+                                    return enErrorCode.Success;
                                 }
-                                return enCheckWithdrawalBene.AddressNotMatch;
+                                return enErrorCode.AddressNotMatch;
                             }
                             else
                             {
                                 BeneficiaryMaster AddNew = new BeneficiaryMaster();
-                                AddNew.IsWhiteListed = 0;
+                                AddNew.IsWhiteListed = Convert.ToInt16(enWhiteListingBit.OFF);
                                 AddNew.Status = 1;
                                 AddNew.CreatedBy = Walletobj.UserID;
                                 AddNew.CreatedDate = UTC_To_IST();
@@ -188,13 +188,13 @@ namespace CleanArchitecture.Infrastructure.Services
                                 AddNew.Name = Name;
                                 AddNew.WalletTypeID = Walletobj.WalletTypeID;
                                 AddNew = _BeneficiarycommonRepository.Add(AddNew);
-                                return enCheckWithdrawalBene.Success;
+                                return enErrorCode.Success;
                             }
                         }
                     }
-                    return enCheckWithdrawalBene.GlobalBitNotFound;
+                    return enErrorCode.GlobalBitNotFound;
                 }
-                return enCheckWithdrawalBene.WalletNotFound;               
+                return enErrorCode.WalletNotFound;               
             }
             catch (Exception ex)
             {
@@ -1873,7 +1873,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
                     return Response;
                 }
-                var BeneficiaryMasterRes = _walletRepository1.GetAllWhitelistedBeneficiaries(walletMasters.WalletTypeID);
+                var BeneficiaryMasterRes = _walletRepository1.GetAllWhitelistedBeneficiaries(walletMasters.WalletTypeID,walletMasters.UserID);
                 if (BeneficiaryMasterRes.Count == 0)
                 {
                     Response.BizResponse.ReturnCode = enResponseCode.Fail;

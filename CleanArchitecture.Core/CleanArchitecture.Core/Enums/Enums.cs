@@ -268,6 +268,13 @@ namespace CleanArchitecture.Core.Enums
         InvalidBeneficiaryID = 4227,
         InvalidLimit = 4233,
         InternalError=9,
+        NotFoundLimit=4280,
+        DuplicateRecord=4281,
+        AddressNotFoundOrWhitelistingBitIsOff = 4237,
+        BeneficiaryNotFound = 4238,
+        AddressNotMatch = 4239,
+        GlobalBitNotFound = 4240,
+        WalletNotFound = 4241
         NotFoundLimit=4234,
         DuplicateRecord=4235,       
         InvalidAddress = 4236,
@@ -467,5 +474,11 @@ namespace CleanArchitecture.Core.Enums
     {
         Organization=0,
         User=1
+    }
+
+    public enum enWhiteListingBit
+    {
+        OFF = 0,
+        ON = 1
     }
 }

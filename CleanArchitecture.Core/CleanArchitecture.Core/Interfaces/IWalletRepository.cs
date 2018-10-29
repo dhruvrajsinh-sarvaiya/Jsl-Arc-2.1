@@ -68,7 +68,7 @@ namespace CleanArchitecture.Core.Interfaces
         Balance GetAllBalances(long userid, long walletid);
         decimal GetTotalAvailbleBal(long userid);
 
-        List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID);
+        List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID,long UserId);
 
         List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID);
         //vsolanki 25-10-2018
