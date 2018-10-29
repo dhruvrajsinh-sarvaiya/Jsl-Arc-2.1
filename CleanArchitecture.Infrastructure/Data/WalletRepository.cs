@@ -828,10 +828,10 @@ namespace CleanArchitecture.Infrastructure.Data
             return result;
         }
 
-        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID)
+        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID,long UserID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
+                                                where b.UserID == UserID && b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,

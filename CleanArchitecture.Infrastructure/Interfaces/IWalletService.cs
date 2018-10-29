@@ -101,6 +101,6 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         long GetWalletID(string AccWalletID);
         string GetAccWalletID(long WalletID);
-        enCheckWithdrawalBene CheckWithdrawalBene(long WalletID, string Name, string DestinationAddress, short WhitelistingBit);
+        enErrorCode CheckWithdrawalBene(long WalletID, string Name, string DestinationAddress, enWhiteListingBit WhitelistingBit);
     }
 }

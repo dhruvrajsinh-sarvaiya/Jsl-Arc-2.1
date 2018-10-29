@@ -269,7 +269,12 @@ namespace CleanArchitecture.Core.Enums
         InvalidLimit = 4233,
         InternalError=9,
         NotFoundLimit=4280,
-        DuplicateRecord=4281
+        DuplicateRecord=4281,
+        AddressNotFoundOrWhitelistingBitIsOff = 4237,
+        BeneficiaryNotFound = 4238,
+        AddressNotMatch = 4239,
+        GlobalBitNotFound = 4240,
+        WalletNotFound = 4241
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -465,5 +470,11 @@ namespace CleanArchitecture.Core.Enums
     {
         Organization=0,
         User=1
+    }
+
+    public enum enWhiteListingBit
+    {
+        OFF = 0,
+        ON = 1
     }
 }
