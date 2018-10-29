@@ -2000,10 +2000,12 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 25-10-2018
-        public List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType)
+        public ListAllBalanceTypeWiseRes GetAllBalancesTypeWise(long userId, string WalletType)
         {
+            ListAllBalanceTypeWiseRes res = new ListAllBalanceTypeWiseRes();
             AllBalanceTypeWiseRes a = new AllBalanceTypeWiseRes();
             List<AllBalanceTypeWiseRes> Response = new List<AllBalanceTypeWiseRes>();
+            res.BizResponseObj = new Core.ApiModels.BizResponseClass();
             a.Wallet = new WalletResponse();
             a.Wallet.Balance = new Balance();
             var listWallet = _walletRepository1.GetWalletMasterResponseByCoin(userId, WalletType);
@@ -2021,7 +2023,18 @@ namespace CleanArchitecture.Infrastructure.Services
                 a.Wallet.Balance = response;
                 Response.Add(a);
             }
-            return Response;
+            if(Response.Count()==0)
+            {
+                res.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                res.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                res.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                return res;
+            }           
+            res.Wallets = Response;
+            res.BizResponseObj.ReturnCode = enResponseCode.Success;
+            res.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            
+            return res;
         }
 
         public UserPreferencesRes SetPreferences(long Userid, int GlobalBit)
