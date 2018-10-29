@@ -173,6 +173,14 @@ namespace CleanArchitecture.Core.Enums
         ProcessTrn_ThirdPartyDataNotFound = 4588,
         ProcessTrn_GettingResponseBlank = 4589,
         ProcessTrn_OprFail = 4590,
+        TradeRecon_InvalidTransactionNo = 4591,
+        TradeRecon_After7DaysTranDontTakeAction = 4593,
+        TradeRecon_InvalidTransactionStatus = 4594,
+        TradeRecon_CancelRequestAlreayInProcess = 4595,
+        TradeRecon_TransactionAlreadyInProcess = 4596,
+        TradeRecon_OrderIsFullyExecuted = 4597,
+        TradeRecon_InvalidDeliveryAmount = 4598,
+        TradeRecon_CencelRequestSuccess = 4600,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
