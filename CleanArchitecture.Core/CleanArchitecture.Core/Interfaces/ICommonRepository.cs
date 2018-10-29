@@ -27,5 +27,6 @@ namespace CleanArchitecture.Core.Interfaces
         Task<T> GetSingleAsync(int id);
         IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate);
         Task<IEnumerable<T>> FindByAsync(Expression<Func<T, bool>> predicate);
+        decimal GetSum(Expression<Func<T, bool>> predicate, Expression<Func<T, decimal>> sumPredicate);
     }
 }
