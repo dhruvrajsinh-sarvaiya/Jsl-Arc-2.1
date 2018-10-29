@@ -29,5 +29,8 @@ namespace CleanArchitecture.Core.Interfaces
         VolumeDataRespose GetVolumeDataByPair(long PairId);
         bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);
         PairRatesResponse GetPairRates(long PairId);
+        int AddToFavouritePair(long PairId, long UserId);
+        int RemoveFromFavouritePair(long PairId, long UserId);
+        List<FavouritePairInfo> GetFavouritePair(long UserId);
     }
 }

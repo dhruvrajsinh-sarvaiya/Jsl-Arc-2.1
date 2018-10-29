@@ -53,6 +53,11 @@ namespace CleanArchitecture.Core.Enums
         public static string TradeRecon_InvalidDeliveryAmount = "Invalid Delivery Amount";
         public static string TradeRecon_CencelRequestSuccess = "Order Cancellation request done successfully.";
         public static string TradeRecon_InvalidActionType = "Invalid ActionType Value";
+        public static string FavPair_InvalidPairId = "Invalid PairId";
+        public static string FavPair_AlreadyAdded = "Pair Already added as favourite";
+        public static string FavPair_AddedSuccess = "Pair Added as favourite pair";
+        public static string FavPair_RemoveSuccess = "Pair Remove from favourite pair";
+        public static string FavPair_NoPairFound = "No Favourites pair found";
         //============================
 
         //============================walelt=================================//       

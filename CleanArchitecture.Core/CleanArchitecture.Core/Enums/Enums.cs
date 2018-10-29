@@ -182,6 +182,11 @@ namespace CleanArchitecture.Core.Enums
         TradeRecon_InvalidDeliveryAmount = 4598,
         TradeRecon_CencelRequestSuccess = 4600,
         TradeRecon_InvalidActionType = 4618,
+        FavPair_InvalidPairId = 4619,
+        FavPair_AlreadyAdded = 4620,
+        FavPair_AddedSuccess = 4621,
+        FavPair_RemoveSuccess = 4622,
+        FavPair_NoPairFound = 4623,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
@@ -782,6 +783,149 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ErrorCode = enErrorCode.NoDataFound;
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("AddToFavouritePair/{PairId}")]
+        public async Task<IActionResult> AddToFavouritePair(long PairId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.FavPair_InvalidPairId;
+                    Response.ErrorCode = enErrorCode.FavPair_InvalidPairId;
+                }
+                else
+                {
+                    var UserId = user.Id;
+                    var returnCode = _frontTrnService.AddToFavouritePair(PairId, UserId);
+                    if(returnCode == 2)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ReturnMsg = EnResponseMessage.FavPair_InvalidPairId;
+                        Response.ErrorCode = enErrorCode.FavPair_InvalidPairId;
+                    }
+                    if(returnCode == 1)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ReturnMsg = EnResponseMessage.FavPair_AlreadyAdded;
+                        Response.ErrorCode = enErrorCode.FavPair_AlreadyAdded;
+                    }
+                    else if(returnCode == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Success;
+                        Response.ReturnMsg = EnResponseMessage.FavPair_AddedSuccess;
+                        Response.ErrorCode = enErrorCode.FavPair_AddedSuccess;
+                    }
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("RemoveFromFavouritePair/{PairId}")]
+        public async Task<IActionResult> RemoveFromFavouritePair(long PairId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                if (PairId == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.FavPair_InvalidPairId;
+                    Response.ErrorCode = enErrorCode.FavPair_InvalidPairId;
+                }
+                else
+                {
+                    var UserId = user.Id;
+                    var returnCode = _frontTrnService.RemoveFromFavouritePair(PairId, UserId);
+                    if (returnCode == 1)
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ReturnMsg = EnResponseMessage.FavPair_InvalidPairId;
+                        Response.ErrorCode = enErrorCode.FavPair_InvalidPairId;
+                    }
+                    else if (returnCode == 0)
+                    {
+                        Response.ReturnCode = enResponseCode.Success;
+                        Response.ReturnMsg = EnResponseMessage.FavPair_RemoveSuccess;
+                        Response.ErrorCode = enErrorCode.FavPair_RemoveSuccess;
+                    }
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                Response.ReturnCode = enResponseCode.InternalError;
+                return Ok(Response);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("GetFavouritePair")]
+        public async Task<IActionResult> GetFavouritePair()
+        {
+            FavoritePairResponse Response = new FavoritePairResponse();
+            try
+            {
+                ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var UserId = user.Id;
+                    var response = _frontTrnService.GetFavouritePair(UserId);
+                    if (response != null && response.Count != 0)
+                    {
+                        Response.response = response;
+                        Response.ReturnCode = enResponseCode.Success;
+                    }
+                    else
+                    {
+                        Response.ReturnCode = enResponseCode.Fail;
+                        Response.ReturnMsg = EnResponseMessage.FavPair_NoPairFound;
+                        Response.ErrorCode = enErrorCode.FavPair_NoPairFound;
+                    }
                 }
                 return Ok(Response);
             }
