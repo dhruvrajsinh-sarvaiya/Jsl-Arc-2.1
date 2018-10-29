@@ -256,11 +256,22 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
 
-        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType)
+        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType, enWalletTrnType walletTrnType)
         {
-            int response = (from u in _dbContext.WalletTransactionQueues
+            int response;
+            if (walletTrnType != enWalletTrnType.Dr_Debit)
+            {
+                response = (from u in _dbContext.WalletTransactionQueues
+                            where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
+                            && u.WalletTrnType == walletTrnType
+                            select u).Count();
+            }
+            else
+            {
+                response = (from u in _dbContext.WalletTransactionQueues
                             where u.TrnRefNo == TrnRefNo && u.TrnType == TrnType
                             select u).Count();
+            }
             return response;
         }
 
@@ -828,10 +839,10 @@ namespace CleanArchitecture.Infrastructure.Data
             return result;
         }
 
-        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID)
+        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID,long UserID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
+                                                where b.UserID == UserID && b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,
@@ -873,12 +884,13 @@ namespace CleanArchitecture.Infrastructure.Data
                 if (arrayObj.Count != 0)
                 {
                     arrayObj.ForEach(e => e.p.IsWhiteListed = e.q.WhitelistingBit);
-                    arrayObj.ForEach(e => {
+                    arrayObj.ForEach(e =>
+                    {
                         if (e.q.WhitelistingBit == 9)
                         {
                             e.p.Status = e.q.WhitelistingBit;
                         }
-                    } );
+                    });
                     arrayObj.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
                     _dbContext.SaveChanges();
                     _dbContext.Database.CommitTransaction();
@@ -1032,12 +1044,12 @@ namespace CleanArchitecture.Infrastructure.Data
                 // _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
-              //  Array val = Enum.GetValues(typeof(enWalletLimitType));
+                //  Array val = Enum.GetValues(typeof(enWalletLimitType));
 
-            //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
-            //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
-            //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
-            //Convert.ToInt32(enWalletLimitType.TradingLimit) };
+                //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
+                //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
+                //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
+                //Convert.ToInt32(enWalletLimitType.TradingLimit) };
 
                 List<int> AllowTrnType = Helpers.GetEnumValue<enWalletLimitType>();
 
@@ -1067,7 +1079,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                UpdatedDate = UTC_To_IST()
                            };
                 _dbContext.WalletLimitConfiguration.AddRange(fadd);
-                 ///_dbContext.SaveChanges();
+                ///_dbContext.SaveChanges();
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
@@ -1113,7 +1125,7 @@ namespace CleanArchitecture.Infrastructure.Data
         public int CreateWalletForAllUser_NewService(string WalletType)
         {
             try
-            {              
+            {
                 var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
                                      where p.Status == 1 && p.WalletTypeName == WalletType
                                      select p);
@@ -1127,7 +1139,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 var Users = from s in _dbContext.Users
                             from wt in WalletTypeObj
                             where !_dbContext.WalletMasters.Any(es => (es.UserID == s.Id) && (es.WalletTypeID == wt.Id) && (es.IsDefaultWallet == 1))
-                select s;
+                            select s;
                 //var ISExistWallet = (from item in _dbContext.WalletMasters
                 //                     from WalletTypearray in WalletTypeObj
                 //                     from ui in Users
@@ -1135,7 +1147,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 //                     select item).ToList();
 
                 var Wallets = from WalletTypearray in WalletTypeObj
-                              from U in Users                           
+                              from U in Users
                               select new WalletMaster
                               {
                                   CreatedBy = U.Id,
@@ -1191,7 +1203,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                UpdatedDate = UTC_To_IST()
                            };
                 _dbContext.WalletLimitConfiguration.AddRange(fadd);
-               //  _dbContext.SaveChanges();
+                //  _dbContext.SaveChanges();
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
@@ -1217,7 +1229,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsolanki 2018-10-29
-        public int AddBizUserTypeMapping(BizUserTypeMapping bizUser)     
+        public int AddBizUserTypeMapping(BizUserTypeMapping bizUser)
         {
             try
             {
@@ -1225,23 +1237,102 @@ namespace CleanArchitecture.Infrastructure.Data
                 _dbContext.SaveChanges();
                 return 1;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return 0;
-            }         
+            }
+        }
+
+        //vsolanki 2018-10-29
+        public List<IncomingTrnRes> GetIncomingTransaction(long Userid)
+        {
+            var trns = (from trn in _dbContext.DepositHistory
+                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid
+                        select new IncomingTrnRes
+                        {
+                            AutoNo = trn.Id,
+                            TrnID = trn.TrnID,
+                            WalletType = trn.SMSCode,
+                            Confirmations = trn.Confirmations,
+                            Amount = trn.Amount,
+                            Address = trn.Address
+                        }).ToList();
+            return trns;
+        }
+
+        public long getOrgID()
+        {
+            try
+            {
+                var orgObj = _dbContext.BizUserTypeMapping.Where(u => u.UserType == 0).SingleOrDefault();
+                if (orgObj == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return orgObj.UserID;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public WalletTransactionQueue GetTransactionQueue(long TrnNo)
+        {
+            try
+            {
+                WalletTransactionQueue tq = _dbContext.WalletTransactionQueues.Where(u => u.TrnNo == TrnNo).SingleOrDefault();
+                return tq;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1, WalletTransactionQueue wtq1, WalletTransactionQueue wtq2, WalletTransactionOrder order)
+        {
+            try
+            { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
+
+                _dbContext.Set<WalletLedger>().Add(wl1);
+                _dbContext.Set<WalletLedger>().Add(wl2);
+                _dbContext.Set<TransactionAccount>().Add(ta1);
+                _dbContext.Set<TransactionAccount>().Add(ta2);
+                _dbContext.Entry(wm1).State = EntityState.Modified;
+                _dbContext.Entry(wm2).State = EntityState.Modified;
+                _dbContext.Entry(wtq1).State = EntityState.Modified;
+                _dbContext.Entry(wtq2).State = EntityState.Modified;
+                _dbContext.Entry(order).State = EntityState.Modified;
+                _dbContext.SaveChanges();
+                _dbContext.Database.CommitTransaction();
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                _dbContext.Database.RollbackTransaction();
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
-}
-        //public object GetTypeMappingObj(long userid)
-        //{
-        //    var items = (from b in _dbContext.BizUserTypeMapping
-        //               where b.UserID == userid
-        //               select new BizUserTypeMapping
-        //               {
-        //                   I
 
-        //               }).AsEnumerable().ToList();
-        //    return items;
-        //}
+}
+//public object GetTypeMappingObj(long userid)
+//{
+//    var items = (from b in _dbContext.BizUserTypeMapping
+//               where b.UserID == userid
+//               select new BizUserTypeMapping
+//               {
+//                   I
+
+//               }).AsEnumerable().ToList();
+//    return items;
+//}
 //    }
 //}

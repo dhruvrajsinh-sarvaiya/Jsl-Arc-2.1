@@ -101,6 +101,28 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         long GetWalletID(string AccWalletID);
         string GetAccWalletID(long WalletID);
-        enCheckWithdrawalBene CheckWithdrawalBene(long WalletID, string Name, string DestinationAddress, short WhitelistingBit);
+        enErrorCode CheckWithdrawalBene(long WalletID, string Name, string DestinationAddress, enWhiteListingBit WhitelistingBit);
+        //enCheckWithdrawalBene CheckWithdrawalBene(long WalletID, string Name, string DestinationAddress, short WhitelistingBit);
+
+        WalletTransactionQueue InsertIntoWalletTransactionQueue(Guid Guid, enWalletTranxOrderType TrnType, decimal Amount, long TrnRefNo, DateTime TrnDate, DateTime? UpdatedDate,
+           long WalletID, string WalletType, long MemberID, string TimeStamp, enTransactionStatus Status, string StatusMsg, enWalletTrnType enWalletTrnType);
+
+        int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType, enWalletTrnType wType);
+
+        //vsolanki 2018-10-29
+        ListIncomingTrnRes GetIncomingTransaction(long Userid);
+
+        // ntrivedi 29102018
+        long GetWalletByAddress(string address);
+
+        // ntrivedi 29102018
+
+        WalletLedger GetWalletLedgerObj(long WalletID, long toWalletID, decimal drAmount, decimal crAmount, enWalletTrnType trnType, enServiceType serviceType, long trnNo, string remarks, decimal currentBalance, byte status);
+        // ntrivedi 29102018
+
+        TransactionAccount GetTransactionAccount(long WalletID, short isSettled, long batchNo, decimal drAmount, decimal crAmount, long trnNo, string remarks, byte status);
+        // ntrivedi 29102018
+
+        WalletTransactionOrder InsertIntoWalletTransactionOrder(DateTime? UpdatedDate, DateTime TrnDate, long OWalletID, long DWalletID, decimal Amount, string WalletType, long OTrnNo, long DTrnNo, enTransactionStatus Status, string StatusMsg);
     }
 }
