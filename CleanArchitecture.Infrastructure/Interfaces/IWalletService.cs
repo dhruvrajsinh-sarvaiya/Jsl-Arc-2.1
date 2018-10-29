@@ -124,5 +124,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         // ntrivedi 29102018
 
         WalletTransactionOrder InsertIntoWalletTransactionOrder(DateTime? UpdatedDate, DateTime TrnDate, long OWalletID, long DWalletID, decimal Amount, string WalletType, long OTrnNo, long DTrnNo, enTransactionStatus Status, string StatusMsg);
+
+        //vsolanki 2018-10-29
+        bool CheckUserBalance(long WalletId);
     }
 }
