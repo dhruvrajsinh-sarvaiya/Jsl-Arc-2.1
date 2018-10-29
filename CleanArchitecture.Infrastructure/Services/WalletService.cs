@@ -201,29 +201,43 @@ namespace CleanArchitecture.Infrastructure.Services
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-        }        
+        }
 
-        //public bool CheckShadowLimit(long WalletID, decimal Amount)
-        //{
-        //    var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID);
-        //    if(Walletobj != null)
-        //    {
-        //        var Balobj = _ShadowBalRepo.GetSingle(item => item.WalletID == WalletID);
-        //        if (Balobj != null)
-        //        {
-        //            if((Balobj.ShadowAmount + Amount) < Walletobj.Balance)
-        //            {
-        //                return true;
-        //            }
-        //            return false;
-        //        }
-        //        else
-        //        {
-        //            var typeobj = _walletRepository1
-        //        }
-        //    }
-            
-        //}
+        public enErrorCode CheckShadowLimit(long WalletID, decimal Amount)
+        {
+            var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID);
+            if (Walletobj != null)
+            {
+                var Balobj = _ShadowBalRepo.GetSingle(item => item.WalletID == WalletID);
+                if (Balobj != null)
+                {
+                    if ((Balobj.ShadowAmount + Amount) < Walletobj.Balance)
+                    {
+                        return enErrorCode.Success;
+                    }
+                    return enErrorCode.InsufficientBalance;
+                }
+                else
+                {
+                    var typeobj = _walletRepository1.GetTypeMappingObj(Walletobj.UserID);
+                    if(typeobj != 0)
+                    {
+                        var Limitobj = _ShadowLimitRepo.GetSingle(item => item.MemberTypeId == typeobj);
+                        if(Limitobj != null)
+                        {
+                            if((Limitobj.ShadowLimitAmount + Amount) < Walletobj.Balance)
+                            {
+                                return enErrorCode.Success;
+                            }
+                            return enErrorCode.InsufficientBalance;
+                        }
+                        return enErrorCode.NotFoundLimit;
+                    }
+                    return enErrorCode.MemberTypeNotFound;
+                }           
+            }
+            return enErrorCode.WalletNotFound;
+        }
 
         //Rushabh 26-10-2018
 

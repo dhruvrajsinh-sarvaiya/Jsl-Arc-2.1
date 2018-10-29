@@ -1332,19 +1332,27 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
+
+        public long GetTypeMappingObj(long userid)
+        {
+            try
+            {
+                var UserTypeObj = _dbContext.BizUserTypeMapping.Where(u => u.UserID == userid).SingleOrDefault();
+                if (UserTypeObj == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return UserTypeObj.UserType;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
     }
 
 }
-//public object GetTypeMappingObj(long userid)
-//{
-//    var items = (from b in _dbContext.BizUserTypeMapping
-//               where b.UserID == userid
-//               select new BizUserTypeMapping
-//               {
-//                   I
-
-//               }).AsEnumerable().ToList();
-//    return items;
-//}
-//    }
-//}
