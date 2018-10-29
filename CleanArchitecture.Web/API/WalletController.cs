@@ -570,10 +570,11 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 25-10-2018
         //[AllowAnonymous]
+        //[AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAvailbleBalTypeWise()
         {
-            // ApplicationUser user = new ApplicationUser(); user.Id = 2;
+           //  ApplicationUser user = new ApplicationUser(); user.Id = 35;
            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             BalanceResponseWithLimit Response = new BalanceResponseWithLimit();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
@@ -600,10 +601,11 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 2018-10-25
+        //[AllowAnonymous]
         [HttpGet("{WalletType}")]
         public async Task<IActionResult> GetAllBalancesTypeWise(string WalletType)
         {
-            // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            // ApplicationUser user = new ApplicationUser(); user.Id = 35;
             ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListAllBalanceTypeWiseRes Response = new ListAllBalanceTypeWiseRes();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
@@ -748,12 +750,12 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 2018-10-29
-        //[AllowAnonymous]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetIncomingTransaction()
         {
-            //ApplicationUser user = new ApplicationUser(); user.Id = 35;
-            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            ApplicationUser user = new ApplicationUser(); user.Id = 35;
+            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListIncomingTrnRes Response = new ListIncomingTrnRes();
             try
             {

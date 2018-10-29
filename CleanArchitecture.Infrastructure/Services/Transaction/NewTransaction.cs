@@ -318,10 +318,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
                     //Check Whilte listed Address 
                    var WalletWhiteListResult = _WalletService.CheckWithdrawalBene(Req.DebitWalletID,Req.AddressLabel, Req.TransactionAccount, Req.WhitelistingBit);
-                   if (!WalletWhiteListResult.Equals(enCheckWithdrawalBene.Success))
+                   if (!WalletWhiteListResult.Equals(enErrorCode.Success))
                     {
-                        Req.StatusMsg = enCheckWithdrawalBene.Success.ToString();
-                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
+                        Req.StatusMsg = WalletWhiteListResult.ToString();
+                        return MarkSystemFailTransaction(WalletWhiteListResult);
                     }
 
                 }

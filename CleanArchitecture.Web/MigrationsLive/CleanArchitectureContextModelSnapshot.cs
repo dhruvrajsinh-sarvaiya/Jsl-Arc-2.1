@@ -45,7 +45,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletId");
 
@@ -86,7 +86,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -123,7 +123,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -159,7 +159,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("UserID")
                         .IsRequired()
@@ -192,7 +192,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -218,7 +218,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<short>("isBaseCurrency");
 
@@ -245,7 +245,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -272,7 +272,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -301,7 +301,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -328,7 +328,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -394,7 +394,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -420,7 +420,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -453,7 +453,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletTypeID");
 
@@ -492,7 +492,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -533,7 +533,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -558,7 +558,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -583,7 +583,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -617,7 +617,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<decimal>("VolGlobal")
                         .HasColumnType("decimal(18, 8)");
@@ -645,7 +645,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -676,7 +676,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -699,7 +699,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("ZipAreaName")
                         .IsRequired()
@@ -781,7 +781,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("UserId");
 
@@ -830,7 +830,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -859,7 +859,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<int>("UserId");
 
@@ -890,7 +890,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<int>("UserId");
 
@@ -957,7 +957,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1014,7 +1014,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1043,7 +1043,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1075,7 +1075,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("contentType")
                         .IsRequired()
@@ -1150,7 +1150,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("ValidationUrl");
 
@@ -1179,7 +1179,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1216,7 +1216,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1280,7 +1280,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1321,7 +1321,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1381,7 +1381,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletId");
 
@@ -1465,7 +1465,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id", "TrnNo");
 
@@ -1550,7 +1550,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<decimal>("WalletAmt")
                         .HasColumnType("decimal(18, 8)");
@@ -1615,7 +1615,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("TrnNo");
 
@@ -1657,7 +1657,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1714,7 +1714,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<decimal>("Volume")
                         .HasColumnType("decimal(18, 8)");
@@ -1781,7 +1781,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1807,7 +1807,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletMasterID");
 
@@ -1867,7 +1867,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -1920,7 +1920,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id", "SellServiceID", "BuyServiceID", "BidPrice");
 
@@ -1945,7 +1945,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<short>("ordertype");
 
@@ -1988,7 +1988,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -2027,7 +2027,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletID");
 
@@ -2098,7 +2098,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<short>("VerifyDone");
 
@@ -2140,7 +2140,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -2159,7 +2159,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -2297,7 +2297,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("UserId");
 
@@ -2332,7 +2332,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<int>("UserId");
 
@@ -2361,7 +2361,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -2394,7 +2394,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<int>("UserId");
 
@@ -2441,7 +2441,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(100);
@@ -2471,7 +2471,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("UserId");
 
@@ -2501,7 +2501,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("UserID");
 
@@ -2553,7 +2553,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -2590,7 +2590,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("prevIterationID");
 
@@ -2622,7 +2622,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletID");
 
@@ -2652,7 +2652,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletType");
 
@@ -2688,7 +2688,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("WalletType");
 
@@ -2711,7 +2711,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("UserID");
 
@@ -2741,7 +2741,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletId");
 
@@ -2770,7 +2770,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletId");
 
@@ -2807,7 +2807,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletId");
 
@@ -2844,7 +2844,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("TrnType");
 
@@ -2975,7 +2975,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("WalletId");
 
@@ -3012,7 +3012,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<long>("UserID");
 
@@ -3065,7 +3065,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("Id");
 
@@ -3098,7 +3098,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long?>("UpdatedBy");
 
-                    b.Property<DateTime>("UpdatedDate");
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.Property<string>("WalletTypeName")
                         .IsRequired()
