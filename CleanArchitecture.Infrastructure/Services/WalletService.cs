@@ -201,29 +201,43 @@ namespace CleanArchitecture.Infrastructure.Services
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-        }        
+        }
 
-        //public bool CheckShadowLimit(long WalletID, decimal Amount)
-        //{
-        //    var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID);
-        //    if(Walletobj != null)
-        //    {
-        //        var Balobj = _ShadowBalRepo.GetSingle(item => item.WalletID == WalletID);
-        //        if (Balobj != null)
-        //        {
-        //            if((Balobj.ShadowAmount + Amount) < Walletobj.Balance)
-        //            {
-        //                return true;
-        //            }
-        //            return false;
-        //        }
-        //        else
-        //        {
-        //            var typeobj = _walletRepository1
-        //        }
-        //    }
-            
-        //}
+        public enErrorCode CheckShadowLimit(long WalletID, decimal Amount)
+        {
+            var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID);
+            if (Walletobj != null)
+            {
+                var Balobj = _ShadowBalRepo.GetSingle(item => item.WalletID == WalletID);
+                if (Balobj != null)
+                {
+                    if ((Balobj.ShadowAmount + Amount) < Walletobj.Balance)
+                    {
+                        return enErrorCode.Success;
+                    }
+                    return enErrorCode.InsufficientBalance;
+                }
+                else
+                {
+                    var typeobj = _walletRepository1.GetTypeMappingObj(Walletobj.UserID);
+                    if(typeobj != 0)
+                    {
+                        var Limitobj = _ShadowLimitRepo.GetSingle(item => item.MemberTypeId == typeobj);
+                        if(Limitobj != null)
+                        {
+                            if((Limitobj.ShadowLimitAmount + Amount) < Walletobj.Balance)
+                            {
+                                return enErrorCode.Success;
+                            }
+                            return enErrorCode.InsufficientBalance;
+                        }
+                        return enErrorCode.NotFoundLimit;
+                    }
+                    return enErrorCode.MemberTypeNotFound;
+                }           
+            }
+            return enErrorCode.WalletNotFound;
+        }
 
         //Rushabh 26-10-2018
 
@@ -2000,10 +2014,12 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 25-10-2018
-        public List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType)
+        public ListAllBalanceTypeWiseRes GetAllBalancesTypeWise(long userId, string WalletType)
         {
+            ListAllBalanceTypeWiseRes res = new ListAllBalanceTypeWiseRes();
             AllBalanceTypeWiseRes a = new AllBalanceTypeWiseRes();
             List<AllBalanceTypeWiseRes> Response = new List<AllBalanceTypeWiseRes>();
+            res.BizResponseObj = new Core.ApiModels.BizResponseClass();
             a.Wallet = new WalletResponse();
             a.Wallet.Balance = new Balance();
             var listWallet = _walletRepository1.GetWalletMasterResponseByCoin(userId, WalletType);
@@ -2021,7 +2037,18 @@ namespace CleanArchitecture.Infrastructure.Services
                 a.Wallet.Balance = response;
                 Response.Add(a);
             }
-            return Response;
+            if(Response.Count()==0)
+            {
+                res.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                res.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                res.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                return res;
+            }           
+            res.Wallets = Response;
+            res.BizResponseObj.ReturnCode = enResponseCode.Success;
+            res.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            
+            return res;
         }
 
         public UserPreferencesRes SetPreferences(long Userid, int GlobalBit)

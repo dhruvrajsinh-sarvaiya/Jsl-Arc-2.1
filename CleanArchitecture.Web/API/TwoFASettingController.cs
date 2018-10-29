@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.UserChangeLog;
 using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using CleanArchitecture.Core.ViewModels.ManageViewModels;
 using CleanArchitecture.Core.ViewModels.ManageViewModels.TwoFA;
+using CleanArchitecture.Core.ViewModels.ManageViewModels.UserChangeLog;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Web.Filters;
@@ -18,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CleanArchitecture.Web.API
 {
@@ -30,6 +33,7 @@ namespace CleanArchitecture.Web.API
         private readonly UrlEncoder _urlEncoder;
         private readonly IBasePage _basePage;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUserChangeLog _iuserChangeLog;
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
         #endregion
 
@@ -37,12 +41,14 @@ namespace CleanArchitecture.Web.API
         public TwoFASettingController(
         UserManager<ApplicationUser> userManager,
         ILoggerFactory loggerFactory,
-        UrlEncoder urlEncoder, SignInManager<ApplicationUser> signInManager)
+        UrlEncoder urlEncoder, SignInManager<ApplicationUser> signInManager, IUserChangeLog userChangeLog)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<ManageController>();
             _urlEncoder = urlEncoder;
             _signInManager = signInManager;
+
+            _iuserChangeLog = userChangeLog;
         }
         #endregion
 
@@ -112,8 +118,17 @@ namespace CleanArchitecture.Web.API
                     var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
                     if (disable2faResult.Succeeded)
                     {
+                        string oldvalue = JsonConvert.SerializeObject(user);
                         user.TwoFactorEnabled = false;
                         await _userManager.UpdateAsync(user);
+                        string Newvalue = JsonConvert.SerializeObject(user);
+                        UserChangeLogViewModel userChangeLogViewModel = new UserChangeLogViewModel();
+                        userChangeLogViewModel.Id = user.Id;
+                        userChangeLogViewModel.Newvalue = Newvalue;
+                        userChangeLogViewModel.Type = EnuserChangeLog.TwofactoreChange.ToString();
+                        userChangeLogViewModel.Oldvalue = oldvalue;
+
+                        long userlog = _iuserChangeLog.AddPassword(userChangeLogViewModel);
                         _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
                         return Ok(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
                     }
@@ -142,7 +157,7 @@ namespace CleanArchitecture.Web.API
             {
                 var user = await GetCurrentUserAsync();
 
-
+                string oldvalue = JsonConvert.SerializeObject(user);
                 user.TwoFactorEnabled = true;
                 await _userManager.UpdateAsync(user);
 
@@ -155,6 +170,15 @@ namespace CleanArchitecture.Web.API
                     await _userManager.ResetAuthenticatorKeyAsync(user);
                     unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
                 }
+                string Newvalue = JsonConvert.SerializeObject(user);
+                UserChangeLogViewModel userChangeLogViewModel = new UserChangeLogViewModel();
+                userChangeLogViewModel.Id = user.Id;
+                userChangeLogViewModel.Newvalue = Newvalue;
+                userChangeLogViewModel.Type = EnuserChangeLog.TwofactoreChange.ToString();
+                userChangeLogViewModel.Oldvalue = oldvalue;
+
+                long userlog = _iuserChangeLog.AddPassword(userChangeLogViewModel);
+
                 if (string.IsNullOrEmpty(user.Email))   ////  This Condition by pankaj for when user login with molile the email field is null so.
                 {
                     var model = new EnableAuthenticatorViewModel
@@ -162,7 +186,7 @@ namespace CleanArchitecture.Web.API
                         SharedKey = FormatKey(unformattedKey),
                         AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
                     };
-                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor , EnableAuthenticatorViewModel = model });
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, EnableAuthenticatorViewModel = model });
 
                 }
                 else
@@ -191,7 +215,6 @@ namespace CleanArchitecture.Web.API
             try
             {
                 var user = await GetCurrentUserAsync();
-
                 // Strip spaces and hypens
                 var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
@@ -200,12 +223,15 @@ namespace CleanArchitecture.Web.API
 
                 if (!is2faTokenValid)
                 {
-                    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail,ReturnMsg= EnResponseMessage.TwoFactorVerification, ErrorCode =enErrorCode.Status4079TwoFAcodeInvalide});
+                    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification, ErrorCode = enErrorCode.Status4079TwoFAcodeInvalide });
 
                 }
+
+
+
                 await _userManager.SetTwoFactorEnabledAsync(user, true);
                 _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success,ReturnMsg= EnResponseMessage.EnableTroFactor });
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
             }
             catch (Exception ex)
             {

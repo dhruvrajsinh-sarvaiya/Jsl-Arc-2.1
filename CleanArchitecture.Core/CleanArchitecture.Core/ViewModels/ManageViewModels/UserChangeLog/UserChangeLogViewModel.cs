@@ -11,5 +11,6 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels.UserChangeLog
         public string Type   { get; set; }
         public string Oldvalue { get; set; }
         public string Newvalue { get; set; }
+       
     }
 }

@@ -16,7 +16,7 @@ namespace CleanArchitecture.Core.Interfaces.User
         Task<bool> IsValidPhoneNumber(string Mobilenumber, string CountryCode);
         Task<string> GetCountryByIP(string ipAddress);
         string GenerateRandomOTPWithPassword(PasswordOptions opts = null);
-        SocialCustomPasswordViewMoel GenerateRamdomSocialPassword(string ProvideKey);
+        SocialCustomPasswordViewMoel GenerateRandomSocialPassword(string ProvideKey);
         Task<ApplicationUser> FindUserDataByUserNameEmailMobile(string UserName);
     }
 }

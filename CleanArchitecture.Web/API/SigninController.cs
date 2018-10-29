@@ -886,7 +886,7 @@ namespace CleanArchitecture.Web.API
                             //_logger.LogInformation(
                             //    "{Name} logged in with {LoginProvider} provider.",
                             //    info.Principal.Identity.Name, info.LoginProvider);
-                            SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+                            SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRandomSocialPassword(model.ProviderKey);
 
                             if (socialCustomPasswordViewMoel != null)
                             {
@@ -915,7 +915,7 @@ namespace CleanArchitecture.Web.API
                             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                             var userdet = await _userManager.CreateAsync(user);
                             var infodet = new UserLoginInfo(model.ProviderName, model.ProviderKey, model.ProviderName);
-                            if (userdet.Succeeded)
+                             if (userdet.Succeeded)
                             {
                                 var userlogin = await _userManager.AddLoginAsync(user, infodet);
 
@@ -935,7 +935,7 @@ namespace CleanArchitecture.Web.API
                                     //    "User created an account using {Name} provider.",
                                     //    info.LoginProvider);
 
-                                    SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+                                    SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRandomSocialPassword(model.ProviderKey);
 
                                     if (socialCustomPasswordViewMoel != null)
                                     {
@@ -1030,7 +1030,7 @@ namespace CleanArchitecture.Web.API
                         var user = await _userManager.FindByLoginAsync(model.ProviderName, model.ProviderKey);
 
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+                        SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRandomSocialPassword(model.ProviderKey);
 
                         if (socialCustomPasswordViewMoel != null)
                         {
@@ -1081,7 +1081,7 @@ namespace CleanArchitecture.Web.API
                                 await _signInManager.SignInAsync(user, isPersistent: false);
 
                                 _logger.LogInformation(1, "User logged in with social using.");
-                                SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRamdomSocialPassword(model.ProviderKey);
+                                SocialCustomPasswordViewMoel socialCustomPasswordViewMoel = _userService.GenerateRandomSocialPassword(model.ProviderKey);
 
 
                                 if (socialCustomPasswordViewMoel != null)

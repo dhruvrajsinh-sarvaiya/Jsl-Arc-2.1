@@ -43,23 +43,23 @@ namespace CleanArchitecture.Web.Filters
 
                     memStream.Position = 0;
                     string responseBody = new StreamReader(memStream).ReadToEnd();
-                    responseLog += $", Response : {responseBody}";
-                    //if (responseBody.ToLower().Contains("error_description"))
-                    //{
-                    //    ErrorParams erParams = JsonConvert.DeserializeObject<ErrorParams>(responseBody);
-                    //    //if (erParams != null && erParams.error.ToLower() == "invalid_request")
-                    //    //{
-                    //    //    newBody.Seek(0, SeekOrigin.Begin);
-                    //    //    newContent = new StreamReader(newBody).ReadToEnd();
+                    var erParams = (dynamic)null;
+                    if (ResponseDetails?[1] != "swagger")
+                        erParams = JsonConvert.DeserializeObject<ErrorParams>(responseBody);
 
-                    //    //    newContent += "{\"ReturnCode\":1,\"ReturnMsg\":\"Invalid Request\",\"ErrorCode\":4000";
-                    //    //    await context.Response.WriteAsync(newContent);
-                    //    //}
-                    //}
-                    //_logger.LogTrace(responseBody);
+                    responseLog += $", Response : {responseBody}";
+
                     if (ResponseDetails?[1] == "api")
-                        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), ResponseDetails?[3], ResponseDetails?[2], responseLog);
-                    else
+                    {
+                        if (erParams.ReturnCode == 9)
+                        {
+                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), ResponseDetails?[3], ResponseDetails?[2], responseLog);
+                            HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), ResponseDetails?[3], ResponseDetails?[2], erParams.ReturnMsg);
+                        }
+                        else
+                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), ResponseDetails?[3], ResponseDetails?[2], responseLog);
+                    }
+                    else if (ResponseDetails?[1] != "swagger")
                         HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), "", "", responseLog);
 
                     memStream.Position = 0;
@@ -76,7 +76,8 @@ namespace CleanArchitecture.Web.Filters
 
     public class ErrorParams
     {
-        public string error { get; set; }
-        public string error_description { get; set; }
+        public long ReturnCode { get; set; }
+        public string ReturnMsg { get; set; }
+        public int ErrorCode { get; set; }
     }
 }

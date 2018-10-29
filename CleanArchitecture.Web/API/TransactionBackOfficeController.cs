@@ -2,34 +2,46 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.ViewModels.Transaction.BackOffice;
+using CleanArchitecture.Infrastructure.Interfaces;
+using CleanArchitecture.Web.Helper;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]")]
-    [ApiController]
+    //[ApiController]
     public class TransactionBackOfficeController : Controller
     {
         private readonly ILogger<TransactionController> _logger;
         private readonly IBackOfficeTrnService _backOfficeService;
         private readonly IFrontTrnService _frontTrnService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IBasePage _basePage;
 
         public TransactionBackOfficeController(
             ILogger<TransactionController> logger,
             IBackOfficeTrnService backOfficeService,
-            IFrontTrnService frontTrnService)
+            IFrontTrnService frontTrnService,
+            UserManager<ApplicationUser> userManager,
+            IBasePage basePage)
         {
             _logger = logger;
             _backOfficeService = backOfficeService;
             _frontTrnService = frontTrnService;
+            _userManager = userManager;
+            _basePage = basePage;
         }
 
         [HttpPost("TradingSummary")]
@@ -116,6 +128,48 @@ namespace CleanArchitecture.Web.API
                 return Ok(Response);
             }
             
+        }
+
+        [Authorize]
+        [HttpPost("TradeRecon")]
+        public async Task<IActionResult> TradeRecon([FromBody]TradeReconRequest request)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+               
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                if (request.TranNo == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.TradeRecon_InvalidTransactionNo;
+                    Response.ErrorCode = enErrorCode.TradeRecon_InvalidTransactionNo;
+                }
+                if(request.ActionType != enTradeReconActionType.Cancel)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.TradeRecon_InvalidActionType;
+                    Response.ErrorCode = enErrorCode.TradeRecon_InvalidActionType;
+                }
+                else
+                {
+                    var UserId = user.Id;
+                    Response = _backOfficeService.TradeRecon(request.TranNo, request.ActionMessage, UserId);
+                }
+                
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
         }
     }
 }
