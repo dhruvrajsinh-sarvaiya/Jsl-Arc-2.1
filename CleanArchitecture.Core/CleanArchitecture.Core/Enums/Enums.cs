@@ -245,7 +245,7 @@ namespace CleanArchitecture.Core.Enums
         Status4101InputProvider = 4101,
         Status4102SignUpUserRegisterError = 4102,
 
-        // Status4103BizUserNameAs_a_MobileExist = 4103,
+        Status4103UserDataNotAvailable = 4103,
         Status4104TempUserNameExist = 4104,
         Status4105TempUserMobileExist = 4105,
         // wallet
