@@ -1,0 +1,144 @@
+-------------------------------------------------------------------------------------------------
+-----> CallAPI  Time 10/29/2018 3:08:30 PM
+ Response : new timer call 
+-------------------------------------------------------------------------------------------------
+-----> ReadMasterFile  Time 10/29/2018 3:08:41 PM
+ Response : Transaction File Path :  G:/GitHub/Jsl-Arc-2.1-svn final/trunk/DepositStatusCheckApp\BTC\BTC_TransactionFile.txt
+-------------------------------------------------------------------------------------------------
+-----> ReadTransactionalFile  Time 10/29/2018 3:08:41 PM
+ Response : Transaction URL :  https://www.bitgo.com/api/v2/btc/wallet/#ProviderWalletID#/transfer/#trnID# Request Type : GET Content Type : application/json
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:08:43 PM: Response - IsProcessing = true + Fetching Rows :  1
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:08:44 PM: Response - Total Count :1 IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:08:44 PM: Response - New Loop TrnID :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:08:49 PM
+ Response : Request :  https://www.bitgo.com/api/v2/btc/wallet/5ae6fb8e6d0140460707ecd124583aa0/transfer/c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:09:03 PM
+ Response : Response :  {"id":"5bd34d9e85eca084079edb97db9aa6dc","coin":"btc","wallet":"5ae6fb8e6d0140460707ecd124583aa0","enterprise":"5a79359692f6f738073dffcbbb0c22df","txid":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d","height":547437,"date":"2018-10-26T17:23:42.719Z","confirmations":379,"type":"receive","value":110000,"valueString":"110000","feeString":"904","payGoFee":0,"payGoFeeString":"0","usd":7.129683,"usdRate":6481.53,"state":"confirmed","instant":false,"tags":["5ae6fb8e6d0140460707ecd124583aa0","5a79359692f6f738073dffcbbb0c22df"],"history":[{"date":"2018-10-26T17:23:42.719Z","action":"confirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"unconfirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"created"}],"entries":[{"address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","wallet":"5ae6fb8e6d0140460707ecd124583aa0","value":110000,"valueString":"110000","isChange":false,"isPayGo":false},{"address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isChange":false,"isPayGo":false},{"address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":-420464,"valueString":"-420464","isChange":false,"isPayGo":false}],"confirmedTime":"2018-10-26T17:23:42.719Z","unconfirmedTime":"2018-10-26T17:23:42.719Z","createdTime":"2018-10-26T17:23:42.719Z","outputs":[{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:0","address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","value":110000,"valueString":"110000","wallet":"5ae6fb8e6d0140460707ecd124583aa0","chain":10,"index":2533,"redeemScript":"0020e08b80428332f4457a2a6a6fcc47c04bc7fbdc2e4825ac2df3046b060048e385","isSegwit":true},{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:1","address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isSegwit":false}],"inputs":[{"id":"294fd5aa48aeceaf0652b81b18af801587ec4929cca6c3b16f5cf9a44b955887:0","address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":420464,"valueString":"420464","isSegwit":false}]}
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:09:05 PM
+ Response : Generate Response :  []
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:09:05 PM: Response - Loop done :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> TradeDepositHistoryUpdationForBitgo: Time 10/29/2018 3:09:08 PM: Response - Update Deposit History :  c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallAPISingle: Time 10/29/2018 3:09:13 PM: Response - IsProcessing = false 
+-------------------------------------------------------------------------------------------------
+-----> CallAPI  Time 10/29/2018 3:09:50 PM
+ Response : new timer call 
+-------------------------------------------------------------------------------------------------
+-----> ReadMasterFile  Time 10/29/2018 3:10:02 PM
+ Response : Transaction File Path :  G:/GitHub/Jsl-Arc-2.1-svn final/trunk/DepositStatusCheckApp\BTC\BTC_TransactionFile.txt
+-------------------------------------------------------------------------------------------------
+-----> ReadTransactionalFile  Time 10/29/2018 3:10:02 PM
+ Response : Transaction URL :  https://www.bitgo.com/api/v2/btc/wallet/#ProviderWalletID#/transfer/#trnID# Request Type : GET Content Type : application/json
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:10:16 PM: Response - IsProcessing = true + Fetching Rows :  1
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:10:26 PM: Response - Total Count :1 IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:10:33 PM: Response - New Loop TrnID :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:10:35 PM
+ Response : Request :  https://www.bitgo.com/api/v2/btc/wallet/5ae6fb8e6d0140460707ecd124583aa0/transfer/c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:10:39 PM
+ Response : Response :  {"id":"5bd34d9e85eca084079edb97db9aa6dc","coin":"btc","wallet":"5ae6fb8e6d0140460707ecd124583aa0","enterprise":"5a79359692f6f738073dffcbbb0c22df","txid":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d","height":547437,"date":"2018-10-26T17:23:42.719Z","confirmations":380,"type":"receive","value":110000,"valueString":"110000","feeString":"904","payGoFee":0,"payGoFeeString":"0","usd":7.129683,"usdRate":6481.53,"state":"confirmed","instant":false,"tags":["5ae6fb8e6d0140460707ecd124583aa0","5a79359692f6f738073dffcbbb0c22df"],"history":[{"date":"2018-10-26T17:23:42.719Z","action":"confirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"unconfirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"created"}],"entries":[{"address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","wallet":"5ae6fb8e6d0140460707ecd124583aa0","value":110000,"valueString":"110000","isChange":false,"isPayGo":false},{"address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isChange":false,"isPayGo":false},{"address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":-420464,"valueString":"-420464","isChange":false,"isPayGo":false}],"confirmedTime":"2018-10-26T17:23:42.719Z","unconfirmedTime":"2018-10-26T17:23:42.719Z","createdTime":"2018-10-26T17:23:42.719Z","outputs":[{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:0","address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","value":110000,"valueString":"110000","wallet":"5ae6fb8e6d0140460707ecd124583aa0","chain":10,"index":2533,"redeemScript":"0020e08b80428332f4457a2a6a6fcc47c04bc7fbdc2e4825ac2df3046b060048e385","isSegwit":true},{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:1","address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isSegwit":false}],"inputs":[{"id":"294fd5aa48aeceaf0652b81b18af801587ec4929cca6c3b16f5cf9a44b955887:0","address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":420464,"valueString":"420464","isSegwit":false}]}
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:10:40 PM
+ Response : Generate Response :  []
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:11:57 PM: Response - Loop done :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> TradeDepositHistoryUpdationForBitgo: Time 10/29/2018 3:11:59 PM: Response - Update Deposit History :  c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallAPI  Time 10/29/2018 3:18:44 PM
+ Response : new timer call 
+-------------------------------------------------------------------------------------------------
+-----> ReadMasterFile  Time 10/29/2018 3:18:44 PM
+ Response : Transaction File Path :  G:/GitHub/Jsl-Arc-2.1-svn final/trunk/DepositStatusCheckApp\BTC\BTC_TransactionFile.txt
+-------------------------------------------------------------------------------------------------
+-----> ReadTransactionalFile  Time 10/29/2018 3:18:44 PM
+ Response : Transaction URL :  https://www.bitgo.com/api/v2/btc/wallet/#ProviderWalletID#/transfer/#trnID# Request Type : GET Content Type : application/json
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:18:45 PM: Response - IsProcessing = true + Fetching Rows :  1
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:18:45 PM: Response - Total Count :1 IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:18:45 PM: Response - New Loop TrnID :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:18:45 PM
+ Response : Request :  https://www.bitgo.com/api/v2/btc/wallet/5ae6fb8e6d0140460707ecd124583aa0/transfer/c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:18:53 PM
+ Response : Response :  {"id":"5bd34d9e85eca084079edb97db9aa6dc","coin":"btc","wallet":"5ae6fb8e6d0140460707ecd124583aa0","enterprise":"5a79359692f6f738073dffcbbb0c22df","txid":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d","height":547437,"date":"2018-10-26T17:23:42.719Z","confirmations":380,"type":"receive","value":110000,"valueString":"110000","feeString":"904","payGoFee":0,"payGoFeeString":"0","usd":7.129683,"usdRate":6481.53,"state":"confirmed","instant":false,"tags":["5ae6fb8e6d0140460707ecd124583aa0","5a79359692f6f738073dffcbbb0c22df"],"history":[{"date":"2018-10-26T17:23:42.719Z","action":"confirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"unconfirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"created"}],"entries":[{"address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","wallet":"5ae6fb8e6d0140460707ecd124583aa0","value":110000,"valueString":"110000","isChange":false,"isPayGo":false},{"address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isChange":false,"isPayGo":false},{"address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":-420464,"valueString":"-420464","isChange":false,"isPayGo":false}],"confirmedTime":"2018-10-26T17:23:42.719Z","unconfirmedTime":"2018-10-26T17:23:42.719Z","createdTime":"2018-10-26T17:23:42.719Z","outputs":[{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:0","address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","value":110000,"valueString":"110000","wallet":"5ae6fb8e6d0140460707ecd124583aa0","chain":10,"index":2533,"redeemScript":"0020e08b80428332f4457a2a6a6fcc47c04bc7fbdc2e4825ac2df3046b060048e385","isSegwit":true},{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:1","address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isSegwit":false}],"inputs":[{"id":"294fd5aa48aeceaf0652b81b18af801587ec4929cca6c3b16f5cf9a44b955887:0","address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":420464,"valueString":"420464","isSegwit":false}]}
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:18:54 PM
+ Response : Generate Response :  []
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:18:55 PM: Response - Loop done :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> TradeDepositHistoryUpdationForBitgo: Time 10/29/2018 3:18:59 PM: Response - Update Deposit History :  c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallAPISingle: Time 10/29/2018 3:19:12 PM: Response - IsProcessing = false 
+-------------------------------------------------------------------------------------------------
+-----> CallAPI  Time 10/29/2018 3:20:15 PM
+ Response : new timer call 
+-------------------------------------------------------------------------------------------------
+-----> ReadMasterFile  Time 10/29/2018 3:20:15 PM
+ Response : Transaction File Path :  G:/GitHub/Jsl-Arc-2.1-svn final/trunk/DepositStatusCheckApp\BTC\BTC_TransactionFile.txt
+-------------------------------------------------------------------------------------------------
+-----> ReadTransactionalFile  Time 10/29/2018 3:20:15 PM
+ Response : Transaction URL :  https://www.bitgo.com/api/v2/btc/wallet/#ProviderWalletID#/transfer/#trnID# Request Type : GET Content Type : application/json
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:20:16 PM: Response - IsProcessing = true + Fetching Rows :  1
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:20:16 PM: Response - Total Count :1 IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:20:16 PM: Response - New Loop TrnID :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:20:16 PM
+ Response : Request :  https://www.bitgo.com/api/v2/btc/wallet/5ae6fb8e6d0140460707ecd124583aa0/transfer/c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:20:21 PM
+ Response : Response :  {"id":"5bd34d9e85eca084079edb97db9aa6dc","coin":"btc","wallet":"5ae6fb8e6d0140460707ecd124583aa0","enterprise":"5a79359692f6f738073dffcbbb0c22df","txid":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d","height":547437,"date":"2018-10-26T17:23:42.719Z","confirmations":380,"type":"receive","value":110000,"valueString":"110000","feeString":"904","payGoFee":0,"payGoFeeString":"0","usd":7.129683,"usdRate":6481.53,"state":"confirmed","instant":false,"tags":["5ae6fb8e6d0140460707ecd124583aa0","5a79359692f6f738073dffcbbb0c22df"],"history":[{"date":"2018-10-26T17:23:42.719Z","action":"confirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"unconfirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"created"}],"entries":[{"address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","wallet":"5ae6fb8e6d0140460707ecd124583aa0","value":110000,"valueString":"110000","isChange":false,"isPayGo":false},{"address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isChange":false,"isPayGo":false},{"address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":-420464,"valueString":"-420464","isChange":false,"isPayGo":false}],"confirmedTime":"2018-10-26T17:23:42.719Z","unconfirmedTime":"2018-10-26T17:23:42.719Z","createdTime":"2018-10-26T17:23:42.719Z","outputs":[{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:0","address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","value":110000,"valueString":"110000","wallet":"5ae6fb8e6d0140460707ecd124583aa0","chain":10,"index":2533,"redeemScript":"0020e08b80428332f4457a2a6a6fcc47c04bc7fbdc2e4825ac2df3046b060048e385","isSegwit":true},{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:1","address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isSegwit":false}],"inputs":[{"id":"294fd5aa48aeceaf0652b81b18af801587ec4929cca6c3b16f5cf9a44b955887:0","address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":420464,"valueString":"420464","isSegwit":false}]}
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:20:21 PM
+ Response : Generate Response :  []
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:20:22 PM: Response - Loop done :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> TradeDepositHistoryUpdationForBitgo: Time 10/29/2018 3:20:35 PM: Response - Update Deposit History :  c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallAPI  Time 10/29/2018 3:40:49 PM
+ Response : new timer call 
+-------------------------------------------------------------------------------------------------
+-----> ReadMasterFile  Time 10/29/2018 3:40:50 PM
+ Response : Transaction File Path :  G:/GitHub/Jsl-Arc-2.1-svn final/trunk/DepositStatusCheckApp\BTC\BTC_TransactionFile.txt
+-------------------------------------------------------------------------------------------------
+-----> ReadTransactionalFile  Time 10/29/2018 3:40:50 PM
+ Response : Transaction URL :  https://www.bitgo.com/api/v2/btc/wallet/#ProviderWalletID#/transfer/#trnID# Request Type : GET Content Type : application/json
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:40:50 PM: Response - IsProcessing = true + Fetching Rows :  1
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:40:50 PM: Response - Total Count :1 IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:40:50 PM: Response - New Loop TrnID :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:40:52 PM
+ Response : Request :  https://www.bitgo.com/api/v2/btc/wallet/5ae6fb8e6d0140460707ecd124583aa0/transfer/c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:41:01 PM
+ Response : Response :  {"id":"5bd34d9e85eca084079edb97db9aa6dc","coin":"btc","wallet":"5ae6fb8e6d0140460707ecd124583aa0","enterprise":"5a79359692f6f738073dffcbbb0c22df","txid":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d","height":547437,"date":"2018-10-26T17:23:42.719Z","confirmations":383,"type":"receive","value":110000,"valueString":"110000","feeString":"904","payGoFee":0,"payGoFeeString":"0","usd":7.129683,"usdRate":6481.53,"state":"confirmed","instant":false,"tags":["5ae6fb8e6d0140460707ecd124583aa0","5a79359692f6f738073dffcbbb0c22df"],"history":[{"date":"2018-10-26T17:23:42.719Z","action":"confirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"unconfirmed"},{"date":"2018-10-26T17:23:42.719Z","action":"created"}],"entries":[{"address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","wallet":"5ae6fb8e6d0140460707ecd124583aa0","value":110000,"valueString":"110000","isChange":false,"isPayGo":false},{"address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isChange":false,"isPayGo":false},{"address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":-420464,"valueString":"-420464","isChange":false,"isPayGo":false}],"confirmedTime":"2018-10-26T17:23:42.719Z","unconfirmedTime":"2018-10-26T17:23:42.719Z","createdTime":"2018-10-26T17:23:42.719Z","outputs":[{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:0","address":"3QwxViTyi47DrEqckaBfRGKn7j4zoy8TXK","value":110000,"valueString":"110000","wallet":"5ae6fb8e6d0140460707ecd124583aa0","chain":10,"index":2533,"redeemScript":"0020e08b80428332f4457a2a6a6fcc47c04bc7fbdc2e4825ac2df3046b060048e385","isSegwit":true},{"id":"c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d:1","address":"15MZihSPT1SMWoeG4kFzcqrp4eGTvsPkoH","value":309560,"valueString":"309560","isSegwit":false}],"inputs":[{"id":"294fd5aa48aeceaf0652b81b18af801587ec4929cca6c3b16f5cf9a44b955887:0","address":"14cquBuvebKv9nieWwZBWePJ6a2GG4Ly9j","value":420464,"valueString":"420464","isSegwit":false}]}
+-------------------------------------------------------------------------------------------------
+-----> CallThirdPartyAPI  Time 10/29/2018 3:41:05 PM
+ Response : Generate Response :  []
+-------------------------------------------------------------------------------------------------
+-----> GetHistory: Time 10/29/2018 3:41:05 PM: Response - Loop done :c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d IsProcessing :True
+-------------------------------------------------------------------------------------------------
+-----> TradeDepositHistoryUpdationForBitgo: Time 10/29/2018 3:41:40 PM: Response - Update Deposit History :  c261644fef8782faad9427bb279da1fa84da659d6a6414f2e3085eb27a61455d

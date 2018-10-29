@@ -1,0 +1,8 @@
+﻿URL:https://www.bitgo.com/api/v2/btc/wallet/#ProviderWalletID#/transfer/#trnID#
+RequestType:GET
+ContentType:application/json
+Category:1
+Authorization:Bearer v2x5e587227b1085bdcd4d5bd3421f0a702fff86d2137af0cf3a8624655d4e42f71
+enterprise:5a79359692f6f738073dffcbbb0c22df
+ConvertAmt:100000000
+ProviderWalletID:5ae6fb8e6d0140460707ecd124583aa0
