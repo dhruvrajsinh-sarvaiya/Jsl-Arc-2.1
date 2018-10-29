@@ -67,13 +67,13 @@ namespace CleanArchitecture.Core.Entities
 
         public string StatusMsg { get; set; }
 
-        public long ServiceID { get; set; }
+        //public long ServiceID { get; set; }
 
-        public long ProductID { get; set; }
+        //public long ProductID { get; set; }
 
-        public long SerProID { get; set; }
+        //public long SerProID { get; set; }
 
-        public int RoutID { get; set; }//change column as new structure
+        //public int RouteID { get; set; }//change column as new structure
 
         public long? TrnRefNo { get; set; }
 
@@ -114,6 +114,14 @@ namespace CleanArchitecture.Core.Entities
             StatusMsg = statusMsg;
             AddValueChangeEvent();
         }
+        //public void SetServiceProviderData(long iServiceID, long iSerProID, long iProductID, long iRouteID)
+        //{
+        //    ServiceID = iServiceID;
+        //    SerProID = iSerProID;
+        //    ProductID = iProductID;
+        //    RouteID = iRouteID;
+        //    AddValueChangeEvent();
+        //}
         public void AddValueChangeEvent()
         {
             Events.Add(new ServiceStatusEvent<TradeTransactionQueue>(this));
