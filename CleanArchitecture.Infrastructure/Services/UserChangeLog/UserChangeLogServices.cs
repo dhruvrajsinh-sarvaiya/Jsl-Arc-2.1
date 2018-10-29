@@ -42,6 +42,7 @@ namespace CleanArchitecture.Infrastructure.Services.UserChangeLog
                     Newvalue=model.Newvalue,
                     
                 };
+
                 _customRepository.Insert(userchangeLog);
                 return model.Id;
             }
