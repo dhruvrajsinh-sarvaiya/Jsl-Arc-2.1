@@ -50,13 +50,13 @@ namespace CleanArchitecture.Web.API
         private readonly ICustomPassword _custompassword;
         private readonly Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>> _tokenProviders =
             new Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>>();
-        public static readonly string ProviderName = "TotpSoftwareAuthenticator";
+        private readonly ITempUserRegisterService _tempUserRegisterService;
 
         #endregion
 
         #region Ctore
         public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage,
-            EncyptedDecrypted encypted, ICustomPassword custompassword)
+            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -68,6 +68,7 @@ namespace CleanArchitecture.Web.API
             _basePage = basePage;
             _encdecAEC = encypted;
             _custompassword = custompassword;
+            _tempUserRegisterService = tempUserRegisterService;
         }
         #endregion
 
@@ -309,13 +310,13 @@ namespace CleanArchitecture.Web.API
             try
             {
                 //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: false);
                 // var checkmail = await _userManager.FindByEmailAsync(model.Username);
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
                     var roles = await _userManager.GetRolesAsync(user);
-                    _logger.LogInformation(1, "User logged in.");
+                    //_logger.LogInformation(1, "User logged in.");
                     return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
                 }
                 if (result.RequiresTwoFactor)
@@ -331,16 +332,33 @@ namespace CleanArchitecture.Web.API
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning(2, "User account locked out for two hours.");
+                    //_logger.LogWarning(2, "User account locked out for two hours.");
 
                     return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
                 }
+
+                ///////////////// Check bizUser  table in username  Exist or not
+                var resultUserName = await _userManager.FindByNameAsync(model.Username);
+                if (!string.IsNullOrEmpty(resultUserName?.UserName))
+                {
+                    return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status4032LoginFailed });
+                    //return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameExist, ErrorCode = enErrorCode.Status4099BizUserNameExist });
+                }
+                ////////////////// check TempUser  table in username Exist and Verify Pending
+                bool IsSignUserName = _tempUserRegisterService.GetUserName(model.Username);
+                if (!IsSignUserName)
+                {
+                    return Ok(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserNameVerifyPending, ErrorCode = enErrorCode.Status4036VerifyPending });
+                }
+
+                return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
+
                 //else
                 //{
                 //    if (checkmail != null)
                 //        await _userManager.AccessFailedAsync(checkmail);
                 //    //return BadRequest(new ApiError("Login failed : Invalid username or password."));
-                return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status4032LoginFailed });
+                //return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.Status4032LoginFailed });
                 //}
             }
             catch (Exception ex)
@@ -390,6 +408,13 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
+                    ////////////////////// check Tempuser table in Email verfy pending
+                    bool IsSignEmailVerifyPending = _tempUserRegisterService.GetEmail(model.Email);
+                    if (!IsSignEmailVerifyPending)
+                    {
+                        return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserEmailVerifyPending, ErrorCode = enErrorCode.Status4036VerifyPending });
+                    }
+
                     //return BadRequest(new ApiError("Login failed: Invalid email."));
                     return BadRequest(new LoginWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                 }
