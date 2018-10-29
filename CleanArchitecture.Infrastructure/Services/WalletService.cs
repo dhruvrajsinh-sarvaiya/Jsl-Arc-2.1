@@ -1125,13 +1125,14 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
-
+                
                 objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 0, "Inserted", trnType);
                 objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
                 TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
                 remarks = "Debit for TrnNo:" + objTQ.TrnNo;
                 WalletLedger walletLedger = GetWalletLedger(dWalletobj.Id, 0, amount, 0, trnType, serviceType, objTQ.TrnNo, remarks, dWalletobj.Balance, 1);
                 TransactionAccount tranxAccount = GetTransactionAccount(dWalletobj.Id, 1, batchObj.Id, amount, 0, objTQ.TrnNo, remarks, 1);
+                dWalletobj = _commonRepository.GetById(dWalletobj.Id);
                 dWalletobj.DebitBalance(amount);
                 objTQ.Status = enTransactionStatus.Hold;
                 objTQ.StatusMsg = "Hold";

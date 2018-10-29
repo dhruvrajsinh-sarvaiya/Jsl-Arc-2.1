@@ -46,7 +46,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public string TrnRefNo { get; set; }
         public string AdditionalInfo { get; set; }
         public enTransactionStatus Status { get; set; }
-        public int StatusCode { get; set; }
+        public long StatusCode { get; set; }
         public string StatusMsg { get; set; }
         //public long WalletID { get; set; }
         //public long DeliveryWalletID { get; set; } //use only in case of Trading
@@ -61,6 +61,10 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 
         public enServiceType ServiceType { get; set; }
         public enWalletTrnType WalletTrnType { get; set; }
+
+        public short WhitelistingBit { get; set; }
+
+        public string AddressLabel { get; set; }
 
     }
 

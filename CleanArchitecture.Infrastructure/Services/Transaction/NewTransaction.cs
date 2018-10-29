@@ -196,11 +196,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 {
                     _TradeTransactionObj.TrnTypeName = "SELL";
                 }
-                Req.DebitWalletID = Convert.ToInt64(Req.DebitAccountID);//Assign from wallet team
-                Req.CreditWalletID = Convert.ToInt64(Req.CreditAccountID);
+                Req.DebitWalletID = _WalletService.GetWalletID(Req.DebitAccountID);                
+              
                 //IF @PairID <> 0 ntrivedi 18-04-2018  check inside @TrnType (4,5) @TradeWalletMasterID will be 0 or null
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
+                    Req.CreditWalletID = _WalletService.GetWalletID(Req.CreditAccountID);
                     //_TradePairObj = new TradePairMaster();
                     _TradePairObj = _TradePairMaster.GetSingle(item => item.Id == Req.PairID && item.Status == Convert.ToInt16(ServiceStatus.Active));                   
                     if (_TradePairObj == null)
@@ -314,8 +315,18 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         Req.StatusMsg = EnResponseMessage.CreateTrn_NoSelfAddressWithdrawAllowMsg;
                         return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
                     }
+
+                    //Check Whilte listed Address 
+                   var WalletWhiteListResult = _WalletService.CheckWithdrawalBene(Req.DebitWalletID,Req.AddressLabel, Req.TransactionAccount, Req.WhitelistingBit);
+                   if (!WalletWhiteListResult.Equals(enCheckWithdrawalBene.Success))
+                    {
+                        Req.StatusMsg = enCheckWithdrawalBene.Success.ToString();
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
+                    }
+
                 }
                 Req.Status = enTransactionStatus.Initialize;
+                Req.StatusCode = Convert.ToInt64(enErrorCode.TransactionInsertSuccess);
                 InsertTransactionInQueue();               
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
@@ -337,6 +348,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             try
             {
                 Req.Status = enTransactionStatus.SystemFail;
+                Req.StatusCode = Convert.ToInt64(ErrorCode);
                 InsertTransactionInQueue();              
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
@@ -369,7 +381,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     SMSCode = Req.SMSCode,
                     Amount = Req.Amount,
                     Status = Convert.ToInt16(Req.Status),
-                    StatusCode = 0,
+                    StatusCode = Req.StatusCode,
                     StatusMsg = Req.StatusMsg,
                     TrnRefNo = Req.TrnRefNo,
                     AdditionalInfo = Req.AdditionalInfo
@@ -586,7 +598,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public void MarkTransactionOperatorFail(string StatusMsg, enErrorCode ErrorCode)
         {
-            CreditWalletDrArryTrnID[] CreditWalletDrArryTrnIDObj = new CreditWalletDrArryTrnID[1];
+            //CreditWalletDrArryTrnID[] CreditWalletDrArryTrnIDObj = new CreditWalletDrArryTrnID[1];
             List<CreditWalletDrArryTrnID> CreditWalletDrArryTrnIDList = new List<CreditWalletDrArryTrnID>();
             try
             {
@@ -603,7 +615,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
 
                 _WalletService.GetWalletCreditNew(Req.SMSCode, "", enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
-                Req.DebitAccountID, CreditWalletDrArryTrnIDObj, Req.TrnNo,1, enWalletTranxOrderType.Credit, enServiceType.Recharge);
+                Req.DebitAccountID, CreditWalletDrArryTrnIDList.ToArray(), Req.TrnNo,1, enWalletTranxOrderType.Credit, Req.ServiceType);
             }
             catch (Exception ex)
             {

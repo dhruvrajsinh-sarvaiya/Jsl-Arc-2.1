@@ -22,6 +22,7 @@ using CleanArchitecture.Core.Entities.Wallet;
 using System.ComponentModel.DataAnnotations.Schema;
 using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.UserChangeLog;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -188,6 +189,8 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<MemberShadowLimit>().Property(p => p.MemberTypeId).ValueGeneratedNever(); // ntrivedi 
             modelBuilder.Entity<StckingScheme>().Property(p => p.WalletType).ValueGeneratedNever(); // ntrivedi 
             modelBuilder.Entity<WalletLimitConfigurationMaster>().Property(p => p.TrnType).ValueGeneratedNever();
+            modelBuilder.Entity<WalletMaster>().Property(x => x.AccWalletID).ValueGeneratedNever();
+            modelBuilder.Entity<WalletMaster>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
 
         }
 
