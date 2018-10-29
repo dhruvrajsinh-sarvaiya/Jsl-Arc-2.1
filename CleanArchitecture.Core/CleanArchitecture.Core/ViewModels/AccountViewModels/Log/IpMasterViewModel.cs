@@ -17,6 +17,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
         public string IpAddress { get; set; }
         public bool IsEnable { get; set; }
         public bool IsDeleted { get; set; }
+        public string IpAliasName { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime CreatedDate { get; set; }
 
@@ -35,6 +36,8 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
         [Required(ErrorMessage = "1,User selected ip address not found,4044")]
         [StringLength(15, ErrorMessage = "1,Invalid user selected ip address,4045")]
         public string SelectedIPAddress { get; set; }
+        [StringLength(150)]
+        public string IpAliasName { get; set; }
     }
 
     public class IpAddressResponse : BizResponseClass

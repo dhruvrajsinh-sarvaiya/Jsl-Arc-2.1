@@ -256,7 +256,11 @@ namespace CleanArchitecture.Web.API
                     IpMasterViewModel imodel = new IpMasterViewModel();
                     imodel.UserId = user.Id;
                     imodel.IpAddress = model.SelectedIPAddress;
-
+                    if (!string.IsNullOrEmpty(model.IpAliasName))
+                    {
+                        imodel.IpAliasName = model.IpAliasName;
+                    }
+                    
                     long id = await _ipAddressService.AddIpAddress(imodel);
 
                     if (id > 0)
@@ -280,6 +284,68 @@ namespace CleanArchitecture.Web.API
             }
 
         }
+
+
+        [HttpPost("UpdateIpAddress")]
+        public async Task<IActionResult> UpdateIpAddress([FromBody]IpAddressReqViewModel model)
+        {
+            try
+            {
+                string IpCountryCode = await _userdata.GetCountryByIP(model.IPAddress);
+                if (!string.IsNullOrEmpty(IpCountryCode) && IpCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+
+                }
+                string UserCountryCode = await _userdata.GetCountryByIP(model.SelectedIPAddress);
+                if (!string.IsNullOrEmpty(UserCountryCode) && UserCountryCode == "fail")
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUserSelectedIp, ErrorCode = enErrorCode.Status4045InvalidUserSelectedIp });
+                }
+
+                var user = await GetCurrentUserAsync();
+
+                if (user != null)
+                {
+                    long getIp = await _ipAddressService.GetIpAddressByUserIdandAddress(model.SelectedIPAddress, user.Id);
+                    if (getIp > 0)
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAlreadyExist, ErrorCode = enErrorCode.Status4083IpAddressExist });
+                    }
+
+                    IpMasterViewModel imodel = new IpMasterViewModel();
+                    imodel.UserId = user.Id;
+                    imodel.IpAddress = model.SelectedIPAddress;
+                    if (!string.IsNullOrEmpty(model.IpAliasName))
+                    {
+                        imodel.IpAliasName = model.IpAliasName;
+                    }
+
+                    long id = await _ipAddressService.UpdateIpAddress(imodel);
+
+                    if (id > 0)
+                    {
+                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessupdateIpData });
+                    }
+                    else
+                    {
+                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status4081IpAddressNotInsert });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+
+        }
+
+
 
         [HttpPost("DisableIpAddress")]
         public async Task<IActionResult> DisableIpAddress([FromBody]IpAddressReqViewModel model)
@@ -914,3 +980,4 @@ namespace CleanArchitecture.Web.API
         #endregion
     }
 }
+

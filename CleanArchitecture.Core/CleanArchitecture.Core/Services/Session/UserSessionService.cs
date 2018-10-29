@@ -1,5 +1,6 @@
 ﻿using System;
 using CleanArchitecture.Core.Entities.User;
+using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.Session;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -56,10 +57,14 @@ namespace CleanArchitecture.Core.Services
 
         }
 
+        
 
         public async void SetSessionToken(string value)
         {
             ApplicationUser user =await _userManager.GetUserAsync(_context.HttpContext.User);
+
+
+
             var TokenData = JsonConvert.DeserializeObject<tokanreponsmodel>(value);
 
             RedisUserModel rModel = new RedisUserModel();
