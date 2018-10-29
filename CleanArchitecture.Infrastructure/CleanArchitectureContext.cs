@@ -135,6 +135,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceTypeMapping> ServiceTypeMapping { get; set; } //uday 24-10-2018
         public DbSet<TradePairStastics> TradePairStastics { get; set; } //uday 25-10-2018
         public DbSet<TransactionRequest> TransactionRequest { get; set; } //Rita 27-10-2018
+        public DbSet<FavouritePair> FavouritePair { get; set; } //Uday 29-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
