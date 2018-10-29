@@ -68,6 +68,12 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public decimal Amount { get; set; }
 
         [Required(ErrorMessage = "1,Required Parameter,4003")]
+        public short WhitelistingBit { get; set; }
+
+        [Required(ErrorMessage = "1,Required Parameter,4003")]
+        public string AddressLabel { get; set; }
+
+        [Required(ErrorMessage = "1,Required Parameter,4003")]
         public long Nonce { get; set; }//Timestamp
     }
 }

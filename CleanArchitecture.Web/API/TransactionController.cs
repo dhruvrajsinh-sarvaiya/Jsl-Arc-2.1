@@ -123,10 +123,10 @@ namespace CleanArchitecture.Web.API
             Req.Price = Request.Price;
             Req.Qty = Request.Amount;
             Req.DebitAccountID = Request.DebitWalletID;
-            Req.CreditAccountID = Request.CreditWalletID;
+            Req.CreditAccountID = Request.CreditWalletID;          
 
             //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
-           // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
+            // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
 
             CreateTransactionResponse Response = new CreateTransactionResponse();
             Task<BizResponse> MethodRespTsk = _transactionProcess.ProcessNewTransactionAsync(Req);
@@ -175,6 +175,8 @@ namespace CleanArchitecture.Web.API
             Req.TransactionAccount = Request.address;
             Req.Amount = Request.Amount;
             Req.DebitAccountID = Request.DebitWalletID;
+            Req.AddressLabel = Request.AddressLabel;
+            Req.WhitelistingBit = Request.WhitelistingBit;
 
             //BizResponse myResp = await _transactionProcess.ProcessNewTransactionAsync(Req);           
             // var myResp = new Task(async()=>_transactionProcess.ProcessNewTransactionAsync(Req));
