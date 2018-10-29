@@ -136,7 +136,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //Rushabh 27-10-2018
-        public enCheckWithdrawalBene CheckWithdrawalBene(long WalletID, string DestinationAddress,short WhitelistingBit)
+        public enCheckWithdrawalBene CheckWithdrawalBene(long WalletID,string Name ,string DestinationAddress,short WhitelistingBit)
         {
             try
             {
@@ -185,7 +185,7 @@ namespace CleanArchitecture.Infrastructure.Services
                                 AddNew.CreatedDate = UTC_To_IST();
                                 AddNew.UserID = Walletobj.UserID;
                                 AddNew.Address = DestinationAddress;
-                                AddNew.Name = "System Generated";
+                                AddNew.Name = Name;
                                 AddNew.WalletTypeID = Walletobj.WalletTypeID;
                                 AddNew = _BeneficiarycommonRepository.Add(AddNew);
                                 return enCheckWithdrawalBene.Success;
@@ -267,11 +267,15 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var obj = _commonRepository.GetSingle(item => item.AccWalletID == walletid);
-                if (obj.Balance < amount)
+                if(obj != null)
                 {
-                    return false;
+                    if (obj.Balance < amount)
+                    {
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
+                return false;
             }
             catch (Exception ex)
             {

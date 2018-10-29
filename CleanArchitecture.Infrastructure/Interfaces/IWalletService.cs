@@ -94,5 +94,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         BizResponseClass CreateDefaulWallet(long UserID);
         BizResponseClass CreateWalletForAllUser_NewService(string WalletType);
+
+        long GetWalletID(string AccWalletID);
+        string GetAccWalletID(long WalletID);
+        enCheckWithdrawalBene CheckWithdrawalBene(long WalletID, string Name, string DestinationAddress, short WhitelistingBit);
     }
 }

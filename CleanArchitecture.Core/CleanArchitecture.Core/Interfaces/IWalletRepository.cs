@@ -87,7 +87,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         int CreateWalletForAllUser_NewService(string WalletType);
 
-        object GetTypeMappingObj(long userid);
+        //object GetTypeMappingObj(long userid);
         
     }
 }
