@@ -54,7 +54,8 @@ namespace CleanArchitecture.Infrastructure.Services
         //readonly IBasePage _BaseObj;
         private static Random random = new Random((int)DateTime.Now.Ticks);
         //vsolanki 10-10-2018 
-        private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepository;
+        private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepository; 
+        private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository; 
 
         //private readonly IRepository<WalletTransactionOrder> _WalletAllowTrnRepository;
         //  private readonly ICommonRepository<WalletTransactionQueue> t;
@@ -245,7 +246,7 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                var obj = _LimitcommonRepository.GetSingle(item => item.Id == WalletID && item.TrnType == Convert.ToInt16(TranType));
+                var obj = _LimitcommonRepository.GetSingle(item => item.WalletId == WalletID && item.TrnType == Convert.ToInt16(TranType));
                 if((PerDayAmt <= obj.LimitPerDay) && (PerHourAmt <= obj.LimitPerHour) && (PerTranAmt <= obj.LimitPerTransaction))
                 {
                     return enValidateWalletLimit.Success;
@@ -2347,6 +2348,21 @@ namespace CleanArchitecture.Infrastructure.Services
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
+        }
+       
+        //vsolanki 2018-10-29
+        public bool CheckUserBalance(long WalletId)
+        {
+            var wObjBal = GetUserBalance(WalletId);
+            //var TA = _TransactionAccountsRepository.FindBy(item=>item.WalletID== WalletId);
+            var crsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.CrAmt);
+            var drsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.DrAmt);
+            var total = crsum - drsum;
+            if(total== wObjBal)
+            {
+                return true;
+            }
+            return false;
         }
     }
 

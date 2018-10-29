@@ -17,5 +17,6 @@ namespace CleanArchitecture.Core.Interfaces.User
         Task<string> GetCountryByIP(string ipAddress);
         string GenerateRandomOTPWithPassword(PasswordOptions opts = null);
         SocialCustomPasswordViewMoel GenerateRandomSocialPassword(string ProvideKey);
+        Task<ApplicationUser> FindUserDataByUserNameEmailMobile(string UserName);
     }
 }

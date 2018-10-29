@@ -1326,6 +1326,7 @@ namespace CleanArchitecture.Infrastructure.Data
             try
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
 
+                _dbContext.Database.BeginTransaction();
                 _dbContext.Set<WalletLedger>().Add(wl1);
                 _dbContext.Set<WalletLedger>().Add(wl2);
                 _dbContext.Set<TransactionAccount>().Add(ta1);
@@ -1368,6 +1369,8 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
+
+      
     }
 
 }

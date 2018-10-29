@@ -104,14 +104,6 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserEmailExist, ErrorCode = enErrorCode.Status4098BizUserEmailExist });
                 }
 
-                ///////////////// Check bizUser  table in username  Exist or not
-                var resultUserName = await _userManager.FindByNameAsync(model.Username);
-                if (!string.IsNullOrEmpty(resultUserName?.UserName))
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameExist, ErrorCode = enErrorCode.Status4099BizUserNameExist });
-                }
-
-
                 ///////////////// check Tempuser table in email exist or not
                 bool IsSignEmailCheck = _tempUserRegisterService.GetEmailCheckExist(model.Email);
                 if (!IsSignEmailCheck)
@@ -127,6 +119,15 @@ namespace CleanArchitecture.Web.API
                     //return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserEmailExist, ErrorCode = enErrorCode.Status4103TempUserEmailExist });
                 }
 
+
+                ///////////////// Check bizUser  table in username  Exist or not
+                var resultUserName = await _userManager.FindByNameAsync(model.Username);
+                if (!string.IsNullOrEmpty(resultUserName?.UserName))
+                {
+                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameExist, ErrorCode = enErrorCode.Status4099BizUserNameExist });
+                }
+
+
                 ////////////////// check TempUser  table in username Exist or not
                 bool IsSignUserNameCheck = _tempUserRegisterService.GetUserNameCheckExist(model.Username);
                 if (!IsSignUserNameCheck)
@@ -141,6 +142,37 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserNameExist, ErrorCode = enErrorCode.Status4104TempUserNameExist });
                 }
 
+
+
+                ///////////////// Check bizUser  table in username  Exist or not
+                var resultMobileUserName = await _userManager.FindByNameAsync(model.Mobile);
+                if (!string.IsNullOrEmpty(resultMobileUserName?.UserName))
+                {
+                    //return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameAs_a_MobileExist, ErrorCode = enErrorCode.Status4103BizUserNameAs_a_MobileExist });
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
+                }
+
+                ///////////////// Check bizUser  table in mobile number  Exist or not
+                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                if (!IsSignMobile)
+                {
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
+                }
+
+                ///////////////// Check TempUser  table in mobile number  Exist or not
+                bool IsSignTempMobileChek = _tempUserRegisterService.GetMobileNumberCheck(model.Mobile);
+                if (!IsSignTempMobileChek)
+                {
+                    ///////////////// Check TempUser  table in mobile number  Exist  and verification pending or not
+                    bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
+                    if (!IsSignTempMobile)
+                    {
+                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpTempUserMobileExistAndVerificationPending, ErrorCode = enErrorCode.Status4036VerifyPending });
+                    }
+                    return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserMobileExist, ErrorCode = enErrorCode.Status4105TempUserMobileExist });
+                }
+
+             
                 //bool IsSignEmail = _tempUserRegisterService.GetEmail(model.Email);
                 //if (IsSignEmail)
                 //{

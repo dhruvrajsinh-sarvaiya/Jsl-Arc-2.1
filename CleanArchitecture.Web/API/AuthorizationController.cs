@@ -41,6 +41,7 @@ namespace CleanArchitecture.Web.API
         private readonly RedisSessionStorage _redisSessionStora;
         private readonly IOtpMasterService _otpMasterService;
         private readonly ICustomPassword _customPassword;
+        private readonly IUserService _userService;
 
         public AuthorizationController(IOptions<IdentityOptions> identityOptions,
             SignInManager<ApplicationUser> signInManager,
@@ -61,6 +62,7 @@ namespace CleanArchitecture.Web.API
             _fact = factory;
             _otpMasterService = otpMasterService;
             _customPassword = customPassword;
+            _userService = userService;
         }
 
         [AllowAnonymous]
@@ -76,15 +78,32 @@ namespace CleanArchitecture.Web.API
             string RedisDBKey = string.Empty;
             if (!string.IsNullOrEmpty(appkey) && !string.IsNullOrEmpty(request.Password)) /// added by nirav savariya for login with email and mobile on 16-10-2018
             {
-                var userdata = await _userManager.FindByNameAsync(request.Username);
+                // Get User Name on Mobile number or Email ID
+                var GetuserName = await _userService.FindUserDataByUserNameEmailMobile(request.Username);
+                if (GetuserName == null)
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TokenCreationUserDataNotAvailable, ErrorCode = enErrorCode.Status4103UserDataNotAvailable });
+
+                // User Data Get 
+                var userdata = await _userManager.FindByNameAsync(GetuserName.UserName);
                 var model = await _customPassword.IsValidPassword(appkey, request.Password);
                 if (model != null)
                 {
-                    request.Password = model.Password;
-                    var newPassword = _userManager.PasswordHasher.HashPassword(userdata, model.Password);
-                    userdata.PasswordHash = newPassword;
-                    var res = await _userManager.UpdateAsync(userdata);
-                    _customPassword.UpdateOtp(model.Id);
+                    try
+                    {                     
+                        request.Username = userdata.UserName;
+                        request.Password = model.Password;
+                        var newPassword = _userManager.PasswordHasher.HashPassword(userdata, model.Password);
+                        userdata.PasswordHash = newPassword;
+                        // Update New Key Password
+                        var res = await _userManager.UpdateAsync(userdata);
+                        
+                        // Update OTP Key Password 
+                        _customPassword.UpdateOtp(model.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        string exs = ex.ToString();
+                    }
                 }
                 else
                 {
@@ -101,7 +120,7 @@ namespace CleanArchitecture.Web.API
                     if (char.IsDigit(str))
                     {
                         if (numeric.Length < 6)
-                            numeric += str.ToString();   
+                            numeric += str.ToString();
                     }
                 }
                 if (numeric.Length == 6)
@@ -129,23 +148,30 @@ namespace CleanArchitecture.Web.API
                 }
 
                 // Validate the username/password parameters and ensure the account is not locked out.
-                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
-                if (!result.Succeeded)
+                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);                                
+                if (result.Succeeded)
+                {
+                    // Create a new authentication ticket.
+                    var ticket = await CreateTicketAsync(request, user, null, RedisDBKey);
+                    if (!string.IsNullOrEmpty(appkey))
+                    {
+                        var setpwd = _userManager.PasswordHasher.HashPassword(user, DateTime.UtcNow.ToString());
+                        user.PasswordHash = setpwd;
+                        var res = await _userManager.UpdateAsync(user);
+                    }
+                    //return Ok(new Customtokenresponse { ReturnCode = enResponseCode.Success, ReturnMsg = "Success", SignIntoken = SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme)});
+
+                    return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
+                }else if (result.IsLockedOut)
+                {
+                    return BadRequest(new StandardLoginResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
+                }
+                else
                 {
                     return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidUser, ErrorCode = enErrorCode.Status4050InvalidUser });
                     //return BadRequest("The username/password couple is invalid.");
                 }
-                // Create a new authentication ticket.
-                var ticket = await CreateTicketAsync(request, user, null, RedisDBKey);
-                if (!string.IsNullOrEmpty(appkey))
-                {
-                    var setpwd = _userManager.PasswordHasher.HashPassword(user, DateTime.UtcNow.ToString());
-                    user.PasswordHash = setpwd;
-                    var res = await _userManager.UpdateAsync(user);
-                }
-                //return Ok(new Customtokenresponse { ReturnCode = enResponseCode.Success, ReturnMsg = "Success", SignIntoken = SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme)});
 
-                return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
             }
 
             else if (request.IsRefreshTokenGrantType())
