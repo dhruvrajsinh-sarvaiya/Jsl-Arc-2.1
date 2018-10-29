@@ -603,11 +603,11 @@ namespace CleanArchitecture.Web.API
         //vsolanki 2018-10-25
         //[AllowAnonymous]
         [HttpGet("{WalletType}")]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         public async Task<IActionResult> GetAllBalancesTypeWise(string WalletType)
         {
-             ApplicationUser user = new ApplicationUser(); user.Id = 35;
-            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            // ApplicationUser user = new ApplicationUser(); user.Id = 35;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListAllBalanceTypeWiseRes Response = new ListAllBalanceTypeWiseRes();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -756,7 +756,7 @@ namespace CleanArchitecture.Web.API
         public async Task<IActionResult> GetIncomingTransaction()
         {
             ApplicationUser user = new ApplicationUser(); user.Id = 35;
-            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListIncomingTrnRes Response = new ListIncomingTrnRes();
             try
             {
