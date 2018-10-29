@@ -181,6 +181,7 @@ namespace CleanArchitecture.Core.Enums
         TradeRecon_OrderIsFullyExecuted = 4597,
         TradeRecon_InvalidDeliveryAmount = 4598,
         TradeRecon_CencelRequestSuccess = 4600,
+        TradeRecon_InvalidActionType = 4618,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -498,5 +499,15 @@ namespace CleanArchitecture.Core.Enums
         UserProfile = 1,
         TwofactoreChange = 2
 
+    }
+
+    public enum enTradeReconActionType
+    {
+        Refund = 1,
+        SuccessAndDebit = 2,
+        Success = 3,
+        FaildeMark = 5,
+        PartialRefund = 7,
+        Cancel = 8
     }
 }

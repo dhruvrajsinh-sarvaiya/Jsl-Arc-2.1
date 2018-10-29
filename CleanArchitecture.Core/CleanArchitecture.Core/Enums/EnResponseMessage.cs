@@ -52,6 +52,7 @@ namespace CleanArchitecture.Core.Enums
         public static string TradeRecon_OrderIsFullyExecuted = "Can not initiate Cancellation Request.Your order is fully executed";
         public static string TradeRecon_InvalidDeliveryAmount = "Invalid Delivery Amount";
         public static string TradeRecon_CencelRequestSuccess = "Order Cancellation request done successfully.";
+        public static string TradeRecon_InvalidActionType = "Invalid ActionType Value";
         //============================
 
         //============================walelt=================================//       
