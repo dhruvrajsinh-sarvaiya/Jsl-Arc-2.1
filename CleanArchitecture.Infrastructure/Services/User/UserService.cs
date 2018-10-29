@@ -65,44 +65,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
             return null;
         }
 
-
-        /// <summary>
-        /// Get User Data
-        /// </summary>
-        /// <param name="MobileNumber"></param>
-        /// <returns></returns>
-
-        public async Task<ApplicationUser> FindUserDataByUserNameEmailMobile(string UserName)
-        {
-            string numeric = string.Empty;
-            foreach (char str in UserName)
-            {
-                if (char.IsDigit(str))
-                {
-                    if (numeric.Length < 10)
-                        numeric += str.ToString();
-                }
-            }
-            if (numeric.Length == 10)
-            {
-                var userdata = _dbContext.Users.Where(i => i.Mobile == UserName).FirstOrDefault();
-                if (userdata != null)
-                {
-                    return userdata;
-
-                }
-            }
-            else
-            {
-                var userdata = await _userManager.FindByEmailAsync(UserName);
-                if (userdata != null)
-                {
-                    return userdata;
-                }
-            }
-            return null;
-        }
-
+             
 
 
         public bool GetMobileNumber(string MobileNumber)
