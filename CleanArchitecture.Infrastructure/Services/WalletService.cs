@@ -2358,7 +2358,7 @@ namespace CleanArchitecture.Infrastructure.Services
             var crsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.CrAmt);
             var drsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.DrAmt);
             var total = crsum - drsum;
-            if(total== wObjBal)
+            if(total== wObjBal && total > 0)
             {
                 return true;
             }

@@ -12,5 +12,8 @@ namespace CleanArchitecture.Core.Interfaces.Session
         void SetSessionValue(string Key, object obj);
 
         void SetSessionToken(string value);
+
+  
+
     }
 }
