@@ -292,7 +292,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
                     }
                     else
                     {
-                        string _Pass1 = alpha.Substring(0, 20);   // If the provider key length is less then  then provide key combination is skip 2 and then add 6 to password.
+                        string _Pass1 = alpha.Substring(0, 20);   // If the provider key length is less then provide key combination is skip 2 and then add 6 to password.
                         string _Pass11 = _Pass1 + ProvideKey.Substring(1, 6);
                         string _Pass2 = alpha.Substring(20, 10);
                         string _Pass3 = alpha.Substring(30, 28);
