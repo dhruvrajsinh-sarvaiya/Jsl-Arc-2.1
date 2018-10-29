@@ -44,6 +44,15 @@ namespace CleanArchitecture.Core.Enums
         public static string ProcessTrn_HoldMsg = "Hold";
         public static string ProcessTrn_ThirdPartyDataNotFoundMsg = "Third Party Data Not Found";
         public static string ProcessTrn_OprFailMsg = "Operator Fail";
+        public static string TradeRecon_InvalidTransactionNo = "Invalid Transaction No";
+        public static string TradeRecon_After7DaysTranDontTakeAction = "After 7 days of transaction you can not take action, Please contact admin";
+        public static string TradeRecon_InvalidTransactionStatus = "Invalid Transaction Status";
+        public static string TradeRecon_CancelRequestAlreayInProcess = "Transaction Cancellation request is already in processing.";
+        public static string TradeRecon_TransactionAlreadyInProcess = "Transaction Already in Process, Please try After Sometime";
+        public static string TradeRecon_OrderIsFullyExecuted = "Can not initiate Cancellation Request.Your order is fully executed";
+        public static string TradeRecon_InvalidDeliveryAmount = "Invalid Delivery Amount";
+        public static string TradeRecon_CencelRequestSuccess = "Order Cancellation request done successfully.";
+        public static string TradeRecon_InvalidActionType = "Invalid ActionType Value";
         //============================
 
         //============================walelt=================================//       

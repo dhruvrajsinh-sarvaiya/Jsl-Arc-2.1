@@ -173,6 +173,15 @@ namespace CleanArchitecture.Core.Enums
         ProcessTrn_ThirdPartyDataNotFound = 4588,
         ProcessTrn_GettingResponseBlank = 4589,
         ProcessTrn_OprFail = 4590,
+        TradeRecon_InvalidTransactionNo = 4591,
+        TradeRecon_After7DaysTranDontTakeAction = 4593,
+        TradeRecon_InvalidTransactionStatus = 4594,
+        TradeRecon_CancelRequestAlreayInProcess = 4595,
+        TradeRecon_TransactionAlreadyInProcess = 4596,
+        TradeRecon_OrderIsFullyExecuted = 4597,
+        TradeRecon_InvalidDeliveryAmount = 4598,
+        TradeRecon_CencelRequestSuccess = 4600,
+        TradeRecon_InvalidActionType = 4618,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -278,7 +287,8 @@ namespace CleanArchitecture.Core.Enums
         //NotFoundLimit=4234,
         //DuplicateRecord=4235,       
         InvalidAddress = 4236,
-        OrgIDNotFound = 2427
+        OrgIDNotFound = 2427,
+        MemberTypeNotFound = 4242
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -492,5 +502,15 @@ namespace CleanArchitecture.Core.Enums
         ChangePassword = 3,
         SetPassword = 4
 
+    }
+
+    public enum enTradeReconActionType
+    {
+        Refund = 1,
+        SuccessAndDebit = 2,
+        Success = 3,
+        FaildeMark = 5,
+        PartialRefund = 7,
+        Cancel = 8
     }
 }
