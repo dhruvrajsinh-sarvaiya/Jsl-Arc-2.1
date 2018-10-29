@@ -1966,26 +1966,29 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 if (limit == null)
                 {
-                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
-                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
-                    return Response;
+                Response.DailyLimit = 0;
+
+                }
+                else
+                {
+                    Response.DailyLimit = limit.LimitPerDay;
+
                 }
                 //get amt from  tq
                 var amt = _walletRepository1.GetTodayAmountOfTQ(userid, wallet.Id);
 
                 if (response.Count == 0)
                 {
-                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
-                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
-                    return Response;
+                Response.UsedLimit = 0;
+
+                }
+                else
+                {
+                    Response.UsedLimit = amt;
                 }
                 Response.BizResponseObj.ReturnCode = enResponseCode.Success;
                 Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 Response.Response = response;
-                Response.DailyLimit = limit.LimitPerDay;
-                Response.UsedLimit = amt;
                 Response.TotalBalance = total;
                 return Response;
             }
