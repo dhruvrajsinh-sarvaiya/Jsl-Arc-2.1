@@ -31,7 +31,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _serviceProviderDetail = serviceProviderDetail;
         }
 
-        public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproDetailID,TransactionQueue TQ)
+        public ThirdPartyAPIRequest MakeWebRequest(long routeID, long thirdpartyID, long serproDetailID, TransactionQueue TQ = null)
         {
             try
             {

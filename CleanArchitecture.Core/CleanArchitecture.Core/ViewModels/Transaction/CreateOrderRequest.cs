@@ -44,6 +44,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4611")]
         [EnumDataType(typeof(enTrnType),ErrorMessage = "1,Invalid Parameter Value,4612")]
+        [Range(4, 5, ErrorMessage = "1,Invalid Parameter Value,4612")]
         public enTrnType OrderSide { get; set; }
 
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4613")]
