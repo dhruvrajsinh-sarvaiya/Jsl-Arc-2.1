@@ -117,7 +117,7 @@ namespace CleanArchitecture.Core.Enums
         public static string StandardLoginfailed = "Login failed : Invalid username or password.";
         public static string LoginWithOtpSuccessSend = "You have send OTP on email.";
        // public static string LoginWithEmailSuccessSend = " User Login with Email Send Success.";
-        public static string LoginWithOtpLoginFailed = "Login failed: Invalid email.";
+       // public static string LoginWithOtpLoginFailed = "Login failed: Invalid email.";
         public static string LoginWithOtpInvalidAttempt = "Invalid login attempt.";
         public static string LoginWithOtpDatanotSend = "User Otp Data Not Send.";
         public static string SignUPMobileValidation = "This mobile number is already registered.";
@@ -226,6 +226,8 @@ namespace CleanArchitecture.Core.Enums
 
         public static string TokenCreationUserDataNotAvailable = "User data not avaialable.";
         public static string LoginWithEmailSuccessSend = " Successfull send otp on your email id.";
+
+        public static string LoginWithOtpLoginFailed = "Login failed: User email id not available.";
     }
 
 

@@ -3,6 +3,7 @@ using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PhoneNumbers;
 using System;
@@ -29,12 +30,10 @@ namespace CleanArchitecture.Infrastructure.Services.User
             _userManager = userManager;
         }
 
-
-
         /// <summary>
-        /// Get User Data
+        /// Get User data
         /// </summary>
-        /// <param name="MobileNumber"></param>
+        /// <param name="username"></param>
         /// <returns></returns>
 
         public async Task<ApplicationUser> FindUserDataByUserNameEmailMobile(string UserName)
@@ -43,18 +42,16 @@ namespace CleanArchitecture.Infrastructure.Services.User
             foreach (char str in UserName)
             {
                 if (char.IsDigit(str))
-                {
-                    if (numeric.Length < 10)
-                        numeric += str.ToString();
+                {      //if (numeric.Length < 10)
+                    numeric += str.ToString();
                 }
             }
-            if (numeric.Length == 10)
+            if (numeric.Length == UserName.Length)
             {
-                var userdata = _dbContext.Users.Where(i => i.Mobile == UserName).FirstOrDefault();
+                var userdata = _dbContext.Users.Where(i => i.Mobile == UserName).AsNoTracking().FirstOrDefault();
                 if (userdata != null)
                 {
                     return userdata;
-
                 }
             }
             else
@@ -68,6 +65,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
             return null;
         }
 
+             
 
 
         public bool GetMobileNumber(string MobileNumber)
