@@ -3,6 +3,7 @@ using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PhoneNumbers;
 using System;
@@ -29,6 +30,40 @@ namespace CleanArchitecture.Infrastructure.Services.User
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Get User data
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+
+        public async Task<ApplicationUser> FindUserDataByUserNameEmailMobile(string UserName)
+        {
+            string numeric = string.Empty;
+            foreach (char str in UserName)
+            {
+                if (char.IsDigit(str))
+                {      //if (numeric.Length < 10)
+                    numeric += str.ToString();
+                }
+            }
+            if (numeric.Length == UserName.Length)
+            {
+                var userdata = _dbContext.Users.Where(i => i.Mobile == UserName).AsNoTracking().FirstOrDefault();
+                if (userdata != null)
+                {
+                    return userdata;
+                }
+            }
+            else
+            {
+                var userdata = await _userManager.FindByEmailAsync(UserName);
+                if (userdata != null)
+                {
+                    return userdata;
+                }
+            }
+            return null;
+        }
 
 
         /// <summary>
