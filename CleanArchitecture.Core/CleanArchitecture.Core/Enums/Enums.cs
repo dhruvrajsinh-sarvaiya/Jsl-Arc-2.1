@@ -268,7 +268,8 @@ namespace CleanArchitecture.Core.Enums
         InvalidBeneficiaryID = 4227,
         InvalidLimit = 4233,
         InternalError=9,
-        NotFoundLimit=4280
+        NotFoundLimit=4280,
+        DuplicateRecord=4281
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -433,5 +434,11 @@ namespace CleanArchitecture.Core.Enums
         RecieveTradingHistory = 8,
         RecieveMarketData = 9,
         RecieveChartData = 10
+    }
+    //vsolanki 2018-10-29
+    public enum enUserType
+    {
+        Organization=0,
+        User=1
     }
 }

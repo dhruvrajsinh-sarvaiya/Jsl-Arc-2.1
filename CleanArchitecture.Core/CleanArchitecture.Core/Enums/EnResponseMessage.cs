@@ -79,7 +79,7 @@ namespace CleanArchitecture.Core.Enums
         public static string InsufficantBal = "Insufficeint Balance";
         public static string SuccessDebit = "Balance Debited Successfully";
         public static string SuccessCredit = "Balance Credited Successfully";
-
+        public static string DuplicateRecord = "Duplicate Record";
 
 
         //========================My Account===============================//

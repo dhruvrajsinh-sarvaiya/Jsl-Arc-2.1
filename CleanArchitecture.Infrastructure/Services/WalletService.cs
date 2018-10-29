@@ -2138,6 +2138,30 @@ namespace CleanArchitecture.Infrastructure.Services
                 ReturnCode = enResponseCode.Success
             };
         }
+
+        //vsolanki 2018-10-29
+        public BizResponseClass AddBizUserTypeMapping(AddBizUserTypeMappingReq req)
+        {
+            BizUserTypeMapping bizUser = new BizUserTypeMapping();
+            bizUser.UserID = req.UserID;
+            bizUser.UserType =Convert.ToInt16( req.UserType);
+            var res = _walletRepository1.AddBizUserTypeMapping(bizUser);
+            if (res == 0)
+            {
+                return new BizResponseClass
+                {
+                    ErrorCode = enErrorCode.DuplicateRecord,
+                    ReturnMsg = EnResponseMessage.DuplicateRecord,
+                    ReturnCode = enResponseCode.Fail
+                };
+            }
+            return new BizResponseClass
+            {
+                ErrorCode = enErrorCode.Success,
+                ReturnMsg = EnResponseMessage.RecordAdded,
+                ReturnCode = enResponseCode.Success
+            };
+        }
     }
 
 }

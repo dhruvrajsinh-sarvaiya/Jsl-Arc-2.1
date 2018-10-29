@@ -86,5 +86,8 @@ namespace CleanArchitecture.Core.Interfaces
         int CreateDefaulWallet(long UserId);
 
         int CreateWalletForAllUser_NewService(string WalletType);
+
+        //vsolanki 2018-10-29
+        int AddBizUserTypeMapping(BizUserTypeMapping bizUser);
     }
 }

@@ -659,12 +659,12 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateDefaulWallet()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             BizResponseClass Response = new BizResponseClass();          
             try
             {
@@ -688,12 +688,12 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost("{WalletType}")]
         public async Task<IActionResult> CreateWalletForAllUser_NewService(string WalletType)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             BizResponseClass Response = new BizResponseClass();
             try
             {
@@ -706,6 +706,35 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     Response = _walletService.CreateWalletForAllUser_NewService(WalletType);
+                }
+                HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
+                return BadRequest();
+            }
+        }
+
+        //[AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> AddBizUserTypeMapping([FromBody] AddBizUserTypeMappingReq req)
+        {
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.AddBizUserTypeMapping(req);
                 }
                 HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
