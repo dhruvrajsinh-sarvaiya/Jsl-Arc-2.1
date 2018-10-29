@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Core.ViewModels.Wallet;
@@ -80,7 +81,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         // vsolanki 25-10-2018
         BalanceResponseWithLimit GetAvailbleBalTypeWise(long userid);
 
-        BeneficiaryResponse AddBeneficiary(string AccWalletID, string BeneficiaryAddress, long UserId);
+        BeneficiaryResponse AddBeneficiary(string AccWalletID,string Name ,string BeneficiaryAddress, long UserId);
         BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
         BeneficiaryResponse ListBeneficiary(long id);
         UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
@@ -94,5 +95,12 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         BizResponseClass CreateDefaulWallet(long UserID);
         BizResponseClass CreateWalletForAllUser_NewService(string WalletType);
+
+        //vsolanki 2018-10-29
+        BizResponseClass AddBizUserTypeMapping(AddBizUserTypeMappingReq req);
+
+        long GetWalletID(string AccWalletID);
+        string GetAccWalletID(long WalletID);
+        enCheckWithdrawalBene CheckWithdrawalBene(long WalletID, string Name, string DestinationAddress, short WhitelistingBit);
     }
 }

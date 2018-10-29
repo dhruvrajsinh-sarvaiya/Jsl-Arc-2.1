@@ -268,7 +268,8 @@ namespace CleanArchitecture.Core.Enums
         InvalidBeneficiaryID = 4227,
         InvalidLimit = 4233,
         InternalError=9,
-        NotFoundLimit=4280
+        NotFoundLimit=4280,
+        DuplicateRecord=4281
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -400,12 +401,28 @@ namespace CleanArchitecture.Core.Enums
         Announcement = 17,
         Time = 18
     }
-    public enum enGlobalMethodName
+    public enum PairWiseMethodName
     {
-        Chat=15,
-        News=16,
-        Announcement=17,
-        Time=18
+        BuyerBook = 5,
+        SellerBook = 6,
+        TradingHistory = 7,
+        MarketData = 8,
+        Price = 9,
+        BuyerSideWallet = 10,
+        SellerSideWallet = 11,
+        ChartData = 12
+    }
+    public enum MarketWiseMethodName
+    {
+        PairData = 13,
+        MarketTicker = 14
+    }
+    public enum GlobalMethodName
+    {
+        Chat = 15,
+        News = 16,
+        Announcement = 17,
+        Time = 18
     }
     public enum enValidateWalletLimit
     {
@@ -433,5 +450,20 @@ namespace CleanArchitecture.Core.Enums
         RecieveTradingHistory = 8,
         RecieveMarketData = 9,
         RecieveChartData = 10
+    }
+    public enum enCheckWithdrawalBene
+    {
+        Success = 1,
+        WalletNotFound = 2,
+        GlobalBitNotFound = 3,
+        BeneficiaryNotFound = 4,
+        AddressNotFoundOrWhitelistingBitIsOff = 5,
+        AddressNotMatch = 6
+    }
+    //vsolanki 2018-10-29
+    public enum enUserType
+    {
+        Organization=0,
+        User=1
     }
 }
