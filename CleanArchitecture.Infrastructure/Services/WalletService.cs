@@ -1701,13 +1701,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 var limit = _LimitcommonRepository.GetSingle(item => item.TrnType == 2 && item.WalletId == wallet.Id);
                 if(limit==null)
                 {
-                    allBalanceResponse.BizResponseObj.ErrorCode = enErrorCode.NotFoundLimit;
-                    allBalanceResponse.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                    allBalanceResponse.BizResponseObj.ReturnMsg = EnResponseMessage.NotFoundLimit;
-                    return allBalanceResponse;
+                    allBalanceResponse.WithdrawalDailyLimit = 0;
                 }
-                allBalanceResponse.WithdrawalDailyLimit = limit.LimitPerDay;
+                else
+                {
+                    allBalanceResponse.WithdrawalDailyLimit = limit.LimitPerDay;
 
+                }
                 // var wallet = _commonRepository.GetById(walletId);
                 var walletType = _WalletTypeMasterRepository.GetById(wallet.WalletTypeID);
                 allBalanceResponse.WalletType = walletType.WalletTypeName;

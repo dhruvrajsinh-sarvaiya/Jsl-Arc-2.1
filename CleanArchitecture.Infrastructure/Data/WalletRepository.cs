@@ -1109,10 +1109,16 @@ namespace CleanArchitecture.Infrastructure.Data
                                      where p.Status == 1 && p.WalletTypeName == WalletType
                                      select p);
 
-                var Users = (from p in _dbContext.Users
-                             where p.IsEnabled == true
-                             select p).ToList();
+                //var Users = (from p in _dbContext.Users
+                //             where p.IsEnabled == true
+                //             select p).ToList();
 
+
+
+                var Users = from s in _dbContext.Users
+                            from wt in WalletTypeObj
+                            where !_dbContext.WalletMasters.Any(es => (es.UserID == s.Id) && (es.WalletTypeID == wt.Id) && (es.IsDefaultWallet == 1))
+                select s;
                 //var ISExistWallet = (from item in _dbContext.WalletMasters
                 //                     from WalletTypearray in WalletTypeObj
                 //                     from ui in Users
