@@ -481,4 +481,14 @@ namespace CleanArchitecture.Core.Enums
         OFF = 0,
         ON = 1
     }
+
+    /// <summary>
+    ///  This enum type are create by pankaj for required to tract the user log for type so.
+    /// </summary>
+    public enum EnuserChangeLog
+    {
+        UserProfile = 1,
+        TwofactoreChange = 2
+
+    }
 }
