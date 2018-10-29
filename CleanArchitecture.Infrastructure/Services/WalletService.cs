@@ -50,7 +50,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
-        //  private readonly ICommonRepository<HistoryObject> _DepositHistoryRepository;
+        private readonly ICommonRepository<DepositHistory> _DepositHistoryRepository;
         //readonly IBasePage _BaseObj;
         private static Random random = new Random((int)DateTime.Now.Ticks);
         //vsolanki 10-10-2018 
@@ -2240,6 +2240,25 @@ namespace CleanArchitecture.Infrastructure.Services
                 ReturnMsg = EnResponseMessage.RecordAdded,
                 ReturnCode = enResponseCode.Success
             };
+        }
+
+        //vsolanki 2018-10-29
+        public ListIncomingTrnRes GetIncomingTransaction(long Userid)
+        {
+            ListIncomingTrnRes Response = new ListIncomingTrnRes();
+            Response.BizResponseObj = new BizResponseClass();
+            var depositHistories = _walletRepository1.GetIncomingTransaction(Userid);
+            if (depositHistories.Count() == 0)
+            {
+                Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                return Response;
+            }
+            Response.IncomingTransactions = depositHistories;
+            Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+            Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            return Response;
         }
     }
 
