@@ -275,6 +275,10 @@ namespace CleanArchitecture.Core.Enums
         AddressNotMatch = 4239,
         GlobalBitNotFound = 4240,
         WalletNotFound = 4241
+        NotFoundLimit=4234,
+        DuplicateRecord=4235,       
+        InvalidAddress = 4236,
+        OrgIDNotFound = 2427
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

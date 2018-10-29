@@ -32,7 +32,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         List<WalletMasterResponse> GetWalletMasterResponseById(long UserId, string coin,string walletId);
 
-        int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType);
+        int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType, enWalletTrnType enWalletTrn);
 
         int CheckTrnRefNoForCredit(long TrnRefNo, enWalletTranxOrderType TrnType);
 
@@ -93,5 +93,14 @@ namespace CleanArchitecture.Core.Interfaces
         //object GetTypeMappingObj(long userid);
         //vsolanki 2018-10-29
         List<IncomingTrnRes> GetIncomingTransaction(long Userid);
+
+        long getOrgID();
+
+        // ntrivedi 29102018
+
+        WalletTransactionQueue GetTransactionQueue(long TrnNo);
+
+        // ntrivedi 29102018
+        bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1, WalletTransactionQueue wtq1, WalletTransactionQueue wtq2, WalletTransactionOrder order);
     }
 }
