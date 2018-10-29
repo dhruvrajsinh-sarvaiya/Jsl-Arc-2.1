@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Services;
 using CleanArchitecture.Web.API;
+using CleanArchitecture.Web.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -158,6 +159,9 @@ namespace CleanArchitecture.Web.Extensions
             loggerFactory.AddDebug();
             app.UseDeveloperExceptionPage();
             app.UseDatabaseErrorPage();
+            //app.UseMiddleware<RequestResponseLoggingMiddleware>();
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
+            app.UseMiddleware<ResponseRewindMiddleware>();
             // NOTE: For SPA swagger needs adding before MVC
             //app.UseCustomSwaggerApi();
 
