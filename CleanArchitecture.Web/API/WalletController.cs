@@ -208,10 +208,11 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 2018-10-16
         [HttpGet("{FromDate}/{ToDate}")]
+        [AllowAnonymous]
         public async Task<IActionResult> WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status)
         {
-            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
-             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+            ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            // ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             DepositHistoryResponse response = new DepositHistoryResponse();
             try
             {
@@ -751,12 +752,12 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 2018-10-29
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetIncomingTransaction()
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 35;
-           // ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+           // ApplicationUser user = new ApplicationUser(); user.Id = 35;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListIncomingTrnRes Response = new ListIncomingTrnRes();
             try
             {

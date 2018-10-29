@@ -13,5 +13,6 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
         public decimal Amount { get; set; }
         public string Address { get; set; }
         public string StatusStr { get; set; }
+        public long Confirmations { get; set; }
     }
 }

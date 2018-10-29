@@ -85,6 +85,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<UserPreferencesMaster> UserPreferencesMaster { get; set; }
         public DbSet<BeneficiaryMaster> BeneficiaryMaster { get; set; }
         public DbSet<WalletLimitConfigurationMaster> WalletLimitConfigurationMaster { get; set; }
+        public DbSet<WithdrawHistory> WithdrawHistory { get; set; }
         
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
@@ -182,6 +183,9 @@ namespace CleanArchitecture.Infrastructure
             // Add your customizations after calling base.OnModelCreating(builder);
             modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
             modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
+
+            modelBuilder.Entity<WithdrawHistory>().HasKey(e => new {  e.TrnID, e.Address }); // vsolanki 2018-10-29 composite primary key
+
             modelBuilder.Entity<DepositCounterMaster>().HasKey(e => new {e.WalletTypeID, e.SerProId}); // Rita 22-10-2018 composite primary key
             modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.TranNo }); // Uday 22-10-2018 composite primary key
             modelBuilder.Entity<DepositHistory>().HasKey(e => new { e.TrnID, e.Address }); // ntrivedi 23-10-2018 composite primary key
