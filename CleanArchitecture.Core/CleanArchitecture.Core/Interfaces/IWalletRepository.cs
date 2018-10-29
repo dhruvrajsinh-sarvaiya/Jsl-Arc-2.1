@@ -91,6 +91,7 @@ namespace CleanArchitecture.Core.Interfaces
         int AddBizUserTypeMapping(BizUserTypeMapping bizUser);
 
         //object GetTypeMappingObj(long userid);
-        
+        //vsolanki 2018-10-29
+        List<IncomingTrnRes> GetIncomingTransaction(long Userid);
     }
 }

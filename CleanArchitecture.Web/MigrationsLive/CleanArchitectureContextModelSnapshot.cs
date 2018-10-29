@@ -2451,6 +2451,33 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("TempUserRegister");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.UserChangeLog.UserLogChange", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("Newvalue");
+
+                    b.Property<string>("Oldvalue");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<long>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserLogChange");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.BeneficiaryMaster", b =>
                 {
                     b.Property<long>("Id")

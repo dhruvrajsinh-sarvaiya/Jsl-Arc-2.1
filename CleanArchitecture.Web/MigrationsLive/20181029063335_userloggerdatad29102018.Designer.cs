@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    [Migration("20181029054652_userloggerdatad29102018")]
+    [Migration("20181029063335_userloggerdatad29102018")]
     partial class userloggerdatad29102018
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2468,8 +2468,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("Oldvalue");
 
                     b.Property<short>("Status");
-
-                    b.Property<string>("Type");
 
                     b.Property<long?>("UpdatedBy");
 

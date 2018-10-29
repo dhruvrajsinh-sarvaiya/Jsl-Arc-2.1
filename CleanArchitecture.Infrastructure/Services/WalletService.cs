@@ -50,7 +50,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
-        //  private readonly ICommonRepository<HistoryObject> _DepositHistoryRepository;
+        private readonly ICommonRepository<DepositHistory> _DepositHistoryRepository;
         //readonly IBasePage _BaseObj;
         private static Random random = new Random((int)DateTime.Now.Ticks);
         //vsolanki 10-10-2018 
@@ -1125,13 +1125,14 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.AlredyExist, ErrorCode = enErrorCode.AlredyExist, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
-
+                
                 objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 0, "Inserted", trnType);
                 objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
                 TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
                 remarks = "Debit for TrnNo:" + objTQ.TrnNo;
                 WalletLedger walletLedger = GetWalletLedger(dWalletobj.Id, 0, amount, 0, trnType, serviceType, objTQ.TrnNo, remarks, dWalletobj.Balance, 1);
                 TransactionAccount tranxAccount = GetTransactionAccount(dWalletobj.Id, 1, batchObj.Id, amount, 0, objTQ.TrnNo, remarks, 1);
+                dWalletobj = _commonRepository.GetById(dWalletobj.Id);
                 dWalletobj.DebitBalance(amount);
                 objTQ.Status = enTransactionStatus.Hold;
                 objTQ.StatusMsg = "Hold";
@@ -2240,6 +2241,25 @@ namespace CleanArchitecture.Infrastructure.Services
                 ReturnMsg = EnResponseMessage.RecordAdded,
                 ReturnCode = enResponseCode.Success
             };
+        }
+
+        //vsolanki 2018-10-29
+        public ListIncomingTrnRes GetIncomingTransaction(long Userid)
+        {
+            ListIncomingTrnRes Response = new ListIncomingTrnRes();
+            Response.BizResponseObj = new BizResponseClass();
+            var depositHistories = _walletRepository1.GetIncomingTransaction(Userid);
+            if (depositHistories.Count() == 0)
+            {
+                Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                return Response;
+            }
+            Response.IncomingTransactions = depositHistories;
+            Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+            Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            return Response;
         }
     }
 
