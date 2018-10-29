@@ -518,7 +518,7 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Error.");
+                       // ModelState.AddModelError(string.Empty, "Error.");
                         return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                     }
                 }
@@ -642,14 +642,22 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-
                         _logger.LogWarning(2, "User Otp Data Not Send.");
                         return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OTPNotSendOnMobile, ErrorCode = enErrorCode.Status4090OTPSendOnMobile });
                     }
                 }
                 else
                 {
-                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginMobileNumberInvalid, ErrorCode = enErrorCode.Status4091LoginMobileNumberInvalid });
+
+                    ///////////////// Check TempUser  table in mobile number  Exist  and verification pending or not
+                    bool IsSignTempMobile = _tempUserRegisterService.GetMobileNumber(model.Mobile);
+                    if (!IsSignTempMobile)
+                    {
+                        return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpTempUserMobileExistAndVerificationPending, ErrorCode = enErrorCode.Status4036VerifyPending });
+                    }
+
+
+                    return BadRequest(new LoginWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithMobileOtpLoginFailed, ErrorCode = enErrorCode.Status4106LoginFailMobileNotAvailable });
                 }
             }
             catch (Exception ex)

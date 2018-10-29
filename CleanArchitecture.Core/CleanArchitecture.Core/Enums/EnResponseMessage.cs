@@ -227,6 +227,7 @@ namespace CleanArchitecture.Core.Enums
         public static string LoginWithEmailSuccessSend = " Successfull send otp on your email id.";
 
         public static string LoginWithOtpLoginFailed = "Login failed: User email id not available.";
+        public static string LoginWithMobileOtpLoginFailed = "Login failed: User mobile number not available.";
     }
 
 
