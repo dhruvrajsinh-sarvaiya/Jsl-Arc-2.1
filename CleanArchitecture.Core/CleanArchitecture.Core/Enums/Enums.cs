@@ -274,9 +274,9 @@ namespace CleanArchitecture.Core.Enums
         BeneficiaryNotFound = 4238,
         AddressNotMatch = 4239,
         GlobalBitNotFound = 4240,
-        WalletNotFound = 4241
-        NotFoundLimit=4234,
-        DuplicateRecord=4235,       
+        WalletNotFound = 4241,
+        //NotFoundLimit=4234,
+        //DuplicateRecord=4235,       
         InvalidAddress = 4236,
         OrgIDNotFound = 2427
     }
