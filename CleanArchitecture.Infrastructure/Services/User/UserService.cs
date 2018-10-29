@@ -22,7 +22,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<UserService> _log;
 
-        public UserService(CleanArchitectureContext dbContext, ILogger<UserService> log, UserManager<ApplicationUser> userManager)       
+        public UserService(CleanArchitectureContext dbContext, ILogger<UserService> log, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _log = log;
@@ -134,13 +134,25 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 long sTempChars;
                 Random rand = new Random();
                 int iOTPLength = 6;
-                for (int i = 0; i < iOTPLength; i++)
+                try
                 {
-                    int p = rand.Next(0, saAllowedCharacters.Length);
-                    sTempChars = Convert.ToInt64(saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)]);
-                    sOTP += sTempChars;
+                    for (int i = 0; i < iOTPLength; i++)
+                    {
+                        int p = rand.Next(0, saAllowedCharacters.Length);
+                        sTempChars = Convert.ToInt64(saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)]);
+                        sOTP += sTempChars;
+                    }
                 }
-                return Convert.ToInt64(sOTP);
+                catch (Exception ex)
+                {
+                    return GenerateRandomOTP();
+                    throw ex;
+                }
+                string firstcharacter = sOTP.Substring(0, 1);
+                if (sOTP.Length == 6 && firstcharacter != "0")
+                    return Convert.ToInt64(sOTP);
+                else
+                    return GenerateRandomOTP();
                 //Random generator = new Random();
                 //String sOTP = generator.Next(1, 999999).ToString("D6");
                 //return Convert.ToInt64(sOTP);
@@ -248,7 +260,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
             }
         }
 
-        public SocialCustomPasswordViewMoel GenerateRamdomSocialPassword(string ProvideKey)
+        public SocialCustomPasswordViewMoel GenerateRandomSocialPassword(string ProvideKey)
         {
             try
             {
