@@ -246,7 +246,7 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                var obj = _LimitcommonRepository.GetSingle(item => item.Id == WalletID && item.TrnType == Convert.ToInt16(TranType));
+                var obj = _LimitcommonRepository.GetSingle(item => item.WalletId == WalletID && item.TrnType == Convert.ToInt16(TranType));
                 if((PerDayAmt <= obj.LimitPerDay) && (PerHourAmt <= obj.LimitPerHour) && (PerTranAmt <= obj.LimitPerTransaction))
                 {
                     return enValidateWalletLimit.Success;
