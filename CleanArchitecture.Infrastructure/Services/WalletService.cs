@@ -136,31 +136,31 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //Rushabh 27-10-2018
-        public enCheckWithdrawalBene CheckWithdrawalBene(long WalletID,string Name ,string DestinationAddress,short WhitelistingBit)
+        public enErrorCode CheckWithdrawalBene(long WalletID,string Name ,string DestinationAddress,enWhiteListingBit bit)
         {
             try
             {
-                var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == 1);
+                var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID && item.Status == Convert.ToInt16(ServiceStatus.Active));
                 if(Walletobj != null)
                 {
                     var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == Walletobj.UserID);
                     if(UserPrefobj != null)
                     {
-                        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == 1);
-                        if (UserPrefobj.IsWhitelisting == 1)
+                        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                        if (UserPrefobj.IsWhitelisting == Convert.ToInt16(enWhiteListingBit.ON))
                         {
                             if (Beneobj != null)
                             {
-                                if (Beneobj.Address == DestinationAddress && Beneobj.IsWhiteListed == 1)
+                                if (Beneobj.Address == DestinationAddress && Beneobj.IsWhiteListed == Convert.ToInt16(enWhiteListingBit.ON))
                                 {
-                                    return enCheckWithdrawalBene.Success;
+                                    return enErrorCode.Success;
                                 }
                                 else
                                 {
-                                    return enCheckWithdrawalBene.AddressNotFoundOrWhitelistingBitIsOff;
+                                    return enErrorCode.AddressNotFoundOrWhitelistingBitIsOff;
                                 }
                             }
-                            return enCheckWithdrawalBene.BeneficiaryNotFound;
+                            return enErrorCode.BeneficiaryNotFound;
                         }
                         else
                         {
@@ -168,18 +168,18 @@ namespace CleanArchitecture.Infrastructure.Services
                             {
                                 if (Beneobj.Address == DestinationAddress)
                                 {
-                                    Beneobj.IsWhiteListed = WhitelistingBit;
+                                    Beneobj.IsWhiteListed = Convert.ToInt16(bit);
                                     Beneobj.UpdatedBy = Walletobj.UserID;
                                     Beneobj.UpdatedDate = UTC_To_IST();
                                     _BeneficiarycommonRepository.Update(Beneobj);
-                                    return enCheckWithdrawalBene.Success;
+                                    return enErrorCode.Success;
                                 }
-                                return enCheckWithdrawalBene.AddressNotMatch;
+                                return enErrorCode.AddressNotMatch;
                             }
                             else
                             {
                                 BeneficiaryMaster AddNew = new BeneficiaryMaster();
-                                AddNew.IsWhiteListed = 0;
+                                AddNew.IsWhiteListed = Convert.ToInt16(enWhiteListingBit.OFF);
                                 AddNew.Status = 1;
                                 AddNew.CreatedBy = Walletobj.UserID;
                                 AddNew.CreatedDate = UTC_To_IST();
@@ -188,13 +188,13 @@ namespace CleanArchitecture.Infrastructure.Services
                                 AddNew.Name = Name;
                                 AddNew.WalletTypeID = Walletobj.WalletTypeID;
                                 AddNew = _BeneficiarycommonRepository.Add(AddNew);
-                                return enCheckWithdrawalBene.Success;
+                                return enErrorCode.Success;
                             }
                         }
                     }
-                    return enCheckWithdrawalBene.GlobalBitNotFound;
+                    return enErrorCode.GlobalBitNotFound;
                 }
-                return enCheckWithdrawalBene.WalletNotFound;               
+                return enErrorCode.WalletNotFound;               
             }
             catch (Exception ex)
             {
@@ -1116,7 +1116,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
-                int count = CheckTrnRefNo(TrnRefNo, orderType);
+                int count = CheckTrnRefNo(TrnRefNo, orderType, trnType);
                 if (count != 0)
                 {
                     // insert with status=2 system failed
@@ -1148,9 +1148,9 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
 
-        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType)
+        public int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType, enWalletTrnType wType)
         {
-            var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType);
+            var count = _walletRepository1.CheckTrnRefNo(TrnRefNo, TrnType, wType);
             return count;
         }
 
@@ -1873,7 +1873,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
                     return Response;
                 }
-                var BeneficiaryMasterRes = _walletRepository1.GetAllWhitelistedBeneficiaries(walletMasters.WalletTypeID);
+                var BeneficiaryMasterRes = _walletRepository1.GetAllWhitelistedBeneficiaries(walletMasters.WalletTypeID,walletMasters.UserID);
                 if (BeneficiaryMasterRes.Count == 0)
                 {
                     Response.BizResponse.ReturnCode = enResponseCode.Fail;
@@ -2263,6 +2263,63 @@ namespace CleanArchitecture.Infrastructure.Services
             Response.BizResponseObj.ReturnCode = enResponseCode.Success;
             Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
             return Response;
+        }
+
+        public WalletLedger GetWalletLedgerObj(long WalletID, long toWalletID, decimal drAmount, decimal crAmount, enWalletTrnType trnType, enServiceType serviceType, long trnNo, string remarks, decimal currentBalance, byte status)
+        {
+            try
+            {
+                var walletLedger2 = new WalletLedger();
+                walletLedger2.ServiceTypeID = serviceType;
+                walletLedger2.TrnType = trnType;
+                walletLedger2.CrAmt = crAmount;
+                walletLedger2.CreatedBy = WalletID;
+                walletLedger2.CreatedDate = UTC_To_IST();
+                walletLedger2.DrAmt = drAmount;
+                walletLedger2.TrnNo = trnNo;
+                walletLedger2.Remarks = remarks;
+                walletLedger2.Status = status;
+                walletLedger2.TrnDate = UTC_To_IST();
+                walletLedger2.UpdatedBy = WalletID;
+                walletLedger2.WalletId = WalletID;
+                walletLedger2.ToWalletId = toWalletID;
+                if (drAmount > 0)
+                {
+                    walletLedger2.PreBal = currentBalance;
+                    walletLedger2.PostBal = currentBalance - drAmount;
+                }
+                else
+                {
+                    walletLedger2.PreBal = currentBalance;
+                    walletLedger2.PostBal = currentBalance + drAmount;
+                }
+                return walletLedger2;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public long GetWalletByAddress(string address)
+        {
+            try
+            {
+                var addressObj = _addressMstRepository.FindBy(e => e.Address == address).FirstOrDefault();
+                if (addressObj == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return addressObj.WalletId;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
 
