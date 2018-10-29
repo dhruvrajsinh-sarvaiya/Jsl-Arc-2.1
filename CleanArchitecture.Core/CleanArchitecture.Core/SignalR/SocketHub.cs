@@ -1,17 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
 using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.ApiModels.Chat;
-using Microsoft.Extensions.Options;
-using CleanArchitecture.Core.ViewModels.Transaction;
-using CleanArchitecture.Core.Helpers;
-using CleanArchitecture.Core.ApiModels;
-using CleanArchitecture.Core.ViewModels.Wallet;
-using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
-using CleanArchitecture.Core.Enums;
 using System.Linq;
 
 namespace CleanArchitecture.Core.SignalR
@@ -26,21 +18,16 @@ namespace CleanArchitecture.Core.SignalR
             _chatHubContext = ChatHubContext;
         }
 
-        //For Testing Connection
+        #region "For Testing Connection"
         public Task SendToAll(string name, string message)
         {
             _chatHubContext.Clients.All.SendAsync("sendToAll", name, message);
             return Task.FromResult(0);
         }
+        #endregion
 
-        //For Testing only
-        public Task SattledOrderUpdate(string Data)
-        {
-            _chatHubContext.Clients.Group("BroadCast").SendAsync("BroadcastMessage", Data);
-            return Task.FromResult(0);
-        }
+        #region "For Connection Management By default from Hub Class"
 
-        // Add for Subscription Channel
         public override Task OnConnectedAsync()
         {
             string Pair = "LTC_BTC";
@@ -90,14 +77,25 @@ namespace CleanArchitecture.Core.SignalR
             return Task.FromResult(0);
         }
 
+        public Task OnTokenChange(string NewToken,string OldToken)
+        {
+            var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+            Redis.DeleteTag("Users:" + Context.ConnectionId, OldToken);
+            Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = NewToken }, NewToken);
+            return Task.FromResult(0);
+        }
+
         public override Task OnDisconnectedAsync(System.Exception exception)
         {
             //var Redis = new RadisServices<ConnetedClientList>(this._fact);
             //Redis.Scan(Context.ConnectionId, ":ConnectionDetail");
             
-            var Redis = new RadisServices<ConnetedClientList>(this._fact);            
+            var Redis = new RadisServices<ConnetedClientToken>(this._fact);            
             string Pair = Redis.GetPair(Context.ConnectionId,":");
             //GetConnectedClient(Pair);
+            ConnetedClientToken Client = new ConnetedClientToken();
+            Client = Redis.GetData("Users:" + Context.ConnectionId);
+            Redis.DeleteTag("Users:" + Context.ConnectionId, Client.Token);
             Redis.DeleteHash("Users:"+Context.ConnectionId);
             Redis.RemoveSetMember("Pairs:" + Pair, Context.ConnectionId);
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "BuyerBook:" + Pair).Wait();
@@ -117,6 +115,10 @@ namespace CleanArchitecture.Core.SignalR
             return ConnectedClient;
         }
 
+        #endregion
+
+        #region "Subscription Managemnet"
+
         // Remove From Subscription Channel
         public Task RemoveSubscription(string Pair)
         {
@@ -126,9 +128,8 @@ namespace CleanArchitecture.Core.SignalR
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "MarketData:" + Pair).Wait();
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "ChartData:" + Pair).Wait();
             return Task.FromResult(0);
-        }      
-
-
+        }
+        
         // Add to Subscription Channel
         public Task AddSubscription(string Pair)
         {
@@ -142,24 +143,18 @@ namespace CleanArchitecture.Core.SignalR
             return Task.FromResult(0);
         }
 
+        #endregion
+
+        #region "Chat Module"
+
         // One to one Message Chat
         public Task SendChatMessage(string UserID, string Message)
         {
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             ConnetedClientList User = new ConnetedClientList();
-            User = Redis.GetConnectionID(UserID + ":ConnectionDetail");
+            User = Redis.GetData(UserID + ":ConnectionDetail");
             _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveMessage", User + ": " + Message);
             //_chatHubContext.Clients.Group("BroadCast").SendAsync("BroadcastMessage", User + ": " + message);
-            return Task.FromResult(0);
-        }
-
-        public Task PendingOrderUpdate(string UserID, string Data)
-        {
-            var Redis = new RadisServices<ConnetedClientList>(this._fact);
-            ConnetedClientList User = new ConnetedClientList();
-            User = Redis.GetConnectionID(UserID + ":ConnectionDetail");
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecievePendingOrderUpdate", Data);
-            //_chatHubContext.Clients.Group("BroadCast").SendAsync("BroadcastMessage", Data);
             return Task.FromResult(0);
         }     
 
@@ -181,6 +176,10 @@ namespace CleanArchitecture.Core.SignalR
             return Task.FromResult(0);
         }
 
+        #endregion
+
+        #region "Global Updates For Time , News , Announce"
+
         //public void getTime(string countryZone)
         public Task GetTime()
         {
@@ -188,7 +187,16 @@ namespace CleanArchitecture.Core.SignalR
             return Task.FromResult(0);
         }
 
-        //User Specific Updates
+        public Task BroadCastData(string Data)
+        {
+            _chatHubContext.Clients.Group("BroadCast").SendAsync("BroadcastMessage", Data);
+            return Task.FromResult(0);
+        }
+
+#endregion
+
+        #region "User Specific Updates"
+
         public Task OpenOrder(string Token, string Order)
         {
             //var Redis = new RadisServices<ConnetedClientList>(this._fact);
@@ -280,7 +288,10 @@ namespace CleanArchitecture.Core.SignalR
             return Task.FromResult(0);
         }
 
-        // Global Updates
+        #endregion
+
+        #region "Pair Wise Global Updates"
+
         public Task BuyerBook(string Pair, string Data)
         {
             //_chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Helpers.Helpers.JsonSerialize(Data));
@@ -320,22 +331,19 @@ namespace CleanArchitecture.Core.SignalR
             return Task.FromResult(0);
         }
 
+        #endregion
+
+
         //public void BlockedUser(string UserID)
         //{
         //    // Add to blocklist
         //    var Redis2 = new RadisServices<BlockUserDetail>(this._fact);
-        //    Redis2.SaveToHash(UserID + ":BlockDetail", new BlockUserDetail { IsBlock = true }, Context.ConnectionId);
-
+        //    Redis2.SaveToHash(UserID + ":BlockDetail", new BlockUserDetail { IsBlock = true }, Context.ConnectionId)
         //    // Call the broadcastMessage method to update _chatHubContext.Clients.
         //    //_chatHubContext.Clients.Group("GroupMessage").SendAsync("ReciveGroupMessage", name, message);
         //    //var redis = new RadisServices<ChatHistory>(this._fact);
         //    //red-is.SaveToSet("GroupChatHistory", new ChatHistory { Name = name, Message = message, Id = Guid.NewGuid() }, name);
         //    //redis.GetSetData("GroupChatHistory");
-        //}
-
-        //public void TransactionHistory(string Data)
-        //{
-        //    _chatHubContext.Clients.Group("BroadCast").SendAsync("BroadcastMessage", Data);
         //}
     }
 }
