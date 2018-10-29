@@ -137,7 +137,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
         }
 
 
-        public void UpdateIpAddress(IpMasterViewModel model)
+        public async Task<long> UpdateIpAddress(IpMasterViewModel model)
         {
             var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (IpAddress != null)
@@ -153,10 +153,16 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                     UpdatedBy = IpAddress.UserId
                 };
 
+
                 _ipMasterRepository.Update(currentIpAddress);
+                return currentIpAddress.Id;
                 //_dbContext.SaveChanges();
 
             }
+            else
+                return 0;
+
+
         }
 
         public async Task<long> DesableIpAddress(IpMasterViewModel model)

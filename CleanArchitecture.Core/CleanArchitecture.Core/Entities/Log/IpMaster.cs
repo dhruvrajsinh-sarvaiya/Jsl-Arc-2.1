@@ -14,8 +14,11 @@ namespace CleanArchitecture.Core.Entities.Log
         [Required]
         [StringLength(15)]
         public string IpAddress { get; set; }
+        [StringLength(150)]
+        public string IpAliasName { get; set; }
         public bool IsEnable { get; set; }
         public bool IsDeleted { get; set; }
+       
 
         public void SetAsIsEnabletatus()
         {

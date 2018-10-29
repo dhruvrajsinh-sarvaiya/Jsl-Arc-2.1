@@ -142,6 +142,7 @@ namespace CleanArchitecture.Core.Enums
         public static string Unableupdateuserinfo = "Unable to update user info";
 
         public static string SuccessAddIpData = "Success full add Ip Address.";
+        public static string SuccessupdateIpData = "Success full Update Ip Address data.";
         public static string IpAddressInsertError = "Ip address not inserted.";
         public static string Verificationpending = "User register verification pending.";
 
@@ -227,6 +228,7 @@ namespace CleanArchitecture.Core.Enums
         public static string LoginWithEmailSuccessSend = " Successfull send otp on your email id.";
 
         public static string LoginWithOtpLoginFailed = "Login failed: User email id not available.";
+        public static string LoginWithMobileOtpLoginFailed = "Login failed: User mobile number not available.";
     }
 
 
