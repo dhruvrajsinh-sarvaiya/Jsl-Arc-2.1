@@ -882,6 +882,9 @@ namespace CleanArchitecture.Web.Migrations
                         .IsRequired()
                         .HasMaxLength(15);
 
+                    b.Property<string>("IpAliasName")
+                        .HasMaxLength(150);
+
                     b.Property<bool>("IsDeleted");
 
                     b.Property<bool>("IsEnable");
@@ -1472,6 +1475,31 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("TradeTransactionQueue");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.FavouritePair", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<long>("PairId");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<long>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FavouritePair");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.PoolOrder", b =>
                 {
                     b.Property<long>("Id")
@@ -1564,9 +1592,11 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.TradeBuyRequest", b =>
                 {
-                    b.Property<long>("TrnNo")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("TrnNo");
 
                     b.Property<decimal>("BidPrice")
                         .HasColumnType("decimal(18, 8)");
@@ -1579,8 +1609,6 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal>("DeliveredQty")
                         .HasColumnType("decimal(18, 8)");
-
-                    b.Property<long>("Id");
 
                     b.Property<short>("IsCancel");
 
@@ -1617,7 +1645,9 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime?>("UpdatedDate");
 
-                    b.HasKey("TrnNo");
+                    b.HasKey("Id", "TrnNo");
+
+                    b.HasAlternateKey("TrnNo");
 
                     b.ToTable("TradeBuyRequest");
                 });
@@ -2933,6 +2963,90 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("TrnNo");
 
                     b.ToTable("WalletTransactionQueues");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.WithdrawHistory", b =>
+                {
+                    b.Property<string>("TrnID");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("APITopUpRefNo")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<decimal>("Charge");
+
+                    b.Property<long>("Confirmations");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<short>("IsProcessing");
+
+                    b.Property<string>("RouteTag")
+                        .IsRequired();
+
+                    b.Property<string>("SMSCode")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<long>("SerProID");
+
+                    b.Property<short>("State");
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("SystemRemarks")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<string>("ToAddress")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<DateTime>("TrnDate");
+
+                    b.Property<long>("TrnNo");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<long>("UserId");
+
+                    b.Property<decimal>("Value");
+
+                    b.Property<string>("Wallet")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("confirmedTime")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("createdTime")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("unconfirmedTime")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.HasKey("TrnID", "Address");
+
+                    b.HasAlternateKey("Address", "TrnID");
+
+                    b.ToTable("WithdrawHistory");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.WalletLedger", b =>
