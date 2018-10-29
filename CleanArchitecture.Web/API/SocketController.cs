@@ -46,7 +46,7 @@ namespace CleanArchitecture.Web.API
 
                 var temp = JsonConvert.SerializeObject(model);
                 SignalRData modelData = new SignalRData();
-                modelData.Type =enSignalREventType.Channel;
+                modelData.EventType =enSignalREventType.Channel;
                 modelData.Method = enMethodName.BuyerBook;
                 modelData.ReturnMethod = enReturnMethod.RecieveBuyerBook;
                 modelData.Subscription = enSubscriptionType.OneToOne;
@@ -77,7 +77,7 @@ namespace CleanArchitecture.Web.API
 
                 var temp = JsonConvert.SerializeObject(model);
                 SignalRData modelData = new SignalRData();
-                modelData.Type = enSignalREventType.Channel;
+                modelData.EventType = enSignalREventType.Channel;
                 modelData.Method = enMethodName.SellerBook;
                 modelData.ReturnMethod = enReturnMethod.RecieveSellerBook;
                 modelData.Subscription = enSubscriptionType.OneToOne;
@@ -115,7 +115,7 @@ namespace CleanArchitecture.Web.API
                 model.Type = "SELL";
                 var temp = JsonConvert.SerializeObject(model);
                 SignalRData modelData = new SignalRData();
-                modelData.Type = enSignalREventType.Channel;
+                modelData.EventType = enSignalREventType.Channel;
                 modelData.Method = enMethodName.TradeHistoryByPair;
                 modelData.ReturnMethod = enReturnMethod.RecieveTradingHistory;
                 modelData.Subscription = enSubscriptionType.OneToOne;
@@ -151,7 +151,7 @@ namespace CleanArchitecture.Web.API
 
                 var temp= JsonConvert.SerializeObject(model);
                 SignalRData modelData = new SignalRData();
-                modelData.Type = enSignalREventType.Channel;
+                modelData.EventType = enSignalREventType.Channel;
                 modelData.Method = enMethodName.ChartData;
                 modelData.ReturnMethod = enReturnMethod.RecieveChartData;
                 modelData.Subscription = enSubscriptionType.OneToOne;
@@ -186,11 +186,11 @@ namespace CleanArchitecture.Web.API
                 model.Volume24 = 253;
 
                 SignalRData modelData = new SignalRData();
-                modelData.Type = enSignalREventType.Channel;
+                modelData.EventType = enSignalREventType.Channel;
                 modelData.Method = enMethodName.MarketData;
                 modelData.ReturnMethod = enReturnMethod.RecieveMarketData;
                 modelData.Subscription = enSubscriptionType.OneToOne;
-                modelData.Data = JsonConvert.SerializeObject(model);
+                modelData.Data = Data;// JsonConvert.SerializeObject(model);
                 modelData.ParamType = enSignalRParmType.PairName;
                 modelData.Parameter = "LTC_BTC";
                 await _mediator.Send(modelData);
@@ -218,7 +218,7 @@ namespace CleanArchitecture.Web.API
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
                 var temp = JsonConvert.SerializeObject(model);
                 SignalRData modelData = new SignalRData();
-                modelData.Type = enSignalREventType.Channel;
+                modelData.EventType = enSignalREventType.Channel;
                 modelData.Method = enMethodName.OpenOrder;
                 modelData.ReturnMethod = enReturnMethod.RecieveOpenOrder;
                 modelData.Subscription = enSubscriptionType.OneToOne;
@@ -236,6 +236,7 @@ namespace CleanArchitecture.Web.API
                 return Ok();
             }
         }
+
         [HttpGet("OrderHistory/{Data}")]
         [Authorize]
         public async Task<IActionResult> OrderHistory(string Data)
@@ -249,7 +250,7 @@ namespace CleanArchitecture.Web.API
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
                 var temp = JsonConvert.SerializeObject(model);
                 SignalRData modelData = new SignalRData();
-                modelData.Type = enSignalREventType.Channel;
+                modelData.EventType = enSignalREventType.Channel;
                 modelData.Method = enMethodName.OrderHistory;
                 modelData.ReturnMethod = enReturnMethod.RecieveOrderHistory;
                 modelData.Subscription = enSubscriptionType.OneToOne;
@@ -281,7 +282,7 @@ namespace CleanArchitecture.Web.API
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
                 var temp = JsonConvert.SerializeObject(model);
                 SignalRData modelData = new SignalRData();
-                modelData.Type = enSignalREventType.Channel;
+                modelData.EventType = enSignalREventType.Channel;
                 modelData.Method = enMethodName.TradeHistory;
                 modelData.ReturnMethod = enReturnMethod.RecieveTradeHistory;
                 modelData.Subscription = enSubscriptionType.OneToOne;
