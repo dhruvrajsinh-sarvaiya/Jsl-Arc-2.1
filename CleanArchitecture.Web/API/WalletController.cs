@@ -538,10 +538,11 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 2018-10-24
         //[AllowAnonymous]
+       // [AllowAnonymous]
         [HttpGet("{WalletId}")]
         public async Task<IActionResult> GetAllBalances(string WalletId)
         {
-           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
+            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             AllBalanceResponse Response = new AllBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
@@ -688,11 +689,11 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        //[AllowAnonymous]
+       // [AllowAnonymous]
         [HttpPost("{WalletType}")]
         public async Task<IActionResult> CreateWalletForAllUser_NewService(string WalletType)
         {
-            //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
             ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             BizResponseClass Response = new BizResponseClass();
             try
