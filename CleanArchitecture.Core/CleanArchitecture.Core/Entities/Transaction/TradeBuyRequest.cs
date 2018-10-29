@@ -10,6 +10,7 @@ namespace CleanArchitecture.Core.Entities.Transaction
 {
     public class TradeBuyRequest : BizBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new long Id { get; set; }
 
         [DataType(DataType.DateTime)]
