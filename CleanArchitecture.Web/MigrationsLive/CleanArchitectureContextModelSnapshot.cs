@@ -2467,6 +2467,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("Status");
 
+                    b.Property<string>("Type");
+
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime>("UpdatedDate");
@@ -2985,7 +2987,6 @@ namespace CleanArchitecture.Web.Migrations
             modelBuilder.Entity("CleanArchitecture.Core.Entities.WalletMaster", b =>
                 {
                     b.Property<string>("AccWalletID")
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(16);
 
                     b.Property<decimal>("Balance")
