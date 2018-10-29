@@ -41,6 +41,8 @@ namespace CleanArchitecture.Web.API
         private readonly RedisSessionStorage _redisSessionStora;
         private readonly IOtpMasterService _otpMasterService;
         private readonly ICustomPassword _customPassword;
+        private readonly IUserService _userService;
+
 
         public AuthorizationController(IOptions<IdentityOptions> identityOptions,
             SignInManager<ApplicationUser> signInManager,
@@ -48,9 +50,8 @@ namespace CleanArchitecture.Web.API
             ILoggerFactory loggerFactory,
             IUserSessionService userSessionService, RedisSessionStorage redisSessionStora,
             RedisConnectionFactory factory,
-            //IRedisConnectionFactory factory,
-            IUserService userService,
-            IOtpMasterService otpMasterService, ICustomPassword customPassword)
+            //IRedisConnectionFactory factory,           
+            IOtpMasterService otpMasterService, ICustomPassword customPassword, IUserService userService)
         {
             _identityOptions = identityOptions;
             _signInManager = signInManager;
@@ -61,6 +62,7 @@ namespace CleanArchitecture.Web.API
             _fact = factory;
             _otpMasterService = otpMasterService;
             _customPassword = customPassword;
+            _userService= userService;
         }
 
         [AllowAnonymous]
@@ -76,15 +78,28 @@ namespace CleanArchitecture.Web.API
             string RedisDBKey = string.Empty;
             if (!string.IsNullOrEmpty(appkey) && !string.IsNullOrEmpty(request.Password)) /// added by nirav savariya for login with email and mobile on 16-10-2018
             {
-                var userdata = await _userManager.FindByNameAsync(request.Username);
+                var userdata =await _userService.FindUserDataByUserNameEmailMobile(request.Username);
+                if(userdata == null)
+                    return BadRequest(new Customtokenresponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TokenCreationUserDataNotAvailable, ErrorCode = enErrorCode.Status4103UserDataNotAvailable });
+
+                //var userdata = await _userManager.FindByNameAsync(request.Username);
                 var model = await _customPassword.IsValidPassword(appkey, request.Password);
                 if (model != null)
                 {
-                    request.Password = model.Password;
-                    var newPassword = _userManager.PasswordHasher.HashPassword(userdata, model.Password);
-                    userdata.PasswordHash = newPassword;
-                    var res = await _userManager.UpdateAsync(userdata);
-                    _customPassword.UpdateOtp(model.Id);
+                    try
+                    {
+                        userdata.Id = userdata.Id;
+                        request.Username = userdata.UserName;
+                        request.Password = model.Password;
+                        var newPassword = _userManager.PasswordHasher.HashPassword(userdata, model.Password);
+                        userdata.PasswordHash = newPassword;
+                        var res = await _userManager.UpdateAsync(userdata);
+                        _customPassword.UpdateOtp(model.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        string exs = ex.ToString();
+                    }
                 }
                 else
                 {

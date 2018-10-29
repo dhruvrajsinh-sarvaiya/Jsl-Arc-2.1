@@ -19,12 +19,14 @@ namespace CleanArchitecture.Infrastructure.Services.User
     public class UserService : IUserService
     {
         private readonly CleanArchitectureContext _dbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<UserService> _log;
 
-        public UserService(CleanArchitectureContext dbContext, ILogger<UserService> log)
+        public UserService(CleanArchitectureContext dbContext, ILogger<UserService> log, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _log = log;
+            _userManager = userManager;
         }
 
         public bool GetMobileNumber(string MobileNumber)
@@ -109,6 +111,45 @@ namespace CleanArchitecture.Infrastructure.Services.User
                 throw ex;
             }
         }
+
+
+        /// <summary>
+        /// Get User Data
+        /// </summary>
+        /// <param name="MobileNumber"></param>
+        /// <returns></returns>
+
+        public async Task<ApplicationUser> FindUserDataByUserNameEmailMobile(string UserName)
+        {
+            string numeric = string.Empty;
+            foreach (char str in UserName)
+            {
+                if (char.IsDigit(str))
+                {
+                    if (numeric.Length < 10)
+                        numeric += str.ToString();
+                }
+            }
+            if (numeric.Length == 10)
+            {
+                var userdata = _dbContext.Users.Where(i => i.Mobile == UserName).FirstOrDefault();
+                if (userdata != null)
+                {
+                    return userdata;
+
+                }
+            }
+            else
+            {
+                var userdata = await _userManager.FindByEmailAsync(UserName);                
+                if (userdata != null)
+                {
+                    return userdata;
+                }
+            }
+                return null;
+        }
+
 
         /// <summary>
         /// added by nirav savariya for random generate otp with password on 10/15/2018

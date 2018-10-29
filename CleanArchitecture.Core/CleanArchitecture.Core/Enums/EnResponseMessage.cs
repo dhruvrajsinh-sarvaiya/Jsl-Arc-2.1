@@ -107,7 +107,7 @@ namespace CleanArchitecture.Core.Enums
         public static string StandardLoginLockOut = "User account locked out for two hours.";
         public static string StandardLoginfailed = "Login failed : Invalid username or password.";
         public static string LoginWithOtpSuccessSend = "You have send OTP on email.";
-        public static string LoginWithEmailSuccessSend = " User Login with Email Send Success.";
+       // public static string LoginWithEmailSuccessSend = " User Login with Email Send Success.";
         public static string LoginWithOtpLoginFailed = "Login failed: Invalid email.";
         public static string LoginWithOtpInvalidAttempt = "Invalid login attempt.";
         public static string LoginWithOtpDatanotSend = "User Otp Data Not Send.";
@@ -213,5 +213,8 @@ namespace CleanArchitecture.Core.Enums
 
         public static string SignUpTempUserMobileExist = "This mobile number already exist input other mobile number.";
         public static string SignUpTempUserMobileExistAndVerificationPending = "This mobile number already exist and verify pending.";
+
+        public static string TokenCreationUserDataNotAvailable = "User data not avaialable.";
+        public static string LoginWithEmailSuccessSend = " Successfull send otp on your email id.";
     }
 }
