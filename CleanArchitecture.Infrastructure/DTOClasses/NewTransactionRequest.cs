@@ -62,7 +62,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public enServiceType ServiceType { get; set; }
         public enWalletTrnType WalletTrnType { get; set; }
 
-        public short WhitelistingBit { get; set; }
+        public enWhiteListingBit WhitelistingBit { get; set; }
 
         public string AddressLabel { get; set; }
 

@@ -150,7 +150,6 @@ namespace CleanArchitecture.Core.Enums
         CreateTrnInvalidAmount = 4575,
         CreateTrnDuplicateTrn = 4576,
         CreateTrn_NoSelfAddressWithdrawAllow = 4577,
-        CreateTrn_WithdrawWhiteListingFail = 4599,
         InvalidPairName = 4500,
         NoDataFound = 4501,
         InvalidStatusType = 4502,
