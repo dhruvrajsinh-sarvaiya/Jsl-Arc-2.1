@@ -40,6 +40,8 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public long BeneficiaryID { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string CoinName { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Address { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }

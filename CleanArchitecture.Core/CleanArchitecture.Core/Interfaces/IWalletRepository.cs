@@ -89,5 +89,8 @@ namespace CleanArchitecture.Core.Interfaces
 
         //vsolanki 2018-10-29
         int AddBizUserTypeMapping(BizUserTypeMapping bizUser);
+
+        //object GetTypeMappingObj(long userid);
+        
     }
 }

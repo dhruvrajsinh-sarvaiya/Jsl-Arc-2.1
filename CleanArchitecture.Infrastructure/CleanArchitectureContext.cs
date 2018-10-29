@@ -21,6 +21,7 @@ using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Wallet;
 using System.ComponentModel.DataAnnotations.Schema;
 using CleanArchitecture.Core.Entities.Communication;
+using CleanArchitecture.Core.Entities.UserChangeLog;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -45,7 +46,7 @@ namespace CleanArchitecture.Infrastructure
         // add by nirav savariya for create password for login with mobile and email
         public virtual DbSet<CustomPassword> CustomPassword { get; set; }
         public virtual DbSet<DeviceMaster> DeviceMaster { get; set; }
-
+        public virtual DbSet<UserLogChange> UserLogChange { get; set; }
         public DbSet<ToDoItem> ToDoItems { get; set; }
         public DbSet<MessagingQueue> MessagingQueue { get; set; }
         public DbSet<EmailQueue> EmailQueue { get; set; }

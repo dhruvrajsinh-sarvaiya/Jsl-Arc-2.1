@@ -209,19 +209,35 @@ namespace CleanArchitecture.Core.SignalR
 
         public Task OrderHistory(string Token, string Order)
         {
-            var Redis = new RadisServices<ConnetedClientList>(this._fact);
-            ConnetedClientList User = new ConnetedClientList();
-            User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOrderHistory", Order);
+            //var Redis = new RadisServices<ConnetedClientList>(this._fact);
+            //ConnetedClientList User = new ConnetedClientList();
+            //User = Redis.GetConnectionID(Token);
+            //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveOrderHistory", Order);
+            var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+            IEnumerable<string> str = Redis.GetKey(Token);
+            foreach (string s in str.ToList())
+            {
+                var key = s;
+                key = key.Split(":")[1].ToString();
+                _chatHubContext.Clients.Client(key).SendAsync("RecieveOrderHistory", Order);
+            }
             return Task.FromResult(0);
         }
 
         public Task TradeHistoryByUser(string Token, string Order)
         {
-            var Redis = new RadisServices<ConnetedClientList>(this._fact);
-            ConnetedClientList User = new ConnetedClientList();
-            User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveTradeHistory", Order);
+            //var Redis = new RadisServices<ConnetedClientList>(this._fact);
+            //ConnetedClientList User = new ConnetedClientList();
+            //User = Redis.GetConnectionID(Token);
+            //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveTradeHistory", Order);
+            var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+            IEnumerable<string> str = Redis.GetKey(Token);
+            foreach (string s in str.ToList())
+            {
+                var key = s;
+                key = key.Split(":")[1].ToString();
+                _chatHubContext.Clients.Client(key).SendAsync("RecieveTradeHistory", Order);
+            }
             return Task.FromResult(0);
         }
         
@@ -229,20 +245,38 @@ namespace CleanArchitecture.Core.SignalR
         {
             //var Name= Context.User.Identity.Name;
             //_chatHubContext.Clients.Group("BuyerSideWalletBal:" + Pair).SendAsync("RecieveBuyerSideWalletBal", Data);
-            var Redis = new RadisServices<ConnetedClientList>(this._fact);
-            ConnetedClientList User = new ConnetedClientList();
-            User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveBuyerSideWalletBal", Data);
+            //++++++++++++++++++++++//
+            //var Redis = new RadisServices<ConnetedClientList>(this._fact);
+            //ConnetedClientList User = new ConnetedClientList();
+            //User = Redis.GetConnectionID(Token);
+            //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveBuyerSideWalletBal", Data);
+            var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+            IEnumerable<string> str = Redis.GetKey(Token);
+            foreach (string s in str.ToList())
+            {
+                var key = s;
+                key = key.Split(":")[1].ToString();
+                _chatHubContext.Clients.Client(key).SendAsync("RecieveBuyerSideWalletBal", Data);
+            }
             return Task.FromResult(0);
         }
 
         public Task SellerSideWalletBal(string Token, string Data)
         {
             //_chatHubContext.Clients.Group("SellerSideWalletBal:" + Pair).SendAsync("RecieveSellerSideWalletBal", Data);
-            var Redis = new RadisServices<ConnetedClientList>(this._fact);
-            ConnetedClientList User = new ConnetedClientList();
-            User = Redis.GetConnectionID(Token);
-            _chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveSellerSideWalletBal", Data);
+            //++++++++++++++++++++++//
+            //var Redis = new RadisServices<ConnetedClientList>(this._fact);
+            //ConnetedClientList User = new ConnetedClientList();
+            //User = Redis.GetConnectionID(Token);
+            //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveSellerSideWalletBal", Data);
+            var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+            IEnumerable<string> str = Redis.GetKey(Token);
+            foreach (string s in str.ToList())
+            {
+                var key = s;
+                key = key.Split(":")[1].ToString();
+                _chatHubContext.Clients.Client(key).SendAsync("RecieveSellerSideWalletBal", Data);
+            }
             return Task.FromResult(0);
         }
 

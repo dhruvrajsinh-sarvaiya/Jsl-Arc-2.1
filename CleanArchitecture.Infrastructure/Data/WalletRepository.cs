@@ -831,7 +831,7 @@ namespace CleanArchitecture.Infrastructure.Data
         public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1
+                                                where b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,
@@ -846,12 +846,15 @@ namespace CleanArchitecture.Infrastructure.Data
         public List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.UserID == UserID
+                                                join w in _dbContext.WalletTypeMasters
+                                                on b.WalletTypeID equals w.Id
+                                                where b.UserID == UserID && b.Status != 9
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,
                                                     BeneficiaryID = b.Id,
                                                     Address = b.Address,
+                                                    CoinName = w.WalletTypeName,
                                                     IsWhiteListed = b.IsWhiteListed,
                                                     Status = b.Status
 
@@ -870,6 +873,12 @@ namespace CleanArchitecture.Infrastructure.Data
                 if (arrayObj.Count != 0)
                 {
                     arrayObj.ForEach(e => e.p.IsWhiteListed = e.q.WhitelistingBit);
+                    arrayObj.ForEach(e => {
+                        if (e.q.WhitelistingBit == 9)
+                        {
+                            e.p.Status = e.q.WhitelistingBit;
+                        }
+                    } );
                     arrayObj.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
                     _dbContext.SaveChanges();
                     _dbContext.Database.CommitTransaction();
@@ -1223,3 +1232,16 @@ namespace CleanArchitecture.Infrastructure.Data
         }
     }
 }
+        //public object GetTypeMappingObj(long userid)
+        //{
+        //    var items = (from b in _dbContext.BizUserTypeMapping
+        //               where b.UserID == userid
+        //               select new BizUserTypeMapping
+        //               {
+        //                   I
+
+        //               }).AsEnumerable().ToList();
+        //    return items;
+        //}
+//    }
+//}
