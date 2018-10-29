@@ -7,39 +7,19 @@ using System.Text;
 using System.Linq;
 
 namespace CleanArchitecture.Core.Services.RadisDatabase
-{
-   
+{   
    public class RadisServices<T>  :BaseService<T>, IRedisService<T>
     {
         internal readonly IDatabase Db;
-        //protected readonly IRedisConnectionFactory ConnectionFactory;
-        //public RadisServices(IRedisConnectionFactory connectionFactory)
-        //{
-        //    this.ConnectionFactory = connectionFactory;
-        //    this.Db = this.ConnectionFactory.Connection().GetDatabase();
-        //}
         protected readonly RedisConnectionFactory ConnectionFactory;
-        internal readonly RedisContext Context;        
+        internal readonly RedisContext Context;
+        
         public RadisServices(RedisConnectionFactory connectionFactory)
         {
             this.ConnectionFactory = connectionFactory;
             this.Db = this.ConnectionFactory.Connection().GetDatabase();
             this.Context = new RedisContext(this.ConnectionFactory.Connection());
-        }
-        public void Delete(string key)
-        {
-           if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
-
-            key = this.GenerateKey(key);
-            this.Db.KeyDelete(key);
-        }
-
-        public void DeleteHash(string key)
-        {
-            // if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
-            
-            this.Db.KeyDelete(key);
-        }
+        }       
 
         public T Get(string key)
         {
@@ -91,7 +71,53 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             
         }
 
-        // khushali 18-10-2018 For signalr scaleout with Redis
+        public void Delete(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
+
+            key = this.GenerateKey(key);
+            this.Db.KeyDelete(key);
+        }
+
+        // --khushali-- For signalr scaleout with Redis
+
+        public string GetSetData(string key)
+        {
+            try
+            {
+                //RedisContext context = new RedisContext();
+                var Messages = this.Db.SetMembers(key);
+                string Data = "[" + string.Join(",", Messages) + "]"; // make json format
+                return Data;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public T GetData(string key)
+        {
+            try
+            {
+                return this.Context.Cache.GetObject<T>(key);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void DeleteTag(string Key, string Tag)
+        {
+            this.Context.Cache.RemoveTagsFromKeyAsync(Key, new[] { Tag });
+        }
+
+        public void DeleteHash(string key)
+        {
+            // if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
+            this.Db.KeyDelete(key);
+        }
 
         public void Scan(string value,string SpecialText)
         {
@@ -159,34 +185,7 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             {
                 throw ex;
             }
-        }
-
-        public string GetSetData(string key)
-        {
-            try
-            {
-                //RedisContext context = new RedisContext();
-                var Messages = this.Db.SetMembers(key);
-                string Data = "[" + string.Join(",", Messages) + "]"; // make json format
-                return Data;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public T GetConnectionID(string key)
-        {
-            try
-            {
-                return this.Context.Cache.GetObject<T>(key);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+        }        
 
         public IEnumerable<T> GetConnectionIDForTest(string Token)
         {

@@ -374,6 +374,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                              Amount = u.Amount,
                                              Date = u.CreatedDate,
                                              Address = u.Address,
+                                             Confirmations=u.Confirmations,
                                              StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
                                          }).AsEnumerable().ToList();
             if (items.Count() == 0)
@@ -397,16 +398,30 @@ namespace CleanArchitecture.Infrastructure.Data
         //vsolanki 16-10-2018
         public DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid)
         {
-            List<HistoryObject> items = (from u in _dbContext.TransactionQueue
-                                         where u.MemberID == Userid && u.TrnDate >= FromDate && u.TrnDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))
+            //List<HistoryObject> items = (from u in _dbContext.TransactionQueue
+            //                             where u.MemberID == Userid && u.TrnDate >= FromDate && u.TrnDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))
+            //                             select new HistoryObject
+            //                             {
+            //                                 CoinName = u.SMSCode,
+            //                                 Status = u.Status,
+            //                                 Information = u.StatusMsg,
+            //                                 Amount = u.Amount,
+            //                                 Date = u.CreatedDate,
+            //                                 Address = u.TransactionAccount,
+            //                                 Confirmations= u.VerifyDone,
+            //                                 StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
+            //                             }).AsEnumerable().ToList();
+            List<HistoryObject> items = (from u in _dbContext.WithdrawHistory
+                                         where u.UserId == Userid && u.TrnDate >= FromDate && u.TrnDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))
                                          select new HistoryObject
                                          {
                                              CoinName = u.SMSCode,
                                              Status = u.Status,
-                                             Information = u.StatusMsg,
+                                             Information = u.SystemRemarks,
                                              Amount = u.Amount,
                                              Date = u.CreatedDate,
-                                             Address = u.TransactionAccount,
+                                             Address = u.Address,
+                                             Confirmations = u.Confirmations,
                                              StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
                                          }).AsEnumerable().ToList();
 
@@ -1311,6 +1326,7 @@ namespace CleanArchitecture.Infrastructure.Data
             try
             { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
 
+                _dbContext.Database.BeginTransaction();
                 _dbContext.Set<WalletLedger>().Add(wl1);
                 _dbContext.Set<WalletLedger>().Add(wl2);
                 _dbContext.Set<TransactionAccount>().Add(ta1);
