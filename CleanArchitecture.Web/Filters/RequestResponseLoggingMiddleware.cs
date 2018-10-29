@@ -55,7 +55,7 @@ namespace CleanArchitecture.Web.Filters
                 //_logger.LogTrace(requestLog);
                 if (PathDetails?[1] == "api")
                     HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), PathDetails?[3], PathDetails?[2], requestLog, accessToken);
-                else
+                else if (PathDetails?[1] != "swagger")
                     HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), "", "", requestLog);
                 //_logger.LogInformation(1, requestLog);
 
