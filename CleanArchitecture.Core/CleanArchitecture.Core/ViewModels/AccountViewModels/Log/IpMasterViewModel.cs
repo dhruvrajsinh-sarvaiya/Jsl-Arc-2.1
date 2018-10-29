@@ -25,7 +25,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Log
         public long? UpdatedBy { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }//rita 29-10-2018 change in bizbase so need to change here for converting error in : IpAddressService
 
         public short Status { get; set; }
     }

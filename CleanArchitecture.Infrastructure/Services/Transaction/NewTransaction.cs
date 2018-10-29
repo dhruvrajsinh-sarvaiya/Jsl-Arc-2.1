@@ -320,8 +320,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                    var WalletWhiteListResult = _WalletService.CheckWithdrawalBene(Req.DebitWalletID,Req.AddressLabel, Req.TransactionAccount, Req.WhitelistingBit);
                    if (!WalletWhiteListResult.Equals(enCheckWithdrawalBene.Success))
                     {
-                        Req.StatusMsg = enCheckWithdrawalBene.Success.ToString();
-                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
+                        Req.StatusMsg = WalletWhiteListResult.ToString();
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_WithdrawWhiteListingFail);
                     }
 
                 }

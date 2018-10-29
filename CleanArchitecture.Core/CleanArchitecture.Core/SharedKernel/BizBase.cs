@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.SharedKernel
         public long? UpdatedBy { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }//rita 29-10-2018 allow null entry at new records
 
         public short Status { get; set; }
 
