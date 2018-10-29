@@ -890,7 +890,7 @@ namespace CleanArchitecture.Web.API
                             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                             var userdet = await _userManager.CreateAsync(user);
                             var infodet = new UserLoginInfo(model.ProviderName, model.ProviderKey, model.ProviderName);
-                            if (userdet.Succeeded)
+                             if (userdet.Succeeded)
                             {
                                 var userlogin = await _userManager.AddLoginAsync(user, infodet);
 

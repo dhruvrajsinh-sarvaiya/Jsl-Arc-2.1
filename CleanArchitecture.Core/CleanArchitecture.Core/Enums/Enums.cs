@@ -173,6 +173,14 @@ namespace CleanArchitecture.Core.Enums
         ProcessTrn_ThirdPartyDataNotFound = 4588,
         ProcessTrn_GettingResponseBlank = 4589,
         ProcessTrn_OprFail = 4590,
+        TradeRecon_InvalidTransactionNo = 4591,
+        TradeRecon_After7DaysTranDontTakeAction = 4593,
+        TradeRecon_InvalidTransactionStatus = 4594,
+        TradeRecon_CancelRequestAlreayInProcess = 4595,
+        TradeRecon_TransactionAlreadyInProcess = 4596,
+        TradeRecon_OrderIsFullyExecuted = 4597,
+        TradeRecon_InvalidDeliveryAmount = 4598,
+        TradeRecon_CencelRequestSuccess = 4600,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -245,7 +253,7 @@ namespace CleanArchitecture.Core.Enums
         Status4101InputProvider = 4101,
         Status4102SignUpUserRegisterError = 4102,
 
-        // Status4103BizUserNameAs_a_MobileExist = 4103,
+        Status4103UserDataNotAvailable = 4103,
         Status4104TempUserNameExist = 4104,
         Status4105TempUserMobileExist = 4105,
         // wallet
@@ -480,5 +488,15 @@ namespace CleanArchitecture.Core.Enums
     {
         OFF = 0,
         ON = 1
+    }
+
+    /// <summary>
+    ///  This enum type are create by pankaj for required to tract the user log for type so.
+    /// </summary>
+    public enum EnuserChangeLog
+    {
+        UserProfile = 1,
+        TwofactoreChange = 2
+
     }
 }

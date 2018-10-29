@@ -44,6 +44,14 @@ namespace CleanArchitecture.Core.Enums
         public static string ProcessTrn_HoldMsg = "Hold";
         public static string ProcessTrn_ThirdPartyDataNotFoundMsg = "Third Party Data Not Found";
         public static string ProcessTrn_OprFailMsg = "Operator Fail";
+        public static string TradeRecon_InvalidTransactionNo = "Invalid Transaction No";
+        public static string TradeRecon_After7DaysTranDontTakeAction = "After 7 days of transaction you can not take action, Please contact admin";
+        public static string TradeRecon_InvalidTransactionStatus = "Invalid Transaction Status";
+        public static string TradeRecon_CancelRequestAlreayInProcess = "Transaction Cancellation request is already in processing.";
+        public static string TradeRecon_TransactionAlreadyInProcess = "Transaction Already in Process, Please try After Sometime";
+        public static string TradeRecon_OrderIsFullyExecuted = "Can not initiate Cancellation Request.Your order is fully executed";
+        public static string TradeRecon_InvalidDeliveryAmount = "Invalid Delivery Amount";
+        public static string TradeRecon_CencelRequestSuccess = "Order Cancellation request done successfully.";
         //============================
 
         //============================walelt=================================//       
@@ -107,7 +115,7 @@ namespace CleanArchitecture.Core.Enums
         public static string StandardLoginLockOut = "User account locked out for two hours.";
         public static string StandardLoginfailed = "Login failed : Invalid username or password.";
         public static string LoginWithOtpSuccessSend = "You have send OTP on email.";
-        public static string LoginWithEmailSuccessSend = " User Login with Email Send Success.";
+       // public static string LoginWithEmailSuccessSend = " User Login with Email Send Success.";
         public static string LoginWithOtpLoginFailed = "Login failed: Invalid email.";
         public static string LoginWithOtpInvalidAttempt = "Invalid login attempt.";
         public static string LoginWithOtpDatanotSend = "User Otp Data Not Send.";
@@ -213,5 +221,10 @@ namespace CleanArchitecture.Core.Enums
 
         public static string SignUpTempUserMobileExist = "This mobile number already exist input other mobile number.";
         public static string SignUpTempUserMobileExistAndVerificationPending = "This mobile number already exist and verify pending.";
+
+        public static string TokenCreationUserDataNotAvailable = "User data not avaialable.";
+        public static string LoginWithEmailSuccessSend = " Successfull send otp on your email id.";
     }
+
+
 }

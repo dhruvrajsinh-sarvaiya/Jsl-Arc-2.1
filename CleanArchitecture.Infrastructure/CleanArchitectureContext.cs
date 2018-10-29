@@ -191,7 +191,7 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<WalletLimitConfigurationMaster>().Property(p => p.TrnType).ValueGeneratedNever();
             modelBuilder.Entity<WalletMaster>().Property(x => x.AccWalletID).ValueGeneratedNever();
             modelBuilder.Entity<WalletMaster>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
-
+            modelBuilder.Entity<TradeBuyRequest>().HasKey(e => new { e.Id, e.TrnNo });
         }
 
         /// <summary>

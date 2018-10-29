@@ -1966,26 +1966,29 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 if (limit == null)
                 {
-                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
-                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
-                    return Response;
+                Response.DailyLimit = 0;
+
+                }
+                else
+                {
+                    Response.DailyLimit = limit.LimitPerDay;
+
                 }
                 //get amt from  tq
                 var amt = _walletRepository1.GetTodayAmountOfTQ(userid, wallet.Id);
 
                 if (response.Count == 0)
                 {
-                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
-                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
-                    return Response;
+                Response.UsedLimit = 0;
+
+                }
+                else
+                {
+                    Response.UsedLimit = amt;
                 }
                 Response.BizResponseObj.ReturnCode = enResponseCode.Success;
                 Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                 Response.Response = response;
-                Response.DailyLimit = limit.LimitPerDay;
-                Response.UsedLimit = amt;
                 Response.TotalBalance = total;
                 return Response;
             }
@@ -1997,10 +2000,12 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 25-10-2018
-        public List<AllBalanceTypeWiseRes> GetAllBalancesTypeWise(long userId, string WalletType)
+        public ListAllBalanceTypeWiseRes GetAllBalancesTypeWise(long userId, string WalletType)
         {
+            ListAllBalanceTypeWiseRes res = new ListAllBalanceTypeWiseRes();
             AllBalanceTypeWiseRes a = new AllBalanceTypeWiseRes();
             List<AllBalanceTypeWiseRes> Response = new List<AllBalanceTypeWiseRes>();
+            res.BizResponseObj = new Core.ApiModels.BizResponseClass();
             a.Wallet = new WalletResponse();
             a.Wallet.Balance = new Balance();
             var listWallet = _walletRepository1.GetWalletMasterResponseByCoin(userId, WalletType);
@@ -2018,7 +2023,18 @@ namespace CleanArchitecture.Infrastructure.Services
                 a.Wallet.Balance = response;
                 Response.Add(a);
             }
-            return Response;
+            if(Response.Count()==0)
+            {
+                res.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                res.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                res.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                return res;
+            }           
+            res.Wallets = Response;
+            res.BizResponseObj.ReturnCode = enResponseCode.Success;
+            res.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            
+            return res;
         }
 
         public UserPreferencesRes SetPreferences(long Userid, int GlobalBit)
