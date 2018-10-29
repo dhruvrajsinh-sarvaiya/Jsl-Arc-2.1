@@ -9,6 +9,8 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SignalR;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -193,6 +195,101 @@ namespace CleanArchitecture.Web.API
                 modelData.Parameter = "LTC_BTC";
                 await _mediator.Send(modelData);
                 ReciveMethod = "RecieveMarketData";
+                return Ok(new { ReciveMethod = ReciveMethod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                return Ok();
+            }
+        }
+
+        [HttpGet("OpenOrder/{Data}")]
+        [Authorize]
+        public async Task<IActionResult> OpenOrder(string Data)
+        {
+            string ReciveMethod = "";
+            try
+            {
+                GetBuySellBook model = new GetBuySellBook();
+                model.Amount = 3;
+                model.Price = 150;
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                var temp = JsonConvert.SerializeObject(model);
+                SignalRData modelData = new SignalRData();
+                modelData.Type = enSignalREventType.Channel;
+                modelData.Method = enMethodName.OpenOrder;
+                modelData.ReturnMethod = enReturnMethod.RecieveOpenOrder;
+                modelData.Subscription = enSubscriptionType.OneToOne;
+                modelData.Data = Data;// JsonConvert.SerializeObject(model);
+                modelData.ParamType = enSignalRParmType.AccessToken;
+                modelData.Parameter = accessToken;
+                await _mediator.Send(modelData);
+                ReciveMethod = "RecieveOpenOrder";
+                return Ok(new { ReciveMethod = ReciveMethod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                return Ok();
+            }
+        }
+        [HttpGet("OrderHistory/{Data}")]
+        [Authorize]
+        public async Task<IActionResult> OrderHistory(string Data)
+        {
+            string ReciveMethod = "";
+            try
+            {
+                GetBuySellBook model = new GetBuySellBook();
+                model.Amount = 3;
+                model.Price = 150;
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                var temp = JsonConvert.SerializeObject(model);
+                SignalRData modelData = new SignalRData();
+                modelData.Type = enSignalREventType.Channel;
+                modelData.Method = enMethodName.OrderHistory;
+                modelData.ReturnMethod = enReturnMethod.RecieveOrderHistory;
+                modelData.Subscription = enSubscriptionType.OneToOne;
+                modelData.Data = Data;// JsonConvert.SerializeObject(model);
+                modelData.ParamType = enSignalRParmType.AccessToken;
+                modelData.Parameter = accessToken;
+                await _mediator.Send(modelData);
+                ReciveMethod = "RecieveOrderHistory";
+                return Ok(new { ReciveMethod = ReciveMethod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                return Ok();
+            }
+        }
+
+        [HttpGet("TradeHistoryByUser/{Data}")]
+        [Authorize]
+        public async Task<IActionResult> TradeHistoryByUser(string Data)
+        {
+            string ReciveMethod = "";
+            try
+            {
+                GetBuySellBook model = new GetBuySellBook();
+                model.Amount = 3;
+                model.Price = 150;
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                var temp = JsonConvert.SerializeObject(model);
+                SignalRData modelData = new SignalRData();
+                modelData.Type = enSignalREventType.Channel;
+                modelData.Method = enMethodName.TradeHistory;
+                modelData.ReturnMethod = enReturnMethod.RecieveTradeHistory;
+                modelData.Subscription = enSubscriptionType.OneToOne;
+                modelData.Data = Data;// JsonConvert.SerializeObject(model);
+                modelData.ParamType = enSignalRParmType.AccessToken;
+                modelData.Parameter = accessToken;
+                await _mediator.Send(modelData);
+                ReciveMethod = "RecieveTradeHistory";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)

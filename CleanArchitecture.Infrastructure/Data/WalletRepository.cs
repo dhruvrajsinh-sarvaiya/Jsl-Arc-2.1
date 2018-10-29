@@ -1209,6 +1209,21 @@ namespace CleanArchitecture.Infrastructure.Data
                 throw ex;
             }
         }
+
+        //vsolanki 2018-10-29
+        public int AddBizUserTypeMapping(BizUserTypeMapping bizUser)     
+        {
+            try
+            {
+                var UserTypeMap = _dbContext.BizUserTypeMapping.Add(bizUser);
+                _dbContext.SaveChanges();
+                return 1;
+            }
+            catch(Exception ex)
+            {
+                return 0;
+            }         
+        }
     }
 }
         //public object GetTypeMappingObj(long userid)
