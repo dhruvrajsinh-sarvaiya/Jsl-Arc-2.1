@@ -97,7 +97,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, Coin, Request.IsDefaultWallet, Request.AllowTrnType, Convert.ToInt64(user.Id),1);
+                    Response = _walletService.InsertIntoWalletMaster(Request.WalletName, Coin, Request.IsDefaultWallet, Request.AllowTrnType, Convert.ToInt64(user.Id),0);
                 }
                 //HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
@@ -782,6 +782,32 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        //Uday 30-10-2018
+        [HttpGet("{TrnType}/{CoinName}")]
+        public ActionResult GetServiceLimitChargeValue(enTrnType TrnType,string CoinName)
+        {
+            ServiceLimitChargeValueResponse Response = new ServiceLimitChargeValueResponse();
+            try
+            {
+                var responseData = _walletService.GetServiceLimitChargeValue(TrnType, CoinName);
+                if (responseData != null)
+                {
+                    Response.response = responseData;
+                    Response.ReturnCode = enResponseCode.Success;
+                }
+                else
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.NotFound;
+                    Response.ErrorCode = enErrorCode.NotFound;
+                }
+                return Ok(Response);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
         /// <summary>
         /// vsolanki 8-10-2018 Get the coin list 
         /// </summary>

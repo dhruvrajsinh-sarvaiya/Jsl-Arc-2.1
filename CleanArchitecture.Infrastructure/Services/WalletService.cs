@@ -55,7 +55,9 @@ namespace CleanArchitecture.Infrastructure.Services
         private static Random random = new Random((int)DateTime.Now.Ticks);
         //vsolanki 10-10-2018 
         private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepository; 
-        private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository; 
+        private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository;
+        private readonly ICommonRepository<ChargeRuleMaster> _chargeRuleMaster;
+        private readonly ICommonRepository<LimitRuleMaster> _limitRuleMaster;
 
         //private readonly IRepository<WalletTransactionOrder> _WalletAllowTrnRepository;
         //  private readonly ICommonRepository<WalletTransactionQueue> t;
@@ -65,7 +67,8 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo,ICommonRepository<MemberShadowLimit>ShadowLimitRepo,ICommonRepository<MemberShadowBalance>ShadowBalRepo ,ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo,ICommonRepository<MemberShadowLimit>ShadowLimitRepo,ICommonRepository<MemberShadowBalance>ShadowBalRepo ,ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig,
+            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -90,6 +93,8 @@ namespace CleanArchitecture.Infrastructure.Services
             _WalletLimitConfigurationMasterRepository = WalletConfigMasterRepo;
             _ShadowBalRepo = ShadowBalRepo;
             _ShadowLimitRepo = ShadowLimitRepo;
+            _chargeRuleMaster = chargeRuleMaster;
+            _limitRuleMaster = limitRuleMaster;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -2363,6 +2368,43 @@ namespace CleanArchitecture.Infrastructure.Services
                 return true;
             }
             return false;
+        }
+
+        //Uday 30-10-2018
+        public ServiceLimitChargeValue GetServiceLimitChargeValue(enTrnType TrnType, string CoinName)
+        {
+            try
+            {
+                ServiceLimitChargeValue response;
+                var walletType = _WalletTypeMasterRepository.GetSingle(x => x.WalletTypeName == CoinName);
+                if (walletType != null)
+                {
+                    response = new ServiceLimitChargeValue();
+                    var limitData = _limitRuleMaster.GetSingle(x => x.TrnType == TrnType && x.WalletType == walletType.Id);
+                    var chargeData = _chargeRuleMaster.GetSingle(x => x.TrnType == TrnType && x.WalletType == walletType.Id);
+
+                    if(limitData != null && chargeData != null)
+                    {
+                        response.CoinName = walletType.WalletTypeName;
+                        response.TrnType = limitData.TrnType;
+                        response.MinAmount = limitData.MinAmount;
+                        response.MaxAmount = limitData.MaxAmount;
+                        response.ChargeType = chargeData.ChargeType;
+                        response.ChargeValue = chargeData.ChargeValue;
+                    }
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+              
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
 
