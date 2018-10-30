@@ -374,7 +374,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                              Amount = u.Amount,
                                              Date = u.CreatedDate,
                                              Address = u.Address,
-                                             Confirmations=u.Confirmations,
+                                             Confirmations = u.Confirmations,
                                              StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
                                          }).AsEnumerable().ToList();
             if (items.Count() == 0)
@@ -514,863 +514,865 @@ namespace CleanArchitecture.Infrastructure.Data
                                                            LimitPerTransaction = u.LimitPerTransaction,
                                                            AccWalletID = c.AccWalletID,
                                                            EndTime = u.EndTime,
+                                                           LifeTime = u.LifeTime,
                                                            StartTime = u.StartTime
                                                        }).AsEnumerable().ToList();
+
             return items;
         }
 
-        public List<AddressMasterResponse> GetAddressMasterResponse(string AccWalletID)
-        {
-            List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
-                                                 join c in _dbContext.WalletMasters
-                                                 on u.WalletId equals c.Id
-                                                 where c.AccWalletID == AccWalletID && u.IsDefaultAddress == 1 && u.Status == 1
+public List<AddressMasterResponse> GetAddressMasterResponse(string AccWalletID)
+{
+    List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
+                                         join c in _dbContext.WalletMasters
+                                         on u.WalletId equals c.Id
+                                         where c.AccWalletID == AccWalletID && u.IsDefaultAddress == 1 && u.Status == 1
 
-                                                 select new AddressMasterResponse
-                                                 {
-                                                     AddressLabel = u.AddressLable,
-                                                     Address = u.Address
-                                                     //IsDefaultAddress = u.IsDefaultAddress,
-                                                 }).AsEnumerable().ToList();
-            if (items.Count() == 0)
-            {
-                List<AddressMasterResponse> items1 = (from u in _dbContext.AddressMasters
-                                                      join c in _dbContext.WalletMasters
-                                                      on u.WalletId equals c.Id
-                                                      where c.AccWalletID == AccWalletID && u.Status == 1
-                                                      orderby u.CreatedDate descending
+                                         select new AddressMasterResponse
+                                         {
+                                             AddressLabel = u.AddressLable,
+                                             Address = u.Address
+                                             //IsDefaultAddress = u.IsDefaultAddress,
+                                         }).AsEnumerable().ToList();
+    if (items.Count() == 0)
+    {
+        List<AddressMasterResponse> items1 = (from u in _dbContext.AddressMasters
+                                              join c in _dbContext.WalletMasters
+                                              on u.WalletId equals c.Id
+                                              where c.AccWalletID == AccWalletID && u.Status == 1
+                                              orderby u.CreatedDate descending
 
-                                                      select new AddressMasterResponse
-                                                      {
-                                                          AddressLabel = u.AddressLable,
-                                                          Address = u.Address,
-                                                          //IsDefaultAddress = u.IsDefaultAddress,
-                                                      }).AsEnumerable().Take(1).ToList();
-                return items1;
-            }
-            else
-            {
-                return items;
-            }
+                                              select new AddressMasterResponse
+                                              {
+                                                  AddressLabel = u.AddressLable,
+                                                  Address = u.Address,
+                                                  //IsDefaultAddress = u.IsDefaultAddress,
+                                              }).AsEnumerable().Take(1).ToList();
+        return items1;
+    }
+    else
+    {
+        return items;
+    }
 
-        }
+}
 
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetAvailableBalance(long userid, long walletId)
-        {
-            List<BalanceResponse> items = (from w in _dbContext.WalletMasters
-                                           join wt in _dbContext.WalletTypeMasters
-                                                   on w.WalletTypeID equals wt.Id
-                                           where w.Id == walletId && w.UserID == userid && w.Status == 1
-                                           select new BalanceResponse
-                                           {
-                                               Balance = w.Balance,
-                                               WalletId = w.Id,
-                                               WalletType = wt.WalletTypeName
-                                           }).AsEnumerable().ToList();
-            return items;
-        }
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetAllAvailableBalance(long userid)
-        {
-            List<BalanceResponse> items = (from w in _dbContext.WalletMasters
-                                           join wt in _dbContext.WalletTypeMasters
-                                                   on w.WalletTypeID equals wt.Id
-                                           where w.UserID == userid && w.Status == 1
-                                           select new BalanceResponse
-                                           {
-                                               Balance = w.Balance,
-                                               WalletId = w.Id,
-                                               WalletType = wt.WalletTypeName,
-                                           }).AsEnumerable().ToList();
-            return items;
-        }
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetAvailableBalance(long userid, long walletId)
+{
+    List<BalanceResponse> items = (from w in _dbContext.WalletMasters
+                                   join wt in _dbContext.WalletTypeMasters
+                                           on w.WalletTypeID equals wt.Id
+                                   where w.Id == walletId && w.UserID == userid && w.Status == 1
+                                   select new BalanceResponse
+                                   {
+                                       Balance = w.Balance,
+                                       WalletId = w.Id,
+                                       WalletType = wt.WalletTypeName
+                                   }).AsEnumerable().ToList();
+    return items;
+}
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetAllAvailableBalance(long userid)
+{
+    List<BalanceResponse> items = (from w in _dbContext.WalletMasters
+                                   join wt in _dbContext.WalletTypeMasters
+                                           on w.WalletTypeID equals wt.Id
+                                   where w.UserID == userid && w.Status == 1
+                                   select new BalanceResponse
+                                   {
+                                       Balance = w.Balance,
+                                       WalletId = w.Id,
+                                       WalletType = wt.WalletTypeName,
+                                   }).AsEnumerable().ToList();
+    return items;
+}
 
-        public decimal GetTotalAvailbleBal(long userid)
-        {
-            var total = (from w in _dbContext.WalletMasters
-                         where w.UserID == userid && w.Status == 1
-                         select w.Balance
-           ).Sum();
-            return total;
-        }
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetUnSettledBalance(long userid, long walletid)
-        {
+public decimal GetTotalAvailbleBal(long userid)
+{
+    var total = (from w in _dbContext.WalletMasters
+                 where w.UserID == userid && w.Status == 1
+                 select w.Balance
+   ).Sum();
+    return total;
+}
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetUnSettledBalance(long userid, long walletid)
+{
 
-            var result = (from w in _dbContext.WalletTransactionQueues
-                          where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
-                          group w by new { w.WalletType } into g
-                          select new BalanceResponse
-                          {
-                              Balance = g.Sum(order => order.Amount),
-                              WalletType = g.Key.WalletType,
-                              WalletId = walletid
-                          }).AsEnumerable().ToList();
+    var result = (from w in _dbContext.WalletTransactionQueues
+                  where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                  group w by new { w.WalletType } into g
+                  select new BalanceResponse
+                  {
+                      Balance = g.Sum(order => order.Amount),
+                      WalletType = g.Key.WalletType,
+                      WalletId = walletid
+                  }).AsEnumerable().ToList();
 
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetAllUnSettledBalance(long userid)
-        {
-            var result = (from w in _dbContext.WalletTransactionQueues
-                          where w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
-                          group w by new { w.WalletType, w.WalletID } into g
-                          select new BalanceResponse
-                          {
-                              Balance = g.Sum(order => order.Amount),
-                              WalletType = g.Key.WalletType,
-                              WalletId = g.Key.WalletID
-                          }).AsEnumerable().ToList();
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetUnClearedBalance(long userid, long walletid)
-        {
+    return result;
+}
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetAllUnSettledBalance(long userid)
+{
+    var result = (from w in _dbContext.WalletTransactionQueues
+                  where w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                  group w by new { w.WalletType, w.WalletID } into g
+                  select new BalanceResponse
+                  {
+                      Balance = g.Sum(order => order.Amount),
+                      WalletType = g.Key.WalletType,
+                      WalletId = g.Key.WalletID
+                  }).AsEnumerable().ToList();
+    return result;
+}
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetUnClearedBalance(long userid, long walletid)
+{
 
-            var result = (from w in _dbContext.DepositHistory
-                          join wt in _dbContext.AddressMasters
-                          on w.Address equals wt.Address
-                          where wt.WalletId == walletid && w.UserId == userid && w.Status == 0
-                          select new BalanceResponse
-                          {
-                              Balance = w.Amount,
-                              WalletType = w.SMSCode,
-                              WalletId = walletid
-                          }).AsEnumerable().ToList();
+    var result = (from w in _dbContext.DepositHistory
+                  join wt in _dbContext.AddressMasters
+                  on w.Address equals wt.Address
+                  where wt.WalletId == walletid && w.UserId == userid && w.Status == 0
+                  select new BalanceResponse
+                  {
+                      Balance = w.Amount,
+                      WalletType = w.SMSCode,
+                      WalletId = walletid
+                  }).AsEnumerable().ToList();
 
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetUnAllClearedBalance(long userid)
-        {
-            var result = (from w in _dbContext.DepositHistory
-                          join wt in _dbContext.AddressMasters
-                          on w.Address equals wt.Address
-                          where w.UserId == userid && w.Status == 0
-                          select new BalanceResponse
-                          {
-                              Balance = w.Amount,
-                              WalletType = w.SMSCode,
-                              WalletId = wt.WalletId
-                          }).AsEnumerable().ToList();
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public List<StackingBalanceRes> GetStackingBalance(long userid, long walletid)
-        {
+    return result;
+}
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetUnAllClearedBalance(long userid)
+{
+    var result = (from w in _dbContext.DepositHistory
+                  join wt in _dbContext.AddressMasters
+                  on w.Address equals wt.Address
+                  where w.UserId == userid && w.Status == 0
+                  select new BalanceResponse
+                  {
+                      Balance = w.Amount,
+                      WalletType = w.SMSCode,
+                      WalletId = wt.WalletId
+                  }).AsEnumerable().ToList();
+    return result;
+}
+//vsolanki 24-10-2018
+public List<StackingBalanceRes> GetStackingBalance(long userid, long walletid)
+{
 
-            var result = (from u in _dbContext.UserStacking
-                          join w in _dbContext.WalletMasters
-                          on u.WalletId equals w.Id
-                          where u.WalletId == walletid && w.UserID == userid && u.Status == 0
-                          select new StackingBalanceRes
-                          {
-                              StackingAmount = u.StackingAmount,
-                              WalletType = u.WalletType,
-                              WalletId = walletid
-                          }).AsEnumerable().ToList();
+    var result = (from u in _dbContext.UserStacking
+                  join w in _dbContext.WalletMasters
+                  on u.WalletId equals w.Id
+                  where u.WalletId == walletid && w.UserID == userid && u.Status == 0
+                  select new StackingBalanceRes
+                  {
+                      StackingAmount = u.StackingAmount,
+                      WalletType = u.WalletType,
+                      WalletId = walletid
+                  }).AsEnumerable().ToList();
 
-            if (result.Count() == 0)
-            {
-                var result1 = (from u in _dbContext.StckingScheme
-                               join w in _dbContext.WalletMasters
-                              on u.WalletType equals w.WalletTypeID
-                               join wt in _dbContext.WalletTypeMasters
-                               on u.WalletType equals wt.Id
-                               where w.Id == walletid && w.UserID == userid && u.Status == 0
-                               select new StackingBalanceRes
-                               {
-                                   MaxLimitAmount = u.MaxLimitAmount,
-                                   MinLimitAmount = u.MinLimitAmount,
-                                   WalletType = wt.WalletTypeName,
-                                   WalletId = walletid
-                               }).AsEnumerable().ToList();
-                return result1;
-            }
-
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public List<StackingBalanceRes> GetAllStackingBalance(long userid)
-        {
-            var result = (from u in _dbContext.UserStacking
-                          join w in _dbContext.WalletMasters
-                          on u.WalletId equals w.Id
-                          where w.UserID == userid && u.Status == 0
-                          select new StackingBalanceRes
-                          {
-                              StackingAmount = u.StackingAmount,
-                              WalletType = u.WalletType,
-                              WalletId = w.Id
-                          }).AsEnumerable().ToList();
-
-            if (result.Count() == 0)
-            {
-                var result1 = (from u in _dbContext.StckingScheme
-                               join w in _dbContext.WalletMasters
-                              on u.WalletType equals w.WalletTypeID
-                               join wt in _dbContext.WalletTypeMasters
-                               on u.WalletType equals wt.Id
-                               where w.UserID == userid && u.Status == 0
-                               select new StackingBalanceRes
-                               {
-                                   MaxLimitAmount = u.MaxLimitAmount,
-                                   MinLimitAmount = u.MinLimitAmount,
-                                   WalletType = wt.WalletTypeName,
-                                   WalletId = w.Id
-                               }).AsEnumerable().ToList();
-                return result1;
-            }
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetShadowBalance(long userid, long walletid)
-        {
-
-            var result = (from u in _dbContext.MemberShadowBalance
-                          join w in _dbContext.WalletMasters
-                          on u.WalletID equals w.Id
-                          join wt in _dbContext.WalletTypeMasters
-                                                   on u.WalletTypeId equals wt.Id
-                          where u.WalletID == walletid && w.UserID == userid && u.Status == 0
-                          select new BalanceResponse
-                          {
-                              Balance = u.ShadowAmount,
-                              WalletType = wt.WalletTypeName,
-                              WalletId = walletid
-                          }).AsEnumerable().ToList();
-
-            if (result.Count() == 0)
-            {
-                var result1 = (from u in _dbContext.MemberShadowLimit
-                               join w in _dbContext.BizUserTypeMapping
-                               on u.MemberTypeId equals w.UserType
-                               join wt in _dbContext.WalletMasters
-                               on walletid equals wt.Id
-                               join wtm in _dbContext.WalletTypeMasters
-                                                  on wt.WalletTypeID equals wtm.Id
-                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
-                               select new BalanceResponse
-                               {
-                                   Balance = u.ShadowLimitAmount,
-                                   WalletType = wtm.WalletTypeName,
-                                   WalletId = walletid
-                               }).AsEnumerable().ToList();
-                return result1;
-            }
-
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public List<BalanceResponse> GetAllShadowBalance(long userid)
-        {
-            var result = (from u in _dbContext.MemberShadowBalance
-                          join w in _dbContext.WalletMasters
-                          on u.WalletID equals w.Id
-                          join wt in _dbContext.WalletTypeMasters
-                                                   on u.WalletTypeId equals wt.Id
-                          where w.UserID == userid && u.Status == 0
-                          select new BalanceResponse
-                          {
-                              Balance = u.ShadowAmount,
-                              WalletType = wt.WalletTypeName,
-                              WalletId = w.Id
-                          }).AsEnumerable().ToList();
-
-            if (result.Count() == 0)
-            {
-                var result1 = (from u in _dbContext.MemberShadowLimit
-                               join w in _dbContext.BizUserTypeMapping
-                               on u.MemberTypeId equals w.UserType
-                               join wt in _dbContext.WalletMasters
-                               on u.WalletType equals wt.WalletTypeID
-                               join wtm in _dbContext.WalletTypeMasters
-                               on wt.WalletTypeID equals wtm.Id
-                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
-                               select new BalanceResponse
-                               {
-                                   Balance = u.ShadowLimitAmount,
-                                   WalletType = wtm.WalletTypeName,
-                                   WalletId = wt.Id
-                               }).AsEnumerable().ToList();
-                return result1;
-            }
-
-            return result;
-        }
-        //vsolanki 24-10-2018
-        public Balance GetAllBalances(long userid, long walletid)
-        {
-            var Unsettled = (from w in _dbContext.WalletTransactionQueues
-                             where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
-                             select w.Amount).Sum();
-
-            var availble = (from w in _dbContext.WalletMasters
-                            join wt in _dbContext.WalletTypeMasters
-                                    on w.WalletTypeID equals wt.Id
-                            where w.Id == walletid && w.UserID == userid && w.Status == 1
-                            select w.Balance).Sum();
-
-            var UnClearedBalance = (from w in _dbContext.DepositHistory
-                                    join wt in _dbContext.AddressMasters
-                                    on w.Address equals wt.Address
-                                    where wt.WalletId == walletid && w.UserId == userid && w.Status == 0
-                                    select w.Amount
-                          ).Sum();
-
-            var ShadowBalance = (from u in _dbContext.MemberShadowBalance
-                                 join w in _dbContext.WalletMasters
-                                 on u.WalletID equals w.Id
-                                 join wt in _dbContext.WalletTypeMasters
-                                                          on u.WalletTypeId equals wt.Id
-                                 where u.WalletID == walletid && w.UserID == userid && u.Status == 0
-                                 select u.ShadowAmount).Sum();
-
-            var StackingBalance = (from u in _dbContext.UserStacking
-                                   join w in _dbContext.WalletMasters
-                                   on u.WalletId equals w.Id
-                                   where u.WalletId == walletid && w.UserID == userid && u.Status == 0
-                                   select u.StackingAmount).Sum(); ;
-
-            return new Balance { UnSettledBalance = Unsettled, AvailableBalance = availble, UnClearedBalance = UnClearedBalance, ShadowBalance = ShadowBalance, StackingBalance = StackingBalance };
-
-        }
-
-        //vsolanki 25-10-2018
-        public List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid)
-        {
-            var result = (from w in _dbContext.WalletMasters
-                          join wt in _dbContext.WalletTypeMasters
-                          on w.WalletTypeID equals wt.Id
-                          where w.UserID == userid && w.Status == 1
-                          group w by new { wt.WalletTypeName } into g
-                          select new BalanceResponseLimit
-                          {
-                              Balance = g.Sum(order => order.Balance),
-                              WalletType = g.Key.WalletTypeName,
-                          }).AsEnumerable().ToList();
-
-            return result;
-        }
-
-        public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID, long UserID)
-        {
-            List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.UserID == UserID && b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
-                                                select new BeneficiaryMasterRes
-                                                {
-                                                    Name = b.Name,
-                                                    BeneficiaryID = b.Id,
-                                                    Address = b.Address,
-                                                    Status = b.Status
-
-                                                }).AsEnumerable().ToList();
-            return items;
-        }
-
-        public List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID)
-        {
-            List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                join w in _dbContext.WalletTypeMasters
-                                                on b.WalletTypeID equals w.Id
-                                                where b.UserID == UserID && b.Status != 9
-                                                select new BeneficiaryMasterRes
-                                                {
-                                                    Name = b.Name,
-                                                    BeneficiaryID = b.Id,
-                                                    Address = b.Address,
-                                                    CoinName = w.WalletTypeName,
-                                                    IsWhiteListed = b.IsWhiteListed,
-                                                    Status = b.Status
-
-                                                }).AsEnumerable().ToList();
-            return items;
-        }
-
-        public bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID)
-        {
-            try
-            {
-                _dbContext.Database.BeginTransaction();
-                var arrayObj = (from p in _dbContext.BeneficiaryMaster
-                                join q in arryTrnID on p.Id equals q.ID
-                                select new { p, q }).ToList();
-                if (arrayObj.Count != 0)
-                {
-                    arrayObj.ForEach(e => e.p.IsWhiteListed = e.q.WhitelistingBit);
-                    arrayObj.ForEach(e =>
-                    {
-                        if (e.q.WhitelistingBit == 9)
-                        {
-                            e.p.Status = e.q.WhitelistingBit;
-                        }
-                    });
-                    arrayObj.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
-                    _dbContext.SaveChanges();
-                    _dbContext.Database.CommitTransaction();
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _dbContext.Database.RollbackTransaction();
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-
-
-        public void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long WalletId)
-        {
-            var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
-                            join q in AllowTrnType on p.TrnType equals q
-                            select p).ToList();
-
-            var fadd = from array in arrayObj
-                       select new WalletLimitConfiguration
+    if (result.Count() == 0)
+    {
+        var result1 = (from u in _dbContext.StckingScheme
+                       join w in _dbContext.WalletMasters
+                      on u.WalletType equals w.WalletTypeID
+                       join wt in _dbContext.WalletTypeMasters
+                       on u.WalletType equals wt.Id
+                       where w.Id == walletid && w.UserID == userid && u.Status == 0
+                       select new StackingBalanceRes
                        {
-                           CreatedBy = userid,
-                           CreatedDate = UTC_To_IST(),
-                           WalletId = WalletId,
-                           TrnType = array.TrnType,
-                           LimitPerDay = array.LimitPerDay,
-                           LimitPerHour = array.LimitPerHour,
-                           LimitPerTransaction = array.LimitPerTransaction,
-                           Status = Convert.ToInt16(ServiceStatus.Active),
-                           StartTime = array.StartTime,
-                           EndTime = array.EndTime,
-                           LifeTime = null,
-                           UpdatedDate = UTC_To_IST()
-                       };
-            _dbContext.WalletLimitConfiguration.AddRange(fadd);
-            _dbContext.SaveChanges();
+                           MaxLimitAmount = u.MaxLimitAmount,
+                           MinLimitAmount = u.MinLimitAmount,
+                           WalletType = wt.WalletTypeName,
+                           WalletId = walletid
+                       }).AsEnumerable().ToList();
+        return result1;
+    }
 
-        }
+    return result;
+}
+//vsolanki 24-10-2018
+public List<StackingBalanceRes> GetAllStackingBalance(long userid)
+{
+    var result = (from u in _dbContext.UserStacking
+                  join w in _dbContext.WalletMasters
+                  on u.WalletId equals w.Id
+                  where w.UserID == userid && u.Status == 0
+                  select new StackingBalanceRes
+                  {
+                      StackingAmount = u.StackingAmount,
+                      WalletType = u.WalletType,
+                      WalletId = w.Id
+                  }).AsEnumerable().ToList();
 
-        //vsolanki 26-10-2018
-        public DateTime UTC_To_IST(DateTime dateTime)
-        {
-            try
-            {
-                // DateTime myUTC = DateTime.UtcNow;
-                // 'Dim utcdate As DateTime = DateTime.ParseExact(DateTime.UtcNow, "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
-                // Dim utcdate As DateTime = DateTime.ParseExact(myUTC, "M/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
-                // 'Dim utcdate As DateTime = DateTime.ParseExact("11/09/2016 6:31:00 PM", "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
-                DateTime istdate = TimeZoneInfo.ConvertTimeFromUtc(dateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
-                // MsgBox(myUTC & " - " & utcdate & " - " & istdate)
-                return istdate;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+    if (result.Count() == 0)
+    {
+        var result1 = (from u in _dbContext.StckingScheme
+                       join w in _dbContext.WalletMasters
+                      on u.WalletType equals w.WalletTypeID
+                       join wt in _dbContext.WalletTypeMasters
+                       on u.WalletType equals wt.Id
+                       where w.UserID == userid && u.Status == 0
+                       select new StackingBalanceRes
+                       {
+                           MaxLimitAmount = u.MaxLimitAmount,
+                           MinLimitAmount = u.MinLimitAmount,
+                           WalletType = wt.WalletTypeName,
+                           WalletId = w.Id
+                       }).AsEnumerable().ToList();
+        return result1;
+    }
+    return result;
+}
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetShadowBalance(long userid, long walletid)
+{
 
-        public decimal GetTodayAmountOfTQ(long userId, long WalletId)
-        {
-            DateTime startDateTime = UTC_To_IST(DateTime.UtcNow); //Today at 12:00:00
-            DateTime endDateTime = UTC_To_IST(DateTime.UtcNow.AddDays(-1).AddTicks(-1));
-            //var d = startDateTime.Date;
-            //var amt = (from tq in _dbContext.WalletTransactionQueues
-            //          where tq.Status == enTransactionStatus.Success && tq.TrnDate >= startDateTime &&
-            //          tq.TrnDate <= endDateTime && tq.WalletID== WalletId && tq.MemberID==userId
-            //          group tq by new { tq.TrnDate } into g
-            //          select
-            //          g.Sum(order => order.Amount));
+    var result = (from u in _dbContext.MemberShadowBalance
+                  join w in _dbContext.WalletMasters
+                  on u.WalletID equals w.Id
+                  join wt in _dbContext.WalletTypeMasters
+                                           on u.WalletTypeId equals wt.Id
+                  where u.WalletID == walletid && w.UserID == userid && u.Status == 0
+                  select new BalanceResponse
+                  {
+                      Balance = u.ShadowAmount,
+                      WalletType = wt.WalletTypeName,
+                      WalletId = walletid
+                  }).AsEnumerable().ToList();
 
+    if (result.Count() == 0)
+    {
+        var result1 = (from u in _dbContext.MemberShadowLimit
+                       join w in _dbContext.BizUserTypeMapping
+                       on u.MemberTypeId equals w.UserType
+                       join wt in _dbContext.WalletMasters
+                       on walletid equals wt.Id
+                       join wtm in _dbContext.WalletTypeMasters
+                                          on wt.WalletTypeID equals wtm.Id
+                       where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
+                       select new BalanceResponse
+                       {
+                           Balance = u.ShadowLimitAmount,
+                           WalletType = wtm.WalletTypeName,
+                           WalletId = walletid
+                       }).AsEnumerable().ToList();
+        return result1;
+    }
 
-            var total = (from tq in _dbContext.WalletTransactionQueues
-                         where tq.Status == enTransactionStatus.Success && tq.TrnDate <= startDateTime.Date &&
-                     tq.TrnDate >= endDateTime.Date && tq.WalletID == WalletId && tq.MemberID == userId
-                         select tq.Amount
-         ).Sum();
-            return total;
+    return result;
+}
+//vsolanki 24-10-2018
+public List<BalanceResponse> GetAllShadowBalance(long userid)
+{
+    var result = (from u in _dbContext.MemberShadowBalance
+                  join w in _dbContext.WalletMasters
+                  on u.WalletID equals w.Id
+                  join wt in _dbContext.WalletTypeMasters
+                                           on u.WalletTypeId equals wt.Id
+                  where w.UserID == userid && u.Status == 0
+                  select new BalanceResponse
+                  {
+                      Balance = u.ShadowAmount,
+                      WalletType = wt.WalletTypeName,
+                      WalletId = w.Id
+                  }).AsEnumerable().ToList();
 
-            //return Convert.ToDecimal(amt);
-        }
+    if (result.Count() == 0)
+    {
+        var result1 = (from u in _dbContext.MemberShadowLimit
+                       join w in _dbContext.BizUserTypeMapping
+                       on u.MemberTypeId equals w.UserType
+                       join wt in _dbContext.WalletMasters
+                       on u.WalletType equals wt.WalletTypeID
+                       join wtm in _dbContext.WalletTypeMasters
+                       on wt.WalletTypeID equals wtm.Id
+                       where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
+                       select new BalanceResponse
+                       {
+                           Balance = u.ShadowLimitAmount,
+                           WalletType = wtm.WalletTypeName,
+                           WalletId = wt.Id
+                       }).AsEnumerable().ToList();
+        return result1;
+    }
 
-        //vsoalnki 26-10-2018
-        public List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page)
-        {
-            //int skip = Helpers.PageSize * (page - 1);
-            List<WalletLedgerRes> wl = (from w in _dbContext.WalletLedgers
-                                        where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
-                                        orderby w.TrnDate ascending
-                                        select new WalletLedgerRes
+    return result;
+}
+//vsolanki 24-10-2018
+public Balance GetAllBalances(long userid, long walletid)
+{
+    var Unsettled = (from w in _dbContext.WalletTransactionQueues
+                     where w.WalletID == walletid && w.MemberID == userid && w.Status == enTransactionStatus.Hold || w.Status == enTransactionStatus.Pending
+                     select w.Amount).Sum();
+
+    var availble = (from w in _dbContext.WalletMasters
+                    join wt in _dbContext.WalletTypeMasters
+                            on w.WalletTypeID equals wt.Id
+                    where w.Id == walletid && w.UserID == userid && w.Status == 1
+                    select w.Balance).Sum();
+
+    var UnClearedBalance = (from w in _dbContext.DepositHistory
+                            join wt in _dbContext.AddressMasters
+                            on w.Address equals wt.Address
+                            where wt.WalletId == walletid && w.UserId == userid && w.Status == 0
+                            select w.Amount
+                  ).Sum();
+
+    var ShadowBalance = (from u in _dbContext.MemberShadowBalance
+                         join w in _dbContext.WalletMasters
+                         on u.WalletID equals w.Id
+                         join wt in _dbContext.WalletTypeMasters
+                                                  on u.WalletTypeId equals wt.Id
+                         where u.WalletID == walletid && w.UserID == userid && u.Status == 0
+                         select u.ShadowAmount).Sum();
+
+    var StackingBalance = (from u in _dbContext.UserStacking
+                           join w in _dbContext.WalletMasters
+                           on u.WalletId equals w.Id
+                           where u.WalletId == walletid && w.UserID == userid && u.Status == 0
+                           select u.StackingAmount).Sum(); ;
+
+    return new Balance { UnSettledBalance = Unsettled, AvailableBalance = availble, UnClearedBalance = UnClearedBalance, ShadowBalance = ShadowBalance, StackingBalance = StackingBalance };
+
+}
+
+//vsolanki 25-10-2018
+public List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid)
+{
+    var result = (from w in _dbContext.WalletMasters
+                  join wt in _dbContext.WalletTypeMasters
+                  on w.WalletTypeID equals wt.Id
+                  where w.UserID == userid && w.Status == 1
+                  group w by new { wt.WalletTypeName } into g
+                  select new BalanceResponseLimit
+                  {
+                      Balance = g.Sum(order => order.Balance),
+                      WalletType = g.Key.WalletTypeName,
+                  }).AsEnumerable().ToList();
+
+    return result;
+}
+
+public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID, long UserID)
+{
+    List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
+                                        where b.UserID == UserID && b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
+                                        select new BeneficiaryMasterRes
                                         {
-                                            LedgerId = w.Id,
-                                            PreBal = w.PreBal,
-                                            PostBal = w.PreBal,
-                                            Remarks = "Opening Balance",
-                                            Amount = 0,
-                                            CrAmount = 0,
-                                            DrAmount = 0,
-                                            TrnDate = w.TrnDate
-                                        }).Take(1).Union((from w in _dbContext.WalletLedgers
-                                                          where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
-                                                          select new WalletLedgerRes
-                                                          {
-                                                              LedgerId = w.Id,
-                                                              PreBal = w.PreBal,
-                                                              PostBal = w.PostBal,
-                                                              Remarks = w.Remarks,
-                                                              Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt,
-                                                              CrAmount = w.CrAmt,
-                                                              DrAmount = w.DrAmt,
-                                                              TrnDate = w.TrnDate
-                                                          })).ToList();
+                                            Name = b.Name,
+                                            BeneficiaryID = b.Id,
+                                            Address = b.Address,
+                                            Status = b.Status
 
-            if (page > 0)
-            {
-                int skip = Helpers.PageSize * (page - 1);
-                wl = wl.Skip(skip).Take(Helpers.PageSize).ToList();
-            }
-            return wl;
-        }
+                                        }).AsEnumerable().ToList();
+    return items;
+}
 
-        //vsolanki 2018-10-27
-        public int CreateDefaulWallet(long UserId)
+public List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID)
+{
+    List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
+                                        join w in _dbContext.WalletTypeMasters
+                                        on b.WalletTypeID equals w.Id
+                                        where b.UserID == UserID && b.Status != 9
+                                        select new BeneficiaryMasterRes
+                                        {
+                                            Name = b.Name,
+                                            BeneficiaryID = b.Id,
+                                            Address = b.Address,
+                                            CoinName = w.WalletTypeName,
+                                            IsWhiteListed = b.IsWhiteListed,
+                                            Status = b.Status
+
+                                        }).AsEnumerable().ToList();
+    return items;
+}
+
+public bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID)
+{
+    try
+    {
+        _dbContext.Database.BeginTransaction();
+        var arrayObj = (from p in _dbContext.BeneficiaryMaster
+                        join q in arryTrnID on p.Id equals q.ID
+                        select new { p, q }).ToList();
+        if (arrayObj.Count != 0)
         {
-            try
+            arrayObj.ForEach(e => e.p.IsWhiteListed = e.q.WhitelistingBit);
+            arrayObj.ForEach(e =>
             {
-                //Craete wallet
-                var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
-                                     where p.Status == 1
-                                     select p).ToList();
-
-                var Wallets = from WalletTypearray in WalletTypeObj
-                              select new WalletMaster
-                              {
-                                  CreatedBy = UserId,
-                                  CreatedDate = UTC_To_IST(),
-                                  Status = Convert.ToInt16(ServiceStatus.Active),
-                                  UpdatedDate = UTC_To_IST(),
-                                  Balance = 0,
-                                  WalletTypeID = WalletTypearray.Id,
-                                  UserID = UserId,
-                                  Walletname = WalletTypearray.WalletTypeName + " DefaultWallet",
-                                  AccWalletID = RandomGenerateWalletId(UserId, 1),
-                                  IsDefaultWallet = 1,
-                                  IsValid=true,
-                                  PublicAddress = ""
-                              };
-                _dbContext.WalletMasters.AddRange(Wallets);
-                _dbContext.SaveChanges();
-
-                //Add limit for following wallet Id           
-                //  Array val = Enum.GetValues(typeof(enWalletLimitType));
-
-                //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
-                //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
-                //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
-                //Convert.ToInt32(enWalletLimitType.TradingLimit) };
-
-                List<int> AllowTrnType = Helpers.GetEnumValue<enWalletLimitType>();
-
-                var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
-                                join q in AllowTrnType on p.TrnType equals q
-                                select p).ToList();
-
-                var walletObj = (from wm in _dbContext.WalletMasters
-                                 where wm.UserID == UserId && wm.IsDefaultWallet == 1
-                                 select wm).ToList();
-
-                var fadd = from array in arrayObj
-                           from ww in walletObj
-                           select new WalletLimitConfiguration
-                           {
-                               CreatedBy = UserId,
-                               CreatedDate = UTC_To_IST(),
-                               WalletId = ww.Id,
-                               TrnType = array.TrnType,
-                               LimitPerDay = array.LimitPerDay,
-                               LimitPerHour = array.LimitPerHour,
-                               LimitPerTransaction = array.LimitPerTransaction,
-                               Status = Convert.ToInt16(ServiceStatus.Active),
-                               StartTime = array.StartTime,
-                               EndTime = array.EndTime,
-                               LifeTime = null,
-                               UpdatedDate = UTC_To_IST()
-                           };
-                _dbContext.WalletLimitConfiguration.AddRange(fadd);
-                ///_dbContext.SaveChanges();
-
-                //add WalletAllowTrn
-                var trntypeObj = from type in AllowTrnType
-                                 from ww in walletObj
-                                 select new WalletAllowTrn
-                                 {
-                                     CreatedDate = UTC_To_IST(),
-                                     CreatedBy = UserId,
-                                     Status = Convert.ToInt16(ServiceStatus.Active),
-                                     WalletId = ww.Id,
-                                     TrnType = Convert.ToByte(type),
-                                 };
-                _dbContext.WalletAllowTrns.AddRange(trntypeObj);
-                _dbContext.SaveChanges();
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-
-        private static Random random = new Random((int)DateTime.Now.Ticks);
-
-        public string RandomGenerateWalletId(long userID, byte isDefaultWallet)
-        {
-            try
-            {
-                long maxValue = 9999999999;
-                long minValue = 1000000000;
-                long x = (long)Math.Round(random.NextDouble() * (maxValue - minValue - 1)) + minValue;
-                string userIDStr = x.ToString() + userID.ToString().PadLeft(5, '0') + isDefaultWallet.ToString();
-                return userIDStr;
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-
-        public int CreateWalletForAllUser_NewService(string WalletType)
-        {
-            try
-            {
-                var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
-                                     where p.Status == 1 && p.WalletTypeName == WalletType
-                                     select p);
-
-                //var Users = (from p in _dbContext.Users
-                //             where p.IsEnabled == true
-                //             select p).ToList();
-
-
-
-                var Users = from s in _dbContext.Users
-                            from wt in WalletTypeObj
-                            where !_dbContext.WalletMasters.Any(es => (es.UserID == s.Id) && (es.WalletTypeID == wt.Id) && (es.IsDefaultWallet == 1))
-                            select s;
-                //var ISExistWallet = (from item in _dbContext.WalletMasters
-                //                     from WalletTypearray in WalletTypeObj
-                //                     from ui in Users
-                //                     where item.WalletTypeID == WalletTypearray.Id && item.IsDefaultWallet == 1 && item.UserID == ui.Id
-                //                     select item).ToList();
-
-                var Wallets = from WalletTypearray in WalletTypeObj
-                              from U in Users
-                              select new WalletMaster
-                              {
-                                  CreatedBy = U.Id,
-                                  CreatedDate = UTC_To_IST(),
-                                  Status = Convert.ToInt16(ServiceStatus.Active),
-                                  UpdatedDate = UTC_To_IST(),
-                                  Balance = 0,
-                                  WalletTypeID = WalletTypearray.Id,
-                                  UserID = U.Id,
-                                  Walletname = WalletTypearray.WalletTypeName + " DefaultWallet",
-                                  AccWalletID = RandomGenerateWalletId(U.Id, 1),
-                                  IsDefaultWallet = 1,
-                                  IsValid = true,
-                                  PublicAddress = ""
-                              };
-                _dbContext.WalletMasters.AddRange(Wallets);
-                 _dbContext.SaveChanges();
-
-                //Add limit for following wallet Id           
-                //  Array val = Enum.GetValues(typeof(enWalletLimitType));
-
-                //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
-                //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
-                //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
-                //Convert.ToInt32(enWalletLimitType.TradingLimit) };
-                List<int> AllowTrnType = Helpers.GetEnumValue<enWalletLimitType>();
-
-
-                var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
-                                join q in AllowTrnType on p.TrnType equals q
-                                select p).ToList();
-
-                var walletObj = (from wm in _dbContext.WalletMasters
-                                 from U in Users
-                                 where wm.UserID == U.Id && wm.IsDefaultWallet == 1
-                                 select wm).ToList();
-
-                var fadd = from array in arrayObj
-                           from ww in walletObj
-                           from U in Users
-                           select new WalletLimitConfiguration
-                           {
-                               CreatedBy = U.Id,
-                               CreatedDate = UTC_To_IST(),
-                               WalletId = ww.Id,
-                               TrnType = array.TrnType,
-                               LimitPerDay = array.LimitPerDay,
-                               LimitPerHour = array.LimitPerHour,
-                               LimitPerTransaction = array.LimitPerTransaction,
-                               Status = Convert.ToInt16(ServiceStatus.Active),
-                               StartTime = array.StartTime,
-                               EndTime = array.EndTime,
-                               LifeTime = null,
-                               UpdatedDate = UTC_To_IST()
-                           };
-                _dbContext.WalletLimitConfiguration.AddRange(fadd);
-                //  _dbContext.SaveChanges();
-
-                //add WalletAllowTrn
-                var trntypeObj = from type in AllowTrnType
-                                 from ww in walletObj
-                                 from U in Users
-                                 select new WalletAllowTrn
-                                 {
-                                     CreatedDate = UTC_To_IST(),
-                                     CreatedBy = U.Id,
-                                     Status = Convert.ToInt16(ServiceStatus.Active),
-                                     WalletId = ww.Id,
-                                     TrnType = Convert.ToByte(type),
-                                 };
-                _dbContext.WalletAllowTrns.AddRange(trntypeObj);
-                _dbContext.SaveChanges();
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-
-        //vsolanki 2018-10-29
-        public int AddBizUserTypeMapping(BizUserTypeMapping bizUser)
-        {
-            try
-            {
-                var UserTypeMap = _dbContext.BizUserTypeMapping.Add(bizUser);
-                _dbContext.SaveChanges();
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
-
-        //vsolanki 2018-10-29
-        public List<IncomingTrnRes> GetIncomingTransaction(long Userid)
-        {
-            //    var myResult = _dbContext.DepositHistory.Where(r => r.Status == 0)
-            //.Select((r, i) => new {idx = i, TrnID = r.TrnID });
-
-            var trns = (from trn in _dbContext.DepositHistory
-                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid
-                        select new IncomingTrnRes
-                        {
-                            AutoNo = trn.Id,
-                            TrnID = trn.TrnID,
-                            WalletType = trn.SMSCode,
-                            Confirmations = trn.Confirmations,
-                            Amount = trn.Amount,
-                            Address = trn.Address
-                        }).ToList();
-            var test = trns.Select((r, i) => new IncomingTrnRes
-            {
-                AutoNo = i+1,
-                TrnID = r.TrnID,
-                WalletType = r.WalletType,
-                Confirmations = r.Confirmations,
-                Amount = r.Amount,
-                Address = r.Address
-            }).ToList();
-            return test;
-        }
-
-        public long getOrgID()
-        {
-            try
-            {
-                var orgObj = _dbContext.BizUserTypeMapping.Where(u => u.UserType == 0).SingleOrDefault();
-                if (orgObj == null)
+                if (e.q.WhitelistingBit == 9)
                 {
-                    return 0;
+                    e.p.Status = e.q.WhitelistingBit;
                 }
-                else
+            });
+            arrayObj.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
+            _dbContext.SaveChanges();
+            _dbContext.Database.CommitTransaction();
+            return true;
+        }
+        return false;
+    }
+    catch (Exception ex)
+    {
+        _dbContext.Database.RollbackTransaction();
+        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
+
+
+public void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long WalletId)
+{
+    var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
+                    join q in AllowTrnType on p.TrnType equals q
+                    select p).ToList();
+
+    var fadd = from array in arrayObj
+               select new WalletLimitConfiguration
+               {
+                   CreatedBy = userid,
+                   CreatedDate = UTC_To_IST(),
+                   WalletId = WalletId,
+                   TrnType = array.TrnType,
+                   LimitPerDay = array.LimitPerDay,
+                   LimitPerHour = array.LimitPerHour,
+                   LimitPerTransaction = array.LimitPerTransaction,
+                   Status = Convert.ToInt16(ServiceStatus.Active),
+                   StartTime = array.StartTime,
+                   EndTime = array.EndTime,
+                   LifeTime = null,
+                   UpdatedDate = UTC_To_IST()
+               };
+    _dbContext.WalletLimitConfiguration.AddRange(fadd);
+    _dbContext.SaveChanges();
+
+}
+
+//vsolanki 26-10-2018
+public DateTime UTC_To_IST(DateTime dateTime)
+{
+    try
+    {
+        // DateTime myUTC = DateTime.UtcNow;
+        // 'Dim utcdate As DateTime = DateTime.ParseExact(DateTime.UtcNow, "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+        // Dim utcdate As DateTime = DateTime.ParseExact(myUTC, "M/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+        // 'Dim utcdate As DateTime = DateTime.ParseExact("11/09/2016 6:31:00 PM", "M/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+        DateTime istdate = TimeZoneInfo.ConvertTimeFromUtc(dateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+        // MsgBox(myUTC & " - " & utcdate & " - " & istdate)
+        return istdate;
+    }
+    catch (Exception ex)
+    {
+        throw ex;
+    }
+}
+
+public decimal GetTodayAmountOfTQ(long userId, long WalletId)
+{
+    DateTime startDateTime = UTC_To_IST(DateTime.UtcNow); //Today at 12:00:00
+    DateTime endDateTime = UTC_To_IST(DateTime.UtcNow.AddDays(-1).AddTicks(-1));
+    //var d = startDateTime.Date;
+    //var amt = (from tq in _dbContext.WalletTransactionQueues
+    //          where tq.Status == enTransactionStatus.Success && tq.TrnDate >= startDateTime &&
+    //          tq.TrnDate <= endDateTime && tq.WalletID== WalletId && tq.MemberID==userId
+    //          group tq by new { tq.TrnDate } into g
+    //          select
+    //          g.Sum(order => order.Amount));
+
+
+    var total = (from tq in _dbContext.WalletTransactionQueues
+                 where tq.Status == enTransactionStatus.Success && tq.TrnDate <= startDateTime.Date &&
+             tq.TrnDate >= endDateTime.Date && tq.WalletID == WalletId && tq.MemberID == userId
+                 select tq.Amount
+ ).Sum();
+    return total;
+
+    //return Convert.ToDecimal(amt);
+}
+
+//vsoalnki 26-10-2018
+public List<WalletLedgerRes> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page)
+{
+    //int skip = Helpers.PageSize * (page - 1);
+    List<WalletLedgerRes> wl = (from w in _dbContext.WalletLedgers
+                                where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                orderby w.TrnDate ascending
+                                select new WalletLedgerRes
+                                {
+                                    LedgerId = w.Id,
+                                    PreBal = w.PreBal,
+                                    PostBal = w.PreBal,
+                                    Remarks = "Opening Balance",
+                                    Amount = 0,
+                                    CrAmount = 0,
+                                    DrAmount = 0,
+                                    TrnDate = w.TrnDate
+                                }).Take(1).Union((from w in _dbContext.WalletLedgers
+                                                  where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                                  select new WalletLedgerRes
+                                                  {
+                                                      LedgerId = w.Id,
+                                                      PreBal = w.PreBal,
+                                                      PostBal = w.PostBal,
+                                                      Remarks = w.Remarks,
+                                                      Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt,
+                                                      CrAmount = w.CrAmt,
+                                                      DrAmount = w.DrAmt,
+                                                      TrnDate = w.TrnDate
+                                                  })).ToList();
+
+    if (page > 0)
+    {
+        int skip = Helpers.PageSize * (page - 1);
+        wl = wl.Skip(skip).Take(Helpers.PageSize).ToList();
+    }
+    return wl;
+}
+
+//vsolanki 2018-10-27
+public int CreateDefaulWallet(long UserId)
+{
+    try
+    {
+        //Craete wallet
+        var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
+                             where p.Status == 1
+                             select p).ToList();
+
+        var Wallets = from WalletTypearray in WalletTypeObj
+                      select new WalletMaster
+                      {
+                          CreatedBy = UserId,
+                          CreatedDate = UTC_To_IST(),
+                          Status = Convert.ToInt16(ServiceStatus.Active),
+                          UpdatedDate = UTC_To_IST(),
+                          Balance = 0,
+                          WalletTypeID = WalletTypearray.Id,
+                          UserID = UserId,
+                          Walletname = WalletTypearray.WalletTypeName + " DefaultWallet",
+                          AccWalletID = RandomGenerateWalletId(UserId, 1),
+                          IsDefaultWallet = 1,
+                          IsValid = true,
+                          PublicAddress = ""
+                      };
+        _dbContext.WalletMasters.AddRange(Wallets);
+        _dbContext.SaveChanges();
+
+        //Add limit for following wallet Id           
+        //  Array val = Enum.GetValues(typeof(enWalletLimitType));
+
+        //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
+        //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
+        //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
+        //Convert.ToInt32(enWalletLimitType.TradingLimit) };
+
+        List<int> AllowTrnType = Helpers.GetEnumValue<enWalletLimitType>();
+
+        var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
+                        join q in AllowTrnType on p.TrnType equals q
+                        select p).ToList();
+
+        var walletObj = (from wm in _dbContext.WalletMasters
+                         where wm.UserID == UserId && wm.IsDefaultWallet == 1
+                         select wm).ToList();
+
+        var fadd = from array in arrayObj
+                   from ww in walletObj
+                   select new WalletLimitConfiguration
+                   {
+                       CreatedBy = UserId,
+                       CreatedDate = UTC_To_IST(),
+                       WalletId = ww.Id,
+                       TrnType = array.TrnType,
+                       LimitPerDay = array.LimitPerDay,
+                       LimitPerHour = array.LimitPerHour,
+                       LimitPerTransaction = array.LimitPerTransaction,
+                       Status = Convert.ToInt16(ServiceStatus.Active),
+                       StartTime = array.StartTime,
+                       EndTime = array.EndTime,
+                       LifeTime = null,
+                       UpdatedDate = UTC_To_IST()
+                   };
+        _dbContext.WalletLimitConfiguration.AddRange(fadd);
+        ///_dbContext.SaveChanges();
+
+        //add WalletAllowTrn
+        var trntypeObj = from type in AllowTrnType
+                         from ww in walletObj
+                         select new WalletAllowTrn
+                         {
+                             CreatedDate = UTC_To_IST(),
+                             CreatedBy = UserId,
+                             Status = Convert.ToInt16(ServiceStatus.Active),
+                             WalletId = ww.Id,
+                             TrnType = Convert.ToByte(type),
+                         };
+        _dbContext.WalletAllowTrns.AddRange(trntypeObj);
+        _dbContext.SaveChanges();
+        return 1;
+    }
+    catch (Exception ex)
+    {
+        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
+
+private static Random random = new Random((int)DateTime.Now.Ticks);
+
+public string RandomGenerateWalletId(long userID, byte isDefaultWallet)
+{
+    try
+    {
+        long maxValue = 9999999999;
+        long minValue = 1000000000;
+        long x = (long)Math.Round(random.NextDouble() * (maxValue - minValue - 1)) + minValue;
+        string userIDStr = x.ToString() + userID.ToString().PadLeft(5, '0') + isDefaultWallet.ToString();
+        return userIDStr;
+    }
+    catch (Exception ex)
+    {
+        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
+
+public int CreateWalletForAllUser_NewService(string WalletType)
+{
+    try
+    {
+        var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
+                             where p.Status == 1 && p.WalletTypeName == WalletType
+                             select p);
+
+        //var Users = (from p in _dbContext.Users
+        //             where p.IsEnabled == true
+        //             select p).ToList();
+
+
+
+        var Users = from s in _dbContext.Users
+                    from wt in WalletTypeObj
+                    where !_dbContext.WalletMasters.Any(es => (es.UserID == s.Id) && (es.WalletTypeID == wt.Id) && (es.IsDefaultWallet == 1))
+                    select s;
+        //var ISExistWallet = (from item in _dbContext.WalletMasters
+        //                     from WalletTypearray in WalletTypeObj
+        //                     from ui in Users
+        //                     where item.WalletTypeID == WalletTypearray.Id && item.IsDefaultWallet == 1 && item.UserID == ui.Id
+        //                     select item).ToList();
+
+        var Wallets = from WalletTypearray in WalletTypeObj
+                      from U in Users
+                      select new WalletMaster
+                      {
+                          CreatedBy = U.Id,
+                          CreatedDate = UTC_To_IST(),
+                          Status = Convert.ToInt16(ServiceStatus.Active),
+                          UpdatedDate = UTC_To_IST(),
+                          Balance = 0,
+                          WalletTypeID = WalletTypearray.Id,
+                          UserID = U.Id,
+                          Walletname = WalletTypearray.WalletTypeName + " DefaultWallet",
+                          AccWalletID = RandomGenerateWalletId(U.Id, 1),
+                          IsDefaultWallet = 1,
+                          IsValid = true,
+                          PublicAddress = ""
+                      };
+        _dbContext.WalletMasters.AddRange(Wallets);
+        _dbContext.SaveChanges();
+
+        //Add limit for following wallet Id           
+        //  Array val = Enum.GetValues(typeof(enWalletLimitType));
+
+        //    int[] AllowTrnType = { Convert.ToInt32(enWalletLimitType.APICallLimit) ,
+        //Convert.ToInt32(enWalletLimitType.WithdrawLimit) ,
+        //Convert.ToInt32(enWalletLimitType.DepositLimit) ,
+        //Convert.ToInt32(enWalletLimitType.TradingLimit) };
+        List<int> AllowTrnType = Helpers.GetEnumValue<enWalletLimitType>();
+
+
+        var arrayObj = (from p in _dbContext.WalletLimitConfigurationMaster
+                        join q in AllowTrnType on p.TrnType equals q
+                        select p).ToList();
+
+        var walletObj = (from wm in _dbContext.WalletMasters
+                         from U in Users
+                         where wm.UserID == U.Id && wm.IsDefaultWallet == 1
+                         select wm).ToList();
+
+        var fadd = from array in arrayObj
+                   from ww in walletObj
+                   from U in Users
+                   select new WalletLimitConfiguration
+                   {
+                       CreatedBy = U.Id,
+                       CreatedDate = UTC_To_IST(),
+                       WalletId = ww.Id,
+                       TrnType = array.TrnType,
+                       LimitPerDay = array.LimitPerDay,
+                       LimitPerHour = array.LimitPerHour,
+                       LimitPerTransaction = array.LimitPerTransaction,
+                       Status = Convert.ToInt16(ServiceStatus.Active),
+                       StartTime = array.StartTime,
+                       EndTime = array.EndTime,
+                       LifeTime = null,
+                       UpdatedDate = UTC_To_IST()
+                   };
+        _dbContext.WalletLimitConfiguration.AddRange(fadd);
+        //  _dbContext.SaveChanges();
+
+        //add WalletAllowTrn
+        var trntypeObj = from type in AllowTrnType
+                         from ww in walletObj
+                         from U in Users
+                         select new WalletAllowTrn
+                         {
+                             CreatedDate = UTC_To_IST(),
+                             CreatedBy = U.Id,
+                             Status = Convert.ToInt16(ServiceStatus.Active),
+                             WalletId = ww.Id,
+                             TrnType = Convert.ToByte(type),
+                         };
+        _dbContext.WalletAllowTrns.AddRange(trntypeObj);
+        _dbContext.SaveChanges();
+        return 1;
+    }
+    catch (Exception ex)
+    {
+        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
+
+//vsolanki 2018-10-29
+public int AddBizUserTypeMapping(BizUserTypeMapping bizUser)
+{
+    try
+    {
+        var UserTypeMap = _dbContext.BizUserTypeMapping.Add(bizUser);
+        _dbContext.SaveChanges();
+        return 1;
+    }
+    catch (Exception ex)
+    {
+        return 0;
+    }
+}
+
+//vsolanki 2018-10-29
+public List<IncomingTrnRes> GetIncomingTransaction(long Userid)
+{
+    //    var myResult = _dbContext.DepositHistory.Where(r => r.Status == 0)
+    //.Select((r, i) => new {idx = i, TrnID = r.TrnID });
+
+    var trns = (from trn in _dbContext.DepositHistory
+                where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid
+                select new IncomingTrnRes
                 {
-                    return orgObj.UserID;
-                }
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
+                    AutoNo = trn.Id,
+                    TrnID = trn.TrnID,
+                    WalletType = trn.SMSCode,
+                    Confirmations = trn.Confirmations,
+                    Amount = trn.Amount,
+                    Address = trn.Address
+                }).ToList();
+    var test = trns.Select((r, i) => new IncomingTrnRes
+    {
+        AutoNo = i + 1,
+        TrnID = r.TrnID,
+        WalletType = r.WalletType,
+        Confirmations = r.Confirmations,
+        Amount = r.Amount,
+        Address = r.Address
+    }).ToList();
+    return test;
+}
 
-        public WalletTransactionQueue GetTransactionQueue(long TrnNo)
+public long getOrgID()
+{
+    try
+    {
+        var orgObj = _dbContext.BizUserTypeMapping.Where(u => u.UserType == 0).SingleOrDefault();
+        if (orgObj == null)
         {
-            try
-            {
-                WalletTransactionQueue tq = _dbContext.WalletTransactionQueues.Where(u => u.TrnNo == TrnNo).SingleOrDefault();
-                return tq;
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
+            return 0;
         }
-        public bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1, WalletTransactionQueue wtq1, WalletTransactionQueue wtq2, WalletTransactionOrder order)
+        else
         {
-            try
-            { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
-
-                _dbContext.Database.BeginTransaction();
-                _dbContext.Set<WalletLedger>().Add(wl1);
-                _dbContext.Set<WalletLedger>().Add(wl2);
-                _dbContext.Set<TransactionAccount>().Add(ta1);
-                _dbContext.Set<TransactionAccount>().Add(ta2);
-                _dbContext.Entry(wm1).State = EntityState.Modified;
-                _dbContext.Entry(wm2).State = EntityState.Modified;
-                _dbContext.Entry(wtq1).State = EntityState.Modified;
-                _dbContext.Entry(wtq2).State = EntityState.Modified;
-                _dbContext.Entry(order).State = EntityState.Modified;
-                _dbContext.SaveChanges();
-                _dbContext.Database.CommitTransaction();
-                return true;
-            }
-
-            catch (Exception ex)
-            {
-                _dbContext.Database.RollbackTransaction();
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
+            return orgObj.UserID;
         }
+    }
+    catch (Exception ex)
+    {
+        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
 
-        public long GetTypeMappingObj(long userid)
+public WalletTransactionQueue GetTransactionQueue(long TrnNo)
+{
+    try
+    {
+        WalletTransactionQueue tq = _dbContext.WalletTransactionQueues.Where(u => u.TrnNo == TrnNo).SingleOrDefault();
+        return tq;
+    }
+    catch (Exception ex)
+    {
+        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
+public bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1, WalletTransactionQueue wtq1, WalletTransactionQueue wtq2, WalletTransactionOrder order)
+{
+    try
+    { // returns the address for ETH which are previously generated but not assinged to any wallet ntrivedi 26-09-2018
+
+        _dbContext.Database.BeginTransaction();
+        _dbContext.Set<WalletLedger>().Add(wl1);
+        _dbContext.Set<WalletLedger>().Add(wl2);
+        _dbContext.Set<TransactionAccount>().Add(ta1);
+        _dbContext.Set<TransactionAccount>().Add(ta2);
+        _dbContext.Entry(wm1).State = EntityState.Modified;
+        _dbContext.Entry(wm2).State = EntityState.Modified;
+        _dbContext.Entry(wtq1).State = EntityState.Modified;
+        _dbContext.Entry(wtq2).State = EntityState.Modified;
+        _dbContext.Entry(order).State = EntityState.Modified;
+        _dbContext.SaveChanges();
+        _dbContext.Database.CommitTransaction();
+        return true;
+    }
+
+    catch (Exception ex)
+    {
+        _dbContext.Database.RollbackTransaction();
+        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
+
+public long GetTypeMappingObj(long userid)
+{
+    try
+    {
+        var UserTypeObj = _dbContext.BizUserTypeMapping.Where(u => u.UserID == userid).SingleOrDefault();
+        if (UserTypeObj == null)
         {
-            try
-            {
-                var UserTypeObj = _dbContext.BizUserTypeMapping.Where(u => u.UserID == userid).SingleOrDefault();
-                if (UserTypeObj == null)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return UserTypeObj.UserType;
-                }
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
+            return 0;
         }
+        else
+        {
+            return UserTypeObj.UserType;
+        }
+    }
+    catch (Exception ex)
+    {
+        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        throw ex;
+    }
+}
 
       
     }
