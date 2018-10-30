@@ -2508,6 +2508,44 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("BizUserTypeMapping");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.ChargeRuleMaster", b =>
+                {
+                    b.Property<int>("TrnType");
+
+                    b.Property<long>("WalletType");
+
+                    b.Property<int>("ChargeType");
+
+                    b.Property<decimal>("ChargeValue")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("MaxAmount")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<decimal>("MinAmount")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<string>("Name");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("TrnType", "WalletType");
+
+                    b.ToTable("ChargeRuleMaster");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.DepositCounterLog", b =>
                 {
                     b.Property<long>("Id")
@@ -2580,6 +2618,39 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasAlternateKey("SerProId", "WalletTypeID");
 
                     b.ToTable("DepositCounterMaster");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.LimitRuleMaster", b =>
+                {
+                    b.Property<int>("TrnType");
+
+                    b.Property<long>("WalletType");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("MaxAmount")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<decimal>("MinAmount")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<string>("Name");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("TrnType", "WalletType");
+
+                    b.ToTable("LimitRuleMaster");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.MemberShadowBalance", b =>
