@@ -55,7 +55,9 @@ namespace CleanArchitecture.Infrastructure.Services
         private static Random random = new Random((int)DateTime.Now.Ticks);
         //vsolanki 10-10-2018 
         private readonly ICommonRepository<WalletAllowTrn> _WalletAllowTrnRepository; 
-        private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository; 
+        private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository;
+        private readonly ICommonRepository<ChargeRuleMaster> _chargeRuleMaster;
+        private readonly ICommonRepository<LimitRuleMaster> _limitRuleMaster;
 
         //private readonly IRepository<WalletTransactionOrder> _WalletAllowTrnRepository;
         //  private readonly ICommonRepository<WalletTransactionQueue> t;
@@ -65,7 +67,8 @@ namespace CleanArchitecture.Infrastructure.Services
             IWebApiRepository webApiRepository, IWebApiSendRequest webApiSendRequest, ICommonRepository<ThirdPartyAPIConfiguration> thirdpartyCommonRepo,
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
-            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo,ICommonRepository<MemberShadowLimit>ShadowLimitRepo,ICommonRepository<MemberShadowBalance>ShadowBalRepo ,ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo,ICommonRepository<MemberShadowLimit>ShadowLimitRepo,ICommonRepository<MemberShadowBalance>ShadowBalRepo ,ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig,
+            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -90,6 +93,8 @@ namespace CleanArchitecture.Infrastructure.Services
             _WalletLimitConfigurationMasterRepository = WalletConfigMasterRepo;
             _ShadowBalRepo = ShadowBalRepo;
             _ShadowLimitRepo = ShadowLimitRepo;
+            _chargeRuleMaster = chargeRuleMaster;
+            _limitRuleMaster = limitRuleMaster;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -228,12 +233,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     var typeobj = _walletRepository1.GetTypeMappingObj(Walletobj.UserID);
-                    if(typeobj != 0)
+                    if (typeobj != 0)
                     {
                         var Limitobj = _ShadowLimitRepo.GetSingle(item => item.MemberTypeId == typeobj);
-                        if(Limitobj != null)
+                        if (Limitobj != null)
                         {
-                            if((Limitobj.ShadowLimitAmount + Amount) < Walletobj.Balance)
+                            if ((Limitobj.ShadowLimitAmount + Amount) < Walletobj.Balance)
                             {
                                 return enErrorCode.Success;
                             }
@@ -242,12 +247,10 @@ namespace CleanArchitecture.Infrastructure.Services
                         return enErrorCode.NotFoundLimit;
                     }
                     return enErrorCode.MemberTypeNotFound;
-                }           
+                }
             }
             return enErrorCode.WalletNotFound;
         }
-
-        //Rushabh 26-10-2018
 
         public enValidateWalletLimit ValidateWalletLimit(enTrnType TranType,decimal PerDayAmt,decimal PerHourAmt,decimal PerTranAmt, long WalletID)
         {
@@ -1103,8 +1106,14 @@ namespace CleanArchitecture.Infrastructure.Services
                     // insert with status=2 system failed
                     objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidWallet, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
-
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
+                }              
+                
+                if (!CheckUserBalance(dWalletobj.Id))
+                {
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.BalMismatch, trnType);
+                    objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.SettedBalanceMismatch, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
                 if (orderType != enWalletTranxOrderType.Debit) // sell 13-10-2018
                 {
@@ -1205,7 +1214,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (cWalletobj.Status != 1 || cWalletobj.IsValid == false)
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
-                }
+                }               
                 if (orderType != enWalletTranxOrderType.Credit) // buy 
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTrnType, ErrorCode = enErrorCode.InvalidTrnType };
@@ -1215,6 +1224,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (TrnRefNo == 0) // buy
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo };
+                }
+                if (!CheckUserBalance(cWalletobj.Id))
+                {
+                    tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.BalMismatch, trnType);
+                    tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.SettedBalanceMismatch, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
                 }
                 if (TotalAmount <= 0)
                 {
@@ -1386,6 +1401,13 @@ namespace CleanArchitecture.Infrastructure.Services
             LimitResponse Response = new LimitResponse();
             try
             {
+                TimeSpan StartTime, EndTime;
+                System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0,System.DateTimeKind.Utc);
+                DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                dateTime1 = istDate.AddSeconds(request.StartTime);
+                StartTime = dateTime1.TimeOfDay;
+                EndTime = dateTime1.TimeOfDay;
+
                 var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
                 if (walletMasters == null)
                 {
@@ -1407,9 +1429,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.CreatedDate = UTC_To_IST();
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
-                    newobj.StartTime = request.StartTime;
+                    newobj.StartTime = StartTime;
                     newobj.LifeTime = 99;
-                    newobj.EndTime = request.EndTime;
+                    newobj.EndTime = EndTime;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
                     // Response.WalletLimitConfigurationRes = newobj;
@@ -1422,8 +1444,8 @@ namespace CleanArchitecture.Infrastructure.Services
                         IsExist.LimitPerHour = request.LimitPerHour;
                         IsExist.LimitPerDay = request.LimitPerDay;
                         IsExist.LimitPerTransaction = request.LimitPerTransaction;
-                        IsExist.StartTime = request.StartTime;
-                        IsExist.EndTime = request.EndTime;
+                        IsExist.StartTime = StartTime;
+                        IsExist.EndTime = EndTime;
                         IsExist.UpdatedBy = Userid;
                         IsExist.UpdatedDate = UTC_To_IST();
                         _LimitcommonRepository.Update(IsExist);
@@ -2360,16 +2382,61 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 2018-10-29
         public bool CheckUserBalance(long WalletId)
         {
-            var wObjBal = GetUserBalance(WalletId);
-            //var TA = _TransactionAccountsRepository.FindBy(item=>item.WalletID== WalletId);
-            var crsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.CrAmt);
-            var drsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.DrAmt);
-            var total = crsum - drsum;
-            if(total== wObjBal && total > 0)
+            try
             {
-                return true;
+                var wObjBal = GetUserBalance(WalletId);
+                //var TA = _TransactionAccountsRepository.FindBy(item=>item.WalletID== WalletId);
+                var crsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.CrAmt);
+                var drsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.DrAmt);
+                var total = crsum - drsum;
+                if (total == wObjBal && total > 0)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //Uday 30-10-2018
+        public ServiceLimitChargeValue GetServiceLimitChargeValue(enTrnType TrnType, string CoinName)
+        {
+            try
+            {
+                ServiceLimitChargeValue response;
+                var walletType = _WalletTypeMasterRepository.GetSingle(x => x.WalletTypeName == CoinName);
+                if (walletType != null)
+                {
+                    response = new ServiceLimitChargeValue();
+                    var limitData = _limitRuleMaster.GetSingle(x => x.TrnType == TrnType && x.WalletType == walletType.Id);
+                    var chargeData = _chargeRuleMaster.GetSingle(x => x.TrnType == TrnType && x.WalletType == walletType.Id);
+
+                    if(limitData != null && chargeData != null)
+                    {
+                        response.CoinName = walletType.WalletTypeName;
+                        response.TrnType = limitData.TrnType;
+                        response.MinAmount = limitData.MinAmount;
+                        response.MaxAmount = limitData.MaxAmount;
+                        response.ChargeType = chargeData.ChargeType;
+                        response.ChargeValue = chargeData.ChargeValue;
+                    }
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+              
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
         }
     }
 

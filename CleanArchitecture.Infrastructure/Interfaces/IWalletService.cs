@@ -127,5 +127,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 2018-10-29
         bool CheckUserBalance(long WalletId);
+
+        //Uday 30-10-2018
+        ServiceLimitChargeValue GetServiceLimitChargeValue(enTrnType TrnType, string CoinName);
+
     }
 }

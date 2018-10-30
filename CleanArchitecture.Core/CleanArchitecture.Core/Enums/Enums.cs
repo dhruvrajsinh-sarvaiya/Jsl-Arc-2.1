@@ -265,7 +265,8 @@ namespace CleanArchitecture.Core.Enums
         Status4104TempUserNameExist = 4104,
         Status4105TempUserMobileExist = 4105,
         Status4106LoginFailMobileNotAvailable = 4106,
-        // wallet
+
+        ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
         BatchNoGenerationFailed = 246,
@@ -296,7 +297,8 @@ namespace CleanArchitecture.Core.Enums
         //DuplicateRecord=4235,       
         InvalidAddress = 4236,
         OrgIDNotFound = 2427,
-        MemberTypeNotFound = 4242
+        MemberTypeNotFound = 4242,
+        SettedBalanceMismatch  = 4243
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

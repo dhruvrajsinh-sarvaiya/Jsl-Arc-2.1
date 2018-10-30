@@ -17,7 +17,7 @@ namespace CleanArchitecture.Web.Filters
     public class RequestResponseLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
+        //private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
         private readonly IBasePage _basePage;
         public RequestResponseLoggingMiddleware(RequestDelegate next, IBasePage basePage)
         {

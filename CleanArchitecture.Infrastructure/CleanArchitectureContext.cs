@@ -124,7 +124,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceProviderType> ServiceProviderType { get; set; }
         public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
         public DbSet<TradeStopLoss> TradeStopLoss { get; set; }
-        public virtual DbSet<IpMaster> IpMaster { get; set; }
+       public DbSet<IpMaster> IpMaster { get; set; }
 
         public DbSet<TradeBuyRequest> TradeBuyRequest { get; set; }
         public DbSet<CountryMaster> CountryMaster { get; set; } //uday 17-10-2018
@@ -139,6 +139,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<FavouritePair> FavouritePair { get; set; } //Uday 29-10-2018
         public DbSet<ChargeRuleMaster> ChargeRuleMaster { get; set; } //Uday 30-10-2018
         public DbSet<LimitRuleMaster> LimitRuleMaster { get; set; } //Uday 30-10-2018
+        public DbSet<TradeBuyerList> TradeBuyerList { get; set; } //Uday 30-10-2018
+        public DbSet<TradeSellerList> TradeSellerList { get; set; } //Uday 30-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
@@ -201,6 +203,12 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeBuyRequest>().HasKey(e => new { e.Id, e.TrnNo });
             modelBuilder.Entity<ChargeRuleMaster>().HasKey(e => new { e.TrnType, e.WalletType });
             modelBuilder.Entity<LimitRuleMaster>().HasKey(e => new { e.TrnType, e.WalletType });
+            modelBuilder.Entity<TradeDepositCompletedTrn>().HasKey(e => new { e.Address, e.TrnID }); // ntrivedi 30-10-2018 composite primary key
+            modelBuilder.Entity<TradeDepositCompletedTrn>().Property(x => x.Address).ValueGeneratedNever(); // ntrivedi 30-10-2018 
+            modelBuilder.Entity<TradeDepositCompletedTrn>().Property(x => x.TrnID).ValueGeneratedNever(); // ntrivedi 30-10-2018 pk and autoid are different
+            modelBuilder.Entity<TradeDepositCompletedTrn>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi 30102018 https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
+            modelBuilder.Entity<TradeBuyerList>().HasKey(e => new { e.TrnNo, e.PoolID });
+            modelBuilder.Entity<TradeSellerList>().HasKey(e => new { e.Id, e.TrnNo });
         }
 
         /// <summary>
