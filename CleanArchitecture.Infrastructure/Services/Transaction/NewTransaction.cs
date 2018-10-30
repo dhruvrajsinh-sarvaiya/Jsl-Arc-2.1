@@ -25,6 +25,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly EFCommonRepository<TradeStopLoss> _TradeStopLoss;
         private readonly ICommonRepository<ServiceMaster> _ServiceConfi;
         private readonly ICommonRepository<AddressMaster> _AddressMasterRepository;
+        private readonly ICommonRepository<PoolOrder> _PoolOrder;
+        private readonly ICommonRepository<TradePoolMaster> _TradePoolMaster; 
+        private readonly ICommonRepository<TradeBuyRequest> _TradeBuyRequest; 
         private readonly ILogger<NewTransaction> _log;
         private readonly IWalletService _WalletService;
         private readonly IWebApiRepository _WebApiRepository;
@@ -49,6 +52,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         ServiceMaster _SecondCurrService;
         ServiceMaster _TrnService;
         TransactionRequest NewtransactionReq;
+        PoolOrder PoolOrderObj;
+        TradePoolMaster TradePoolMasterObj;
+        TradeBuyRequest TradeBuyRequestObj;
         private string ControllerName = "TradingTransaction";
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
@@ -58,7 +64,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             EFCommonRepository<TradeStopLoss> tradeStopLoss, IWalletService WalletService,
             ICommonRepository<TradePairDetail> TradePairDetail, IWebApiRepository WebApiRepository,
             ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest,
-            IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData)
+            IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData,
+            ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
+            ICommonRepository<TradeBuyRequest> TradeBuyRequest)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -75,6 +83,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _IWebApiSendRequest = WebApiSendRequest;
             _WebApiParseResponseObj = WebApiParseResponseObj;
             _IWebApiData = IWebApiData;
+            _PoolOrder = PoolOrder;
+            _TradePoolMaster = TradePoolMaster;
+            _TradeBuyRequest = TradeBuyRequest;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -125,17 +136,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 //Deduct balance here
                 if (Req.TrnType == enTrnType.Transaction)
                 {
-                    //ServiceType
                     Req.ServiceType = (enServiceType)_TrnService.ServiceType;
                     //Req.WalletTrnType = enWalletTrnType.;
-
                 }
                 else if (Req.TrnType == enTrnType.Withdraw)
                 {
-                    //ServiceType
                     Req.ServiceType = (enServiceType)_TrnService.ServiceType;
                     Req.WalletTrnType = enWalletTrnType.Dr_Withdrawal;
-
                 }
                 else//trading
                 {
@@ -154,7 +161,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                     return _Resp;
                 }
-                //Make txn hold as balance debited
+                //===================================Make txn HOLD as balance debited=======================
                 MarkTransactionHold(EnResponseMessage.ProcessTrn_HoldMsg, enErrorCode.ProcessTrn_Hold);
                 if (Req.TrnType == enTrnType.Transaction || Req.TrnType == enTrnType.Withdraw)
                 {
@@ -163,7 +170,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
                 else//Trading process here
                 {
+                    //Make Trading Data Entry
+                    //NOTE : Make Pool Order here
+                    
 
+                    //Start Settlement Here
                 }
 
                 //=========================UPDATE
@@ -366,7 +377,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public BizResponse InsertTransactionInQueue()//ref long TrnNo
         {
-            _Resp = new BizResponse();
+            //_Resp = new BizResponse();
             try
             {
                 Newtransaction = new TransactionQueue()
@@ -491,6 +502,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             return Task.FromResult(false);
                         }
                         _TransactionObj.Delivery_ServiceID = _SecondCurrService.Id;
+                        _TransactionObj.Order_ServiceID = _BaseCurrService.Id;
 
                     }
                     else if (Req.TrnType == enTrnType.Sell_Trade)
@@ -513,6 +525,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             return Task.FromResult(false);
                         }
                         _TransactionObj.Delivery_ServiceID = _BaseCurrService.Id;
+                        _TransactionObj.Order_ServiceID = _SecondCurrService.Id;
 
                     }
                     if (_TransactionObj.BidPrice_TQ == 0 || _TransactionObj.BidPrice_BuyReq == 0)
@@ -522,9 +535,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _Resp.ReturnCode = enResponseCodeService.Fail;
                         return Task.FromResult(false);
                     }
-                    //_TransactionObj.Delivery_ServiceID = _ServiceConfi.GetSingle(item => item.SMSCode == _TradeTransactionObj.Delivery_Currency).Id;
-                    //NOTE : Make Pool Order here
-                    if (_TransactionObj.Pool_OrderID == 0)
+                    //_TransactionObj.Delivery_ServiceID = _ServiceConfi.GetSingle(item => item.SMSCode == _TradeTransactionObj.Delivery_Currency).Id;                   
+                    CreatePoolOrder();
+                    if (PoolOrderObj == null)
                     {
                         _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_PoolOrderCreateFailMsg;
                         _Resp.ErrorCode = enErrorCode.ProcessTrn_PoolOrderCreateFail;
@@ -636,7 +649,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 foreach (TransactionProviderResponse Provider in TxnProviderList)//Make txn on every API
                 {
 
-                    WebApiConfigurationResponseObj=_IWebApiData.GetAPIConfiguration(Provider.ThirPartyAPIID);
+                    Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
+
+                    WebApiConfigurationResponseObj =_IWebApiData.GetAPIConfiguration(Provider.ThirPartyAPIID);
                     if(WebApiConfigurationResponseObj==null)
                     {
                         _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_ThirdPartyDataNotFoundMsg;
@@ -646,10 +661,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         continue;
                     }
                     ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID, Newtransaction);
-                    Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
+                    
                     //Insert API request Data
                     _TransactionObj.TransactionRequestID = InsertTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody);
-
                     switch (Provider.AppTypeID)
                     {
                         case (long)enAppType.WebSocket:
@@ -745,7 +759,146 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 HelperForLog.WriteErrorLog("InsertTransactionRequest", ControllerName, ex);
                 return 0;
             }
-        }       
+        }
+        #endregion
+
+        #region Settlement Insert Data
+        public void CreatePoolOrder()
+        {
+            try
+            {
+                PoolOrderObj = new PoolOrder()
+                {
+                    CreatedDate = Helpers.UTC_To_IST(),
+                    CreatedBy = Req.MemberID,                   
+                    TrnMode = Req.TrnMode,
+                    PayMode = Convert.ToInt16(enWebAPIRouteType.TradeServiceLocal),
+                    ORemarks = "Order Created",
+                    OrderAmt = Req.Amount,
+                    DiscPer = 0,
+                    DiscRs = 0,                   
+                    Status = Convert.ToInt16(enTransactionStatus.Initialize),//txn type status
+                    UserWalletID = Req.DebitWalletID,
+                    UserWalletAccID = Req.DebitAccountID,                  
+                };
+                PoolOrderObj = _PoolOrder.Add(PoolOrderObj);              
+
+                //return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog("CreatePoolOrder", ControllerName, ex);
+                //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
+                throw ex;
+            }
+
+        }
+        public void Tradepoolmaster()
+        {
+            try
+            {
+                TradePoolMasterObj = new TradePoolMaster()
+                {
+                    CreatedDate = Helpers.UTC_To_IST(),
+                    CreatedBy = Req.MemberID,
+                    PairName = _TradeTransactionObj.PairName,
+                    ProductID = Convert.ToInt16(enWebAPIRouteType.TradeServiceLocal),
+                    SellServiceID = _TransactionObj.Order_ServiceID,
+                    BuyServiceID = _TransactionObj.Delivery_ServiceID,
+                    BidPrice = 0,
+                    CountPerPrice = 0,
+                    Status = Convert.ToInt16(ServiceStatus.Active),//Record Type Status
+                    TotalQty = Req.Amount,
+                    OnProcessing = 0,
+                    TPSPickupStatus = 0,
+                    IsSleepMode = 0,
+                    GUID = Guid.NewGuid(),
+                    PairId = Req.PairID,
+                };
+                TradePoolMasterObj = _TradePoolMaster.Add(TradePoolMasterObj);
+
+                //return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog("Tradepoolmaster", ControllerName, ex);
+                //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
+                throw ex;
+            }
+
+        }
+        public void TradeBuyRequest()
+        {
+            try
+            {
+                TradeBuyRequestObj = new TradeBuyRequest()
+                {
+                    CreatedDate = Helpers.UTC_To_IST(),
+                    PickupDate = Helpers.UTC_To_IST(),
+                    CreatedBy = Req.MemberID,
+                    TrnNo = Req.TrnNo,
+                    PairID = Req.PairID,                   
+                    ServiceID = _TransactionObj.Delivery_ServiceID,
+                    PaidServiceID = _TransactionObj.Order_ServiceID,
+                    BidPrice = _TransactionObj.BidPrice_BuyReq,
+                    Qty = _TradeTransactionObj.DeliveryTotalQty,                   
+                    PaidQty = _TradeTransactionObj.OrderTotalQty,
+                    PendingQty = _TradeTransactionObj.DeliveryTotalQty,
+                    DeliveredQty = 0,
+                    IsCancel = 0,
+                    IsPartialProceed = 0,
+                    IsProcessing=0,
+                    SellStockID = TradePoolMasterObj.Id,
+                    BuyStockID = 0,//No use as process with multiple stock
+                    Status = Convert.ToInt16(enTransactionStatus.Initialize),
+                };
+                TradeBuyRequestObj = _TradeBuyRequest.Add(TradeBuyRequestObj);
+
+                //return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog("Tradepoolmaster", ControllerName, ex);
+                //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
+                throw ex;
+            }
+
+        }
+        public void TradingDataInsert(BizResponse _Resp)
+        {
+            try
+            {
+                foreach (TransactionProviderResponse Provider in TxnProviderList)//Make txn on every API
+                {
+                    //Update Service Provider Data
+                    Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
+
+                    //===========POOL==================
+                    TradePoolMasterObj = _TradePoolMaster.GetSingle(item => item.BidPrice == _TransactionObj.BidPrice_TQ && item.SellServiceID == _TransactionObj.Order_ServiceID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                    if (TradePoolMasterObj != null)//Update
+                    {
+                        TradePoolMasterObj.TotalQty += Req.Amount;
+                        TradePoolMasterObj.UpdatedBy = Req.MemberID;
+                        TradePoolMasterObj.UpdatedDate = Helpers.UTC_To_IST();
+                        _TradePoolMaster.Update(TradePoolMasterObj);
+                    }
+                    else//Make new Pool Entry
+                    {
+                        Tradepoolmaster();
+                    }
+                    
+                    //=======================Buy Request
+
+
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog("CallWebAPI", ControllerName, ex);
+                throw ex;
+            }
+        }
         #endregion
 
 
