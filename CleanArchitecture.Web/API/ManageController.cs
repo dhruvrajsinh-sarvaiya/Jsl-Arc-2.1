@@ -157,33 +157,33 @@ namespace CleanArchitecture.Web.API
             {
 
                 var user = await GetCurrentUserAsync();
-                bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
-                if (!IsSignMobile)
-                {
-                    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
-                }
-                var resultUserName = await _userManager.FindByNameAsync(model.UserName);
-                if (!string.IsNullOrEmpty(resultUserName?.UserName))
-                {
-                    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameExist, ErrorCode = enErrorCode.Status4099BizUserNameExist });
-                }
-                var EmailAddressIsExist = await _userManager.FindByEmailAsync(model.Email);
-                if (!string.IsNullOrEmpty(EmailAddressIsExist?.Email))
-                {
-                    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserEmailExist, ErrorCode = enErrorCode.Status4098BizUserEmailExist });
-                }
+                //bool IsSignMobile = _userdata.GetMobileNumber(model.Mobile);
+                //if (!IsSignMobile)
+                //{
+                //    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUPMobileValidation, ErrorCode = enErrorCode.Status4074SignUPMobileValidation });
+                //}
+                //var resultUserName = await _userManager.FindByNameAsync(model.UserName);
+                //if (!string.IsNullOrEmpty(resultUserName?.UserName))
+                //{
+                //    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserNameExist, ErrorCode = enErrorCode.Status4099BizUserNameExist });
+                //}
+                //var EmailAddressIsExist = await _userManager.FindByEmailAsync(model.Email);
+                //if (!string.IsNullOrEmpty(EmailAddressIsExist?.Email))
+                //{
+                //    return BadRequest(new UserInfoResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpBizUserEmailExist, ErrorCode = enErrorCode.Status4098BizUserEmailExist });
+                //}
                 //////////////////// Check bizUser  table in Email Exist or not
                 string Oldvalue = JsonConvert.SerializeObject(user);  
                 if (!string.IsNullOrEmpty(model.FirstName))
                     user.FirstName = model.FirstName;
                 if (!string.IsNullOrEmpty(model.LastName))
                     user.LastName = model.LastName;
-                if (!string.IsNullOrEmpty(model.UserName))
-                    user.UserName = model.UserName;
-                if (!string.IsNullOrEmpty(model.Email))
-                    user.Email = model.Email;
-                if (!string.IsNullOrEmpty(model.Mobile))
-                    user.Mobile = model.Mobile;
+                //if (!string.IsNullOrEmpty(model.UserName))
+                //    user.UserName = model.UserName;
+                //if (!string.IsNullOrEmpty(model.Email))
+                //    user.Email = model.Email;
+                //if (!string.IsNullOrEmpty(model.Mobile))
+                //    user.Mobile = model.Mobile;
 
                 //user.UserName = string.IsNullOrEmpty(model.Username) ? user.UserName : model.Username;
                 //user.Email = string.IsNullOrEmpty(model.Email) ? user.Email : model.Email;
@@ -310,22 +310,27 @@ namespace CleanArchitecture.Web.API
                     long getIp = await _ipAddressService.GetIpAddressByUserIdandAddress(model.SelectedIPAddress, user.Id);
                     if (getIp > 0)
                     {
-                        return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAlreadyExist, ErrorCode = enErrorCode.Status4083IpAddressExist });
-                    }
 
-                    IpMasterViewModel imodel = new IpMasterViewModel();
-                    imodel.UserId = user.Id;
-                    imodel.IpAddress = model.SelectedIPAddress;
-                    if (!string.IsNullOrEmpty(model.IpAliasName))
-                    {
-                        imodel.IpAliasName = model.IpAliasName;
-                    }
 
-                    long id = await _ipAddressService.UpdateIpAddress(imodel);
+                        IpMasterViewModel imodel = new IpMasterViewModel();
+                        imodel.UserId = user.Id;
+                        imodel.Id = getIp;
+                        imodel.IpAddress = model.SelectedIPAddress;
+                        if (!string.IsNullOrEmpty(model.IpAliasName))
+                        {
+                            imodel.IpAliasName = model.IpAliasName;
+                        }
 
-                    if (id > 0)
-                    {
-                        return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessupdateIpData });
+                        long id = await _ipAddressService.UpdateIpAddress(imodel);
+
+                        if (id > 0)
+                        {
+                            return Ok(new IpAddressResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessupdateIpData });
+                        }
+                        else
+                        {
+                            return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInsertError, ErrorCode = enErrorCode.Status4081IpAddressNotInsert });
+                        }
                     }
                     else
                     {

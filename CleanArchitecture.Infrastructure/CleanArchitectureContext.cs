@@ -124,7 +124,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceProviderType> ServiceProviderType { get; set; }
         public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
         public DbSet<TradeStopLoss> TradeStopLoss { get; set; }
-        public virtual DbSet<IpMaster> IpMaster { get; set; }
+       public DbSet<IpMaster> IpMaster { get; set; }
 
         public DbSet<TradeBuyRequest> TradeBuyRequest { get; set; }
         public DbSet<CountryMaster> CountryMaster { get; set; } //uday 17-10-2018
