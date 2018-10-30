@@ -397,7 +397,7 @@ namespace CleanArchitecture.Web.API
 
 
                         _logger.LogWarning(1, "User Login with Email Send Success.");
-                        return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, appkey = otpData.appkey });
+                        return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, Appkey = otpData.appkey });
                     }
                     else
                     {
@@ -580,7 +580,7 @@ namespace CleanArchitecture.Web.API
                                 data.EnableStatus = false;
                                 await _custompassword.AddPassword(data);
                                 _logger.LogWarning(1, "User Login with Email OTP Send Success.");
-                                return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP, appkey = otpData.appkey });
+                                return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginUserEmailOTP, Appkey = otpData.appkey });
 
                             }
                             else
@@ -638,7 +638,7 @@ namespace CleanArchitecture.Web.API
                         data.EnableStatus = false;
                         await _custompassword.AddPassword(data);
                         _logger.LogWarning(1, "User Login with Mobile Send Success.");
-                        return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile, appkey = otpData.appkey });
+                        return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile, Appkey = otpData.appkey });
                     }
                     else
                     {
@@ -809,7 +809,7 @@ namespace CleanArchitecture.Web.API
                                 data.EnableStatus = false;
                                 await _custompassword.AddPassword(data);
                                 _logger.LogWarning(1, "User Login with Mobile OTP Send Success.");
-                                return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile, appkey = otpData.appkey });
+                                return Ok(new LoginWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.OTPSendOnMobile, Appkey = otpData.appkey });
                             }
                             else
                             {
@@ -1165,6 +1165,8 @@ namespace CleanArchitecture.Web.API
                 {
                     emailConfirmCode = SubScriptionKey
                 }, protocol: HttpContext.Request.Scheme);
+
+                // string ctokenlink = _configuration["ResetPaswword"].ToString() + SubScriptionKey;
 
                 var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">" + EnResponseMessage.ResetEmailMessage + "</a>";
 
