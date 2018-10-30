@@ -33,9 +33,9 @@ namespace CleanArchitecture.Web.Filters
             {
                 var requestLog =
                 $"REQUEST Host:{context.Request.Host} ,HttpMethod: {context.Request.Method}, Path: {context.Request.Path}";
-                string Path = context.Request.Path.ToString();
-                string[] PathDetails = Path.Split("/");
-                //var accessToken1 = await context.Request.HttpContext.User("access_token");
+                //string Path = context.Request.Path.ToString();
+                //string[] PathDetails = Path.Split("/");
+
                 var accessToken = await context.Request.HttpContext.GetTokenAsync("access_token");
                 using (var bodyReader = new StreamReader(context.Request.Body))
                 {
@@ -52,14 +52,17 @@ namespace CleanArchitecture.Web.Filters
                 }
 
                 //_logger.LogTrace(requestLog);
-                if (PathDetails?[1] == "api")
-                    HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), PathDetails?[3], PathDetails?[2], requestLog, accessToken);
-                else if (PathDetails?[1] != "swagger")
-                    HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), "", "", requestLog);
+                //if (PathDetails?[1] == "api")
+                HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), requestLog, accessToken);
+                //else if (PathDetails?[1] != "swagger")
+                // HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), "", "", requestLog);
                 //_logger.LogInformation(1, requestLog);
-
                 await _next.Invoke(context);
 
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), "", "", ex.ToString());
             }
             finally
             {

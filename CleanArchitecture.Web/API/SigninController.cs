@@ -1160,12 +1160,12 @@ namespace CleanArchitecture.Web.API
 
 
 
-                string ctokenlink = Url.Action("resetpassword", "Signin", new
+                //string ctokenlink = Url.Action("resetpassword", "Signin", new
 
-                {
-                    emailConfirmCode = SubScriptionKey
-                }, protocol: HttpContext.Request.Scheme);
-
+                //{
+                //    emailConfirmCode = SubScriptionKey
+                //}, protocol: HttpContext.Request.Scheme);
+                string ctokenlink = _configuration["ResetPaswword"].ToString() + SubScriptionKey;
                 var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">" + EnResponseMessage.ResetEmailMessage + "</a>";
 
                 SendEmailRequest request = new SendEmailRequest();

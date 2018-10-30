@@ -210,11 +210,12 @@ namespace CleanArchitecture.Web.API
 
                     string UserDetails = JsonConvert.SerializeObject(linkToken);
                     string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
-                    string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
-                    {
-                        //userId = currentUser.Id,
-                        emailConfirmCode = SubScriptionKey
-                    }, protocol: HttpContext.Request.Scheme);
+                    //string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
+                    //{
+                    //    //userId = currentUser.Id,
+                    //    emailConfirmCode = SubScriptionKey
+                    //}, protocol: HttpContext.Request.Scheme);
+                    string ctokenlink = _configuration["ConfirmMailURL"].ToString() + SubScriptionKey;
 
                     var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 
@@ -386,10 +387,11 @@ namespace CleanArchitecture.Web.API
 
                             string UserDetails = JsonConvert.SerializeObject(linkToken);
                             string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
-                            string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
-                            {
-                                emailConfirmCode = SubScriptionKey
-                            }, protocol: HttpContext.Request.Scheme);
+                            //string ctokenlink = Url.Action("ConfirmEmail", "SignUp", new
+                            //{
+                            //    emailConfirmCode = SubScriptionKey
+                            //}, protocol: HttpContext.Request.Scheme);
+                            string ctokenlink = _configuration["ConfirmMailURL"].ToString() + SubScriptionKey;
 
                             var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 

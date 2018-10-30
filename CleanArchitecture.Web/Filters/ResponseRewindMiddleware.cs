@@ -38,34 +38,38 @@ namespace CleanArchitecture.Web.Filters
                     await next(context);
                     var responseLog = $"RESPONSE Host:{context.Request.Host}, HttpMethod: {context.Request.Method}, Path: {context.Request.Path}";
 
-                    string ResponsePath = context.Request.Path.ToString();
-                    string[] ResponseDetails = ResponsePath.Split("/");
+                    //string ResponsePath = context.Request.Path.ToString();
+                    //string[] ResponseDetails = ResponsePath.Split("/");
 
                     memStream.Position = 0;
                     string responseBody = new StreamReader(memStream).ReadToEnd();
                     var erParams = (dynamic)null;
-                    if (ResponseDetails?[1] != "swagger")
+                    if (responseBody.Contains("ReturnCode"))
                         erParams = JsonConvert.DeserializeObject<ErrorParams>(responseBody);
 
                     responseLog += $", Response : {responseBody}";
 
-                    if (ResponseDetails?[1] == "api")
-                    {
-                        if (erParams.ReturnCode == 9)
+                    //if (ResponseDetails?[1] == "api")
+                    //{
+                        if (erParams?.ReturnCode == 9)
                         {
-                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), ResponseDetails?[3], ResponseDetails?[2], responseLog);
-                            HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), ResponseDetails?[3], ResponseDetails?[2], erParams.ReturnMsg);
+                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), responseLog);
+                            HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), erParams.ReturnMsg);
                         }
                         else
-                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), ResponseDetails?[3], ResponseDetails?[2], responseLog);
-                    }
-                    else if (ResponseDetails?[1] != "swagger")
-                        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), "", "", responseLog);
+                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), responseLog);
+                    //}
+                    //else if (ResponseDetails?[1] != "swagger")
+                    //    HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), "", "", responseLog);
 
                     memStream.Position = 0;
                     await memStream.CopyToAsync(originalBody);
                 }
 
+            }
+            catch(Exception ex)
+            {
+                HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), "", "", ex.ToString());
             }
             finally
             {
