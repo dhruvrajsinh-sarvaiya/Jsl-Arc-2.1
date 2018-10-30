@@ -157,9 +157,13 @@ namespace CleanArchitecture.Web.API
             {
                 var user = await GetCurrentUserAsync();
 
+                //// Update Status
+
                 string oldvalue = JsonConvert.SerializeObject(user);
-                user.TwoFactorEnabled = true;
-                await _userManager.UpdateAsync(user);
+                //user.TwoFactorEnabled = true;
+                //await _userManager.UpdateAsync(user);
+
+                //// Update Status
 
                 //return Ok(new TwoFactorAuthResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
 
@@ -186,7 +190,7 @@ namespace CleanArchitecture.Web.API
                         SharedKey = FormatKey(unformattedKey),
                         AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
                     };
-                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, EnableAuthenticatorViewModel = model });
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, EnableAuthenticatorViewModel = model });
 
                 }
                 else
@@ -197,7 +201,7 @@ namespace CleanArchitecture.Web.API
                         SharedKey = FormatKey(unformattedKey),
                         AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
                     };
-                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor, EnableAuthenticatorViewModel = model });
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, EnableAuthenticatorViewModel = model });
 
                 }
 
@@ -224,19 +228,14 @@ namespace CleanArchitecture.Web.API
                 if (!is2faTokenValid)
                 {
                     return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification, ErrorCode = enErrorCode.Status4079TwoFAcodeInvalide });
-
                 }
 
-
-
-                await _userManager.SetTwoFactorEnabledAsync(user, true);
-                _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTroFactor });
+                await _userManager.SetTwoFactorEnabledAsync(user, true);               
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTwoFactor });
             }
             catch (Exception ex)
             {
-
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+                                
                 return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
 
             }

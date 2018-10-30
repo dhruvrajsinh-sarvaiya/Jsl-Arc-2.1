@@ -178,7 +178,7 @@ namespace CleanArchitecture.Core.Enums
         public static string RefreshToken = "The refresh token is no longer valid.";
         public static string UserToken = "The user is no longer allowed to sign in.";
         public static string Granttype = "The specified grant type is not supported.";
-        public static string EnableTroFactor = "User two factor authentication successfully activates";
+        public static string EnableTwoFactor = "User two factor authentication successfully activates";
         public static string DisableTroFactor = "User two factor authentication successfully disable";
         public static string DisableTroFactorError = "Unexpected error occured disabling 2FA for user with ID";
         public static string FactorFail = "Invalid authenticator code ";
@@ -234,6 +234,8 @@ namespace CleanArchitecture.Core.Enums
 
         public static string LoginWithOtpLoginFailed = "Login failed: User email id not available.";
         public static string LoginWithMobileOtpLoginFailed = "Login failed: User mobile number not available.";
+
+        public static string TwoFactorActiveRequest = "User two factor authentication reguest successfully send.";
     }
 
 
