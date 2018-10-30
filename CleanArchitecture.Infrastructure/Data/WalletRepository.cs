@@ -1050,13 +1050,14 @@ namespace CleanArchitecture.Infrastructure.Data
                                   Balance = 0,
                                   WalletTypeID = WalletTypearray.Id,
                                   UserID = UserId,
-                                  Walletname = WalletTypearray.WalletTypeName + "DefaultWallet",
+                                  Walletname = WalletTypearray.WalletTypeName + " DefaultWallet",
                                   AccWalletID = RandomGenerateWalletId(UserId, 1),
                                   IsDefaultWallet = 1,
+                                  IsValid=true,
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
-                // _dbContext.SaveChanges();
+                _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
                 //  Array val = Enum.GetValues(typeof(enWalletLimitType));
@@ -1077,7 +1078,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                  select wm).ToList();
 
                 var fadd = from array in arrayObj
-                           from ww in Wallets
+                           from ww in walletObj
                            select new WalletLimitConfiguration
                            {
                                CreatedBy = UserId,
@@ -1098,7 +1099,7 @@ namespace CleanArchitecture.Infrastructure.Data
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
-                                 from ww in Wallets
+                                 from ww in walletObj
                                  select new WalletAllowTrn
                                  {
                                      CreatedDate = UTC_To_IST(),
@@ -1172,13 +1173,14 @@ namespace CleanArchitecture.Infrastructure.Data
                                   Balance = 0,
                                   WalletTypeID = WalletTypearray.Id,
                                   UserID = U.Id,
-                                  Walletname = WalletTypearray.WalletTypeName + "DefaultWallet",
+                                  Walletname = WalletTypearray.WalletTypeName + " DefaultWallet",
                                   AccWalletID = RandomGenerateWalletId(U.Id, 1),
                                   IsDefaultWallet = 1,
+                                  IsValid = true,
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
-                // _dbContext.SaveChanges();
+                 _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
                 //  Array val = Enum.GetValues(typeof(enWalletLimitType));
@@ -1200,7 +1202,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                  select wm).ToList();
 
                 var fadd = from array in arrayObj
-                           from ww in Wallets
+                           from ww in walletObj
                            from U in Users
                            select new WalletLimitConfiguration
                            {
@@ -1222,7 +1224,7 @@ namespace CleanArchitecture.Infrastructure.Data
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
-                                 from ww in Wallets
+                                 from ww in walletObj
                                  from U in Users
                                  select new WalletAllowTrn
                                  {
