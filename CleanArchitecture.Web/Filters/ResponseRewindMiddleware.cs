@@ -14,7 +14,7 @@ namespace CleanArchitecture.Web.Filters
     public class ResponseRewindMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
+        //private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
         private readonly IBasePage _basePage;
 
         public ResponseRewindMiddleware(RequestDelegate next, IBasePage basePage)
