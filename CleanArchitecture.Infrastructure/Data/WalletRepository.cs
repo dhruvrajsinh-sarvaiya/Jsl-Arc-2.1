@@ -1057,7 +1057,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
-                // _dbContext.SaveChanges();
+                _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
                 //  Array val = Enum.GetValues(typeof(enWalletLimitType));
@@ -1078,7 +1078,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                  select wm).ToList();
 
                 var fadd = from array in arrayObj
-                           from ww in Wallets
+                           from ww in walletObj
                            select new WalletLimitConfiguration
                            {
                                CreatedBy = UserId,
@@ -1099,7 +1099,7 @@ namespace CleanArchitecture.Infrastructure.Data
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
-                                 from ww in Wallets
+                                 from ww in walletObj
                                  select new WalletAllowTrn
                                  {
                                      CreatedDate = UTC_To_IST(),
@@ -1180,7 +1180,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
-                // _dbContext.SaveChanges();
+                 _dbContext.SaveChanges();
 
                 //Add limit for following wallet Id           
                 //  Array val = Enum.GetValues(typeof(enWalletLimitType));
@@ -1202,7 +1202,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                  select wm).ToList();
 
                 var fadd = from array in arrayObj
-                           from ww in Wallets
+                           from ww in walletObj
                            from U in Users
                            select new WalletLimitConfiguration
                            {
@@ -1224,7 +1224,7 @@ namespace CleanArchitecture.Infrastructure.Data
 
                 //add WalletAllowTrn
                 var trntypeObj = from type in AllowTrnType
-                                 from ww in Wallets
+                                 from ww in walletObj
                                  from U in Users
                                  select new WalletAllowTrn
                                  {
