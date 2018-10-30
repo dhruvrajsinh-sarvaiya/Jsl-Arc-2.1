@@ -54,6 +54,7 @@ namespace CleanArchitecture.Core.SignalR
                 Groups.AddToGroupAsync(Context.ConnectionId, "TradingHistory:" + Pair).Wait();
                 Groups.AddToGroupAsync(Context.ConnectionId, "MarketData:" + Pair).Wait();            
                 Groups.AddToGroupAsync(Context.ConnectionId, "ChartData:" + Pair).Wait();
+                Groups.AddToGroupAsync(Context.ConnectionId, "Price:" + Pair).Wait();
                 Groups.AddToGroupAsync(Context.ConnectionId, "PairData:" + BaseCurrency).Wait();
                 Groups.AddToGroupAsync(Context.ConnectionId, "MarketTicker:" + BaseCurrency).Wait();
                 return base.OnConnectedAsync();
@@ -153,6 +154,7 @@ namespace CleanArchitecture.Core.SignalR
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "TradingHistory:" + Pair).Wait();
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "MarketData:" + Pair).Wait();
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "ChartData:" + Pair).Wait();
+                Groups.RemoveFromGroupAsync(Context.ConnectionId, "Price:" + Pair).Wait();
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "BroadCast").Wait();
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "GroupMessage").Wait();
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "PairData:" + BaseCurrency).Wait();
@@ -200,6 +202,7 @@ namespace CleanArchitecture.Core.SignalR
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "TradingHistory:" + Pair).Wait();
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "MarketData:" + Pair).Wait();
                 Groups.RemoveFromGroupAsync(Context.ConnectionId, "ChartData:" + Pair).Wait();
+                Groups.RemoveFromGroupAsync(Context.ConnectionId, "Price:" + Pair).Wait();
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -221,6 +224,7 @@ namespace CleanArchitecture.Core.SignalR
                 Groups.AddToGroupAsync(Context.ConnectionId, "TradingHistory:" + Pair).Wait();
                 Groups.AddToGroupAsync(Context.ConnectionId, "MarketData:" + Pair).Wait();
                 Groups.AddToGroupAsync(Context.ConnectionId, "ChartData:" + Pair).Wait();
+                Groups.AddToGroupAsync(Context.ConnectionId, "Price:" + Pair).Wait();
                 RemovePairSubscription(OldPair);
                 return Task.FromResult(0);
             }
@@ -439,7 +443,7 @@ namespace CleanArchitecture.Core.SignalR
             }            
         }
         
-        public Task BuyerSideWalletBal(string Token, string Data)
+        public Task BuyerSideWalletBal(string Token, string WalletName, string Data)
         {
             try
             {
@@ -451,12 +455,20 @@ namespace CleanArchitecture.Core.SignalR
                 //User = Redis.GetConnectionID(Token);
                 //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveBuyerSideWalletBal", Data);
                 var Redis = new RadisServices<ConnetedClientToken>(this._fact);
-                IEnumerable<string> str = Redis.GetKey(Token);
-                foreach (string s in str.ToList())
+                IEnumerable<string> ClientList = Redis.GetKey(Token);
+                foreach (string s in ClientList.ToList())
                 {
-                    var key = s;
-                    key = key.Split(":")[1].ToString();
-                    _chatHubContext.Clients.Client(key).SendAsync("RecieveBuyerSideWalletBal", Data);
+                    var Key = s;
+                    Key = Key.Split(":")[1].ToString();
+                    string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
+                    if (Pair.ToUpper().Contains(WalletName.ToUpper()))
+                    {
+                        _chatHubContext.Clients.Client(Key).SendAsync("RecieveBuyerSideWalletBal", Data);
+                    }
+                    else
+                    {
+                        // ignore Data
+                    }                   
                 }
                 return Task.FromResult(0);
             }
@@ -467,7 +479,7 @@ namespace CleanArchitecture.Core.SignalR
             }            
         }
 
-        public Task SellerSideWalletBal(string Token, string Data)
+        public Task SellerSideWalletBal(string Token, string WalletName, string Data)
         {
             try
             {
@@ -478,12 +490,20 @@ namespace CleanArchitecture.Core.SignalR
                 //User = Redis.GetConnectionID(Token);
                 //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveSellerSideWalletBal", Data);
                 var Redis = new RadisServices<ConnetedClientToken>(this._fact);
-                IEnumerable<string> str = Redis.GetKey(Token);
-                foreach (string s in str.ToList())
+                IEnumerable<string> ClientList = Redis.GetKey(Token);
+                foreach (string s in ClientList.ToList())
                 {
-                    var key = s;
-                    key = key.Split(":")[1].ToString();
-                    _chatHubContext.Clients.Client(key).SendAsync("RecieveSellerSideWalletBal", Data);
+                    var Key = s;
+                    Key = Key.Split(":")[1].ToString();
+                    string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
+                    if (Pair.ToUpper().Contains(WalletName.ToUpper()))
+                    {
+                        _chatHubContext.Clients.Client(Key).SendAsync("RecieveSellerSideWalletBal", Data);
+                    }
+                    else
+                    {
+                        // ignore Data
+                    }                   
                 }
                 return Task.FromResult(0);
             }
@@ -574,7 +594,21 @@ namespace CleanArchitecture.Core.SignalR
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 return Task.FromResult(0);
             }            
-        }        
+        }
+
+        public Task LastPrice(string Pair, string Data)
+        {
+            try
+            {
+                _chatHubContext.Clients.Group("Price:" + Pair).SendAsync("RecieveLastPrice", Data);
+                return Task.FromResult(0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return Task.FromResult(0);
+            }
+        }
 
         public Task ChartData(string Pair, string Data)
         {
