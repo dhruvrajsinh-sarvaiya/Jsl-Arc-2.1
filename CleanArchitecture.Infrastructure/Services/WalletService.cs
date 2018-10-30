@@ -112,7 +112,10 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var obj = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID);
-                return obj.Id;
+                if (obj != null)//Rita for object ref error
+                    return obj.Id;
+                else
+                    return 0;
             }
             catch (Exception ex)
             {
@@ -127,7 +130,11 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var obj = _commonRepository.GetSingle(item => item.Id == WalletID);
-                return obj.AccWalletID;
+                if (obj != null)//Rita for object ref error
+                    return obj.AccWalletID;
+                else
+                    return "";
+               
             }
             catch (Exception ex)
             {

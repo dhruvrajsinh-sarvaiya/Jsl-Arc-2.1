@@ -9,9 +9,13 @@ using System.Text;
 namespace CleanArchitecture.Core.Entities.Transaction
 {
     public class PoolOrder : BizBase
-    {       
-        public long PoolID { get; set; }
+    {
+        [Required]
+        public long OMemberID { get; set; }
+        [Required]
+        public long DMemberID { get; set; }
         public long TrnNo { get; set; }
+        public long PoolID { get; set; }       
         [Required]
         public long UserID { get; set; }       
         [Required]

@@ -187,6 +187,8 @@ namespace CleanArchitecture.Core.Enums
         FavPair_AddedSuccess = 4621,
         FavPair_RemoveSuccess = 4622,
         FavPair_NoPairFound = 4623,
+        InValidDebitAccountID=0,
+        InValidCreditAccountID = 0,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
