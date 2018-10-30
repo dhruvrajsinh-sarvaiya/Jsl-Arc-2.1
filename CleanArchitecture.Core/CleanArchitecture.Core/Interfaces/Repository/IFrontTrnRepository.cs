@@ -12,10 +12,10 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<TradeHistoryResponce> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll);
         long GetPairIdByName(string pair);
         List<RecentOrderRespose> GetRecentOrder(long PairId, long MemberID);
-        List<GetBuySellBook> GetBuyerBook(long id);
-        List<GetBuySellBook> GetSellerBook(long id);
+        List<GetBuySellBook> GetBuyerBook(long id,decimal Price= -0);
+        List<GetBuySellBook> GetSellerBook(long id, decimal Price = -0);
         List<GetGraphResponse> GetGraphData(long id);
-        MarketCapData GetMarketCap(long PairId);
+        decimal GetMarketCap(long PairId);
         PairRatesResponse GetPairRates(long PairId);
     }
 }
