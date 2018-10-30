@@ -92,15 +92,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             Req = Req1;
             //_Resp = new BizResponse();            
 
-            _Resp = CreateTransaction();
+            _Resp =CreateTransaction();
             if (_Resp.ReturnCode != enResponseCodeService.Success)
             {
                 HelperForLog.WriteLogIntoFile("ProcessNewTransactionAsync", ControllerName, _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
                 return _Resp;
             }
             //var myResp = new Task(async () => CombineAllInitTransactionAsync());
-            await Task.Run(() => CombineAllInitTransactionAsync());
+            //await Task.Run(() => CombineAllInitTransactionAsync());
 
+            MiddleWare();
             //CombineAllInitTransactionAsync();
 
             //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
@@ -108,8 +109,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess };
             //return _Resp;
         }
+        public async void MiddleWare()
+        {
+           var dsfd = await Task.Run(() => CombineAllInitTransactionAsync());
+        }
 
-        public BizResponse CombineAllInitTransactionAsync()
+        public Task<BizResponse> CombineAllInitTransactionAsync()
         {
             _Resp = new BizResponse();
             try
@@ -121,8 +126,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
                 if (!Validation.Result) //validation and balance check success
                 {
+                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Validation fail" + _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
-                    return _Resp;
+                    return Task.FromResult(_Resp);
                 }
                 var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitAccountID); //DI of Wallet for balance check
                 if (!BalResult) //validation and balance check success
@@ -131,7 +137,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     _Resp.ReturnCode = enResponseCodeService.Fail;
                     _Resp.ErrorCode = enErrorCode.ProcessTrn_InsufficientBalance;
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
-                    return _Resp;
+                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Balance check Fail" + _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
+                    return Task.FromResult(_Resp);
                 }
                 //Deduct balance here
                 if (Req.TrnType == enTrnType.Transaction)
@@ -159,20 +166,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     _Resp.ReturnCode = enResponseCodeService.Fail;
                     _Resp.ErrorCode = enErrorCode.ProcessTrn_WalletDebitFail;
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
-                    return _Resp;
+                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Balance Deduction Fail" + _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
+                    return Task.FromResult(_Resp);
                 }
                 //===================================Make txn HOLD as balance debited=======================
                 MarkTransactionHold(EnResponseMessage.ProcessTrn_HoldMsg, enErrorCode.ProcessTrn_Hold);
                 if (Req.TrnType == enTrnType.Transaction || Req.TrnType == enTrnType.Withdraw)
                 {
+                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Transaction/Withdraw Process Start" + "##TrnNo:" + Req.TrnNo);
                     CallWebAPI(_Resp);
-                    return _Resp;
+                    return Task.FromResult(_Resp);
                 }
                 else//Trading process here
                 {
+                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Start" + "##TrnNo:" + Req.TrnNo);
                     //Make Trading Data Entry
-                    //NOTE : Make Pool Order here
-                    
+                    TradingDataInsert(_Resp);
 
                     //Start Settlement Here
                 }
@@ -183,8 +192,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             catch (Exception ex)
             {
                 //_log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                HelperForLog.WriteErrorLog("CombineAllInitTransactionAsync", ControllerName, ex);                
-                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionProcessInternalError });
+                HelperForLog.WriteErrorLog("CombineAllInitTransactionAsync:##TrnNo " + Req.TrnNo, ControllerName, ex);
+                return Task.FromResult((new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionProcessInternalError }));
             }            
         }
 
@@ -199,22 +208,34 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             //long TrnNo = 0;
             try
             {
+                HelperForLog.WriteLogIntoFile("CreateTransaction", ControllerName, "Transaction Process For" + Req.TrnType + "##TrnNo:" + Req.TrnNo);
                 if (Req.TrnType == enTrnType.Buy_Trade)
                 {
-                    _TradeTransactionObj.TrnTypeName = "BUY";                    
+                    _TradeTransactionObj.TrnTypeName = "BUY";
                 }
                 else if (Req.TrnType == enTrnType.Sell_Trade)
                 {
                     _TradeTransactionObj.TrnTypeName = "SELL";
                 }
-                Req.DebitWalletID = _WalletService.GetWalletID(Req.DebitAccountID);                
-              
+                Req.DebitWalletID = _WalletService.GetWalletID(Req.DebitAccountID);
+                if(Req.DebitWalletID==0)
+                {
+                    Req.StatusMsg = EnResponseMessage.InValidDebitAccountIDMsg;
+                    return MarkSystemFailTransaction(enErrorCode.InValidDebitAccountID);
+                }
+                HelperForLog.WriteLogIntoFile("CreateTransaction", ControllerName, "Debit WalletID" + Req.DebitWalletID + "##TrnNo:" + Req.TrnNo);
                 //IF @PairID <> 0 ntrivedi 18-04-2018  check inside @TrnType (4,5) @TradeWalletMasterID will be 0 or null
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
                     Req.CreditWalletID = _WalletService.GetWalletID(Req.CreditAccountID);
+                    if (Req.CreditWalletID == 0)
+                    {
+                        Req.StatusMsg = EnResponseMessage.InValidCreditAccountIDMsg;
+                        return MarkSystemFailTransaction(enErrorCode.InValidCreditAccountID);
+                    }
+                    HelperForLog.WriteLogIntoFile("CreateTransaction", ControllerName, "Credit WalletID" + Req.CreditWalletID + "##TrnNo:" + Req.TrnNo);
                     //_TradePairObj = new TradePairMaster();
-                    _TradePairObj = _TradePairMaster.GetSingle(item => item.Id == Req.PairID && item.Status == Convert.ToInt16(ServiceStatus.Active));                   
+                    _TradePairObj = _TradePairMaster.GetSingle(item => item.Id == Req.PairID && item.Status == Convert.ToInt16(ServiceStatus.Active));
                     if (_TradePairObj == null)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnNoPairSelectedMsg;
@@ -272,7 +293,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 if (Req.TrnType == enTrnType.Shoping_Cart)//IF TRNTYPE = 7 THEN FETCH BALANCE OF INR WALLET 
                 {
                     Amount2 = Convert.ToDecimal(Req.AdditionalInfo);
-                    if(Amount2 < Req.Amount)
+                    if (Amount2 < Req.Amount)
                     {
                         Req.StatusMsg = EnResponseMessage.CreateTrnInvalidAmountMsg;
                         return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidAmount);
@@ -303,8 +324,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         return MarkSystemFailTransaction(enErrorCode.CreateTrnDuplicateTrn);
                     }
                 }
-                 
-                if(Req.Amount<0)
+
+                if (Req.Amount < 0)
                 {
                     Req.StatusMsg = EnResponseMessage.CreateTrnInvalidAmountMsg;
                     return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidAmount);
@@ -328,8 +349,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
 
                     //Check Whilte listed Address 
-                   var WalletWhiteListResult = _WalletService.CheckWithdrawalBene(Req.DebitWalletID,Req.AddressLabel, Req.TransactionAccount, Req.WhitelistingBit);
-                   if (!WalletWhiteListResult.Equals(enErrorCode.Success))
+                    var WalletWhiteListResult = _WalletService.CheckWithdrawalBene(Req.DebitWalletID, Req.AddressLabel, Req.TransactionAccount, Req.WhitelistingBit);
+                    if (!WalletWhiteListResult.Equals(enErrorCode.Success))
                     {
                         Req.StatusMsg = WalletWhiteListResult.ToString();
                         return MarkSystemFailTransaction(WalletWhiteListResult);
@@ -338,18 +359,18 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
                 Req.Status = enTransactionStatus.Initialize;
                 Req.StatusCode = Convert.ToInt64(enErrorCode.TransactionInsertSuccess);
-                InsertTransactionInQueue();               
+                InsertTransactionInQueue();
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
                     InsertTradeTransactionInQueue();
                     InsertTradeStopLoss();
                 }
-                   
+
                 return (new BizResponse { ReturnMsg = "", ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("CreateTransaction", ControllerName, ex);
+                HelperForLog.WriteErrorLog("CreateTransaction:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
 
@@ -371,7 +392,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("MarkSystemFailTransaction", ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkSystemFailTransaction:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionInsertInternalError });
             }
         }
@@ -405,7 +426,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("InsertTransactionInQueue", ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTransactionInQueue:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -445,7 +466,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("InsertTradeTransactionInQueue", ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTradeTransactionInQueue:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -465,7 +486,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("InsertTradeStopLoss", ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTradeStopLoss:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -565,7 +586,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("ValidateTransaction", ControllerName, ex);
+                HelperForLog.WriteErrorLog("ValidateTransaction:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 return Task.FromResult(false);
             }
 
@@ -589,7 +610,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch(Exception ex)
             {
-                HelperForLog.WriteErrorLog("MarkTransactionSystemFail", ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkTransactionSystemFail:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 throw ex;
             } 
         }
@@ -605,7 +626,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("MarkTransactionHold", ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkTransactionHold:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 throw ex;
             }
         }
@@ -632,7 +653,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("MarkTransactionOperatorFail", ControllerName, ex);
+                HelperForLog.WriteErrorLog("MarkTransactionOperatorFail:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 throw ex;
             }
         }
@@ -733,7 +754,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("CallWebAPI", ControllerName, ex);
+                HelperForLog.WriteErrorLog("CallWebAPI:##TrnNo " + Req.TrnNo, ControllerName, ex);
 
             }
         }
@@ -756,7 +777,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch(Exception ex)
             {
-                HelperForLog.WriteErrorLog("InsertTransactionRequest", ControllerName, ex);
+                HelperForLog.WriteErrorLog("InsertTransactionRequest:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 return 0;
             }
         }
@@ -771,6 +792,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 {
                     CreatedDate = Helpers.UTC_To_IST(),
                     CreatedBy = Req.MemberID,                   
+                    UserID = Req.MemberID,
+                    DMemberID = Req.MemberID, //Member/User gives Amount to Pool
+                    TrnNo = Req.TrnNo,
                     TrnMode = Req.TrnMode,
                     PayMode = Convert.ToInt16(enWebAPIRouteType.TradeServiceLocal),
                     ORemarks = "Order Created",
@@ -787,7 +811,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("CreatePoolOrder", ControllerName, ex);
+                HelperForLog.WriteErrorLog("CreatePoolOrder:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -815,13 +839,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     GUID = Guid.NewGuid(),
                     PairId = Req.PairID,
                 };
-                TradePoolMasterObj = _TradePoolMaster.Add(TradePoolMasterObj);
-
+                TradePoolMasterObj = _TradePoolMaster.Add(TradePoolMasterObj);                
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("Tradepoolmaster", ControllerName, ex);
+                HelperForLog.WriteErrorLog("Tradepoolmaster:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -858,7 +881,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("Tradepoolmaster", ControllerName, ex);
+                HelperForLog.WriteErrorLog("Tradepoolmaster:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
                 throw ex;
             }
@@ -886,16 +909,19 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     {
                         Tradepoolmaster();
                     }
-                    
-                    //=======================Buy Request
+                    PoolOrderObj.PoolID = TradePoolMasterObj.Id;
+                    PoolOrderObj.OMemberID = TradePoolMasterObj.Id;//Pool takes amount from member
+                    _PoolOrder.Update(PoolOrderObj);
 
+                    //=======================Buy Request
+                    TradeBuyRequest();
 
                     break;
                 }
             }
             catch (Exception ex)
             {
-                HelperForLog.WriteErrorLog("CallWebAPI", ControllerName, ex);
+                HelperForLog.WriteErrorLog("TradingDataInsert:##TrnNo " + Req.TrnNo, ControllerName, ex);
                 throw ex;
             }
         }
