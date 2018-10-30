@@ -39,6 +39,8 @@ namespace CleanArchitecture.Infrastructure.Services
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         private readonly IWalletRepository _walletRepository1;
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
+        private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository;
+
         //private readonly IWalletService _walletService;
         //private readonly IWebApiRepository _webApiRepository;
         //private readonly IWebApiSendRequest _webApiSendRequest;
@@ -50,7 +52,7 @@ namespace CleanArchitecture.Infrastructure.Services
            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,          
            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository,
-           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig) : base(logger)
+           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -69,10 +71,11 @@ namespace CleanArchitecture.Infrastructure.Services
             //_WebApiParseResponse = WebApiParseResponse;
             //_walletLedgerRepository = walletledgerrepo;
             _WalletAllowTrnRepo = WalletAllowTrnRepo;
-           // _walletService = walletService;
+            // _walletService = walletService;
             //_LimitcommonRepository = WalletLimitConfig;
             //_BeneficiarycommonRepository = BeneficiaryMasterRepo;
             //_UserPreferencescommonRepository = UserPreferenceRepo;
+            _TransactionAccountsRepository = TransactionAccountsRepository;
         }
 
         public WalletDrCrResponse InsertWalletTQDebit(string timestamp, long walletID, string coinName, decimal amount, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enWalletTranxOrderType enWalletTranx, enWalletLimitType enWalletLimit)
@@ -112,6 +115,13 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
+                
+                if (!CheckUserBalance(Walletobj.Id))
+                {
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(),enWalletTranxOrderType.Debit , amount, TrnRefNo, UTC_To_IST(), null, Walletobj.Id, coinName, Walletobj.UserID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.BalMismatch, trnType);
+                    objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.SettedBalanceMismatch, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
+                }                
                 if (TrnRefNo == 0) // sell 13-10-2018
                 {
                     // insert with status=2 system failed
@@ -368,6 +378,43 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletLedger2.IsSettled = isSettled;
                 walletLedger2.BatchNo = batchNo;
                 return walletLedger2;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        //vsolanki 2018-10-29
+        public bool CheckUserBalance(long WalletId)
+        {
+            try
+            {
+                var wObjBal = GetUserBalance(WalletId);
+                //var TA = _TransactionAccountsRepository.FindBy(item=>item.WalletID== WalletId);
+                var crsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.CrAmt);
+                var drsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.DrAmt);
+                var total = crsum - drsum;
+                if (total == wObjBal && total > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public decimal GetUserBalance(long walletId)
+        {
+            try
+            {
+                var obj = _commonRepository.GetById(walletId);
+                return obj.Balance;
             }
             catch (Exception ex)
             {

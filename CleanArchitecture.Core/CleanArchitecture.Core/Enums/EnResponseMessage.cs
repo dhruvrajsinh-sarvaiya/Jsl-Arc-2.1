@@ -97,6 +97,8 @@ namespace CleanArchitecture.Core.Enums
         public static string InvalidAddress = "Invalid Addess";
         public static string OrgIDNotFound = "Org record not found";
         public static string InternalError = "Internal Error";
+        public static string BalMismatch = "Settled Balance Mismatch";
+
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";
         public static string ReSendMailSubject = "Registration confirmation resend email";
