@@ -31,7 +31,7 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             
         }
@@ -66,17 +66,24 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
             
         }
 
         public void Delete(string key)
         {
-            if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
 
-            key = this.GenerateKey(key);
-            this.Db.KeyDelete(key);
+                key = this.GenerateKey(key);
+                this.Db.KeyDelete(key);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }            
         }
 
         // --khushali-- For signalr scaleout with Redis
@@ -110,13 +117,27 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
 
         public void DeleteTag(string Key, string Tag)
         {
-            this.Context.Cache.RemoveTagsFromKeyAsync(Key, new[] { Tag });
+            try
+            {
+                this.Context.Cache.RemoveTagsFromKeyAsync(Key, new[] { Tag });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }            
         }
 
         public void DeleteHash(string key)
         {
-            // if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
-            this.Db.KeyDelete(key);
+            try
+            {
+                // if (string.IsNullOrWhiteSpace(key) || key.Contains(":")) throw new ArgumentException("invalid key");
+                this.Db.KeyDelete(key);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }            
         }
 
         public void Scan(string value,string SpecialText)
