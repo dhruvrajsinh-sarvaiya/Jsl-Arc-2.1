@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    class SignalRService :ISignalRService
+    class SignalRService : ISignalRService
     {
         private readonly ILogger<SignalRService> _logger;
         private readonly IMediator _mediator;
@@ -29,15 +29,20 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 5);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 6);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = Pair;
-                _mediator.Send(modelData);
+                SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.BuyerBook);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerBook);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = Data;
+                CommonData.Parameter = Pair;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.BuyerBook;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -50,15 +55,20 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 6);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 7);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = Pair;
-                _mediator.Send(modelData);
+                SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerBook);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = Data;
+                CommonData.Parameter = Pair;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.SellerBook;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                 _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -71,15 +81,20 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 7);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 8);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = Pair;
-                _mediator.Send(modelData);
+                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistoryByPair);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = Data;
+                CommonData.Parameter = Pair;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.TradeHistoryByPair;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -92,15 +107,20 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 12);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 10);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = Pair;
-                 _mediator.Send(modelData);
+                SignalRComm<List<GetGraphResponse>> CommonData = new SignalRComm<List<GetGraphResponse>>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ChartData);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = Data;
+                CommonData.Parameter = Pair;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.ChartData;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -113,15 +133,20 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 8);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 9);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data =JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = Pair;
-                _mediator.Send(modelData);
+                SignalRComm<MarketCapData> CommonData = new SignalRComm<MarketCapData>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.MarketData);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveMarketData);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = Data;
+                CommonData.Parameter = Pair;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.MarketData;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -134,15 +159,21 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 1);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 1);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data =  JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = Token;
-                _mediator.Send(modelData);
+                SignalRComm<ActiveOrderInfo> CommonData = new SignalRComm<ActiveOrderInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OpenOrder);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOpenOrder);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Data;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.OpenOrder;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                 _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -155,15 +186,21 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 2);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 2);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = Token;
-                _mediator.Send(modelData);
+                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OrderHistory);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOrderHistory);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Data;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.OrderHistory;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -176,15 +213,21 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 3);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 3);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = Token;
-                _mediator.Send(modelData);
+                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistory);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradeHistory);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Data;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.TradeHistory;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -197,15 +240,21 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 10);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 4);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data =JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = Token;
-                _mediator.Send(modelData);
+                SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.BuyerSideWallet);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerSideWalletBal);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Data;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.BuyerSideWallet;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -218,15 +267,21 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 11);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 5);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = JsonConvert.SerializeObject(Data);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = Token;
-                _mediator.Send(modelData);
+                SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerSideWallet);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerSideWalletBal);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Data;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.SellerSideWallet;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -236,6 +291,6 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
 
-        
+
     }
 }

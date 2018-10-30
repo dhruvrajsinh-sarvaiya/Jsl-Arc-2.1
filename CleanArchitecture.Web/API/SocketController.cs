@@ -34,7 +34,7 @@ namespace CleanArchitecture.Web.API
         private readonly ILogger<SocketController> _logger;
         private readonly IMediator _mediator;
         //private readonly UserManager<ApplicationUser> _userManager;
-       // private readonly ISignalRTestService _signalRTestService; 
+        //private readonly ISignalRTestService _signalRTestService; 
 
         //public SocketController(ILogger<SocketController> logger, IMediator mediator, ISignalRTestService signalRTestService)
         public SocketController(ILogger<SocketController> logger, IMediator mediator)
@@ -56,17 +56,22 @@ namespace CleanArchitecture.Web.API
                 model.Amount = 3;
                 model.Price = 150;
 
-                //var temp = JsonConvert.DeserializeObject< GetBuySellBook>(Data);
-                //SignalRData<GetBuySellBook> modelData = new SignalRData<GetBuySellBook>();
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 5);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 6);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(temp);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = "LTC_BTC";
-                await _mediator.Send(modelData);
+                GetBuySellBook temp = JsonConvert.DeserializeObject<GetBuySellBook>(Data);
+
+                SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.BuyerBook);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod .RecieveBuyerBook);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne );
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType .PairName );
+                CommonData.Data = temp;
+                CommonData.Parameter = "LTC_BTC";
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.BuyerBook;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveBuyerBook";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -85,19 +90,25 @@ namespace CleanArchitecture.Web.API
             try
             {
                 GetBuySellBook model = new GetBuySellBook();
-                model.Amount = 1755;
-                model.Price = 40;
+                model.Amount = 3;
+                model.Price = 150;
 
-                var temp = JsonConvert.SerializeObject(model);
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 6);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 7);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = "LTC_BTC";
-                await _mediator.Send(modelData);
+                GetBuySellBook temp = JsonConvert.DeserializeObject<GetBuySellBook>(Data);
+
+                SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerBook);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook );
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = temp;
+                CommonData.Parameter = "LTC_BTC";
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.SellerBook;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveSellerBook";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -115,27 +126,34 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                TradeHistoryResponce model = new TradeHistoryResponce();
+                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
                 model.Amount = 20;
                 model.ChargeRs = 1;
-                model.DateTime = DateTime.Now; ;
-                model.IsCancelled = 1;
+                model.DateTime = DateTime.Now; 
+                model.IsCancel = 1;
                 model.PairName = "LTC_BTC";
                 model.Price = 150;
                 model.Status = 1;
                 model.StatusText = "Success";
                 model.TrnNo = 90;
                 model.Type = "SELL";
-                var temp = JsonConvert.SerializeObject(model);
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 7);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 8);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = "LTC_BTC";
-                await _mediator.Send(modelData);
+
+                GetTradeHistoryInfo temp = JsonConvert.DeserializeObject<GetTradeHistoryInfo>(Data);
+
+                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistoryByPair);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory );
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = temp;
+                CommonData.Parameter = "LTC_BTC";
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.TradeHistoryByPair;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveTradingHistory";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -153,25 +171,31 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                //GetGraphResponse model = new GetGraphResponse();
-                //model.ChangePer = 20;
-                //model.DataDate = 20180203073000;
-                //model.High = 1199;
-                //model.Low = 1177;
-                //model.TodayClose = 1452;
-                //model.TodayOpen = 1477;
-                //model.Volume = 173;
+                GetGraphResponse model = new GetGraphResponse();
+                model.ChangePer = 20;
+                model.DataDate = 20180203073000;
+                model.High = 1199;
+                model.Low = 1177;
+                model.TodayClose = 1452;
+                model.TodayOpen = 1477;
+                model.Volume = 173;
 
-                //var temp= JsonConvert.SerializeObject(model);
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 12);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 10);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = "LTC_BTC";
-                await _mediator.Send(modelData);
+                GetGraphResponse temp = JsonConvert.DeserializeObject<GetGraphResponse>(Data);
+
+                SignalRComm<GetGraphResponse> CommonData = new SignalRComm<GetGraphResponse>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ChartData);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = temp;
+                CommonData.Parameter = "LTC_BTC";
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.ChartData;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveChartData";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -189,23 +213,30 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                //MarketCapData model = new MarketCapData();
-                //model.Change24 = 1;
-                //model.ChangePer = 3;
-                //model.High24 = 1153;
-                //model.Low24 = 1125;
-                //model.LastPrice = 1137;
-                //model.Volume24 = 253;
+                MarketCapData model = new MarketCapData();
+                model.Change24 = 1;
+                model.ChangePer = 3;
+                model.High24 = 1153;
+                model.Low24 = 1125;
+                model.LastPrice = 1137;
+                model.Volume24 = 253;
 
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 8);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 9);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 1);
-                modelData.Parameter = "LTC_BTC";
-                await _mediator.Send(modelData);
+                MarketCapData temp = JsonConvert.DeserializeObject<MarketCapData>(Data);
+
+                SignalRComm<MarketCapData> CommonData = new SignalRComm<MarketCapData>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.MarketData);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveMarketData);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = temp;
+                CommonData.Parameter = "LTC_BTC";
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.MarketData;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveMarketData";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -224,20 +255,25 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                //GetBuySellBook model = new GetBuySellBook();
-                //model.Amount = 3;
-                //model.Price = 150;
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
-                //var temp = JsonConvert.SerializeObject(model);
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 1);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 1);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = accessToken;
-                await _mediator.Send(modelData);
+
+                ActiveOrderInfo temp = JsonConvert.DeserializeObject<ActiveOrderInfo>(Data);
+
+                SignalRComm<ActiveOrderInfo> CommonData = new SignalRComm<ActiveOrderInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OpenOrder);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOpenOrder);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = temp;
+                CommonData.Parameter = accessToken;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.OpenOrder;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveOpenOrder";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -256,20 +292,25 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                //GetBuySellBook model = new GetBuySellBook();
-                //model.Amount = 3;
-                //model.Price = 150;
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
-                //var temp = JsonConvert.SerializeObject(model);
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 2);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 2);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = accessToken;
-                await _mediator.Send(modelData);
+
+                GetTradeHistoryInfo temp = JsonConvert.DeserializeObject<GetTradeHistoryInfo>(Data);
+
+                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OrderHistory);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOrderHistory);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = temp;
+                CommonData.Parameter = accessToken;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.OrderHistory;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveOrderHistory";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -288,20 +329,25 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                //GetBuySellBook model = new GetBuySellBook();
-                //model.Amount = 3;
-                //model.Price = 150;
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
-                //var temp = JsonConvert.SerializeObject(model);
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 3);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 3);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = accessToken;
-                await _mediator.Send(modelData);
+
+                GetTradeHistoryInfo temp = JsonConvert.DeserializeObject<GetTradeHistoryInfo>(Data);
+
+                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistory);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradeHistory);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = temp;
+                CommonData.Parameter = accessToken;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.TradeHistory;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveTradeHistory";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -320,18 +366,25 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                WalletMasterResponse model = new WalletMasterResponse();
-
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 10);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 4);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = accessToken;
-                await _mediator.Send(modelData);
+
+                WalletMasterResponse temp = JsonConvert.DeserializeObject<WalletMasterResponse>(Data);
+
+                SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.BuyerSideWallet);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerSideWalletBal);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = temp;
+                CommonData.Parameter = accessToken;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.BuyerSideWallet;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveBuyerSideWalletBal";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -350,18 +403,25 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                WalletMasterResponse model = new WalletMasterResponse();
+                 var accessToken = await HttpContext.GetTokenAsync("access_token");
 
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                SignalRData modelData = new SignalRData();
-                modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-                modelData.Method = Enum.GetName(typeof(enMethodName), 11);
-                modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 5);
-                modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-                modelData.Data = Data;// JsonConvert.SerializeObject(model);
-                modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-                modelData.Parameter = accessToken;
-                await _mediator.Send(modelData);
+                WalletMasterResponse temp = JsonConvert.DeserializeObject<WalletMasterResponse>(Data);
+
+                SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerSideWallet);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerSideWalletBal);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = temp;
+                CommonData.Parameter = accessToken;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.SellerSideWallet;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
                 ReciveMethod = "RecieveSellerSideWalletBal";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
@@ -381,17 +441,7 @@ namespace CleanArchitecture.Web.API
         //    {
 
         //        _signalRTestService.MarkTransactionHold(ID);
-        //        //var accessToken = await HttpContext.GetTokenAsync("access_token");
-        //        //SignalRData modelData = new SignalRData();
-        //        //modelData.EventType = Enum.GetName(typeof(enSignalREventType), 4);
-        //        //modelData.Method = Enum.GetName(typeof(enMethodName), 11);
-        //        //modelData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), 5);
-        //        //modelData.Subscription = Enum.GetName(typeof(enSubscriptionType), 1);
-        //        //modelData.Data = JsonConvert.SerializeObject(model);
-        //        //modelData.ParamType = Enum.GetName(typeof(enSignalRParmType), 3);
-        //        //modelData.Parameter = accessToken;
-        //        //await _mediator.Send(modelData);
-        //        //ReciveMethod = "RecieveSellerSideWalletBal";
+                
         //        return Ok(new { ReciveMethod = ReciveMethod });
         //    }
         //    catch (Exception ex)
