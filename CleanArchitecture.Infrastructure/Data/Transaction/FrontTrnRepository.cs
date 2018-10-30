@@ -275,7 +275,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             return Result.ToList();
         }
 
-        public decimal GetMarketCap(long PairId)
+        public decimal LastPriceByPair(long PairId)
         {
             try
             {

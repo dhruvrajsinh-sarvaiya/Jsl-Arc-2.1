@@ -610,7 +610,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 dataRes.Change24 = res.High24Hr - res.Low24Hr;
                 dataRes.ChangePer = res.ChangePer;
                 dataRes.High24 = res.High24Hr;
-                dataRes.LastPrice = _frontTrnRepository.GetMarketCap(PairId);
+                dataRes.LastPrice = _frontTrnRepository.LastPriceByPair(PairId);
                 dataRes.Low24 = res.Low24Hr;
                 dataRes.Volume24 = res.Volume24;
                 return dataRes;

@@ -15,7 +15,7 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<GetBuySellBook> GetBuyerBook(long id,decimal Price= -0);
         List<GetBuySellBook> GetSellerBook(long id, decimal Price = -0);
         List<GetGraphResponse> GetGraphData(long id);
-        decimal GetMarketCap(long PairId);
+        decimal LastPriceByPair(long PairId);
         PairRatesResponse GetPairRates(long PairId);
     }
 }
