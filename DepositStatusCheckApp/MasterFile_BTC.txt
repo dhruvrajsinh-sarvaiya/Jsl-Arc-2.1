@@ -1,0 +1,2 @@
+﻿APIName:BTC
+TransactionFilePath:BTC_TransactionFile.txt

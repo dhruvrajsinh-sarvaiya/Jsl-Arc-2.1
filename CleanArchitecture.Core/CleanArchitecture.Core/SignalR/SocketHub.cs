@@ -31,14 +31,18 @@ namespace CleanArchitecture.Core.SignalR
         public override Task OnConnectedAsync()
         {
             string Pair = "LTC_BTC";
+            string BaseCurrency = "BTC";
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             Redis.SaveTagsToSetMember("Pairs:" + Pair, Context.ConnectionId, Pair); 
+            Redis.SaveTagsToSetMember("Markets:" + BaseCurrency, Context.ConnectionId, BaseCurrency);
             Groups.AddToGroupAsync(Context.ConnectionId, "BroadCast").Wait();
             Groups.AddToGroupAsync(Context.ConnectionId, "BuyerBook:" + Pair).Wait();
             Groups.AddToGroupAsync(Context.ConnectionId, "SellerBook:" + Pair).Wait();
             Groups.AddToGroupAsync(Context.ConnectionId, "TradingHistory:" + Pair).Wait();
-            Groups.AddToGroupAsync(Context.ConnectionId, "MarketData:" + Pair).Wait();
+            Groups.AddToGroupAsync(Context.ConnectionId, "MarketData:" + Pair).Wait();            
             Groups.AddToGroupAsync(Context.ConnectionId, "ChartData:" + Pair).Wait();
+            Groups.AddToGroupAsync(Context.ConnectionId, "PairData:" + BaseCurrency).Wait();
+            Groups.AddToGroupAsync(Context.ConnectionId, "MarketTicker:" + BaseCurrency).Wait();
             return base.OnConnectedAsync();
         }
 
@@ -91,12 +95,14 @@ namespace CleanArchitecture.Core.SignalR
             //Redis.Scan(Context.ConnectionId, ":ConnectionDetail");
             
             var Redis = new RadisServices<ConnetedClientToken>(this._fact);            
-            string Pair = Redis.GetPair(Context.ConnectionId,":");
+            string Pair = Redis.GetPairOrMarketData(Context.ConnectionId,":",0);
+            string BaseCurrency = Redis.GetPairOrMarketData(Context.ConnectionId,":",1);
             //GetConnectedClient(Pair);
             ConnetedClientToken Client = new ConnetedClientToken();
             Client = Redis.GetData("Users:" + Context.ConnectionId);
             Redis.DeleteTag("Users:" + Context.ConnectionId, Client.Token);
             Redis.DeleteHash("Users:"+Context.ConnectionId);
+            Redis.RemoveSetMember("Pairs:" + Pair, Context.ConnectionId);
             Redis.RemoveSetMember("Pairs:" + Pair, Context.ConnectionId);
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "BuyerBook:" + Pair).Wait();
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "SellerBook:" + Pair).Wait();
@@ -105,6 +111,8 @@ namespace CleanArchitecture.Core.SignalR
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "ChartData:" + Pair).Wait();
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "BroadCast").Wait();
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "GroupMessage").Wait();
+            Groups.RemoveFromGroupAsync(Context.ConnectionId, "PairData:" + BaseCurrency).Wait();
+            Groups.RemoveFromGroupAsync(Context.ConnectionId, "MarketTicker:" + BaseCurrency).Wait();
             return base.OnDisconnectedAsync(exception);
         }
 
@@ -333,6 +341,17 @@ namespace CleanArchitecture.Core.SignalR
 
         #endregion
 
+        public Task PairData(string BaseCurrency, string Data)
+        {
+            _chatHubContext.Clients.Group("PairData:" + BaseCurrency).SendAsync("RecievePairData", Data);
+            return Task.FromResult(0);
+        }
+        
+        public Task MarketTicker(string BaseCurrency, string Data)
+        {
+            _chatHubContext.Clients.Group("MarketTicker:" + BaseCurrency).SendAsync("RecieveMarketTicker", Data);
+            return Task.FromResult(0);
+        }
 
         //public void BlockedUser(string UserID)
         //{

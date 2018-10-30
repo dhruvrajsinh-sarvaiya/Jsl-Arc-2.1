@@ -1,0 +1,34 @@
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\NLog.config
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.deps.json
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.runtimeconfig.json
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.runtimeconfig.dev.json
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.dll
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.pdb
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.csproj.CoreCompileInputs.cache
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.AssemblyInfoInputs.cache
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.AssemblyInfo.cs
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.dll
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.pdb
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.csprojAssemblyReference.cache
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.dll
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.dll
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.pdb
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.pdb
+G:\GitHub\Jsl-Arc-2.1-svn final\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.csproj.CopyComplete
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\NLog.config
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.deps.json
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.runtimeconfig.json
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.runtimeconfig.dev.json
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.dll
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\DepositStatusCheckApp.pdb
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.dll
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.dll
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Core.pdb
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.pdb
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.csprojAssemblyReference.cache
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.csproj.CoreCompileInputs.cache
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.AssemblyInfoInputs.cache
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.AssemblyInfo.cs
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.csproj.CopyComplete
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.dll
+G:\GitHub\27-102018-svn\trunk\DepositStatusCheckApp\obj\Debug\netcoreapp2.1\DepositStatusCheckApp.pdb

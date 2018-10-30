@@ -9,6 +9,7 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
+using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<SettledTradeTransactionQueue> _settelTradeTranQueue;
         private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
         private readonly ICommonRepository<Market> _marketRepository;
+        private readonly ICommonRepository<FavouritePair> _favouritePairRepository;
+        private readonly IBasePage _basePage;
 
         public FrontTrnService(IFrontTrnRepository frontTrnRepository,
             ICommonRepository<TradePairMaster> tradeMasterRepository,
@@ -40,7 +43,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ICommonRepository<TradeTransactionQueue> tradeTransactionQueueRepository,
             ICommonRepository<SettledTradeTransactionQueue> settelTradeTranQueue,
             ICommonRepository<TradePairStastics> tradePairStastics,
-            ICommonRepository<Market> marketRepository)
+            ICommonRepository<Market> marketRepository,
+            ICommonRepository<FavouritePair> favouritePairRepository,
+            IBasePage basePage)
 
         {
             _frontTrnRepository = frontTrnRepository;
@@ -52,6 +57,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _settelTradeTranQueue = settelTradeTranQueue;
             _tradePairStastics = tradePairStastics;
             _marketRepository = marketRepository;
+            _favouritePairRepository = favouritePairRepository;
+            _basePage = basePage;
         }
 
         #region method
@@ -593,6 +600,123 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 responseData = _frontTrnRepository.GetPairRates(PairId);
                
                 return responseData;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int AddToFavouritePair(long PairId, long UserId)
+        {
+            try
+            {
+                var pairData = _tradeMasterRepository.GetById(PairId);
+                if(pairData == null)
+                {
+                    return 2;
+                }
+                var favouritePair = _favouritePairRepository.GetSingle(x => x.PairId == PairId && x.UserId == UserId);
+                if(favouritePair == null)
+                {
+                    //Add With First Time
+                    favouritePair = new FavouritePair()
+                    {
+                        PairId = PairId,
+                        UserId = UserId,
+                        Status = 1,
+                        CreatedBy = UserId,
+                        CreatedDate = _basePage.UTC_To_IST()
+                    };
+                    favouritePair = _favouritePairRepository.Add(favouritePair);
+                }
+                else if(favouritePair != null)
+                {
+                    if(favouritePair.Status == 1)
+                    {
+                        return 1;  // already added as favourite pair
+                    }
+                    else if(favouritePair.Status == 9)
+                    {
+                        favouritePair.Status = 1;
+                        _favouritePairRepository.Update(favouritePair);
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public int RemoveFromFavouritePair(long PairId, long UserId)
+        {
+            try
+            {
+                var favouritePair = _favouritePairRepository.GetSingle(x => x.PairId == PairId && x.UserId == UserId);
+                if (favouritePair == null)
+                {
+                    return 1;
+                }
+                else if (favouritePair != null)
+                {
+                    favouritePair.Status = 9;
+                    _favouritePairRepository.Update(favouritePair);
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+        public List<FavouritePairInfo> GetFavouritePair(long UserId)
+        {
+            List<FavouritePairInfo> responsedata = new List<FavouritePairInfo>();
+            try
+            {
+                var favouritepair = _favouritePairRepository.FindBy(x => x.UserId == UserId && x.Status == 1);
+                if(favouritepair != null)
+                {
+                    foreach (var favPair in favouritepair)
+                    {
+                        FavouritePairInfo response = new FavouritePairInfo();
+                        var pairMasterData = _tradeMasterRepository.GetById(favPair.PairId);
+                        var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pairMasterData.Id);
+                        var chidService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.SecondaryCurrencyId);
+                        var baseService = _serviceMasterRepository.GetSingle(x => x.Id == pairMasterData.BaseCurrencyId);
+                        var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pairMasterData.Id);
+
+                        response.PairId = pairMasterData.Id;
+                        response.Pairname = pairMasterData.PairName;
+                        response.Currentrate = pairStastics.CurrentRate;
+                        response.BuyFees = pairDetailData.BuyFees;
+                        response.SellFees = pairDetailData.SellFees;
+                        response.ChildCurrency = chidService.Name;
+                        response.Abbrevation = chidService.SMSCode;
+                        response.BaseCurrency = baseService.Name;
+                        response.BaseAbbrevation = baseService.SMSCode;
+                        response.ChangePer = pairStastics.ChangePer24;
+                        response.Volume = pairStastics.ChangeVol24;
+                        response.High24Hr = pairStastics.High24Hr;
+                        response.Low24Hr = pairStastics.Low24Hr;
+                        response.HighWeek = pairStastics.HighWeek;
+                        response.LowWeek = pairStastics.LowWeek;
+                        response.High52Week = pairStastics.High52Week;
+                        response.Low52Week = pairStastics.Low52Week;
+                        response.UpDownBit = pairStastics.UpDownBit;
+
+                        responsedata.Add(response);
+                    }
+                    return responsedata;
+                }
+                else
+                {
+                    return responsedata;
+                }
+                 
             }
             catch (Exception ex)
             {
