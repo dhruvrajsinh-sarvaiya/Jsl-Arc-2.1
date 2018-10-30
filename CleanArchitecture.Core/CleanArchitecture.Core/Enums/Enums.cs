@@ -519,4 +519,10 @@ namespace CleanArchitecture.Core.Enums
         PartialRefund = 7,
         Cancel = 8
     }
+
+    public enum enChargeType
+    {
+        Fixed = 1,
+        Pecentage = 2
+    }
 }

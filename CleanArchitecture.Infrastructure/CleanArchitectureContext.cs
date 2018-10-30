@@ -137,6 +137,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<TradePairStastics> TradePairStastics { get; set; } //uday 25-10-2018
         public DbSet<TransactionRequest> TransactionRequest { get; set; } //Rita 27-10-2018
         public DbSet<FavouritePair> FavouritePair { get; set; } //Uday 29-10-2018
+        public DbSet<ChargeRuleMaster> ChargeRuleMaster { get; set; } //Uday 30-10-2018
+        public DbSet<LimitRuleMaster> LimitRuleMaster { get; set; } //Uday 30-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
@@ -197,6 +199,8 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<WalletMaster>().Property(x => x.AccWalletID).ValueGeneratedNever();
             modelBuilder.Entity<WalletMaster>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
             modelBuilder.Entity<TradeBuyRequest>().HasKey(e => new { e.Id, e.TrnNo });
+            modelBuilder.Entity<ChargeRuleMaster>().HasKey(e => new { e.TrnType, e.WalletType });
+            modelBuilder.Entity<LimitRuleMaster>().HasKey(e => new { e.TrnType, e.WalletType });
         }
 
         /// <summary>
