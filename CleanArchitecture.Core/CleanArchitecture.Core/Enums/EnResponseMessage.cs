@@ -58,6 +58,8 @@ namespace CleanArchitecture.Core.Enums
         public static string FavPair_AddedSuccess = "Pair Added as favourite pair";
         public static string FavPair_RemoveSuccess = "Pair Remove from favourite pair";
         public static string FavPair_NoPairFound = "No Favourites pair found";
+        public static string InValidDebitAccountIDMsg = "Invalid Debit Account ID";        
+        public static string InValidCreditAccountIDMsg = "Invalid Credit Account ID";
         //============================
 
         //============================walelt=================================//       

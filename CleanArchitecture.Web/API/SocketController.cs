@@ -248,6 +248,38 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        [HttpGet("LastPrice/{Data}")]
+        public async Task<IActionResult> LastPrice(decimal Data)
+        {
+            string ReciveMethod = "";
+            try
+            {
+                SignalRComm<Decimal> CommonData = new SignalRComm<Decimal>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.Price);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveLastPrice);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = Data;
+                CommonData.Parameter = "LTC_BTC";
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.Price;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
+                ReciveMethod = "RecieveLastPrice";
+                return Ok(new { ReciveMethod = ReciveMethod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                return Ok();
+            }
+        }
+
         [HttpGet("OpenOrder/{Data}")]
         [Authorize]
         public async Task<IActionResult> OpenOrder(string Data)
@@ -256,6 +288,15 @@ namespace CleanArchitecture.Web.API
             try
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
+                ActiveOrderInfo model = new ActiveOrderInfo();
+                model.Id = 96;
+                model.TrnDate = DateTime.UtcNow;
+                model.Type = "BUY";
+                model.Order_Currency = "BTC";
+                model.Delivery_Currency = "LTC";
+                model.Amount = 100;
+                model.Price = 1400;
+                model.IsCancelled = 1;
 
                 ActiveOrderInfo temp = JsonConvert.DeserializeObject<ActiveOrderInfo>(Data);
 
@@ -294,6 +335,19 @@ namespace CleanArchitecture.Web.API
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
 
+                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
+                model.TrnNo = 90;
+                model.Type = "SELL";
+                model.Price = 1400;
+                model.Amount = 1000;
+                model.Total = 140000;
+                model.DateTime = DateTime.UtcNow;
+                model.Status = 1;
+                model.StatusText = "Success";
+                model.PairName = "LTC_BTC";
+                model.ChargeRs = 10;
+                model.IsCancel = 0;
+
                 GetTradeHistoryInfo temp = JsonConvert.DeserializeObject<GetTradeHistoryInfo>(Data);
 
                 SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
@@ -330,6 +384,17 @@ namespace CleanArchitecture.Web.API
             try
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
+                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
+                model.TrnNo = 90;
+                model.Type = "SELL";
+                model.Price = 1400;
+                model.Amount = 1000;
+                model.Total = 140000;
+                model.DateTime = DateTime.UtcNow;
+                model.Status = 1;
+                model.StatusText = "Success";
+                model.PairName = "LTC_BTC";
+                model.ChargeRs = 10;
 
                 GetTradeHistoryInfo temp = JsonConvert.DeserializeObject<GetTradeHistoryInfo>(Data);
 
@@ -368,6 +433,13 @@ namespace CleanArchitecture.Web.API
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
 
+                WalletMasterResponse model = new WalletMasterResponse();
+                model.WalletName = "BTC Default";
+                model.AccWalletID = "1029399266000200";
+                model.Balance = 201200;
+                model.CoinName = "BTC";
+                model.IsDefaultWallet = 0;
+                model.PublicAddress = "";
                 WalletMasterResponse temp = JsonConvert.DeserializeObject<WalletMasterResponse>(Data);
 
                 SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
@@ -383,6 +455,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Method = enMethodName.BuyerSideWallet;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                SendData.WalletName = "BTC";
 
                 await _mediator.Send(SendData);
                 ReciveMethod = "RecieveBuyerSideWalletBal";
@@ -403,10 +476,17 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                 var accessToken = await HttpContext.GetTokenAsync("access_token");
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                WalletMasterResponse model = new WalletMasterResponse();
+                model.WalletName = "LTC Default";
+                model.AccWalletID = "1053841474000201";
+                model.Balance = 201200;
+                model.CoinName = "LTC";
+                model.IsDefaultWallet = 1;
+                model.PublicAddress = "";
 
                 WalletMasterResponse temp = JsonConvert.DeserializeObject<WalletMasterResponse>(Data);
-
+                
                 SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerSideWallet);
@@ -420,7 +500,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Method = enMethodName.SellerSideWallet;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-
+                SendData.WalletName = "LTC";
                 await _mediator.Send(SendData);
                 ReciveMethod = "RecieveSellerSideWalletBal";
                 return Ok(new { ReciveMethod = ReciveMethod });
@@ -433,6 +513,102 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        [HttpGet("PairData/{Data}")]
+        public async Task<IActionResult> PairData(string Data)
+        {
+            string ReciveMethod = "";
+            try
+            {
+                VolumeDataRespose model = new VolumeDataRespose();
+                model.ChangePer = 20;
+                model.Currentrate = 1;
+                model.High24Hr = 1814;
+                model.High52Week = 1744;
+                model.HighWeek = 1800;
+                model.Low24Hr = 1812;
+                model.Low52Week = 1725;
+                model.LowWeek = 1700;
+                model.PairId = 10021001;
+                model.PairName = "INR_BTC";
+                model.UpDownBit = 0;
+                model.Volume24 = 1406;
+
+
+                VolumeDataRespose temp = JsonConvert.DeserializeObject<VolumeDataRespose>(Data);
+
+                SignalRComm<VolumeDataRespose> CommonData = new SignalRComm<VolumeDataRespose>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.PairData);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecievePairData);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.Base);
+                CommonData.Data = temp;
+                CommonData.Parameter = "XRP";
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.PairData;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                await _mediator.Send(SendData);
+                ReciveMethod = "RecievePairData";
+                return Ok(new { ReciveMethod = ReciveMethod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                return Ok();
+            }
+        }
+
+        //[HttpGet("MarketTicker/{Data}")]
+        //public async Task<IActionResult> MarketTicker(string Data)
+        //{
+        //    string ReciveMethod = "";
+        //    try
+        //    {
+        //        VolumeDataRespose model = new VolumeDataRespose();
+        //        model.ChangePer = 20;
+        //        model.Currentrate = 1;
+        //        model.High24Hr = 1814;
+        //        model.High52Week = 1744;
+        //        model.HighWeek = 1800;
+        //        model.Low24Hr = 1812;
+        //        model.Low52Week = 1725;
+        //        model.LowWeek = 1700;
+        //        model.PairId = 10021001;
+        //        model.PairName = "INR_BTC";
+        //        model.UpDownBit = 0;
+        //        model.Volume24 = 1406;
+
+
+        //        //VolumeDataRespose temp = JsonConvert.DeserializeObject<VolumeDataRespose>(Data);
+
+        //        SignalRComm<VolumeDataRespose> CommonData = new SignalRComm<VolumeDataRespose>();
+        //        CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+        //        CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.MarketTicker);
+        //        CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveMarketTicker);
+        //        CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+        //        CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.Base);
+        //        CommonData.Data = model;
+        //        CommonData.Parameter = "BTC";
+
+        //        SignalRData SendData = new SignalRData();
+        //        SendData.Method = enMethodName.MarketTicker;
+        //        SendData.Parameter = CommonData.Parameter;
+        //        SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+        //        await _mediator.Send(SendData);
+        //        ReciveMethod = "RecieveMarketTicker";
+        //        return Ok(new { ReciveMethod = ReciveMethod });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+        //        return Ok();
+        //    }
+        //}
+
         //[HttpGet("CreateTranTest")]
         //public async Task<IActionResult> CreateTranTest(long ID)
         //{
@@ -441,7 +617,7 @@ namespace CleanArchitecture.Web.API
         //    {
 
         //        _signalRTestService.MarkTransactionHold(ID);
-                
+
         //        return Ok(new { ReciveMethod = ReciveMethod });
         //    }
         //    catch (Exception ex)

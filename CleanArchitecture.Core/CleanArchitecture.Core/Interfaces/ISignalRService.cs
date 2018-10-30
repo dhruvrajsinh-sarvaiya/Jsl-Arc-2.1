@@ -16,12 +16,17 @@ namespace CleanArchitecture.Core.Interfaces
         void TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair);
         void ChartData(List<GetGraphResponse> Data, string Pair);
         void MarketData(MarketCapData Data, string Pair);
+        void LastPrice(Decimal Price,string Pair);
 
         //user wise
         void OpenOrder(ActiveOrderInfo Data, string Token);
         void OrderHistory(GetTradeHistoryInfo Data, string Token);
         void TradeHistoryByUser(GetTradeHistoryInfo Data, string Token);
-        void BuyerSideWalletBal(WalletMasterResponse Data, string Token);
-        void SellerSideWalletBal(WalletMasterResponse Data, string Token);
+        void BuyerSideWalletBal(WalletMasterResponse Data,string Wallet, string Token);
+        void SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token);
+
+        //Base Market
+        void PairData(VolumeDataRespose Data,string Base);
+        void MarketTicker(VolumeDataRespose Data, string Base);
     }
 }
