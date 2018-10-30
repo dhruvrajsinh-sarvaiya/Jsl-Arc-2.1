@@ -12,5 +12,6 @@ namespace CleanArchitecture.Core.Entities.Communication
         public string DataObj { get; set; }
         public enMethodName Method { get; set; }
         public string Parameter { get; set; }
+        public string WalletName { get; set; }
     }
 }

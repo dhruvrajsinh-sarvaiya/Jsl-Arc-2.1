@@ -478,7 +478,12 @@ namespace CleanArchitecture.Core.Enums
         RecieveSellerBook = 7,
         RecieveTradingHistory = 8,
         RecieveMarketData = 9,
-        RecieveChartData = 10
+        RecieveChartData = 10,
+        RecieveLastPrice = 11,
+
+        //Base Market
+        RecievePairData = 12,
+        RecieveMarketTicker = 13,
     }
     public enum enCheckWithdrawalBene
     {
