@@ -1053,6 +1053,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                   Walletname = WalletTypearray.WalletTypeName + "DefaultWallet",
                                   AccWalletID = RandomGenerateWalletId(UserId, 1),
                                   IsDefaultWallet = 1,
+                                  IsValid=true,
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
@@ -1175,6 +1176,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                   Walletname = WalletTypearray.WalletTypeName + "DefaultWallet",
                                   AccWalletID = RandomGenerateWalletId(U.Id, 1),
                                   IsDefaultWallet = 1,
+                                  IsValid = true,
                                   PublicAddress = ""
                               };
                 _dbContext.WalletMasters.AddRange(Wallets);
