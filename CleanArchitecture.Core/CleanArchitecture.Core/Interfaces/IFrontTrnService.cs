@@ -32,5 +32,6 @@ namespace CleanArchitecture.Core.Interfaces
         int AddToFavouritePair(long PairId, long UserId);
         int RemoveFromFavouritePair(long PairId, long UserId);
         List<FavouritePairInfo> GetFavouritePair(long UserId);
+        void GetPairAdditionalVal(long PairId, decimal CurrentRate,long TrnNo);
     }
 }
