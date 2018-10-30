@@ -25,6 +25,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _mediator = mediator;
         }
 
+        #region Pairwise
         public void BuyerBook(GetBuySellBook Data, string Pair)
         {
             try
@@ -33,7 +34,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.BuyerBook);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerBook);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
                 CommonData.Parameter = Pair;
@@ -59,7 +60,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerBook);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
                 CommonData.Parameter = Pair;
@@ -85,7 +86,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistoryByPair);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
                 CommonData.Parameter = Pair;
@@ -111,7 +112,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ChartData);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
                 CommonData.Parameter = Pair;
@@ -137,7 +138,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.MarketData);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveMarketData);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
                 CommonData.Parameter = Pair;
@@ -155,6 +156,35 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        public void LastPrice(decimal Price, string Pair)
+        {
+            try
+            {
+                SignalRComm<Decimal> CommonData = new SignalRComm<Decimal>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.Price);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveLastPrice);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
+                CommonData.Data = Price;
+                CommonData.Parameter = Pair;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.Price;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                _mediator.Send(SendData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region UserSpecific
         public void OpenOrder(ActiveOrderInfo Data, string Token)
         {
             try
@@ -236,7 +266,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void BuyerSideWalletBal(WalletMasterResponse Data, string Token)
+        public void BuyerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token)
         {
             try
             {
@@ -253,6 +283,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.BuyerSideWallet;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                SendData.WalletName = Wallet;
 
                 _mediator.Send(SendData);
             }
@@ -263,7 +294,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void SellerSideWalletBal(WalletMasterResponse Data, string Token)
+        public void SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token)
         {
             try
             {
@@ -280,6 +311,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.SellerSideWallet;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                SendData.WalletName = Wallet;
 
                 _mediator.Send(SendData);
             }
@@ -290,7 +322,62 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        #endregion
 
+        #region BaseMarket
+        public void PairData(VolumeDataRespose Data, string Base)
+        {
+            try
+            {
+                SignalRComm<VolumeDataRespose> CommonData = new SignalRComm<VolumeDataRespose>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.PairData);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecievePairData);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.Base);
+                CommonData.Data = Data;
+                CommonData.Parameter = Base;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.PairData;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                _mediator.Send(SendData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void MarketTicker(VolumeDataRespose Data, string Base)
+        {
+            try
+            {
+                SignalRComm<VolumeDataRespose> CommonData = new SignalRComm<VolumeDataRespose>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.MarketTicker);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveMarketTicker);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.Base);
+                CommonData.Data = Data;
+                CommonData.Parameter = Base;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.MarketTicker;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                _mediator.Send(SendData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        #endregion
 
     }
 }
