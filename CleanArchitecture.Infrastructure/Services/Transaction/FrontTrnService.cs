@@ -596,17 +596,24 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public MarketCapData GetMarketCap(long PairId)
         {
-            decimal ChangePer = 0;
-            decimal Volume24 = 0;
             try
             {
-                MarketCapData res = new MarketCapData();
-                res = _frontTrnRepository.GetMarketCap(PairId);
-                var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == PairId);
+                MarketCapData dataRes = new MarketCapData();
+
+                //var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == PairId);
                 //GetPairAdditionalVal(PairId, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
-                res.Volume24 = Volume24;
-                res.ChangePer = ChangePer;
-                return res;
+                //res.Volume24 = Volume24;
+                //res.ChangePer = ChangePer;
+                //return res;
+                VolumeDataRespose res = new VolumeDataRespose();
+                res = GetVolumeDataByPair(PairId);
+                dataRes.Change24 = res.High24Hr - res.Low24Hr;
+                dataRes.ChangePer = res.ChangePer;
+                dataRes.High24 = res.High24Hr;
+                dataRes.LastPrice = _frontTrnRepository.GetMarketCap(PairId);
+                dataRes.Low24 = res.Low24Hr;
+                dataRes.Volume24 = res.Volume24;
+                return dataRes;
             }
             catch (Exception ex)
             {
