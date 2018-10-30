@@ -13,13 +13,13 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new long Id { get; set; }
 
-        [DataType(DataType.DateTime)]
-        public DateTime TrnDate { get; set; }
+        //[DataType(DataType.DateTime)]
+        //public DateTime TrnDate { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime PickupDate { get; set; }
-        [Required]
-        public long MemberID { get; set; }
+        //[Required]
+        //public long MemberID { get; set; }
         [Key]
         public long TrnNo { get; set; }
         [Required]
