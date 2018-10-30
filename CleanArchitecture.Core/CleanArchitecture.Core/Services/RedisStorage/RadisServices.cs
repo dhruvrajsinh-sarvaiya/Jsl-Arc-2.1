@@ -165,19 +165,22 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
             }
         }
 
-        public string GetPairOrMarketData(string Value,string keySplitString,int i)
+        public string GetPairOrMarketData(string Value,string keySplitString,string Identifier)
         {
             try
             {
                 IEnumerable<TagMember> members = this.Context.Cache.GetMembersByTag(Value);
                 foreach (TagMember member in members)
                 {
-                    var Key = member.Key;
-                    if (string.IsNullOrWhiteSpace(Key) || Key.Contains(keySplitString))
+                    if(member.Key.Contains(Identifier))
                     {
-                        Key = Key.Split(keySplitString)[1];
-                    }
-                    return Key;
+                        var Key = member.Key;
+                        if (string.IsNullOrWhiteSpace(Key) || Key.Contains(keySplitString))
+                        {
+                            Key = Key.Split(keySplitString)[1];
+                        }
+                        return Key;
+                    }                   
                 }
                 return "";
             }
