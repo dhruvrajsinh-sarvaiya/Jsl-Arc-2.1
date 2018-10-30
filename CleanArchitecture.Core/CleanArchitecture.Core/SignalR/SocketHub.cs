@@ -31,7 +31,7 @@ namespace CleanArchitecture.Core.SignalR
         public override Task OnConnectedAsync()
         {
             string Pair = "LTC_BTC";
-            string BaseCurrency = "BTC";
+            string BaseCurrency = "XRP";
             var Redis = new RadisServices<ConnetedClientList>(this._fact);
             Redis.SaveTagsToSetMember("Pairs:" + Pair, Context.ConnectionId, Pair); 
             Redis.SaveTagsToSetMember("Markets:" + BaseCurrency, Context.ConnectionId, BaseCurrency);
@@ -100,7 +100,10 @@ namespace CleanArchitecture.Core.SignalR
             //GetConnectedClient(Pair);
             ConnetedClientToken Client = new ConnetedClientToken();
             Client = Redis.GetData("Users:" + Context.ConnectionId);
-            Redis.DeleteTag("Users:" + Context.ConnectionId, Client.Token);
+            if (Client != null)
+            {
+                Redis.DeleteTag("Users:" + Context.ConnectionId, Client.Token);
+            }
             Redis.DeleteTag("Pairs:" + Pair, Context.ConnectionId);
             Redis.DeleteTag("Markets:" + BaseCurrency, Context.ConnectionId);
             Redis.DeleteHash("Users:"+Context.ConnectionId);
