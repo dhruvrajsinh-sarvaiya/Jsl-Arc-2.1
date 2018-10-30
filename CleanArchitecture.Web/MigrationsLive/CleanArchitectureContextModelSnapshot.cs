@@ -2676,25 +2676,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("StckingScheme");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.TradeDepositCompletedTrn", b =>
-                {
-                    b.Property<string>("Address");
-
-                    b.Property<string>("TrnID");
-
-                    b.Property<DateTime>("CreatedTime");
-
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Status");
-
-                    b.HasKey("Address", "TrnID");
-
-                    b.ToTable("TradeDepositCompletedTrn");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.UserPreferencesMaster", b =>
                 {
                     b.Property<long>("Id")
