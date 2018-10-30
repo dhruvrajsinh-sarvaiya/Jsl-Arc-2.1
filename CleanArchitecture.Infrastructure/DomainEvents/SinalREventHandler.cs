@@ -10,6 +10,7 @@ using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -49,23 +50,28 @@ namespace CleanArchitecture.Infrastructure.DomainEvents
         {
             try
             {
-                
-                if(request.Method == enMethodName.BuyerBook)
-                    _chat.BuyerBook(request.Parameter, request.Data);
-                else if (request.Method == enMethodName.SellerBook)
-                    _chat.SellerBook(request.Parameter, request.Data);
-                else if(request.Method == enMethodName.TradeHistoryByPair)
-                    _chat.TradeHistoryByPair(request.Parameter, request.Data);
-                else if (request.Method == enMethodName.ChartData)
-                    _chat.ChartData(request.Parameter, request.Data);
-                else if (request.Method == enMethodName.MarketData)
-                    _chat.MarketData(request.Parameter, request.Data);
-                else if (request.Method == enMethodName.OpenOrder)
-                    _chat.OpenOrder(request.Parameter, request.Data);
-                else if (request.Method == enMethodName.OrderHistory)
-                    _chat.OrderHistory(request.Parameter, request.Data);
-                else if (request.Method == enMethodName.TradeHistory)
-                    _chat.TradeHistoryByUser(request.Parameter, request.Data);
+                var replaceChar1 ="{\"Data\":\"{";
+                String Data = JsonConvert.SerializeObject(request);
+                Data = Data.Replace(@"\", "");
+                Data = Data.Replace(replaceChar1, "{\"Data\":{");
+                Data = Data.Replace("}\",\"IsBuyerMaker\"", "},\"IsBuyerMaker\"");
+
+                if (request.Method.ToString() == Enum.GetName(typeof(enMethodName), 5))//BuyerBook
+                    _chat.BuyerBook(request.Parameter, Data);
+                else if (request.Method == Enum.GetName(typeof(enMethodName), 6))//SellerBook
+                    _chat.SellerBook(request.Parameter, Data);
+                else if(request.Method == Enum.GetName(typeof(enMethodName), 7))//TradeHistoryByPair
+                    _chat.TradeHistoryByPair(request.Parameter, Data);
+                else if (request.Method == Enum.GetName(typeof(enMethodName), 12))//ChartData
+                    _chat.ChartData(request.Parameter, Data);
+                else if (request.Method == Enum.GetName(typeof(enMethodName), 8))//MarketData
+                    _chat.MarketData(request.Parameter, Data);
+                else if (request.Method == Enum.GetName(typeof(enMethodName), 1))//OpenOrder
+                    _chat.OpenOrder(request.Parameter, Data);
+                else if (request.Method == Enum.GetName(typeof(enMethodName), 2))//OrderHistory
+                    _chat.OrderHistory(request.Parameter, Data);
+                else if (request.Method == Enum.GetName(typeof(enMethodName), 3))//TradeHistoryByUser
+                    _chat.TradeHistoryByUser(request.Parameter, Data);
 
                 //_chat.OpenOrder("CfDJ8MB8DXV9k79JrEe_PIsRHuriLlB4BgdnHH8a68GFLRS8lKmDBmEroQPEr7Ut3SdC4N3B6LKb826fWnx5CCHwGA28z0Qj2_mU9jp3L2HgggdUTI38vyxTUNrDKAo_ajk7Mn8D9-PdbcXYqGIVNSUZ58Vj0XqbW9nAkKcfIx6ZfSy9JY_w5aBtVL8mLB3gqKuX-SWyMsEGKzW70_cU49ALKLEUo1p6Pap4S4d3QCbnbiBV5dw4sshE5DhXdPflobrF6G1kDBzCyL8nLr3GFnJZIQPQfKl8v80MuLtBDmDttfAkNP_vbL0dg-muZipMLFCvkz1Sg3pPGbcCTaU-u1EsrRw3CB8LKR3yfpDGOUkr0mj3mU7rNE15hePJnUZPSeAiniKnouXmvkg5bTp4LjVUWY_uRKk2SJNYjBDfw68UtpyhTD_FjgVNL7pqW0GNoGCFUXwYz9JkxtR00aFo8xuH4pIOSmVqWIM-UXHMRQwbwML_HL0rZ79Ol11w-HuIwz5NPJ40vb5sFPlD54FkH5F522a3YmT8GBkYltGJfnpfz_BqHKw1JFO2RuVhpTqONfibcp8hyhP8alB0Eaok12xuSI0km8PAd8ZKqCu3O-gqOsn6e8pu9ZRxSZgsL-VB2kTMmtKsc2TB74m8Cus15T6yB0-vTBju1Vl6sptcoRo-bS8tgZ858aw9MJOZcU0FlFMMICfJAwpQNdpSBQWQ8eAF49Z8cc7_KUGBen93ZYrKsIhdZ0tvTl_5MKkbbTDYOFWri9VzyarzpTPlh7l8uYXN1peJOdARroPSF3MF7kPyiEXjnERRtzD02GfwjPujDLtlw8wqNL9aONYwBwertKVUYOs", "xyz");
                 return Task.FromResult(new Unit());
