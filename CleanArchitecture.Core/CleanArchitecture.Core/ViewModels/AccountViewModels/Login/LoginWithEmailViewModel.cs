@@ -17,7 +17,7 @@ namespace CleanArchitecture.Core.ViewModels.AccountViewModels.Login
     }
     public class LoginWithEmailResponse : BizResponseClass
     {
-        public string appkey { get; set; }
+        public string Appkey { get; set; }
     }
 
     public class LoginWithEmail2FAResponse : BizResponseClass
