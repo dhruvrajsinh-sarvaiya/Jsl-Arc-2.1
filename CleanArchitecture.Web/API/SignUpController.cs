@@ -14,6 +14,7 @@ using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.Login;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.OTP;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
+using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Infrastructure.Services;
 using CleanArchitecture.Web.Filters;
@@ -43,10 +44,12 @@ namespace CleanArchitecture.Web.API
         private readonly ITempOtpService _tempOtpService;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private readonly IBasePage _basePage;
+        private readonly IWalletService _IwalletService;
         #endregion
 
         #region Ctore
-        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage)
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService, Microsoft.Extensions.Configuration.IConfiguration configuration, 
+            IBasePage basePage, IWalletService walletService)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
@@ -58,6 +61,9 @@ namespace CleanArchitecture.Web.API
             _tempOtpService = tempOtpService;
             _configuration = configuration;
             _basePage = basePage;
+            _IwalletService = walletService;
+
+
         }
         #endregion
 
@@ -291,6 +297,17 @@ namespace CleanArchitecture.Web.API
                                         currentUser.EmailConfirmed = true;
                                         var resultupdate = await _userManager.UpdateAsync(currentUser);
                                         _tempUserRegisterService.Update(user.Id);
+
+                                        ///   define the wallet services..
+
+                                        _IwalletService.CreateDefaulWallet(currentUser.Id);
+                                        AddBizUserTypeMappingReq addBizUserTypeMappingReq = new AddBizUserTypeMappingReq()
+                                        {
+                                            UserID = currentUser.Id,
+                                            UserType = enUserType.User
+
+                                        };
+                                        _IwalletService.AddBizUserTypeMapping(addBizUserTypeMappingReq);
 
                                         //return Ok("Your account has been activated, you can now login.");
                                         //return AppUtils.StanderdSignUp("Your account has been activated, you can now login.");
@@ -542,6 +559,18 @@ namespace CleanArchitecture.Web.API
                                             _tempUserRegisterService.Update(tempdata.Id);
                                             _tempOtpService.Update(tempotp.Id);
                                             var emailconfirmed = await _userManager.IsEmailConfirmedAsync(currentUser);
+                                            ///   define the wallet services..
+
+                                            _IwalletService.CreateDefaulWallet(currentUser.Id);
+                                            AddBizUserTypeMappingReq addBizUserTypeMappingReq = new AddBizUserTypeMappingReq()
+                                            {
+                                                UserID = currentUser.Id,
+                                                UserType = enUserType.User
+
+                                            };
+                                            _IwalletService.AddBizUserTypeMapping(addBizUserTypeMappingReq);
+
+
                                             //return Ok("Your account has been activated, you can now login.");
                                             //return AppUtils.StanderdSignUp("You have successfully verified.");
                                             return Ok(new SignUpWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUPVerification });
@@ -804,6 +833,16 @@ namespace CleanArchitecture.Web.API
                                             _tempOtpService.Update(tempotp.Id);
                                             var mobileconfirmed = await _userManager.IsPhoneNumberConfirmedAsync(currentUser);
                                             //return AppUtils.StanderdSignUp("You have successfully verified.");
+                                            /// Wallet services define.
+
+                                            _IwalletService.CreateDefaulWallet(currentUser.Id);
+                                            AddBizUserTypeMappingReq addBizUserTypeMappingReq = new AddBizUserTypeMappingReq()
+                                            {
+                                                UserID = currentUser.Id,
+                                                UserType = enUserType.User
+
+                                            };
+                                            _IwalletService.AddBizUserTypeMapping(addBizUserTypeMappingReq);
                                             return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUPVerification });
                                         }
                                         else
