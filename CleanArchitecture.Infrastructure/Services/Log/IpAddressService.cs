@@ -22,7 +22,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public async Task<long> AddIpAddress(IpMasterViewModel model)
         {
-            var getIp = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress  && i.UserId == model.UserId && !i.IsDeleted);
+            var getIp = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (getIp != null)
             {
                 return getIp.Id;
@@ -37,6 +37,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = model.UserId,
                 Status = 0,
+                IpAliasName = model.IpAliasName
 
             };
             _ipMasterRepository.Insert(currentIpAddress);
@@ -45,8 +46,8 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             return currentIpAddress.Id;
         }
 
-        public async Task<long> GetIpAddressByUserIdandAddress(string IpAddress,long UserId)
-        {           
+        public async Task<long> GetIpAddressByUserIdandAddress(string IpAddress, long UserId)
+        {
             var getIp = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == IpAddress && i.UserId == UserId && !i.IsDeleted);
             if (getIp != null)
             {
@@ -56,7 +57,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             return 0;
         }
 
-            public async Task<IpMasterViewModel> GetIpAddressById(long Id)
+        public async Task<IpMasterViewModel> GetIpAddressById(long Id)
         {
             var IpAddress = _ipMasterRepository.GetById(Id);
             if (IpAddress == null)
@@ -83,31 +84,34 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         }
 
-        public async Task<List<IpMasterViewModel>> GetIpAddressListByUserId(long UserId, int pageIndex, int pageSize)
+        public async Task<List<IpMasterGetViewModel>> GetIpAddressListByUserId(long UserId, int pageIndex, int pageSize)
         {
+            
+
             var IpAddressList = _ipMasterRepository.Table.Where(i => i.UserId == UserId && !i.IsDeleted).ToList();
             if (IpAddressList == null)
             {
                 return null;
             }
 
-            var IpList = new List<IpMasterViewModel>();
+            var IpList = new List<IpMasterGetViewModel>();
             foreach (var item in IpAddressList)
             {
-                IpMasterViewModel imodel = new IpMasterViewModel();
-                imodel.Id = item.Id;
-                imodel.UserId = item.UserId;
+                IpMasterGetViewModel imodel = new IpMasterGetViewModel();
+               // imodel.Id = item.Id;
+               // imodel.UserId = item.UserId;
                 imodel.IpAddress = item.IpAddress;
                 imodel.IsEnable = item.IsEnable;
-                imodel.IsDeleted = item.IsDeleted;
+                //imodel.IsDeleted = item.IsDeleted;
                 imodel.CreatedDate = item.CreatedDate;
-                imodel.CreatedBy = item.CreatedBy;
-                imodel.UpdatedDate = item.UpdatedDate;
-                imodel.UpdatedBy = item.UpdatedBy;
+              //  imodel.CreatedBy = item.CreatedBy;
+                //imodel.UpdatedDate = item.UpdatedDate;
+               // imodel.UpdatedBy = item.UpdatedBy;
                 imodel.Status = item.Status;
+                imodel.IpAliasName = item.IpAliasName;
 
                 IpList.Add(imodel);
-            }     
+            }
             //return IpList;
 
 
@@ -115,12 +119,12 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             //var pageSize = 10; // set your page size, which is number of records per page
 
             //var page = 1; // set current page number, must be >= 1
-            if(pageIndex == 0)
+            if (pageIndex == 0)
             {
                 pageIndex = 1;
             }
 
-            if(pageSize == 0)
+            if (pageSize == 0)
             {
                 pageSize = 10;
             }
@@ -142,20 +146,14 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             var IpAddress = _ipMasterRepository.Table.FirstOrDefault(i => i.IpAddress == model.IpAddress && i.UserId == model.UserId && !i.IsDeleted);
             if (IpAddress != null)
             {
-                var currentIpAddress = new IpMaster
-                {
-                    Id = IpAddress.Id,
-                    UserId = IpAddress.UserId,
-                    IpAddress = model.IpAddress,
-                    IsEnable = IpAddress.IsEnable,
-                    //IsDeleted = IpAddress.IsDeleted,                    
-                    UpdatedDate = DateTime.UtcNow,
-                    UpdatedBy = IpAddress.UserId
-                };
+                IpAddress.IpAddress = model.IpAddress;
+                IpAddress.IpAliasName = model.IpAliasName;
+                IpAddress.UpdatedBy = IpAddress.UserId;
+                IpAddress.UpdatedDate = DateTime.UtcNow;
 
 
-                _ipMasterRepository.Update(currentIpAddress);
-                return currentIpAddress.Id;
+                _ipMasterRepository.Update(IpAddress);
+                return IpAddress.Id;
                 //_dbContext.SaveChanges();
 
             }
