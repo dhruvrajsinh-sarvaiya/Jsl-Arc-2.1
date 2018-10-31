@@ -43,7 +43,7 @@ namespace CleanArchitecture.Core.SignalR
         {
             try
             {
-                string Pair = "LTC_BTC";
+                string Pair = "INR_BTC";
                 string BaseCurrency = "XRP";
                 var Redis = new RadisServices<ConnetedClientList>(this._fact);
                 Redis.SaveTagsToSetMember("Pairs:" + Pair, Context.ConnectionId, Pair); 
