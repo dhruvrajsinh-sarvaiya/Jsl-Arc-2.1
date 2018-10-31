@@ -263,7 +263,7 @@ namespace DepositStatusCheckApp
             }
             finally
             {
-                TransactionTick.Start(); //ntrivedi temperory 28-06-2018
+                //TransactionTick.Start(); //ntrivedi temperory 28-06-2018
             }
         }
         #endregion
@@ -408,7 +408,7 @@ namespace DepositStatusCheckApp
                 //  dayDiff = walletServiceDataObj.ValidDays; //komal 10/9/2018 get valid days from table
                 //dayDiff = (Configuration["DayDiff"] != string.Empty? Convert.ToInt16(Configuration["DayDiff"]):1);
                 // ntrivedi 28-05-2018 temperory top 1
-                SqlStr = "SELECT top " + walletServiceDataObj.RecordCount.ToString() + " ID, TrnID , Address, SMSCode, Amount, Confirmations,OrderID,isNull(FromAddress,'') as FromAddress From DepositHistory WHERE SMSCode = '" + CommonMethod.SMSCode + "' AND Status = 0 AND IsProcessing = 0  order by UpdatedDate";
+               SqlStr = "SELECT top " + walletServiceDataObj.RecordCount.ToString() + " ID, TrnID , Address, SMSCode, Amount, Confirmations,OrderID,isNull(FromAddress,'') as FromAddress From DepositHistory WHERE SMSCode = '" + CommonMethod.SMSCode + "' AND Status = 0 AND IsProcessing = 0  order by CreatedDate desc"; // ntrivedi temperory order by updateddate
                 dSet = (new DataCommon()).OpenDataSet("DepositHistory", SqlStr, dSet, 30);
                 if (dSet.Tables[0].Rows.Count > 0)
                 {
@@ -466,7 +466,7 @@ namespace DepositStatusCheckApp
                                                         (new DataCommon()).ExecuteQuery(SqlStr);
                                                         continue;
                                                     }
-                                                    if (iv.address.ToString().Equals(dSet.Tables[0].Rows[0]["address"]) && iv.wallet == CommonMethod.ProviderWalletID)
+                                                    if (iv.address.ToString() == dSet.Tables[0].Rows[0]["address"].ToString() && iv.wallet == CommonMethod.ProviderWalletID)
                                                     {
                                                         // iv["address"] = iv["address"].ToString();
                                                         //iv["Amount"] = Convert.ToDecimal(iv["value"]) / Convert.ToDecimal(Configuration[Convert.ToString(iv["btc"])]);
@@ -496,6 +496,7 @@ namespace DepositStatusCheckApp
                                                     }
                                                     else
                                                     {
+                                                        //SqlStr = dSet.Tables[0].Rows[0]["address"].ToString(); //temperory
                                                         SqlStr = "UPDATE DepositHistory SET IsProcessing = 1,Status=9,StatusMsg='mismatch walletid or address' WHERE Address='" + iv.address.ToString() + "' and ID = " + dRow["ID"].ToString() + "";
                                                         (new DataCommon()).ExecuteQuery(SqlStr);
                                                     }
@@ -553,9 +554,7 @@ namespace DepositStatusCheckApp
                 {
                     foreach (var item in CommonMethod.Transfers)
                     {
-                        // update                      
-                        
-
+                        // update 
                         CommonMethod.SqlStr = "UPDATE DepositHistory SET Amount=" + item.Amount + ",Confirmations =" + item.confirmations + ", ConfirmedTime ='" + item.confirmedTime + "', epochtimepure  ='" + item.unconfirmedTime + "', UpdatedDate = dbo.GetISTDate(),SystemRemarks='Str Amt:" + item.valueStr + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
                         (new DataCommon()).ExecuteQuery(CommonMethod.SqlStr);
                         WriteRequestLog("Update Deposit History :  " + item.txid, "TradeDepositHistoryUpdationForBitgo", CommonMethod.SMSCode, Convert.ToInt16(Configuration["AllowLog"]), Action: 2);
@@ -590,9 +589,13 @@ namespace DepositStatusCheckApp
                         {
                             CommonMethod.DMemberID = Convert.ToInt64(queryResult);
                         }
+                                             
 
-                        SqlStr = "select WalletID from AddressMasters Where Address=@PublicAddress and Status=1";
-                        queryResult = (new DataCommon()).ExecuteScalarWDMParameterize("@PublicAddress", item.address, SqlStr);
+                        SqlStr = "select WalletID from AddressMasters  AM " +
+                                 " inner join WalletMasters WM on wm.Id = am.WalletId " +
+                                 " inner join WalletTypeMasters WTM on WTM.Id = wm.WalletTypeID " +
+                                 " Where Address = @PublicAddress and AM.Status = 1 and WTM.WalletTypeName = @CoinName";
+                        queryResult = (new DataCommon()).ExecuteScalarWDMParameterize("@PublicAddress,@CoinName", item.address + "," + item.coin, SqlStr);
                         if (string.IsNullOrEmpty(queryResult))
                         {
                             // ntrivedi temperory 29-10-2018
@@ -600,9 +603,10 @@ namespace DepositStatusCheckApp
                             //(new DataCommon()).ExecuteQuery(SqlStr);
                             //CommonMethod.DMemberID = 0;
                             //continue;
+
                             SqlStr = "INSERT INTO [dbo].[AddressMasters]([CreatedDate],[CreatedBy],[UpdatedBy],[UpdatedDate] " +
                                     ",[Status],[WalletId],[Address],[IsDefaultAddress],[SerProID],[AddressLable]) "  +
-                                    " VALUES(dbo.GetISTDate(),900,900, dbo.GetISTDate(),1,40, "+ item.address +",0,0,'test')";
+                                    " VALUES(dbo.GetISTDate(),900,900, dbo.GetISTDate(),1,'"+ queryResult + "', "+ item.address +",0,0,'test')";
                             (new DataCommon()).ExecuteQuery(SqlStr);
                         }
                         else
@@ -625,8 +629,8 @@ namespace DepositStatusCheckApp
                             //DeliveryProcessOrder(ref CommonMethod, item, 1, CommonMethod.DMemberID);
                             // trn pr , status ,date 
                             // ntrivedi move inside delivery process order function
-                            //SqlStr = "INSERT INTO TradeDepositCompletedTrn(TrnID, Status, CreatedTime) VALUES('" + item.txid + "', 1 , dbo.GetISTDate())";
-                            //(new DataCommon()).ExecuteQuery(SqlStr);
+                            SqlStr = "INSERT INTO TradeDepositCompletedTrn(TrnID,Address, Status, CreatedTime) VALUES('" + item.txid + "','"+ item.address + "', 1 , dbo.GetISTDate())";
+                            (new DataCommon()).ExecuteQuery(SqlStr);
                             //WalletService walletService = new WalletService();
                             //WalletDrCrResponse walletDrCrResponse = _walletService.DepositionWalletOperation("123456", item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit);
                             //_walletService.GetAddress("123");
@@ -674,16 +678,16 @@ namespace DepositStatusCheckApp
                                                         
                             var bar = serviceProvider.GetService<IWalletTransactionCrDr>();
                            //long id= bar.getOrgID();
-                          WalletDrCrResponse walletDrCrResponse =  bar.DepositionWalletOperation("123456", item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit);
+                          WalletDrCrResponse walletDrCrResponse =  bar.DepositionWalletOperation(UTC_To_IST().ToString("ddMMyyyyHHmmss"), item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit);
 
-                            if(walletDrCrResponse.ReturnCode == 0)
+                            if (walletDrCrResponse.ReturnCode == 0)
                             {
                                     SqlStr = "UPDATE DepositHistory SET status = 1,StatusMsg='Success',OrderID='" + walletDrCrResponse.TrnNo + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
                                     (new DataCommon()).ExecuteQuery(SqlStr);
                             }
                             else
                             {
-                                SqlStr = "UPDATE DepositHistory SET status = 9,StatusMsg='"+ walletDrCrResponse.StatusMsg +"',OrderID='" + walletDrCrResponse.TrnNo + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
+                                SqlStr = "UPDATE DepositHistory SET status = 9,StatusMsg='"+ walletDrCrResponse.ReturnMsg +"',OrderID='" + walletDrCrResponse.TrnNo + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
                                 (new DataCommon()).ExecuteQuery(SqlStr);
                             }
                         }
@@ -1019,7 +1023,7 @@ namespace DepositStatusCheckApp
             {
 
                 WriteErrorLog(ex, "Program", "CallThirdPartyAPI");
-                throw ex;
+                return "";
             }
         }
 

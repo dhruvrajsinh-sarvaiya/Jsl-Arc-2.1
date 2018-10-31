@@ -2387,7 +2387,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     walletLedger2.PreBal = currentBalance;
-                    walletLedger2.PostBal = currentBalance + drAmount;
+                    walletLedger2.PostBal = currentBalance + crAmount;
                 }
                 return walletLedger2;
             }

@@ -37,7 +37,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //{
         //    try
         //    {
-        //        return _dbContext.Set<T>().SingleOrDefault(e => e.Id == id);
+        //        return _dbContext.Set<T>().FirstOrDefault(e => e.Id == id);
         //    }
         //    catch (Exception ex)
         //    {
@@ -1296,7 +1296,7 @@ public long getOrgID()
 {
     try
     {
-        var orgObj = _dbContext.BizUserTypeMapping.Where(u => u.UserType == 0).SingleOrDefault();
+        var orgObj = _dbContext.BizUserTypeMapping.Where(u => u.UserType == 0).FirstOrDefault();
         if (orgObj == null)
         {
             return 0;
