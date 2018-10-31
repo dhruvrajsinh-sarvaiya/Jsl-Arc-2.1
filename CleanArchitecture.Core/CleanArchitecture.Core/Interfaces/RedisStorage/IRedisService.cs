@@ -18,6 +18,8 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
         
         T GetData(string key);
 
+        string GetHashData(string Key, string Field);
+
         void DeleteHash(string key);
 
         void DeleteTag(string key, string Tag);

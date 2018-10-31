@@ -788,8 +788,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (isBaseService == 0)    //uday 25-10-2018 When Service is add create default wallet of org not generate the address
                 {
                     var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
+                    if(addressClass.address!=null)
+                    {
+                        walletMaster.WalletPublicAddress(addressClass.address);
+                    }
                     //walletMaster.PublicAddress = addressClass.address;
-                    walletMaster.WalletPublicAddress(addressClass.address);
+                    walletMaster.WalletPublicAddress("NotGenerate");
                     _commonRepository.Update(walletMaster);
                 }
                 //vsolanki 26-10-2018 insert and limitConfigration
@@ -1455,9 +1459,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.CreatedDate = UTC_To_IST();
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
-                    newobj.StartTime = request.StartTime;
+                    newobj.StartTimeUnix = request.StartTimeUnix;
                     newobj.LifeTime = request.LifeTime;
-                    newobj.EndTime = request.EndTime;
+                    newobj.EndTimeUnix = request.EndTimeUnix;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
                     // Response.WalletLimitConfigurationRes = newobj;
@@ -1471,8 +1475,8 @@ namespace CleanArchitecture.Infrastructure.Services
                         IsExist.LimitPerDay = request.LimitPerDay;
                         IsExist.LifeTime = request.LifeTime;
                         IsExist.LimitPerTransaction = request.LimitPerTransaction;
-                        IsExist.StartTime = request.StartTime;
-                        IsExist.EndTime = request.EndTime;
+                        IsExist.StartTimeUnix = request.StartTimeUnix;
+                        IsExist.EndTimeUnix = request.EndTimeUnix;
                         IsExist.UpdatedBy = Userid;
                         IsExist.UpdatedDate = UTC_To_IST();
                         _LimitcommonRepository.Update(IsExist);

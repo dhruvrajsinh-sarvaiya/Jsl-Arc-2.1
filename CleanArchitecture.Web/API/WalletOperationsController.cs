@@ -572,7 +572,7 @@ namespace CleanArchitecture.Web.API
             try
             {
                 CreateWalletAddressRes responseClass=new CreateWalletAddressRes();
-                if (user == null && user.Id != 1)
+                if (user == null)
                 {
                     new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.StandardLoginfailed };                  
                 }
