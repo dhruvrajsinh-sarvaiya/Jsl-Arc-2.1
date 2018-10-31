@@ -59,6 +59,14 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal LTP { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal BidPrice { get; set; }
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal Quantity { get; set; }
 
     }
 }
