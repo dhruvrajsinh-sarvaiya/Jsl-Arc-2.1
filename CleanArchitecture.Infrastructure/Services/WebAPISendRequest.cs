@@ -17,12 +17,12 @@ namespace CleanArchitecture.Infrastructure.Services
     //For All type of Web Request
     public class WebAPISendRequest : IWebApiSendRequest
     {
-        public readonly ILogger<WebAPISendRequest> _log;
+        //public readonly ILogger<WebAPISendRequest> _log;
 
-        public WebAPISendRequest(ILogger<WebAPISendRequest> log)
-        {
-            _log = log;
-        }
+        //public WebAPISendRequest(ILogger<WebAPISendRequest> log)
+        //{
+        //    _log = log;
+        //}
 
         public string  SendAPIRequestAsync(string Url, string Request, string ContentType,int Timeout= 180000, WebHeaderCollection   headerDictionary = null, string MethodType = "POST")
         {
@@ -44,8 +44,8 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 httpWebRequest.Headers = headerDictionary;
 
-                _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, Request);
-
+                //_log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, Request);
+                HelperForLog.WriteLogIntoFile(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name,Url+ "Request::"+ Request);
                 if (Request != null)
                 {
                     using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
@@ -64,12 +64,13 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 }
                 httpWebResponse.Close();
-                _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, responseFromServer);                
+                //_log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, responseFromServer); 
+                HelperForLog.WriteLogIntoFile(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, responseFromServer);
             }
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                _log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                
                 //throw ex;
             }
             
@@ -97,9 +98,9 @@ namespace CleanArchitecture.Infrastructure.Services
                 // httpWebRequest.Headers.Add(string.Format("Authorization: key={0}", Headers));
                 // }
 
-                _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, Url, MethodType);
 
-                if(Request != "")
+                HelperForLog.WriteLogIntoFile(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, Url);
+                if (Request != "")
                 {
                     using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
                     {
@@ -117,7 +118,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     sr.Dispose();
                 }
                 httpWebResponse.Close();
-                _log.LogInformation(System.Reflection.MethodBase.GetCurrentMethod().Name, responseFromServer);
+                HelperForLog.WriteLogIntoFile(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, responseFromServer);
                 return Task.FromResult(responseFromServer);
             }
             catch (Exception ex)

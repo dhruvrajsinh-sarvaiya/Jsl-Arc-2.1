@@ -635,7 +635,7 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 2018-10-26
        // [AllowAnonymous]
-       [AllowAnonymous]
+      // [AllowAnonymous]
         [HttpGet("{FromDate}/{ToDate}/{WalletId}")]
         public async Task<IActionResult> GetWalletLedger(DateTime FromDate, DateTime ToDate, string WalletId, int Page)
         {

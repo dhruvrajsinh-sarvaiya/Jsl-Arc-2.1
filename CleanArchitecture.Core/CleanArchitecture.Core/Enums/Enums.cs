@@ -298,7 +298,8 @@ namespace CleanArchitecture.Core.Enums
         InvalidAddress = 4236,
         OrgIDNotFound = 2427,
         MemberTypeNotFound = 4242,
-        SettedBalanceMismatch  = 4243
+        SettedBalanceMismatch  = 4243,
+        ShadowBalanceExceed = 4244
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService
@@ -398,7 +399,8 @@ namespace CleanArchitecture.Core.Enums
         Alert = 1,
         Nofification = 2,
         GrpMsg = 3,
-        Channel = 4
+        Channel = 4,
+        BroadCast = 5
     }
     
     public enum enSubscriptionType
@@ -485,6 +487,7 @@ namespace CleanArchitecture.Core.Enums
         //Base Market
         RecievePairData = 12,
         RecieveMarketTicker = 13,
+        BroadcastMessage = 14
     }
     public enum enCheckWithdrawalBene
     {

@@ -100,6 +100,8 @@ namespace CleanArchitecture.Core.Enums
         public static string OrgIDNotFound = "Org record not found";
         public static string InternalError = "Internal Error";
         public static string BalMismatch = "Settled Balance Mismatch";
+        public static string ShadowLimitExceed = "Exceed Shadow Limit";
+
 
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";
@@ -240,6 +242,9 @@ namespace CleanArchitecture.Core.Enums
         public static string LoginWithMobileOtpLoginFailed = "Login failed: User mobile number not available.";
 
         public static string TwoFactorActiveRequest = "User two factor authentication reguest successfully send.";
+
+        // ================================ SignalR ========================= //
+        public static string SignalRTrnSuccessfullyCreated = "Transacton Successfully created.";
     }
 
 
