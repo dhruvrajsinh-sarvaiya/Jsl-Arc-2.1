@@ -209,8 +209,8 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeDepositCompletedTrn>().Property(x => x.Address).ValueGeneratedNever(); // ntrivedi 30-10-2018 
             modelBuilder.Entity<TradeDepositCompletedTrn>().Property(x => x.TrnID).ValueGeneratedNever(); // ntrivedi 30-10-2018 pk and autoid are different
             modelBuilder.Entity<TradeDepositCompletedTrn>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi 30102018 https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
-            modelBuilder.Entity<TradeBuyerList>().HasKey(e => new { e.TrnNo, e.PoolID });
-            modelBuilder.Entity<TradeSellerList>().HasKey(e => new { e.Id, e.TrnNo });
+            modelBuilder.Entity<TradeBuyerList>().HasKey(e => new { e.TrnNo });
+            modelBuilder.Entity<TradeSellerList>().HasKey(e => new { e.TrnNo, e.PoolID });
         }
 
         /// <summary>
