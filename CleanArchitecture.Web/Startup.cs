@@ -28,6 +28,7 @@ using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.Services.Session;
 using CleanArchitecture.Core.SignalR;
 using Newtonsoft.Json.Serialization;
+using CleanArchitecture.Web.Filters;
 
 namespace CleanArchitecture.Web
 {
@@ -182,7 +183,7 @@ namespace CleanArchitecture.Web
                 config.For(typeof(IWebApiSendRequest)).Add(typeof(WebAPISendRequest));
                 config.For(typeof(IGetWebRequest)).Add(typeof(GetWebRequest));
                 config.For(typeof(IWalletConfigurationService)).Add(typeof(WalletConfigurationService));
-                
+
                 //  config.For(typeof(ILogger));
 
                 // added by nirav savariya for common repository on 10-04-2018
@@ -193,7 +194,7 @@ namespace CleanArchitecture.Web
 
                 //Populate the container using the service collection
                 config.Populate(services);
-               
+
             });
 
             return container.GetInstance<IServiceProvider>();
@@ -203,6 +204,7 @@ namespace CleanArchitecture.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             //loggerFactory.AddFile(Configuration["LogPath"].ToString());//Take from Setting file
+
             if (env.IsDevelopment())
             {
                 // app.UseDeveloperExceptionPage();
@@ -212,6 +214,7 @@ namespace CleanArchitecture.Web
             {
                 app.UseHsts();
                 app.UseResponseCompression();
+                app.AddDevMiddlewares();
             }
 
             // NOTE: For SPA swagger needs adding before MVC
@@ -271,4 +274,4 @@ namespace CleanArchitecture.Web
             app.UseMvc();
         }
     }
-} 
+}

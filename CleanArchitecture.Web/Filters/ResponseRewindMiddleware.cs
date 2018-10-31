@@ -14,7 +14,6 @@ namespace CleanArchitecture.Web.Filters
     public class ResponseRewindMiddleware
     {
         private readonly RequestDelegate next;
-        //private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
         private readonly IBasePage _basePage;
 
         public ResponseRewindMiddleware(RequestDelegate next, IBasePage basePage)
@@ -48,16 +47,15 @@ namespace CleanArchitecture.Web.Filters
                         erParams = JsonConvert.DeserializeObject<ErrorParams>(responseBody);
 
                     responseLog += $", Response : {responseBody}";
-
                     //if (ResponseDetails?[1] == "api")
                     //{
-                        if (erParams?.ReturnCode == 9)
-                        {
-                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), responseLog);
-                            HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), erParams.ReturnMsg);
-                        }
-                        else
-                            HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), responseLog);
+                    if (erParams?.ReturnCode == 9)
+                    {
+                        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), responseLog);
+                        HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), erParams.ReturnMsg);
+                    }
+                    else
+                        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), responseLog);
                     //}
                     //else if (ResponseDetails?[1] != "swagger")
                     //    HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), "", "", responseLog);
@@ -67,7 +65,7 @@ namespace CleanArchitecture.Web.Filters
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), "", "", ex.ToString());
             }

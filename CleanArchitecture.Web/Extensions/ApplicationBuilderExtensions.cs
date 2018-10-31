@@ -136,6 +136,7 @@ namespace CleanArchitecture.Web.Extensions
             return app;
         }
 
+
         public static IApplicationBuilder UseCustomSwaggerApi(this IApplicationBuilder app, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             // Enable middleware to serve generated Swagger as a JSON endpoint
@@ -159,7 +160,7 @@ namespace CleanArchitecture.Web.Extensions
             loggerFactory.AddDebug();
             app.UseDeveloperExceptionPage();
             app.UseDatabaseErrorPage();
-            //app.UseMiddleware<RequestResponseLoggingMiddleware>();
+            // added by nirav savariya for Req. and Res. using write log data on 31-10-2018
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseMiddleware<ResponseRewindMiddleware>();
             // NOTE: For SPA swagger needs adding before MVC

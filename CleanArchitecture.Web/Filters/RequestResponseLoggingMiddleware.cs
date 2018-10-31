@@ -17,7 +17,6 @@ namespace CleanArchitecture.Web.Filters
     public class RequestResponseLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        //private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
         private readonly IBasePage _basePage;
         public RequestResponseLoggingMiddleware(RequestDelegate next, IBasePage basePage)
         {
@@ -51,7 +50,6 @@ namespace CleanArchitecture.Web.Filters
                     context.Request.Body = injectedRequestStream;
                 }
 
-                //_logger.LogTrace(requestLog);
                 //if (PathDetails?[1] == "api")
                 HelperForLog.WriteLogIntoFile(1, _basePage.UTC_To_IST(), context.Request.Path.ToString(), context.Request.Path.ToString(), requestLog, accessToken);
                 //else if (PathDetails?[1] != "swagger")
