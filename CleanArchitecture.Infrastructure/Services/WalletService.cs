@@ -521,7 +521,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
 
                 transactionProviderResponses = _webApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { SMSCode = coin.ToLower(), amount = 0, APIType = enWebAPIRouteType.TransactionAPI, trnType = Convert.ToInt32(enTrnType.Generate_Address) });
-                if (transactionProviderResponses == null)
+                if (transactionProviderResponses == null || transactionProviderResponses.Count == 0)
                 {
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCode.Fail, ReturnMsg = "Please try after sometime." };
                 }
@@ -531,7 +531,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
 
                 ThirdPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
-                if (thirdPartyAPIConfiguration == null)
+                if (thirdPartyAPIConfiguration == null || transactionProviderResponses.Count == 0)
                 {
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
@@ -1410,12 +1410,18 @@ namespace CleanArchitecture.Infrastructure.Services
             LimitResponse Response = new LimitResponse();
             try
             {
+                //TimeSpan StartTime, EndTime;
+                //System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0,System.DateTimeKind.Utc);
+                //DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                //dateTime1 = istDate.AddSeconds(request.StartTime);
+                //StartTime = dateTime1.TimeOfDay;
+                //EndTime = dateTime1.TimeOfDay;
+
                 TimeSpan StartTime, EndTime;
-                System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0,System.DateTimeKind.Utc);
+                System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                 DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
-                dateTime1 = istDate.AddSeconds(request.StartTime);
-                StartTime = dateTime1.TimeOfDay;
-                EndTime = dateTime1.TimeOfDay;
+                StartTime = istDate.AddSeconds(request.StartTime).TimeOfDay;
+                EndTime = istDate.AddSeconds(request.EndTime).TimeOfDay;
 
                 var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
                 if (walletMasters == null)
@@ -1439,7 +1445,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
                     newobj.StartTime = StartTime;
-                    newobj.LifeTime = 99;
+                    newobj.LifeTime = request.LifeTime;
                     newobj.EndTime = EndTime;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
@@ -1452,6 +1458,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     {
                         IsExist.LimitPerHour = request.LimitPerHour;
                         IsExist.LimitPerDay = request.LimitPerDay;
+                        IsExist.LifeTime = request.LifeTime;
                         IsExist.LimitPerTransaction = request.LimitPerTransaction;
                         IsExist.StartTime = StartTime;
                         IsExist.EndTime = EndTime;
@@ -1491,6 +1498,17 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else
                 {
+                    TimeSpan StartTime, EndTime;
+                    System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                    DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                    //StartTime = istDate.AddSeconds(request.StartTime).TimeOfDay;
+                    //EndTime = istDate.AddSeconds(request.EndTime).TimeOfDay;
+                    var t = from ti in WalletLimitResponse
+                            select new
+                            {
+                                StartTime = istDate.AddSeconds(Convert.ToDouble(ti.StartTime)).TimeOfDay,
+                                EndTime = istDate.AddSeconds(Convert.ToDouble(ti.StartTime)).TimeOfDay
+                            };                    
                     LimitResponse.WalletLimitConfigurationRes = WalletLimitResponse;
                     LimitResponse.ReturnCode = enResponseCode.Success;
                     LimitResponse.ReturnMsg = EnResponseMessage.FindRecored;
@@ -1855,7 +1873,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse AddBeneficiary(string CoinName,string Name ,string BeneficiaryAddress, long UserId)
+        public BeneficiaryResponse AddBeneficiary(string CoinName, short WhitelistingBit,string Name ,string BeneficiaryAddress, long UserId)
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
@@ -1890,6 +1908,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddNew.UserID = UserId;
                     AddNew.Address = BeneficiaryAddress;
                     AddNew.Name = Name;
+                    AddNew.IsWhiteListed = WhitelistingBit;
                     AddNew.WalletTypeID = walletMasters.Id;
                     AddNew = _BeneficiarycommonRepository.Add(AddNew);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
@@ -2155,7 +2174,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] Request, long ID)
+        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq Request, long ID)
         {
             BeneficiaryResponse Response = new BeneficiaryResponse();
             Response.BizResponse = new BizResponseClass();

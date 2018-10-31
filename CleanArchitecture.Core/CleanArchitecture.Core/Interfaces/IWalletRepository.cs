@@ -74,7 +74,7 @@ namespace CleanArchitecture.Core.Interfaces
         //vsolanki 25-10-2018
         List<BalanceResponseLimit> GetAvailbleBalTypeWise(long userid);
 
-        bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID);
+        bool BeneficiaryBulkEdit(BulkBeneUpdateReq arryTrnID);
 
         void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long WalletId);
 
