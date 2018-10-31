@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using System;
@@ -11,23 +12,30 @@ namespace CleanArchitecture.Core.Interfaces
     public interface ISignalRService
     {
         //Pair wise
-        Task BuyerBook(GetBuySellBook Data,string Pair);
-        Task SellerBook(GetBuySellBook Data, string Pair);
-        Task TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair);
-        Task ChartData(List<GetGraphResponse> Data, string Pair);
-        Task MarketData(MarketCapData Data, string Pair);
-        Task LastPrice(LastPriceViewModel Data,string Pair);
+        void BuyerBook(GetBuySellBook Data,string Pair);
+        void SellerBook(GetBuySellBook Data, string Pair);
+        void TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair);
+        void ChartData(List<GetGraphResponse> Data, string Pair);
+        void MarketData(MarketCapData Data, string Pair);
+        void LastPrice(LastPriceViewModel Data,string Pair);
 
         //user wise
-        Task OpenOrder(ActiveOrderInfo Data, string Token);
-        Task OrderHistory(GetTradeHistoryInfo Data, string Token);
-        Task TradeHistoryByUser(GetTradeHistoryInfo Data, string Token);
-        Task BuyerSideWalletBal(WalletMasterResponse Data,string Wallet, string Token);
-        Task SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token);
-        Task ActivityNotification(string Msg,string Token);
+        void OpenOrder(ActiveOrderInfo Data, string Token);
+        void OrderHistory(GetTradeHistoryInfo Data, string Token);
+        void TradeHistoryByUser(GetTradeHistoryInfo Data, string Token);
+        void BuyerSideWalletBal(WalletMasterResponse Data,string Wallet, string Token);
+        void SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token);
+        void ActivityNotification(string Msg,string Token);
 
         //Base Market
-        Task PairData(VolumeDataRespose Data,string Base);
-        Task MarketTicker(VolumeDataRespose Data, string Base);
+        void PairData(VolumeDataRespose Data,string Base);
+        void MarketTicker(VolumeDataRespose Data, string Base);
+
+
+
+        //Event Call
+        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, String Token);
+
+        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction);
     }
 }

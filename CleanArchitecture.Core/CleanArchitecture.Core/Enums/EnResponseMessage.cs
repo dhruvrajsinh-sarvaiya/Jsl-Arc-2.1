@@ -240,6 +240,9 @@ namespace CleanArchitecture.Core.Enums
         public static string LoginWithMobileOtpLoginFailed = "Login failed: User mobile number not available.";
 
         public static string TwoFactorActiveRequest = "User two factor authentication reguest successfully send.";
+
+        // ================================ SignalR ========================= //
+        public static string SignalRTrnSuccessfullyCreated = "Transacton Successfully created.";
     }
 
 

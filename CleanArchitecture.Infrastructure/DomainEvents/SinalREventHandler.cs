@@ -22,30 +22,11 @@ namespace CleanArchitecture.Infrastructure.DomainEvents
 {
     public class SinalREventHandler : IRequestHandler<SignalRData>
     {
-        private readonly IMessageRepository<NotificationQueue> _MessageRepository;
-        private readonly IMessageConfiguration _MessageConfiguration;
-        private readonly IMessageService _MessageService;
-        private WebApiParseResponse _WebApiParseResponse;
-        private GetDataForParsingAPI _GetDataForParsingAPI;
-        private WebAPIParseResponseCls _GenerateResponse;
-        //private readonly IHubContext<Chat> _hubContext;
         private SocketHub _chat;
-
-
-        public SinalREventHandler(IMessageRepository<NotificationQueue> MessageRepository, 
-            MessageConfiguration MessageConfiguration, 
-            MessageService MessageService, GetDataForParsingAPI GetDataForParsingAPI, 
-            WebApiParseResponse WebApiParseResponse, WebAPIParseResponseCls GenerateResponse, SocketHub chat)
+        public SinalREventHandler( SocketHub chat)
         {
-            _MessageRepository = MessageRepository;
-            _MessageConfiguration = MessageConfiguration;
-            _MessageService = MessageService;
-            _GetDataForParsingAPI = GetDataForParsingAPI;
-            _WebApiParseResponse = WebApiParseResponse;
-            _GenerateResponse = GenerateResponse;
             _chat = chat;
         }
-        
         public Task<Unit> Handle(SignalRData request, CancellationToken cancellationToken)
         {
             try
