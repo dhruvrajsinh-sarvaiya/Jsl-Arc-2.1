@@ -23,10 +23,10 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         public decimal LimitPerTransaction { get; set; }
 
         //[Required(ErrorMessage = "1,Please Enter Required Parameters,4229")]
-        public double StartTime { get; set; }
+        public double? StartTimeUnix { get; set; }
 
         //[Required(ErrorMessage = "1,Please Enter Required Parameters,4230")]
-        public double EndTime { get; set; }
+        public double? EndTimeUnix { get; set; }
 
         public decimal LifeTime { get; set; }
     }

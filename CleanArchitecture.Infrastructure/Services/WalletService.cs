@@ -1455,9 +1455,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.CreatedDate = UTC_To_IST();
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
-                    newobj.StartTime = request.StartTime;
+                    newobj.StartTimeUnix = request.StartTimeUnix;
                     newobj.LifeTime = request.LifeTime;
-                    newobj.EndTime = request.EndTime;
+                    newobj.EndTimeUnix = request.EndTimeUnix;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
                     // Response.WalletLimitConfigurationRes = newobj;
@@ -1471,8 +1471,8 @@ namespace CleanArchitecture.Infrastructure.Services
                         IsExist.LimitPerDay = request.LimitPerDay;
                         IsExist.LifeTime = request.LifeTime;
                         IsExist.LimitPerTransaction = request.LimitPerTransaction;
-                        IsExist.StartTime = request.StartTime;
-                        IsExist.EndTime = request.EndTime;
+                        IsExist.StartTimeUnix = request.StartTimeUnix;
+                        IsExist.EndTimeUnix = request.EndTimeUnix;
                         IsExist.UpdatedBy = Userid;
                         IsExist.UpdatedDate = UTC_To_IST();
                         _LimitcommonRepository.Update(IsExist);

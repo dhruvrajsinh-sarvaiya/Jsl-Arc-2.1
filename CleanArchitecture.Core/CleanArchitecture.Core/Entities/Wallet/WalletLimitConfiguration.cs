@@ -26,10 +26,10 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal? LifeTime { get; set; }
 
         //[Required]
-        public double? StartTime { get; set; }
+        public double? StartTimeUnix { get; set; }
 
         //[Required]
-        public double? EndTime { get; set; }
+        public double? EndTimeUnix { get; set; }
       
     }
 }
