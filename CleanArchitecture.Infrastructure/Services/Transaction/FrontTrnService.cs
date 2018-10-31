@@ -407,9 +407,29 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     Volume24 = 0;
                 }
 
+
+                //Insert In GraphDetail Only BidPrice
+                var tradegraph = new TradeGraphDetail()
+                {
+                    PairId = PairId,
+                    TranNo = TrnNo,
+                    DataDate = _basePage.UTC_To_IST(),
+                    ChangePer = ChangePer,
+                    Volume = Volume24,
+                    BidPrice = CurrentRate,
+                    LTP = CurrentRate,
+                    Quantity = Quantity,
+                    CreatedBy = 1,
+                    CreatedDate = _basePage.UTC_To_IST()
+                };
+                tradegraph = _graphDetailRepository.Add(tradegraph);
+
+
                 //Calculate High Low Data For 24Hr
                 var tradegraphdetail = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-1) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
-                if(tradegraphdetail.Count > 0)
+                High24Hr = CurrentRate;
+                Low24Hr = CurrentRate;
+                if (tradegraphdetail.Count > 0)
                 {         
                     foreach (TradeGraphDetail type in tradegraphdetail)
                     {
@@ -423,15 +443,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         }
                     }                  
                 }
-                else
-                {
-                    High24Hr = CurrentRate;
-                    Low24Hr = CurrentRate;
-                }
+              
 
 
                 //Calculate High Low Data For Week
                 var tradegraphdetail2 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-7) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
+                WeekHigh = CurrentRate;
+                WeekLow = CurrentRate;
                 if (tradegraphdetail2.Count > 0)
                 {
                     foreach (TradeGraphDetail type in tradegraphdetail2)
@@ -446,15 +464,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         }
                     }
                 }
-                else
-                {
-                    WeekHigh = CurrentRate;
-                    WeekLow = CurrentRate;
-                }
-
 
                 //Calculate High Low Data For 52Week
                 var tradegraphdetail3 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-365) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
+                Week52High = CurrentRate;
+                Week52Low = CurrentRate;
                 if (tradegraphdetail3.Count > 0)
                 {
                     foreach (TradeGraphDetail type in tradegraphdetail2)
@@ -468,14 +482,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             Week52Low = type.BidPrice;
                         }
                     }
-                }
-                else
-                {
-                    Week52High = CurrentRate;
-                    Week52Low = CurrentRate;
-                }
-
-
+                }              
 
                 //Calculate Open Close
                 var now = _basePage.UTC_To_IST();
@@ -494,27 +501,20 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     todayclose = CurrentRate;
                 }
 
-                var tradegraph = new TradeGraphDetail()
-                {
-                    PairId = PairId,
-                    TranNo = TrnNo,
-                    DataDate = _basePage.UTC_To_IST(),
-                    ChangePer = ChangePer,
-                    Volume = Volume24,
-                    High24Hr = High24Hr,
-                    Low24Hr = Low24Hr,
-                    HighWeek = WeekHigh,
-                    LowWeek = WeekLow,
-                    High52Week = Week52High,
-                    Low52Week = Week52Low,
-                    LTP = CurrentRate,
-                    TodayOpen = todayopen,
-                    TodayClose = todayclose,
-                    Quantity = Quantity,
-                    CreatedBy = 1,
-                    CreatedDate = _basePage.UTC_To_IST()
-                };
-                _graphDetailRepository.Add(tradegraph);
+
+                //Update TradeGraph Detail Data
+
+                tradegraph.High24Hr = High24Hr;
+                tradegraph.Low24Hr = Low24Hr;
+                tradegraph.HighWeek = WeekHigh;
+                tradegraph.LowWeek = WeekLow;
+                tradegraph.High52Week = Week52High;
+                tradegraph.Low52Week = Week52Low;
+                tradegraph.LTP = CurrentRate;
+                tradegraph.TodayOpen = todayopen;
+                tradegraph.TodayClose = todayclose;                   
+                _graphDetailRepository.Update(tradegraph);
+
 
                 var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
                 pairData.ChangePer24 = ChangePer;
