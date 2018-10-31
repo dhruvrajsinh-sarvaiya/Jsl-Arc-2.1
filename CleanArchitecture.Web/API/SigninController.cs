@@ -30,6 +30,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.AspNet.Identity.Owin;
+using System.Text;
 
 namespace CleanArchitecture.Web.API
 {
@@ -51,6 +53,8 @@ namespace CleanArchitecture.Web.API
         private readonly Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>> _tokenProviders =
             new Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>>();
         private readonly ITempUserRegisterService _tempUserRegisterService;
+
+        private ApplicationUser _ApplicationUser;
 
         #endregion
 
@@ -194,7 +198,16 @@ namespace CleanArchitecture.Web.API
             //  var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
             try
             {
+              
+                var usdata = await _userManager.FindByIdAsync("45");
+                
 
+
+
+
+                var user1 = _userManager.GenerateTwoFactorTokenAsync(usdata,model.Code);
+
+        
 
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
@@ -315,6 +328,7 @@ namespace CleanArchitecture.Web.API
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
+                    _ApplicationUser = user;
                     var roles = await _userManager.GetRolesAsync(user);
                     //_logger.LogInformation(1, "User logged in.");
                     return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
@@ -1165,7 +1179,10 @@ namespace CleanArchitecture.Web.API
                 //{
                 //    emailConfirmCode = SubScriptionKey
                 //}, protocol: HttpContext.Request.Scheme);
-                string ctokenlink = _configuration["ResetPaswword"].ToString() + SubScriptionKey;
+                //string ctokenlink = _configuration["ResetPaswword"].ToString() + SubScriptionKey;
+                byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);                
+                string ctokenlink = _configuration["ResetPaswword"].ToString() + Convert.ToBase64String(plainTextBytes);
+
                 var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">" + EnResponseMessage.ResetEmailMessage + "</a>";
 
                 SendEmailRequest request = new SendEmailRequest();

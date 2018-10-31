@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Primitives;
 using CleanArchitecture.Core.Entities.User;
@@ -215,7 +216,8 @@ namespace CleanArchitecture.Web.API
                     //    //userId = currentUser.Id,
                     //    emailConfirmCode = SubScriptionKey
                     //}, protocol: HttpContext.Request.Scheme);
-                    string ctokenlink = _configuration["ConfirmMailURL"].ToString() + SubScriptionKey;
+                    byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);
+                    string ctokenlink = _configuration["ConfirmMailURL"].ToString() + Convert.ToBase64String(plainTextBytes);
 
                     var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 
@@ -391,8 +393,10 @@ namespace CleanArchitecture.Web.API
                             //{
                             //    emailConfirmCode = SubScriptionKey
                             //}, protocol: HttpContext.Request.Scheme);
-                            string ctokenlink = _configuration["ConfirmMailURL"].ToString() + SubScriptionKey;
+                            byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);
+                            string ctokenlink = _configuration["ConfirmMailURL"].ToString() + Convert.ToBase64String(plainTextBytes);
 
+                           
                             var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 
                             SendEmailRequest request = new SendEmailRequest();
