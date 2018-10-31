@@ -512,7 +512,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
 
                 transactionProviderResponses = _webApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { SMSCode = coin.ToLower(), amount = 0, APIType = enWebAPIRouteType.TransactionAPI, trnType = Convert.ToInt32(enTrnType.Generate_Address) });
-                if (transactionProviderResponses == null)
+                if (transactionProviderResponses == null || transactionProviderResponses.Count == 0)
                 {
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.ItemNotFoundForGenerateAddress, ReturnCode = enResponseCode.Fail, ReturnMsg = "Please try after sometime." };
                 }
@@ -522,7 +522,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
 
                 ThirdPartyAPIConfiguration thirdPartyAPIConfiguration = _thirdPartyCommonRepository.GetById(transactionProviderResponses[0].ThirPartyAPIID);
-                if (thirdPartyAPIConfiguration == null)
+                if (thirdPartyAPIConfiguration == null || transactionProviderResponses.Count == 0)
                 {
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
@@ -1864,7 +1864,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse AddBeneficiary(string CoinName,string Name ,string BeneficiaryAddress, long UserId)
+        public BeneficiaryResponse AddBeneficiary(string CoinName, short WhitelistingBit,string Name ,string BeneficiaryAddress, long UserId)
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
@@ -1899,6 +1899,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddNew.UserID = UserId;
                     AddNew.Address = BeneficiaryAddress;
                     AddNew.Name = Name;
+                    AddNew.IsWhiteListed = WhitelistingBit;
                     AddNew.WalletTypeID = walletMasters.Id;
                     AddNew = _BeneficiarycommonRepository.Add(AddNew);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
@@ -2164,7 +2165,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] Request, long ID)
+        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq Request, long ID)
         {
             BeneficiaryResponse Response = new BeneficiaryResponse();
             Response.BizResponse = new BizResponseClass();

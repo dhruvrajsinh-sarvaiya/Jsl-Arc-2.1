@@ -890,22 +890,23 @@ public List<BeneficiaryMasterRes> GetAllBeneficiaries(long UserID)
     return items;
 }
 
-public bool BeneficiaryBulkEdit(BulkBeneUpdateReq[] arryTrnID)
+public bool BeneficiaryBulkEdit(BulkBeneUpdateReq arryTrnID)
 {
     try
     {
         _dbContext.Database.BeginTransaction();
         var arrayObj = (from p in _dbContext.BeneficiaryMaster
-                        join q in arryTrnID on p.Id equals q.ID
+                        join q in arryTrnID.ID on p.Id equals q
                         select new { p, q }).ToList();
-        if (arrayObj.Count != 0)
+        if (arrayObj.Count() != 0)
         {
-            arrayObj.ForEach(e => e.p.IsWhiteListed = e.q.WhitelistingBit);
+            //arrayObj.ForEach(e => e.p.IsWhiteListed = e.q.WhitelistingBit);
+            arrayObj.ForEach(e => e.p.IsWhiteListed = arryTrnID.WhitelistingBit);
             arrayObj.ForEach(e =>
             {
-                if (e.q.WhitelistingBit == 9)
+                if (arryTrnID.WhitelistingBit == 9)
                 {
-                    e.p.Status = e.q.WhitelistingBit;
+                    e.p.Status = arryTrnID.WhitelistingBit;
                 }
             });
             arrayObj.ForEach(e => e.p.UpdatedDate = UTC_To_IST());

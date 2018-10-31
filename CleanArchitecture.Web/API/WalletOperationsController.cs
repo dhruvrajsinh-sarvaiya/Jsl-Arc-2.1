@@ -363,8 +363,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost("{CoinName}/{BeneficiaryAddress}/{BeneficiaryName}")]
-        public async Task<IActionResult> AddBeneficiary(string CoinName, string BeneficiaryAddress,string BeneficiaryName)
+        [HttpPost("{CoinName}/{BeneficiaryAddress}/{BeneficiaryName}/{WhitelistingBit}")]
+        public async Task<IActionResult> AddBeneficiary(string CoinName,short WhitelistingBit ,string BeneficiaryAddress,string BeneficiaryName)
         {
             BeneficiaryResponse response = new BeneficiaryResponse();
             try
@@ -378,7 +378,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.AddBeneficiary(CoinName,BeneficiaryName,BeneficiaryAddress, user.Id);
+                    response = _walletService.AddBeneficiary(CoinName, WhitelistingBit, BeneficiaryName,BeneficiaryAddress, user.Id);
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -392,7 +392,7 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost]
-        public async Task<IActionResult> WhitelistBeneficiary([FromBody] BulkBeneUpdateReq[] Request)
+        public async Task<IActionResult> WhitelistBeneficiary([FromBody] BulkBeneUpdateReq Request)
         {
             BeneficiaryResponse response = new BeneficiaryResponse();
             try
