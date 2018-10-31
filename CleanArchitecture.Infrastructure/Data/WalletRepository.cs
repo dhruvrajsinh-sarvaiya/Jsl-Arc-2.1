@@ -518,9 +518,9 @@ namespace CleanArchitecture.Infrastructure.Data
                                                                LimitPerHour = u.LimitPerHour,
                                                                LimitPerTransaction = u.LimitPerTransaction,
                                                                AccWalletID = c.AccWalletID,
-                                                               EndTime = u.EndTime,
+                                                               EndTime = u.EndTimeUnix,
                                                                LifeTime = u.LifeTime,
-                                                               StartTime = u.StartTime
+                                                               StartTime = u.StartTimeUnix
                                                            }).AsEnumerable().ToList();
 
                 return items;
@@ -953,8 +953,8 @@ public void GetSetLimitConfigurationMaster(int[] AllowTrnType, long userid, long
                    LimitPerHour = array.LimitPerHour,
                    LimitPerTransaction = array.LimitPerTransaction,
                    Status = Convert.ToInt16(ServiceStatus.Active),
-                   StartTime = array.StartTime,
-                   EndTime = array.EndTime,
+                   StartTimeUnix = array.StartTimeUnix,
+                   EndTimeUnix = array.EndTimeUnix,
                    LifeTime = null,
                    UpdatedDate = UTC_To_IST()
                };
@@ -1103,8 +1103,8 @@ public int CreateDefaulWallet(long UserId)
                        LimitPerHour = array.LimitPerHour,
                        LimitPerTransaction = array.LimitPerTransaction,
                        Status = Convert.ToInt16(ServiceStatus.Active),
-                       StartTime = array.StartTime,
-                       EndTime = array.EndTime,
+                       StartTimeUnix = array.StartTimeUnix,
+                       EndTimeUnix = array.EndTimeUnix,
                        LifeTime = null,
                        UpdatedDate = UTC_To_IST()
                    };
@@ -1228,8 +1228,8 @@ public int CreateWalletForAllUser_NewService(string WalletType)
                        LimitPerHour = array.LimitPerHour,
                        LimitPerTransaction = array.LimitPerTransaction,
                        Status = Convert.ToInt16(ServiceStatus.Active),
-                       StartTime = array.StartTime,
-                       EndTime = array.EndTime,
+                       StartTimeUnix = array.StartTimeUnix,
+                       EndTimeUnix = array.EndTimeUnix,
                        LifeTime = null,
                        UpdatedDate = UTC_To_IST()
                    };
