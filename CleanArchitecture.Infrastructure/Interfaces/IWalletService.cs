@@ -131,5 +131,8 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         //Uday 30-10-2018
         ServiceLimitChargeValue GetServiceLimitChargeValue(enTrnType TrnType, string CoinName);
 
+        //vsoalnki 2018-10-31
+        CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId);
+
     }
 }

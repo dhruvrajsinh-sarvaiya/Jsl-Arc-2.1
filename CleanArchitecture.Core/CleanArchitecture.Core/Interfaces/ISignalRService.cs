@@ -16,7 +16,7 @@ namespace CleanArchitecture.Core.Interfaces
         Task TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair);
         Task ChartData(List<GetGraphResponse> Data, string Pair);
         Task MarketData(MarketCapData Data, string Pair);
-        Task LastPrice(Decimal Price,string Pair);
+        Task LastPrice(LastPriceViewModel Data,string Pair);
 
         //user wise
         Task OpenOrder(ActiveOrderInfo Data, string Token);
@@ -24,6 +24,7 @@ namespace CleanArchitecture.Core.Interfaces
         Task TradeHistoryByUser(GetTradeHistoryInfo Data, string Token);
         Task BuyerSideWalletBal(WalletMasterResponse Data,string Wallet, string Token);
         Task SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token);
+        Task ActivityNotification(string Msg,string Token);
 
         //Base Market
         Task PairData(VolumeDataRespose Data,string Base);

@@ -19,12 +19,14 @@ using CleanArchitecture.Core.Entities.Wallet;
 using System.Linq;
 using CleanArchitecture.Core.ViewModels.WalletConfiguration;
 using System.Collections;
+using CleanArchitecture.Core.Helpers;
+
 
 namespace CleanArchitecture.Infrastructure.Services
 {
     public class WalletTransactionCrDr : BasePage , IWalletTransactionCrDr
     {
-        private readonly ILogger<WalletService> _log;
+       // private readonly ILogger<WalletService> _log;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
         //private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
        // private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
@@ -48,13 +50,13 @@ namespace CleanArchitecture.Infrastructure.Services
         //private readonly WebApiParseResponse _WebApiParseResponse;
 
 
-        public WalletTransactionCrDr(ILogger<WalletService> log, ICommonRepository<WalletMaster> commonRepository,
+        public WalletTransactionCrDr( ICommonRepository<WalletMaster> commonRepository,
            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,          
            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository,
            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository) : base(logger)
         {
-            _log = log;
+           // _log = log;
             _commonRepository = commonRepository;
             _walletOrderRepository = walletOrderRepository;
             //_walletRepository = repository;
@@ -165,7 +167,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -208,7 +211,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
                 }
 
-                resp = InsertWalletTQDebit(timestamp, dWalletobj.Id, coinName, amount, TrnRefNo, serviceType, trnType, enWalletTranx, enWalletLimit);
+                resp = InsertWalletTQDebit(timestamp, dWalletobj.Id, coinName, amount, TrnRefNo, serviceType, enWalletTrnType.Dr_Debit, enWalletTranx, enWalletLimit);
                 if (resp.ReturnCode !=0 || resp.Status != enTransactionStatus.Initialize)
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = resp.StatusMsg, ErrorCode = resp.ErrorCode };
@@ -224,9 +227,9 @@ namespace CleanArchitecture.Infrastructure.Services
                 objTQDr = _walletRepository1.GetTransactionQueue(resp.TrnNo);
                 TrnAcBatch batchObj = _trnBatch.Add(new TrnAcBatch(UTC_To_IST()));
                 DrRemarks = "Debit for Deposition TrnNo:" + TrnRefNo;
-                WalletLedger walletLedgerDr = GetWalletLedgerObj(dWalletobj.Id, 0, amount, 0, trnType, serviceType, objTQDr.TrnNo, DrRemarks, dWalletobj.Balance, 1);
+                WalletLedger walletLedgerDr = GetWalletLedgerObj(dWalletobj.Id, cWalletObj.Id, amount, 0, enWalletTrnType.Dr_Debit, serviceType, objTQDr.TrnNo, DrRemarks, dWalletobj.Balance, 1);
                 TransactionAccount tranxAccounDrt = GetTransactionAccount(dWalletobj.Id, 1, batchObj.Id, amount, 0, objTQDr.TrnNo, DrRemarks, 1);
-                dWalletobj.DebitBalance(amount);
+                dWalletobj.DebitBalance(amount);                
                 objTQDr.Status = enTransactionStatus.Success;
                 objTQDr.StatusMsg = "Success";
                 DrRemarks = "Credit for Deposition TrnNo:" + TrnRefNo;
@@ -234,15 +237,18 @@ namespace CleanArchitecture.Infrastructure.Services
                 objTQCr = _walletRepository1.AddIntoWalletTransactionQueue(objTQCr, 1);
                 woObj = InsertIntoWalletTransactionOrder(null, UTC_To_IST(), cWalletObj.Id, dWalletobj.Id, amount, coinName, objTQCr.TrnNo, objTQDr.TrnNo, 0, "Inserted");
                 woObj = _walletRepository1.AddIntoWalletTransactionOrder(woObj, 1);
-                WalletLedger walletLedgerCr = GetWalletLedgerObj(cWalletObj.Id, 0, 0, amount, trnType, serviceType, objTQCr.TrnNo, DrRemarks, cWalletObj.Balance, 1);
+                WalletLedger walletLedgerCr = GetWalletLedgerObj(cWalletObj.Id, dWalletobj.Id, 0, amount, trnType, serviceType, objTQCr.TrnNo, DrRemarks, cWalletObj.Balance, 1);
                 TransactionAccount tranxAccountCr = GetTransactionAccount(cWalletObj.Id, 1, batchObj.Id, 0, amount, objTQCr.TrnNo, DrRemarks, 1);
                 cWalletObj.CreditBalance(amount);
                 //var objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, 1, "Updated");
                 objTQCr.Status = enTransactionStatus.Success;
                 objTQCr.StatusMsg = "Success";
                 objTQCr.UpdatedDate = UTC_To_IST();
-
-                _walletRepository1.WalletCreditDebitwithTQ(walletLedgerCr, walletLedgerDr, tranxAccountCr, tranxAccounDrt, dWalletobj, cWalletObj, objTQCr, objTQDr, woObj);
+                woObj.Status = enTransactionStatus.Success;
+                woObj.StatusMsg = "Deposition success for RefNo :" + TrnRefNo;
+                woObj.UpdatedDate = UTC_To_IST();
+                objTQDr.SettedAmt = amount;
+                _walletRepository1.WalletCreditDebitwithTQ(walletLedgerDr, walletLedgerCr, tranxAccountCr, tranxAccounDrt, dWalletobj, cWalletObj, objTQCr, objTQDr, woObj);
                 //CreditWalletDrArryTrnID[] arryTrnID = new CreditWalletDrArryTrnID [1];
                 //arryTrnID[0].Amount = amount;
                 //arryTrnID[0].DrTrnRefNo = TrnRefNo;
@@ -253,7 +259,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -301,7 +308,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -349,13 +357,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     walletLedger2.PreBal = currentBalance;
-                    walletLedger2.PostBal = currentBalance + drAmount;
+                    walletLedger2.PostBal = currentBalance + crAmount;
                 }
                 return walletLedger2;
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -381,7 +390,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -396,7 +406,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 var crsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.CrAmt);
                 var drsum = _TransactionAccountsRepository.GetSum(e => e.WalletID == WalletId && e.IsSettled == 1, f => f.DrAmt);
                 var total = crsum - drsum;
-                if (total == wObjBal && total > 0)
+                if (total == wObjBal && total >= 0)
                 {
                     return true;
                 }
@@ -404,7 +414,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -418,7 +429,8 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }

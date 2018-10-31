@@ -529,7 +529,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     responsedata.High52Week = pairStastics.High52Week;
                     responsedata.Low52Week = pairStastics.Low52Week;
                     responsedata.UpDownBit = pairStastics.UpDownBit;
-
+                   
                     responsedata.BaseCurrencyId = baseService.Id;
                     responsedata.BaseCurrencyName = baseService.Name;
                     responsedata.BaseAbbrevation = baseService.SMSCode;
@@ -599,20 +599,21 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             try
             {
                 MarketCapData dataRes = new MarketCapData();
-
-                //var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == PairId);
-                //GetPairAdditionalVal(PairId, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
-                //res.Volume24 = Volume24;
-                //res.ChangePer = ChangePer;
-                //return res;
                 VolumeDataRespose res = new VolumeDataRespose();
-                res = GetVolumeDataByPair(PairId);
-                dataRes.Change24 = res.High24Hr - res.Low24Hr;
-                dataRes.ChangePer = res.ChangePer;
-                dataRes.High24 = res.High24Hr;
-                dataRes.LastPrice = _frontTrnRepository.LastPriceByPair(PairId);
-                dataRes.Low24 = res.Low24Hr;
-                dataRes.Volume24 = res.Volume24;
+                var pairMasterData = _tradeMasterRepository.GetById(PairId);
+                if(pairMasterData != null)
+                {
+                    var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pairMasterData.Id);
+                    if(pairStastics != null)
+                    {
+                        dataRes.Change24 = pairStastics.High24Hr - pairStastics.Low24Hr;
+                        dataRes.ChangePer = pairStastics.ChangePer24;
+                        dataRes.High24 = pairStastics.High24Hr;
+                        dataRes.Low24 = pairStastics.Low24Hr;
+                        dataRes.LastPrice = pairStastics.LTP;
+                        dataRes.Volume24 = pairStastics.ChangeVol24;
+                    }
+                }
                 return dataRes;
             }
             catch (Exception ex)

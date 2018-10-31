@@ -69,7 +69,7 @@ namespace CleanArchitecture.Web.API
         //} 
 
 
-        //[HttpGet("{coin}/{id}")]
+        //[HttpGet("{coin}/{id}")]m
         ////[Route("{coin}/{id}")]
         ////[Authorize]
         //public async Task<IActionResult> ListwalletTransfer(string id, string coin, string prevId = null, bool allToken = false, bool includeHex = false, string searchLabel = null, string type = null)
@@ -229,7 +229,7 @@ namespace CleanArchitecture.Web.API
         //        return BadRequest();
         //    }
         //}
-
+       // [AllowAnonymous]
         [HttpPost("{Coin}/{AccWalletID}")]
         public async Task<IActionResult> CreateWalletAddress(string Coin, string AccWalletID)/*[FromBody]CreateWalletAddressReq Request*/ /*Removed Temporarily as Not in use*/
         {
@@ -559,6 +559,35 @@ namespace CleanArchitecture.Web.API
             {
                 _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
                 return BadRequest();
+            }
+        }
+
+        //vsolanki 2018-10-31
+        //[AllowAnonymous]
+        [HttpPost("{Coin}/{AddressCount}")]
+        public async Task<IActionResult> CreateETHAddress(string Coin, int AddressCount)
+        {
+            //ApplicationUser user = new ApplicationUser();user.Id = 1;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            try
+            {
+                CreateWalletAddressRes responseClass=new CreateWalletAddressRes();
+                if (user == null && user.Id != 1)
+                {
+                    new BizResponseClass { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginfailed, ErrorCode = enErrorCode.StandardLoginfailed };                  
+                }
+                else
+                {
+                    responseClass = _walletService.CreateETHAddress(Coin, AddressCount,user.Id);
+                }
+             
+                //var respObj = JsonConvert.SerializeObject(Response);
+                //dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(responseClass);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
     }
