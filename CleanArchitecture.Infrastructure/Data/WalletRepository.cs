@@ -502,23 +502,34 @@ namespace CleanArchitecture.Infrastructure.Data
         //Rushabh 16-10-2018
         public List<WalletLimitConfigurationRes> GetWalletLimitResponse(string AccWaletID)
         {
-            List<WalletLimitConfigurationRes> items = (from u in _dbContext.WalletLimitConfiguration
-                                                       join c in _dbContext.WalletMasters
-                                                       on u.WalletId equals c.Id
-                                                       where c.AccWalletID == AccWaletID && u.Status == 1
-                                                       select new WalletLimitConfigurationRes
-                                                       {
-                                                           TrnType = u.TrnType,
-                                                           LimitPerDay = u.LimitPerDay,
-                                                           LimitPerHour = u.LimitPerHour,
-                                                           LimitPerTransaction = u.LimitPerTransaction,
-                                                           AccWalletID = c.AccWalletID,
-                                                           EndTime = u.EndTime,
-                                                           LifeTime = u.LifeTime,
-                                                           StartTime = u.StartTime
-                                                       }).AsEnumerable().ToList();
+            //double StartTime, EndTime;
+            //System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            //DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            try
+            {
+                List<WalletLimitConfigurationRes> items = (from u in _dbContext.WalletLimitConfiguration
+                                                           join c in _dbContext.WalletMasters
+                                                           on u.WalletId equals c.Id
+                                                           where c.AccWalletID == AccWaletID && u.Status == 1
+                                                           select new WalletLimitConfigurationRes
+                                                           {
+                                                               TrnType = u.TrnType,
+                                                               LimitPerDay = u.LimitPerDay,
+                                                               LimitPerHour = u.LimitPerHour,
+                                                               LimitPerTransaction = u.LimitPerTransaction,
+                                                               AccWalletID = c.AccWalletID,
+                                                               EndTime = u.EndTime,
+                                                               LifeTime = u.LifeTime,
+                                                               StartTime = u.StartTime
+                                                           }).AsEnumerable().ToList();
 
-            return items;
+                return items;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
 public List<AddressMasterResponse> GetAddressMasterResponse(string AccWalletID)

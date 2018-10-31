@@ -1416,11 +1416,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 //StartTime = dateTime1.TimeOfDay;
                 //EndTime = dateTime1.TimeOfDay;
 
-                TimeSpan StartTime, EndTime;
-                System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-                DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
-                StartTime = istDate.AddSeconds(request.StartTime).TimeOfDay;
-                EndTime = istDate.AddSeconds(request.EndTime).TimeOfDay;
+                //TimeSpan StartTime, EndTime;
+                //System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                //DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                //StartTime = istDate.AddSeconds(request.StartTime).TimeOfDay;
+                //EndTime = istDate.AddSeconds(request.EndTime).TimeOfDay;
 
                 var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == accWalletID);
                 if (walletMasters == null)
@@ -1443,9 +1443,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.CreatedDate = UTC_To_IST();
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     //obj.UpdatedDate = UTC_To_IST();
-                    newobj.StartTime = StartTime;
+                    newobj.StartTime = request.StartTime;
                     newobj.LifeTime = request.LifeTime;
-                    newobj.EndTime = EndTime;
+                    newobj.EndTime = request.EndTime;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
                     // Response.WalletLimitConfigurationRes = newobj;
@@ -1459,8 +1459,8 @@ namespace CleanArchitecture.Infrastructure.Services
                         IsExist.LimitPerDay = request.LimitPerDay;
                         IsExist.LifeTime = request.LifeTime;
                         IsExist.LimitPerTransaction = request.LimitPerTransaction;
-                        IsExist.StartTime = StartTime;
-                        IsExist.EndTime = EndTime;
+                        IsExist.StartTime = request.StartTime;
+                        IsExist.EndTime = request.EndTime;
                         IsExist.UpdatedBy = Userid;
                         IsExist.UpdatedDate = UTC_To_IST();
                         _LimitcommonRepository.Update(IsExist);
@@ -1497,17 +1497,20 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else
                 {
-                    TimeSpan StartTime, EndTime;
-                    System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-                    DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
-                    //StartTime = istDate.AddSeconds(request.StartTime).TimeOfDay;
-                    //EndTime = istDate.AddSeconds(request.EndTime).TimeOfDay;
-                    var t = from ti in WalletLimitResponse
-                            select new
-                            {
-                                StartTime = istDate.AddSeconds(Convert.ToDouble(ti.StartTime)).TimeOfDay,
-                                EndTime = istDate.AddSeconds(Convert.ToDouble(ti.StartTime)).TimeOfDay
-                            };                    
+                    //TimeSpan StartTime1, EndTime1;
+                    //System.DateTime dateTime1 = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                    //DateTime istDate = TimeZoneInfo.ConvertTimeFromUtc(dateTime1, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                    //var data = WalletLimitResponse.FirstOrDefault();
+                    //StartTime1 = data.StartTime;
+                    //WalletLimitConfigurationRes2 newRes = new WalletLimitConfigurationRes2();
+                    //double stime = TimeSpan.Parse(data.StartTime).TotalSeconds;
+                    //double etime = TimeSpan.Parse(data.EndTime).TotalSeconds;
+                    //newRes.AccWalletID = data.AccWalletID;
+                    //newRes.TrnType = data.TrnType;
+                    //newRes.LimitPerDay = data.LimitPerDay;
+                    //newRes.LimitPerHour = data.LimitPerHour;
+                    //newRes.LimitPerTransaction = data.LimitPerTransaction;
+                    //newRes.StartTime =
                     LimitResponse.WalletLimitConfigurationRes = WalletLimitResponse;
                     LimitResponse.ReturnCode = enResponseCode.Success;
                     LimitResponse.ReturnMsg = EnResponseMessage.FindRecored;
