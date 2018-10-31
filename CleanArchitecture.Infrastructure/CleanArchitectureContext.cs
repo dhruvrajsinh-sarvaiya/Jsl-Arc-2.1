@@ -75,6 +75,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<WalletLimitConfiguration> WalletLimitConfiguration { get; set; }
         public DbSet<DepositCounterLog> DepositCounterLog { get; set; }
         public DbSet<DepositCounterMaster> DepositCounterMaster { get; set; }
+        public DbSet<TradeDepositCompletedTrn> TradeDepositCompletedTrn { get; set; }
+
         //vsolnki 24-10-2018
         public DbSet<UserStacking> UserStacking { get; set; }
         public DbSet<MemberShadowBalance> MemberShadowBalance { get; set; }

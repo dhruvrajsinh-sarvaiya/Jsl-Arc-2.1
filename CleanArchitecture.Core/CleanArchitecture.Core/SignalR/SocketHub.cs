@@ -43,7 +43,7 @@ namespace CleanArchitecture.Core.SignalR
         {
             try
             {
-                string Pair = "LTC_BTC";
+                string Pair = "INR_BTC";
                 string BaseCurrency = "XRP";
                 var Redis = new RadisServices<ConnetedClientList>(this._fact);
                 Redis.SaveTagsToSetMember("Pairs:" + Pair, Context.ConnectionId, Pair); 
@@ -255,7 +255,7 @@ namespace CleanArchitecture.Core.SignalR
         }
 
         // Add to Subscription Channel
-        public Task AddMArketSubscription(string BaseCurrency,string OldBaseCurrency)
+        public Task AddMarketSubscription(string BaseCurrency,string OldBaseCurrency)
         {
             try
             {
@@ -513,6 +513,27 @@ namespace CleanArchitecture.Core.SignalR
                 return Task.FromResult(0);
             }
             
+        }
+
+        public Task ActivityNotification(string Token, string Message)
+        {
+            try
+            {
+                var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+                IEnumerable<string> str = Redis.GetKey(Token);
+                foreach (string s in str.ToList())
+                {
+                    var key = s;
+                    key = key.Split(":")[1].ToString();
+                    _chatHubContext.Clients.Client(key).SendAsync("RecieveNotification", Message);
+                }
+                return Task.FromResult(0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return Task.FromResult(0);
+            }
         }
 
         #endregion

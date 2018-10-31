@@ -175,11 +175,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             {
 
                                 CreatedDate = _basePage.UTC_To_IST(),
-                                CreatedBy = transactionQueue.MemberID,
+                                CreatedBy = UserId,
                                 TrnMode = Convert.ToByte(transactionQueue.TrnMode),
                                 PayMode = Convert.ToInt16(enWebAPIRouteType.TradeServiceLocal),
                                 ORemarks = "Cancellation Initiated",
                                 OrderAmt = DeliveryQty,
+                                OMemberID = transactionQueue.MemberID,
+                                DMemberID = tradeBuyRequest.SellStockID,
                                 DiscPer = 0,
                                 DiscRs = 0,
                                 Status = Convert.ToInt16(enTransactionStatus.Initialize),//txn type status

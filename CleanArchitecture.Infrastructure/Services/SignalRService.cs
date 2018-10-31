@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    class SignalRService : ISignalRService
+    public class SignalRService : ISignalRService
     {
         private readonly ILogger<SignalRService> _logger;
         private readonly IMediator _mediator;
@@ -26,7 +26,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         #region Pairwise
-        public void BuyerBook(GetBuySellBook Data, string Pair)
+        public async Task BuyerBook(GetBuySellBook Data, string Pair)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.BuyerBook;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -52,7 +52,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void SellerBook(GetBuySellBook Data, string Pair)
+        public async Task SellerBook(GetBuySellBook Data, string Pair)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.SellerBook;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                 _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair)
+        public async Task TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.TradeHistoryByPair;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void ChartData(List<GetGraphResponse> Data, string Pair)
+        public async Task ChartData(List<GetGraphResponse> Data, string Pair)
         {
             try
             {
@@ -121,7 +121,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.ChartData;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -130,7 +130,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void MarketData(MarketCapData Data, string Pair)
+        public async Task MarketData(MarketCapData Data, string Pair)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.MarketData;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -156,7 +156,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void LastPrice(decimal Price, string Pair)
+        public async Task LastPrice(decimal Price, string Pair)
         {
             try
             {
@@ -173,7 +173,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.Price;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -181,11 +181,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
+        
         #endregion
 
         #region UserSpecific
-        public void OpenOrder(ActiveOrderInfo Data, string Token)
+        public async Task OpenOrder(ActiveOrderInfo Data, string Token)
         {
             try
             {
@@ -203,7 +203,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
-                 _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -212,7 +212,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void OrderHistory(GetTradeHistoryInfo Data, string Token)
+        public async Task OrderHistory(GetTradeHistoryInfo Data, string Token)
         {
             try
             {
@@ -230,7 +230,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -239,7 +239,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void TradeHistoryByUser(GetTradeHistoryInfo Data, string Token)
+        public async Task TradeHistoryByUser(GetTradeHistoryInfo Data, string Token)
         {
             try
             {
@@ -257,7 +257,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -266,7 +266,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void BuyerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token)
+        public async Task BuyerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token)
         {
             try
             {
@@ -285,7 +285,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = Wallet;
 
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -294,7 +294,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token)
+        public async Task SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token)
         {
             try
             {
@@ -313,7 +313,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = Wallet;
 
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -325,7 +325,7 @@ namespace CleanArchitecture.Infrastructure.Services
         #endregion
 
         #region BaseMarket
-        public void PairData(VolumeDataRespose Data, string Base)
+        public async Task PairData(VolumeDataRespose Data, string Base)
         {
             try
             {
@@ -342,7 +342,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.PairData;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                _mediator.Send(SendData);
+                await _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -351,7 +351,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void MarketTicker(VolumeDataRespose Data, string Base)
+        public async Task MarketTicker(VolumeDataRespose Data, string Base)
         {
             try
             {
