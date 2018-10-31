@@ -322,6 +322,34 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        public async Task ActivityNotification(string Msg, string Token)
+        {
+            try
+            {
+                SignalRComm<String> CommonData = new SignalRComm<String>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ActivityNotification);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveNotification);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Msg;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.ActivityNotification;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                //SendData.WalletName = Wallet;
+
+                await _mediator.Send(SendData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
         #endregion
 
         #region BaseMarket

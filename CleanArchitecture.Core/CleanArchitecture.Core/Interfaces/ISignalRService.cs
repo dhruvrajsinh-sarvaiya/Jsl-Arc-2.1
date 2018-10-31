@@ -24,6 +24,7 @@ namespace CleanArchitecture.Core.Interfaces
         Task TradeHistoryByUser(GetTradeHistoryInfo Data, string Token);
         Task BuyerSideWalletBal(WalletMasterResponse Data,string Wallet, string Token);
         Task SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token);
+        Task ActivityNotification(string Msg,string Token);
 
         //Base Market
         Task PairData(VolumeDataRespose Data,string Base);

@@ -472,6 +472,7 @@ namespace CleanArchitecture.Core.Enums
         RecieveTradeHistory = 3,
         RecieveBuyerSideWalletBal = 4,
         RecieveSellerSideWalletBal = 5,
+        RecieveNotification=14,
 
         //pair wise
         RecieveBuyerBook = 6,
