@@ -10,7 +10,8 @@ namespace CleanArchitecture.Core.Entities.Transaction
     public class TradePoolQueue : BizBase
     {
         [Required]
-        public long StockID { get; set; }
+        public long PoolID { get; set; }
+        public long SellerListID { get; set; }
 
         public long MakerTrnNo { get; set; }
 
