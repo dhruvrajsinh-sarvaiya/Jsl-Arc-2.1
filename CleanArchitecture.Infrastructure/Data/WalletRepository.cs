@@ -1105,11 +1105,11 @@ public int CreateDefaulWallet(long UserId)
                        Status = Convert.ToInt16(ServiceStatus.Active),
                        StartTimeUnix = array.StartTimeUnix,
                        EndTimeUnix = array.EndTimeUnix,
-                       LifeTime = null,
+                       LifeTime = array.LifeTime,
                        UpdatedDate = UTC_To_IST()
                    };
         _dbContext.WalletLimitConfiguration.AddRange(fadd);
-        ///_dbContext.SaveChanges();
+        ///_dbContext.SaveChanges(); 
 
         //add WalletAllowTrn
         var trntypeObj = from type in AllowTrnType

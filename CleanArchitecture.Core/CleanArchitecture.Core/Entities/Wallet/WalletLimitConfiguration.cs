@@ -2,16 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Wallet
 {
     public class WalletLimitConfiguration : BizBase
     {
+       
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
+
         [Required]
+        [Key]
         public long WalletId { get; set; }
 
         [Required]
+        [Key]
         public int TrnType { get; set; }
 
         [Required]
