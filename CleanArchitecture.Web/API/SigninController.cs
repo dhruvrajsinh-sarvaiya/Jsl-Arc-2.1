@@ -1276,7 +1276,9 @@ namespace CleanArchitecture.Web.API
                 {
                     byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
 
-                    string DecryptToken = EncyptedDecrypted.Decrypt(emailConfirmCode, DecpasswordBytes);
+                    var bytes = Convert.FromBase64String(emailConfirmCode);
+                    var encodedString = Encoding.UTF8.GetString(bytes);
+                    string DecryptToken = EncyptedDecrypted.Decrypt(encodedString, DecpasswordBytes);
 
                     ResetPasswordViewModel model = JsonConvert.DeserializeObject<ResetPasswordViewModel>(DecryptToken);
                     if (model?.Expirytime >= DateTime.UtcNow)

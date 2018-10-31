@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
@@ -35,13 +36,14 @@ namespace CleanArchitecture.Web.API
         private readonly IMediator _mediator;
         //private readonly UserManager<ApplicationUser> _userManager;
         //private readonly ISignalRTestService _signalRTestService; 
-
+        private readonly ISignalRService _signalRService;
         //public SocketController(ILogger<SocketController> logger, IMediator mediator, ISignalRTestService signalRTestService)
-        public SocketController(ILogger<SocketController> logger, IMediator mediator)
+        public SocketController(ILogger<SocketController> logger, IMediator mediator, ISignalRService signalRService)
         {
             _logger = logger;
             //_chat = chat;
             _mediator = mediator;
+            _signalRService = signalRService;
             //_signalRTestService = signalRTestService;
         }
         
@@ -51,7 +53,6 @@ namespace CleanArchitecture.Web.API
             string ReciveMethod = "";
             try
             {
-                
                 GetBuySellBook model = new GetBuySellBook();
                 model.Amount = 3;
                 model.Price = 150;
@@ -147,7 +148,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "LTC_BTC";
+                CommonData.Parameter = "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.TradeHistoryByPair;
@@ -307,11 +308,11 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = temp;
-                CommonData.Parameter = accessToken;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.OpenOrder;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = accessToken;// CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 await _mediator.Send(SendData);
@@ -357,11 +358,11 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = temp;
-                CommonData.Parameter = accessToken;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.OrderHistory;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = accessToken;// CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 await _mediator.Send(SendData);
@@ -405,11 +406,11 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = temp;
-                CommonData.Parameter = accessToken;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.TradeHistory;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = accessToken;// CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 await _mediator.Send(SendData);
@@ -449,11 +450,11 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = temp;
-                CommonData.Parameter = accessToken;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.BuyerSideWallet;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = accessToken;// CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = "BTC";
 
@@ -494,15 +495,49 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = temp;
-                CommonData.Parameter = accessToken;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.SellerSideWallet;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = accessToken;// CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                SendData.WalletName = "LTC";
+                SendData.WalletName = "INR";
                 await _mediator.Send(SendData);
                 ReciveMethod = "RecieveSellerSideWalletBal";
+                return Ok(new { ReciveMethod = ReciveMethod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                return Ok();
+            }
+        }
+
+        [HttpGet("ActivityNotification/{Data}")]
+        [Authorize]
+        public async Task<IActionResult> ActivityNotification(string Data)
+        {
+            string ReciveMethod = "";
+            try
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                SignalRComm<String> CommonData = new SignalRComm<String>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ActivityNotification);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveNotification);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Data;
+                CommonData.Parameter =null;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.ActivityNotification;
+                SendData.Parameter = accessToken;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
+                ReciveMethod = "RecieveNotification";
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -610,15 +645,31 @@ namespace CleanArchitecture.Web.API
         //}
 
         //[HttpGet("CreateTranTest")]
-        //[Authorize]
+        ////[Authorize]
         //public async Task<IActionResult> CreateTranTest(long ID)
         //{
         //    string ReciveMethod = "";
         //    try
         //    {
-        //        var accessToken = await HttpContext.GetTokenAsync("access_token");
-        //        _signalRTestService.MarkTransactionHold(ID, accessToken);
+        //        var accessToken = "CfDJ8GX72IE05DhMsT4VIPEe9lq_VFZzbmJIlw2XMjA1HrvNrTLM7tc0vzM6XCBmVdiBnZt0OddELrA_kaKm53McC54HxwtXipiQhl3m_ty1YYTYQ-Pmre3UxZhlR2bQ3jYPLUVLRiFZ0FOZTAGEwXesE2aiBsKcA3nZ7PWs7pUeGqpA5zCAON-O2YkGBWzO4wIaqUQX7knyrQNX7eQHXhr3EGxr5VJz9EyjOs_TRNsBd8zb9H8lzOSnUVUW_e6dvvYjFkPopuiTN3g1vDTL2Sde0pUIZllBm5w7emieidcgsaiiSWj_tQld4gd-Lcv0yRDgtM83ur3kvih_sNdw0dSywKQQUd7z7xq87hG3Zkpgu271eKkcNuB7vum5bamROi3m-ESDSdn_SdKl1vlrVUrSBeUSzsxWy20jbH4YMzCM-hFB3FmhHdybzuGMtu4y0uB-ROGuoXK5RjFAC_72-VqCQSFgWkhsuIlVrvNFKFk279HtmMWL9JU2IXqtl_50dJHol46DG5x0TGNDqa0IfW6onc7EQhYv2DSeORAY9QLQVdgCI761qJ3rNnWZ1-bGbo-6t-PWI9v8G9XnZ7mne8xpeSgf8zMos7NAmOOjnGa3-jB3mNZbmhaYKL_y9knG63YRw8AW3h8doYnk6W9Wwehi0ECCiccKdmc_ohfaLTXPjUL5Miz_wXdb_fKQolgIy4dT76kVE5wKDKFtzLT_YfuvQQN8xzUoZH6ybihIrFBrecJj"; await HttpContext.GetTokenAsync("access_token");
+        //        //_signalRTestService.MarkTransactionHold(ID, accessToken);
+        //        TransactionQueue Newtransaction = new TransactionQueue();
+        //        Newtransaction.TrnType = 4;
+        //        Newtransaction.Id = 91;
+        //        Newtransaction.TrnDate = DateTime.Now;
 
+        //        TradeTransactionQueue NewTradeTransaction = new TradeTransactionQueue();
+        //        NewTradeTransaction.PairName = "INR_BTC";
+        //        NewTradeTransaction.BidPrice = 1450;
+        //        NewTradeTransaction.PairID = 10021001;
+        //        NewTradeTransaction.AskPrice = 1500;
+        //        NewTradeTransaction.TrnType = 4;
+        //        NewTradeTransaction.Order_Currency = "BTC";
+        //        NewTradeTransaction.Delivery_Currency = "INR";
+        //        NewTradeTransaction.BuyQty = 2;
+        //        NewTradeTransaction.SellQty = 1;
+        //        NewTradeTransaction.IsCancelled = 0;
+        //        _signalRService.OnStatusChange(4, Newtransaction, NewTradeTransaction, accessToken);
         //        return Ok(new { ReciveMethod = ReciveMethod });
         //    }
         //    catch (Exception ex)

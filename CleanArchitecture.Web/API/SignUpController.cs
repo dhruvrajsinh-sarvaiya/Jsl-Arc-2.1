@@ -216,6 +216,9 @@ namespace CleanArchitecture.Web.API
                     //    //userId = currentUser.Id,
                     //    emailConfirmCode = SubScriptionKey
                     //}, protocol: HttpContext.Request.Scheme);
+
+
+
                     byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);
                     string ctokenlink = _configuration["ConfirmMailURL"].ToString() + Convert.ToBase64String(plainTextBytes);
 
@@ -256,8 +259,10 @@ namespace CleanArchitecture.Web.API
                 if (!string.IsNullOrEmpty(emailConfirmCode))
                 {
                     byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
-
-                    string DecryptToken = EncyptedDecrypted.Decrypt(emailConfirmCode, DecpasswordBytes);
+                    
+                    var bytes = Convert.FromBase64String(emailConfirmCode);
+                    var encodedString = Encoding.UTF8.GetString(bytes);
+                    string DecryptToken = EncyptedDecrypted.Decrypt(encodedString, DecpasswordBytes);
 
                     LinkTokenViewModel dmodel = JsonConvert.DeserializeObject<LinkTokenViewModel>(DecryptToken);
                     if (dmodel?.Expirytime >= DateTime.UtcNow)

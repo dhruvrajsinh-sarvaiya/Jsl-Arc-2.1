@@ -52,6 +52,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
 
                 SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.News;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
                 return Ok();
@@ -76,6 +77,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
 
                 SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.Announcement;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
                 return Ok();
