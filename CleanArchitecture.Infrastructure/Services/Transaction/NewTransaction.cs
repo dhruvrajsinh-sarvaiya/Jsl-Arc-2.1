@@ -5,6 +5,8 @@ using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
@@ -36,6 +38,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly IWebApiSendRequest _IWebApiSendRequest;
         private readonly IWebApiData _IWebApiData;
         WebApiParseResponse _WebApiParseResponseObj;
+        private readonly IFrontTrnRepository _frontTrnRepository; //komal 31-10-2018
+        private readonly ISignalRService _signalRService; //komal 31-10-2018 SignalR service
 
         public BizResponse _Resp;        
         public BizResponse _CreateTransactionResp;
@@ -66,7 +70,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest,
             IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData,
             ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
-            ICommonRepository<TradeBuyRequest> TradeBuyRequest)
+            ICommonRepository<TradeBuyRequest> TradeBuyRequest, IFrontTrnRepository frontTrnRepository,
+            ISignalRService signalRService)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -86,6 +91,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _PoolOrder = PoolOrder;
             _TradePoolMaster = TradePoolMaster;
             _TradeBuyRequest = TradeBuyRequest;
+            _frontTrnRepository = frontTrnRepository;
+            _signalRService = signalRService;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -618,13 +625,49 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public void MarkTransactionHold(string StatusMsg, enErrorCode ErrorCode)
         {
+            
             try
             {
                 //var Txn = _TransactionRepository.GetById(Req.TrnNo);
                 Newtransaction.MakeTransactionHold();
                 Newtransaction.SetTransactionStatusMsg(StatusMsg);
                 Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TransactionRepository.Update(Newtransaction);              
+                _TransactionRepository.Update(Newtransaction);
+
+                //komal 31-10-2018 Socket call
+                GetBuySellBook BuySellmodel = new GetBuySellBook();
+                List<GetBuySellBook> list = new List<GetBuySellBook>();
+
+                if (NewTradetransaction.TrnType == 4)//Buy
+                {
+                    list = _frontTrnRepository.GetBuyerBook(NewTradetransaction.PairID, NewTradetransaction.BidPrice);
+                    foreach (var model in list)
+                    {
+                        BuySellmodel = model;
+                        break;
+                    }
+                    _signalRService.BuyerBook(BuySellmodel, NewTradetransaction.PairName);
+                }
+                else//Sell
+                {
+                    list = _frontTrnRepository.GetSellerBook(NewTradetransaction.PairID, NewTradetransaction.AskPrice);
+                    foreach (var model in list)
+                    {
+                        BuySellmodel = model;
+                        break;
+                    }
+                    _signalRService.SellerBook(BuySellmodel, NewTradetransaction.PairName);
+                }
+                ActiveOrderInfo OpenOrder = new ActiveOrderInfo();
+                OpenOrder.Id = Newtransaction.Id;
+                OpenOrder.TrnDate = Newtransaction.TrnDate;
+                OpenOrder.Type = (NewTradetransaction.TrnType == 4) ? "BUY" : "SELL";
+                OpenOrder.Order_Currency = NewTradetransaction.Order_Currency;
+                OpenOrder.Delivery_Currency = NewTradetransaction.Delivery_Currency;
+                OpenOrder.Amount = (NewTradetransaction.BuyQty == 0) ? NewTradetransaction.SellQty : (NewTradetransaction.SellQty == 0) ? NewTradetransaction.BuyQty : NewTradetransaction.BuyQty;
+                OpenOrder.Price = (NewTradetransaction.BidPrice == 0) ? NewTradetransaction.AskPrice : (NewTradetransaction.AskPrice == 0) ? NewTradetransaction.BidPrice : NewTradetransaction.BidPrice;
+                OpenOrder.IsCancelled = NewTradetransaction.IsCancelled;
+                _signalRService.OpenOrder(OpenOrder," Token"); //komal 31-10-2018 push token here
             }
             catch (Exception ex)
             {
