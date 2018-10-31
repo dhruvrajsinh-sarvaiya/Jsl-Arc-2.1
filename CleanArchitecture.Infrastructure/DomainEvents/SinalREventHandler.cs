@@ -31,7 +31,6 @@ namespace CleanArchitecture.Infrastructure.DomainEvents
         {
             try
             {
-                
                 if (request.Method == enMethodName.BuyerBook)
                     _chat.BuyerBook(request.Parameter,request.DataObj);
                 else if (request.Method == enMethodName.SellerBook)

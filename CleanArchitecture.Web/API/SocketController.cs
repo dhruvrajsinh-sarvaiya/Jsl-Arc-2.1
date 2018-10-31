@@ -47,8 +47,8 @@ namespace CleanArchitecture.Web.API
             //_signalRTestService = signalRTestService;
         }
         
-        [HttpGet("BuyerBook/{Data}")]
-        public async Task<IActionResult> BuyerBook(string Data)
+        [HttpGet("BuyerBook/{Data}/{Pair}")]
+        public async Task<IActionResult> BuyerBook(string Data,String Pair)
         {
             string ReciveMethod = "";
             try
@@ -66,7 +66,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne );
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType .PairName );
                 CommonData.Data = temp;
-                CommonData.Parameter = "INR_BTC";
+                CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.BuyerBook;
@@ -84,8 +84,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("SellerBook/{Data}")]
-        public async Task<IActionResult> SellerBook(string Data)
+        [HttpGet("SellerBook/{Data}/{Pair}")]
+        public async Task<IActionResult> SellerBook(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -103,7 +103,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "INR_BTC";
+                CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.SellerBook;
@@ -121,8 +121,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("TradingHistory/{Data}")]
-        public async Task<IActionResult> TradingHistory(string Data)
+        [HttpGet("TradingHistory/{Data}/{Pair}")]
+        public async Task<IActionResult> TradingHistory(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -148,7 +148,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "INR_BTC";
+                CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.TradeHistoryByPair;
@@ -166,8 +166,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("ChartData/{Data}")]
-        public async Task<IActionResult> ChartData(string Data)
+        [HttpGet("ChartData/{Data}/{Pair}")]
+        public async Task<IActionResult> ChartData(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -190,7 +190,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "INR_BTC";
+                CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.ChartData;
@@ -208,8 +208,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("MarketData/{Data}")]
-        public async Task<IActionResult> MarketData(string Data)
+        [HttpGet("MarketData/{Data}/{Pair}")]
+        public async Task<IActionResult> MarketData(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -231,7 +231,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "INR_BTC";
+                CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.MarketData;
@@ -249,8 +249,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("LastPrice/{Data}")]
-        public async Task<IActionResult> LastPrice(decimal Data)
+        [HttpGet("LastPrice/{Data}/{Pair}")]
+        public async Task<IActionResult> LastPrice(decimal Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -262,7 +262,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
-                CommonData.Parameter = "INR_BTC";
+                CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.Price;
@@ -456,7 +456,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Method = enMethodName.BuyerSideWallet;
                 SendData.Parameter = accessToken;// CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                SendData.WalletName = "BTC";
+                SendData.WalletName = temp.CoinName;
 
                 await _mediator.Send(SendData);
                 ReciveMethod = "RecieveBuyerSideWalletBal";
@@ -501,7 +501,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Method = enMethodName.SellerSideWallet;
                 SendData.Parameter = accessToken;// CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                SendData.WalletName = "INR";
+                SendData.WalletName = temp.CoinName;
                 await _mediator.Send(SendData);
                 ReciveMethod = "RecieveSellerSideWalletBal";
                 return Ok(new { ReciveMethod = ReciveMethod });
@@ -567,10 +567,10 @@ namespace CleanArchitecture.Web.API
                 model.PairName = "INR_BTC";
                 model.UpDownBit = 0;
                 model.Volume24 = 1406;
-
+               
 
                 VolumeDataRespose temp = JsonConvert.DeserializeObject<VolumeDataRespose>(Data);
-
+                string a = temp.PairName.Split("_")[1];
                 SignalRComm<VolumeDataRespose> CommonData = new SignalRComm<VolumeDataRespose>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.PairData);
@@ -578,7 +578,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.Base);
                 CommonData.Data = temp;
-                CommonData.Parameter = "XRP";
+                CommonData.Parameter =a;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.PairData;
@@ -651,7 +651,8 @@ namespace CleanArchitecture.Web.API
         //    string ReciveMethod = "";
         //    try
         //    {
-        //        var accessToken = "CfDJ8GX72IE05DhMsT4VIPEe9lq_VFZzbmJIlw2XMjA1HrvNrTLM7tc0vzM6XCBmVdiBnZt0OddELrA_kaKm53McC54HxwtXipiQhl3m_ty1YYTYQ-Pmre3UxZhlR2bQ3jYPLUVLRiFZ0FOZTAGEwXesE2aiBsKcA3nZ7PWs7pUeGqpA5zCAON-O2YkGBWzO4wIaqUQX7knyrQNX7eQHXhr3EGxr5VJz9EyjOs_TRNsBd8zb9H8lzOSnUVUW_e6dvvYjFkPopuiTN3g1vDTL2Sde0pUIZllBm5w7emieidcgsaiiSWj_tQld4gd-Lcv0yRDgtM83ur3kvih_sNdw0dSywKQQUd7z7xq87hG3Zkpgu271eKkcNuB7vum5bamROi3m-ESDSdn_SdKl1vlrVUrSBeUSzsxWy20jbH4YMzCM-hFB3FmhHdybzuGMtu4y0uB-ROGuoXK5RjFAC_72-VqCQSFgWkhsuIlVrvNFKFk279HtmMWL9JU2IXqtl_50dJHol46DG5x0TGNDqa0IfW6onc7EQhYv2DSeORAY9QLQVdgCI761qJ3rNnWZ1-bGbo-6t-PWI9v8G9XnZ7mne8xpeSgf8zMos7NAmOOjnGa3-jB3mNZbmhaYKL_y9knG63YRw8AW3h8doYnk6W9Wwehi0ECCiccKdmc_ohfaLTXPjUL5Miz_wXdb_fKQolgIy4dT76kVE5wKDKFtzLT_YfuvQQN8xzUoZH6ybihIrFBrecJj"; await HttpContext.GetTokenAsync("access_token");
+        //        var accessToken = "CfDJ8MB8DXV9k79JrEe_PIsRHuoXYoktXaP7EjFqGuVjEiiaoDD4xLApH2bywCk5ehhm8--MqkgUUfQs5aZG7CHzBOaKL6PRj_D807rvIwwaAFtAntn9ZIdvSKXnPOoBgqJ2eKHn23BuXL7mhB046b6dssHLWqKoWPnqzR98h5whdupq3FnlbKIqggRZ_4TDO60_h4Qnan7TWq4Keki3QysUwBK2Ozc2QsrqTevt9lG7Zo-1kV_8AB4XVb86cvuioiRQUFrHyF6o6VqNimPW882kzoktQFc1gI0qlCkHD8z0f7iFWs1e56r94mUOIqjXtIbL-yWQpoo5edgzcMZpool-L-cttcx-enWXcx91ziL_PBGC3Uko1EcuqFPGRqNKVc6ABFv4igSkyV1cnScMrertxYAU_ito2LlFqSlwhiLjDP2WghLMDPYI7KX76VVeSDKaLWJcYlKX3f272229tMEkyGVNfcqYkVvndLF5mgEtvk6XCXQ22w51pArBwtRkxxD3u2MYDN51VIpCvi7vkD1pyrQEidBhttBB5ySs0cF8aV8YXRBAYqLa9Dqyb1fuqu4kbrmHKgpEVhbT9H5d2ERnhEzowF7Q_doO-rPmc9RM2_h_28GTH1M0OD8BDiSpxaRIhKROm34Lof6DcmcHHF68biccOTjAk78sficf6NEVSj0zamO1KvvYcgtXX2ueTgXCcx7QUzQwG8mVEVgNVYwXs3Hzi7ycCcImwsvoihGDtgCb";
+        //        //await HttpContext.GetTokenAsync("access_token");
         //        //_signalRTestService.MarkTransactionHold(ID, accessToken);
         //        TransactionQueue Newtransaction = new TransactionQueue();
         //        Newtransaction.TrnType = 4;
