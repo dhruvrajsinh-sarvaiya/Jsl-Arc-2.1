@@ -115,7 +115,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
         }
 
-        public List<TradeHistoryResponce> GetTradeHistory(long MemberID, string sCondition, string FromDate, string ToDate, int page, int IsAll)
+        public List<TradeHistoryResponce> GetTradeHistory(long MemberID, string sCondition, string FromDate, string ToDate, int page, int IsAll,long TrnNo=0)
         {
             IQueryable<TradeHistoryResponce> Result = null;
             string qry = "";
@@ -130,6 +130,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     long PairId = MemberID;
                     if (PairId != 999)
                         sCon = "and TTQ.PairID ="+ PairId;
+                    if (PairId != 0)
+                        sCon = "and TQ.TrnNo =" + TrnNo;
 
                     qry = "Select top 100 TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type, "+
                                 "CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price, "+

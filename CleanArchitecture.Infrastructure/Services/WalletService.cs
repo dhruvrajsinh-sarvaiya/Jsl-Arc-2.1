@@ -1008,9 +1008,8 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var walletResponse = _walletRepository1.GetWalletMasterResponseByCoin(userid, coin);
-                var UserPrefobj = _UserPreferencescommonRepository.GetSingle(item => item.UserID == userid && item.Status == 1);
-                //if(UserPrefobj == null )
-                if (walletResponse.Count == 0 && UserPrefobj == null)
+                var UserPrefobj = _UserPreferencescommonRepository.FindBy(item => item.UserID == userid && item.Status == 1).FirstOrDefault();
+                if (walletResponse.Count == 0)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
                     listWalletResponse.ReturnMsg = EnResponseMessage.NotFound;
@@ -1018,8 +1017,15 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else
                 {
+                    if (UserPrefobj != null)
+                    {
+                        listWalletResponse.IsWhitelisting = UserPrefobj.IsWhitelisting;
+                    }
+                    else
+                    {
+                        listWalletResponse.IsWhitelisting = 0;
+                    }
                     listWalletResponse.Wallets = walletResponse;
-                    listWalletResponse.IsWhitelisting = UserPrefobj.IsWhitelisting;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
@@ -1027,7 +1033,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-              HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 listWalletResponse.ReturnCode = enResponseCode.InternalError;
                 return listWalletResponse;
             }

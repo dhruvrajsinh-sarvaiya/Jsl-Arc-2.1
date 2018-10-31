@@ -13,6 +13,7 @@ using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services.Transaction
@@ -61,6 +62,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         TradeBuyRequest TradeBuyRequestObj;
         TradeSellerList TradeSellerListObj;
         TradeBuyerList TradeBuyerListObj;
+        TradePoolConfiguration TradePoolConfigurationObj;
         private string ControllerName = "TradingTransaction";
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
@@ -110,18 +112,18 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             //var myResp = new Task(async () => CombineAllInitTransactionAsync());
             //await Task.Run(() => CombineAllInitTransactionAsync());
 
-            MiddleWare();
-            //CombineAllInitTransactionAsync();
+            //MiddleWare();
+            return await Task.Run(() => CombineAllInitTransactionAsync());
 
             //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
             //_Resp = await MethodRespTsk;            
-            return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess };
+            //return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess };
             //return _Resp;
         }
-        public async Task<BizResponse> MiddleWare()
-        {
-           return await Task.Run(() => CombineAllInitTransactionAsync());
-        }
+        //public async Task<BizResponse> MiddleWare()
+        //{
+        //   return await Task.Run(() => CombineAllInitTransactionAsync());
+        //}
 
         public async Task<BizResponse> CombineAllInitTransactionAsync()
         {
@@ -167,14 +169,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     Req.WalletTrnType = enWalletTrnType.Dr_Sell_Trade;
                 }
 
-                var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode, "", enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
+                var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode,Helpers.GetTimeStamp(), enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
                     Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType);
 
                 if (DebitResult.ReturnCode == enResponseCode.Fail)
                 {
-                    _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_WalletDebitFailMsg;
+                    _Resp.ReturnMsg = DebitResult.ReturnMsg;//EnResponseMessage.ProcessTrn_WalletDebitFailMsg;
                     _Resp.ReturnCode = enResponseCodeService.Fail;
-                    _Resp.ErrorCode = enErrorCode.ProcessTrn_WalletDebitFail;
+                    _Resp.ErrorCode = DebitResult.ErrorCode;//enErrorCode.ProcessTrn_WalletDebitFail;
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Balance Deduction Fail" + _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
                     return _Resp;
@@ -189,12 +191,17 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
                 else//Trading process here
                 {
-                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Start" + "##TrnNo:" + Req.TrnNo);
+                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Start " + "##TrnNo:" + Req.TrnNo);
                     //Make Trading Data Entry
                     _Resp = await TradingDataInsert(_Resp);
-                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Done" + "##TrnNo:" + Req.TrnNo);
-                    return _Resp;
+                    HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Done " +_Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
+
                     //Start Settlement Here
+                    if(_Resp.ReturnCode==enResponseCodeService.Success)
+                    {
+
+                    }
+                    return _Resp;
                 }
 
                 //=========================UPDATE
@@ -661,7 +668,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 CreditWalletDrArryTrnIDList.Add(new CreditWalletDrArryTrnID { DrTrnRefNo = Req.TrnNo, Amount = Req.Amount });
 
 
-                _WalletService.GetWalletCreditNew(Req.SMSCode, "", enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
+                _WalletService.GetWalletCreditNew(Req.SMSCode, Helpers.GetTimeStamp(), enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
                 Req.DebitAccountID, CreditWalletDrArryTrnIDList.ToArray(), Req.TrnNo,1, enWalletTranxOrderType.Credit, Req.ServiceType);
             }
             catch (Exception ex)
@@ -878,6 +885,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     BuyServiceID = TradePoolMasterObj.BuyServiceID,
                     Price = TradePoolMasterObj.BidPrice,
                     Qty = Req.Amount,//take trnno amount as pool as total amount
+                    RemainQty = Req.Amount,
                     Status = Convert.ToInt16(enTransactionStatus.Initialize),//txn type status
                 };
                 TradeSellerListObj = _TradeSellerList.Add(TradeSellerListObj);
@@ -943,6 +951,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     PaidServiceID = TradeBuyRequestObj.PaidServiceID,
                     Price = TradeBuyRequestObj.BidPrice,
                     Qty = TradeBuyRequestObj.Qty, //same as request as one entry per one request
+                    IsProcessing = 0,
                     Status = Convert.ToInt16(enTransactionStatus.Initialize),//txn type status
                 };
                 TradeBuyerListObj = _TradeBuyerList.Add(TradeBuyerListObj);
@@ -960,6 +969,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
+                _Resp.ReturnCode = enResponseCodeService.Fail;//temp init
                 foreach (TransactionProviderResponse Provider in TxnProviderList)//Make txn on every API
                 {
                     //Update Service Provider Data
@@ -993,18 +1003,81 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     TradeBuyRequest();
                     InsertBuyerList();
 
+                    _Resp.ReturnCode = enResponseCodeService.Success;
+                    _Resp.ReturnMsg = "Pool Order Updated Inserted";                    
                     break;
-                }
-                return Task.FromResult(_Resp);
+                }              
             }
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog("TradingDataInsert:##TrnNo " + Req.TrnNo, ControllerName, ex);
-                throw ex;
+                _Resp.ReturnCode = enResponseCodeService.Fail;
+                _Resp.ReturnMsg = ex.Message;
+                //throw ex;
             }
+            return Task.FromResult(_Resp);
         }
         #endregion
 
+
+        #region ==============================PROCESS SETLLEMENT========================
+        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp)
+        {
+            try
+            {
+                TradeBuyRequestObj.Status = Convert.ToInt16(enTransactionStatus.Pending);
+                TradeBuyRequestObj.UpdatedDate = Helpers.UTC_To_IST();
+                TradeBuyRequestObj.IsPartialProceed = 1;
+                _TradeBuyRequest.Update(TradeBuyRequestObj);
+
+                TradeBuyerListObj.Status = Convert.ToInt16(enTransactionStatus.Pending);
+                TradeBuyerListObj.UpdatedDate = Helpers.UTC_To_IST();
+                TradeBuyerListObj.IsProcessing = 1;
+                _TradeBuyerList.Update(TradeBuyerListObj);
+
+                //SortedList<TradeSellerList, TradeSellerList>
+                var MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0 
+                                                        && item.BuyServiceID== TradeBuyRequestObj.PaidServiceID &&
+                                                        item.SellServiceID== TradeBuyRequestObj.ServiceID 
+                                                        && (item.Status== Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Pending))
+                                                        && item.RemainQty>0);//Pending after partial Qty remain
+
+                var MatchSellerList = MatchSellerListBase.OrderBy(x => x.TrnNo).OrderBy(x => x.Price);
+
+                foreach (TradeSellerList SellerList in MatchSellerList)
+                {
+                    SellerList.IsProcessing = 1;
+                    _TradeSellerList.Update(SellerList);
+                    var PoolMst = _TradePoolMaster.GetById(SellerList.PoolID);
+
+                    if(SellerList.RemainQty<= TradeBuyRequestObj.PendingQty)
+                    {
+                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SellerList.RemainQty;
+                        TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SellerList.RemainQty;
+
+                        SellerList.RemainQty = SellerList.RemainQty- SellerList.RemainQty;//take all
+                        SellerList.Status = Convert.ToInt16(enTransactionStatus.Success);
+                        SellerList.IsProcessing = 0;
+
+                        _TradeBuyRequest.Update(TradeBuyRequestObj);
+                        _TradeSellerList.Update(SellerList);
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+            }
+            catch(Exception ex)
+            {
+                HelperForLog.WriteErrorLog("PROCESSSETLLEMENT:##TrnNo " + Req.TrnNo, ControllerName, ex);
+                _Resp.ReturnCode = enResponseCodeService.Fail;
+                _Resp.ReturnMsg = ex.Message;
+            }
+            return Task.FromResult(_Resp);
+        }
+        #endregion
 
     }
 }

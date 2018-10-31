@@ -25,7 +25,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly IFrontTrnRepository _frontTrnRepository;
         public String Token;
-        public SignalRService(ILogger<SignalRService> logger, IMediator mediator,EFCommonRepository<TransactionQueue> TransactionRepository, IFrontTrnRepository frontTrnRepository,
+        public SignalRService(ILogger<SignalRService> logger, IMediator mediator, EFCommonRepository<TransactionQueue> TransactionRepository, IFrontTrnRepository frontTrnRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository)
         {
             _logger = logger;
@@ -83,7 +83,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.SellerBook;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.TradeHistoryByPair;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -135,7 +135,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.ChartData;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -161,7 +161,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.MarketData;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -187,7 +187,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Method = enMethodName.Price;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -195,7 +195,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-        
+
         #endregion
 
         #region UserSpecific
@@ -218,7 +218,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -245,7 +245,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -272,7 +272,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -300,7 +300,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = Wallet;
 
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -328,7 +328,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = Wallet;
 
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -357,7 +357,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 //SendData.WalletName = Wallet;
 
-                 _mediator.Send(SendData);
+                _mediator.Send(SendData);
             }
             catch (Exception ex)
             {
@@ -422,40 +422,42 @@ namespace CleanArchitecture.Infrastructure.Services
         }
         #endregion
 
-        public void OnStatusChange(short Status,TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token)
+        public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token)
         {
             try
             {
-                if(Status ==Convert.ToInt16( enTransactionStatus .Hold)) 
+                if (Status == Convert.ToInt16(enTransactionStatus.Hold))
                 {
                     GetBuySellBook BuySellmodel = new GetBuySellBook();
                     List<GetBuySellBook> list = new List<GetBuySellBook>();
-                    if(!string.IsNullOrEmpty(Token))
-                    if (NewTradeTransaction.TrnType == 4)//Buy
-                    {
-                        list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
-                        foreach (var model in list)
+                    if (!string.IsNullOrEmpty(Token))
+                        if (NewTradeTransaction.TrnType == 4)//Buy
                         {
-                            BuySellmodel = model;
-                            break;
+                            list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
+                            foreach (var model in list)
+                            {
+                                BuySellmodel = model;
+                                break;
+                            }
+                            BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
                         }
-                        BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                    }
-                    else//Sell
-                    {
-                        list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
-                        foreach (var model in list)
+                        else//Sell
                         {
-                            BuySellmodel = model;
-                            break;
+                            list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
+                            foreach (var model in list)
+                            {
+                                BuySellmodel = model;
+                                break;
+                            }
+                            SellerBook(BuySellmodel, NewTradeTransaction.PairName);
                         }
-                        SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                    }
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction);
                     ActivityNotification(EnResponseMessage.SignalRTrnSuccessfullyCreated, Token);
                 }
-                else if(Status == Convert.ToInt16(enTransactionStatus.Success))
+                else if (Status == Convert.ToInt16(enTransactionStatus.Success))
                 {
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);
+
 
                 }
             }
@@ -466,7 +468,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction)
+        public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
         {
             try
             {
@@ -476,11 +478,95 @@ namespace CleanArchitecture.Infrastructure.Services
                 OpenOrderModel.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
                 OpenOrderModel.Order_Currency = NewTradeTransaction.Order_Currency;
                 OpenOrderModel.Delivery_Currency = NewTradeTransaction.Delivery_Currency;
-                OpenOrderModel.Amount = (NewTradeTransaction.BuyQty == 0) ? NewTradeTransaction.SellQty : (NewTradeTransaction.SellQty == 0) ? NewTradeTransaction.BuyQty : NewTradeTransaction.BuyQty;
+                if (IsPop == 1)
+                    OpenOrderModel.Amount = 0;
+                else
+                    OpenOrderModel.Amount = (NewTradeTransaction.BuyQty == 0) ? NewTradeTransaction.SellQty : (NewTradeTransaction.SellQty == 0) ? NewTradeTransaction.BuyQty : NewTradeTransaction.BuyQty;
                 OpenOrderModel.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
                 OpenOrderModel.IsCancelled = NewTradeTransaction.IsCancelled;
 
                 OpenOrder(OpenOrderModel, Token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void GetAndSendOrderHistory(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
+        {
+            try
+            {
+                var OrderHistoryList = _frontTrnRepository.GetTradeHistory(0, "", "", "", 0, 0, Newtransaction.Id);
+                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
+                model.TrnNo = NewTradeTransaction.TrnNo;
+                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
+                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
+                model.Amount = (NewTradeTransaction.TrnType == 4) ? NewTradeTransaction.SettledBuyQty : NewTradeTransaction.SettledSellQty;
+                model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
+                model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
+                model.Status = NewTradeTransaction.Status;
+                model.StatusText = NewTradeTransaction.StatusMsg;
+                model.PairName = NewTradeTransaction.PairName;
+                model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
+                model.IsCancel = NewTradeTransaction.IsCancelled;
+
+                OrderHistory(model, Token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void GetAndSendTradeHistoryByUser(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction)
+        {
+            try
+            {
+                //var OrderHistoryList = _frontTrnRepository.GetTradeHistory(0, "", "", "", 0, 0, Newtransaction.Id);
+                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
+                model.TrnNo = NewTradeTransaction.TrnNo;
+                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
+                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
+                model.Amount = (NewTradeTransaction.TrnType == 4) ? NewTradeTransaction.SettledBuyQty : NewTradeTransaction.SettledSellQty;
+                model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
+                model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
+                model.Status = NewTradeTransaction.Status;
+                model.StatusText = NewTradeTransaction.StatusMsg;
+                model.PairName = NewTradeTransaction.PairName;
+                model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
+                model.IsCancel = NewTradeTransaction.IsCancelled;
+
+                TradeHistoryByUser(model, Token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void GetAndSendTradeHistoryByPair(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction)
+        {
+            try
+            {
+                //var OrderHistoryList = _frontTrnRepository.GetTradeHistory(0, "", "", "", 0, 0, Newtransaction.Id);
+                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
+                model.TrnNo = NewTradeTransaction.TrnNo;
+                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
+                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
+                model.Amount = (NewTradeTransaction.TrnType == 4) ? NewTradeTransaction.SettledBuyQty : NewTradeTransaction.SettledSellQty;
+                model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
+                model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
+                model.Status = NewTradeTransaction.Status;
+                model.StatusText = NewTradeTransaction.StatusMsg;
+                model.PairName = NewTradeTransaction.PairName;
+                model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
+                model.IsCancel = NewTradeTransaction.IsCancelled;
+
+                TradingHistoryByPair(model, model.PairName);
             }
             catch (Exception ex)
             {

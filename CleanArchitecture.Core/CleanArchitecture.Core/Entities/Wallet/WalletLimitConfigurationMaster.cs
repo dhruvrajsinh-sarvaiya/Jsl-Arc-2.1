@@ -29,9 +29,11 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal? LifeTime { get; set; }
 
         [Required]
+        [Column(TypeName = "float")]
         public double StartTimeUnix { get; set; }
 
         [Required]
+        [Column(TypeName = "float")]
         public double EndTimeUnix { get; set; }
 
     }
