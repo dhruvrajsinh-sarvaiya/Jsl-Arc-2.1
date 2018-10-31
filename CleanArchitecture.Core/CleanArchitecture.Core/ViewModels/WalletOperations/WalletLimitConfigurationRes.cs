@@ -21,6 +21,8 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         public TimeSpan? StartTime { get; set; }
 
         public TimeSpan? EndTime { get; set; }
+
+        public decimal? LifeTime { get; set; }
     }
     public class LimitResponse : BizResponseClass
     {

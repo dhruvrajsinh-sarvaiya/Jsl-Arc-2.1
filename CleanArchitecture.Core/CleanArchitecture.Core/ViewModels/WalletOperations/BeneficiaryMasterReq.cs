@@ -30,7 +30,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
     public class BulkBeneUpdateReq
     {
         [Required(ErrorMessage = "1,Please Enter Required Parameter,4225")]
-        public long ID { get; set; }
+        public long[] ID { get; set; }
         [Required(ErrorMessage = "1,Please Enter Required Parameter,4226")]
         public short WhitelistingBit { get; set; }
     }

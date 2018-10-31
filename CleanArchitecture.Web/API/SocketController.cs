@@ -65,7 +65,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne );
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType .PairName );
                 CommonData.Data = temp;
-                CommonData.Parameter = "LTC_BTC";
+                CommonData.Parameter = "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.BuyerBook;
@@ -102,7 +102,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "LTC_BTC";
+                CommonData.Parameter = "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.SellerBook;
@@ -131,7 +131,7 @@ namespace CleanArchitecture.Web.API
                 model.ChargeRs = 1;
                 model.DateTime = DateTime.Now; 
                 model.IsCancel = 1;
-                model.PairName = "LTC_BTC";
+                model.PairName = "INR_BTC";
                 model.Price = 150;
                 model.Status = 1;
                 model.StatusText = "Success";
@@ -180,16 +180,16 @@ namespace CleanArchitecture.Web.API
                 model.TodayOpen = 1477;
                 model.Volume = 173;
 
-                GetGraphResponse temp = JsonConvert.DeserializeObject<GetGraphResponse>(Data);
+                List<GetGraphResponse> temp = JsonConvert.DeserializeObject<List<GetGraphResponse>>(Data);
 
-                SignalRComm<GetGraphResponse> CommonData = new SignalRComm<GetGraphResponse>();
+                SignalRComm<List<GetGraphResponse>> CommonData = new SignalRComm<List<GetGraphResponse>>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ChartData);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "LTC_BTC";
+                CommonData.Parameter = "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.ChartData;
@@ -230,7 +230,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
-                CommonData.Parameter = "LTC_BTC";
+                CommonData.Parameter = "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.MarketData;
@@ -261,7 +261,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
-                CommonData.Parameter = "LTC_BTC";
+                CommonData.Parameter = "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.Price;
@@ -344,7 +344,7 @@ namespace CleanArchitecture.Web.API
                 model.DateTime = DateTime.UtcNow;
                 model.Status = 1;
                 model.StatusText = "Success";
-                model.PairName = "LTC_BTC";
+                model.PairName = "INR_BTC";
                 model.ChargeRs = 10;
                 model.IsCancel = 0;
 
@@ -393,7 +393,7 @@ namespace CleanArchitecture.Web.API
                 model.DateTime = DateTime.UtcNow;
                 model.Status = 1;
                 model.StatusText = "Success";
-                model.PairName = "LTC_BTC";
+                model.PairName = "INR_BTC";
                 model.ChargeRs = 10;
 
                 GetTradeHistoryInfo temp = JsonConvert.DeserializeObject<GetTradeHistoryInfo>(Data);
@@ -610,13 +610,14 @@ namespace CleanArchitecture.Web.API
         //}
 
         //[HttpGet("CreateTranTest")]
+        //[Authorize]
         //public async Task<IActionResult> CreateTranTest(long ID)
         //{
         //    string ReciveMethod = "";
         //    try
         //    {
-
-        //        _signalRTestService.MarkTransactionHold(ID);
+        //        var accessToken = await HttpContext.GetTokenAsync("access_token");
+        //        _signalRTestService.MarkTransactionHold(ID, accessToken);
 
         //        return Ok(new { ReciveMethod = ReciveMethod });
         //    }

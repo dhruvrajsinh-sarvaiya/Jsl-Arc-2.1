@@ -27,5 +27,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
 
         //[Required(ErrorMessage = "1,Please Enter Required Parameters,4230")]
         public double EndTime { get; set; }
+
+        public decimal LifeTime { get; set; }
     }
 }

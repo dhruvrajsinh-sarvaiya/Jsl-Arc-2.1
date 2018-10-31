@@ -81,12 +81,12 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         // vsolanki 25-10-2018
         BalanceResponseWithLimit GetAvailbleBalTypeWise(long userid);
 
-        BeneficiaryResponse AddBeneficiary(string AccWalletID,string Name ,string BeneficiaryAddress, long UserId);
+        BeneficiaryResponse AddBeneficiary(string CoinName,short WhitelistingBit,string Name ,string BeneficiaryAddress, long UserId);
         BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
         BeneficiaryResponse ListBeneficiary(long id);
         UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
         UserPreferencesRes GetPreferences(long Userid);
-        BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq[] request, long id);
+        BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq request, long id);
         BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request,string AccWalletID, long id);
         //vsolanki 25-10-2018
         ListAllBalanceTypeWiseRes GetAllBalancesTypeWise(long userId, string WalletType);
@@ -130,6 +130,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //Uday 30-10-2018
         ServiceLimitChargeValue GetServiceLimitChargeValue(enTrnType TrnType, string CoinName);
+
+        //vsoalnki 2018-10-31
+        CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId);
 
     }
 }

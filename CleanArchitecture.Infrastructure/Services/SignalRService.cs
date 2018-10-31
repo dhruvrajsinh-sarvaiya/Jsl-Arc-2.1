@@ -156,17 +156,17 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public async Task LastPrice(decimal Price, string Pair)
+        public async Task LastPrice(LastPriceViewModel Data, string Pair)
         {
             try
             {
-                SignalRComm<Decimal> CommonData = new SignalRComm<Decimal>();
+                SignalRComm<LastPriceViewModel> CommonData = new SignalRComm<LastPriceViewModel>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.Price);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveLastPrice);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
-                CommonData.Data = Price;
+                CommonData.Data = Data;
                 CommonData.Parameter = Pair;
 
                 SignalRData SendData = new SignalRData();
@@ -312,6 +312,34 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = Wallet;
+
+                await _mediator.Send(SendData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public async Task ActivityNotification(string Msg, string Token)
+        {
+            try
+            {
+                SignalRComm<String> CommonData = new SignalRComm<String>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ActivityNotification);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveNotification);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Msg;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.ActivityNotification;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+                //SendData.WalletName = Wallet;
 
                 await _mediator.Send(SendData);
             }
