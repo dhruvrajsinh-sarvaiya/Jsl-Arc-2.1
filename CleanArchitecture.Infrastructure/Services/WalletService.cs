@@ -2491,7 +2491,13 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 CreateWalletAddressRes addr=new CreateWalletAddressRes();
-                var walletObj = _commonRepository.FindBy(t => t.UserID == UserId && t.IsDefaultWallet==1).FirstOrDefault();
+                var orgid = _walletRepository1.getOrgID();
+                if(orgid!= UserId)
+                {
+                    return new CreateWalletAddressRes { ReturnCode=enResponseCode.Fail,ReturnMsg=EnResponseMessage.OrgIDNotFound,ErrorCode=enErrorCode.OrgIDNotFound};
+                }
+                var type = _WalletTypeMasterRepository.GetSingle(t=>t.WalletTypeName== Coin);
+                var walletObj = _commonRepository.FindBy(t => t.UserID == orgid && t.IsDefaultWallet==1&& t.WalletTypeID== type.Id).FirstOrDefault();
                 for (int i = 0; i <= AddressCount; i++)
                 {
                      addr =GenerateAddress(walletObj.AccWalletID, Coin);
