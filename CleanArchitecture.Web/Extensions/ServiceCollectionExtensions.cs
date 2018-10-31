@@ -15,6 +15,7 @@ using CleanArchitecture.Infrastructure.Data.Transaction;
 using CleanArchitecture.Infrastructure.EFLocalizer;
 using CleanArchitecture.Infrastructure.Services.Transaction;
 using CleanArchitecture.Infrastructure.Services.User;
+using CleanArchitecture.Infrastructure.Services;
 using CleanArchitecture.Web.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -385,10 +386,10 @@ namespace CleanArchitecture.Web.Extensions
             //services.AddTransient<IMessageSender, MessageService>();
             // added by nirav savariya for Encypted Decrypted on 10-02-2018
             services.AddScoped<EncyptedDecrypted>();
-            services.AddTransient<IFrontTrnService, FrontTrnService>();
+            services.AddTransient<IFrontTrnService, FrontTrnService>(); 
             services.AddTransient<IFrontTrnRepository, FrontTrnRepository>();
             services.AddTransient<ITransactionConfigService, TransactionConfigService>();
-
+            services.AddTransient<ISignalRService, SignalRService>();//komal 30-10-2018 
             //REDIS RELETED CLASS                  
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddSingleton<IRedisConnectionFactory, RedisConnectionFactory>();

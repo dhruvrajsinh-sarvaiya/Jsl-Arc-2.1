@@ -11,22 +11,22 @@ namespace CleanArchitecture.Core.Interfaces
     public interface ISignalRService
     {
         //Pair wise
-        void BuyerBook(GetBuySellBook Data,string Pair);
-        void SellerBook(GetBuySellBook Data, string Pair);
-        void TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair);
-        void ChartData(List<GetGraphResponse> Data, string Pair);
-        void MarketData(MarketCapData Data, string Pair);
-        void LastPrice(Decimal Price,string Pair);
+        Task BuyerBook(GetBuySellBook Data,string Pair);
+        Task SellerBook(GetBuySellBook Data, string Pair);
+        Task TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair);
+        Task ChartData(List<GetGraphResponse> Data, string Pair);
+        Task MarketData(MarketCapData Data, string Pair);
+        Task LastPrice(Decimal Price,string Pair);
 
         //user wise
-        void OpenOrder(ActiveOrderInfo Data, string Token);
-        void OrderHistory(GetTradeHistoryInfo Data, string Token);
-        void TradeHistoryByUser(GetTradeHistoryInfo Data, string Token);
-        void BuyerSideWalletBal(WalletMasterResponse Data,string Wallet, string Token);
-        void SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token);
+        Task OpenOrder(ActiveOrderInfo Data, string Token);
+        Task OrderHistory(GetTradeHistoryInfo Data, string Token);
+        Task TradeHistoryByUser(GetTradeHistoryInfo Data, string Token);
+        Task BuyerSideWalletBal(WalletMasterResponse Data,string Wallet, string Token);
+        Task SellerSideWalletBal(WalletMasterResponse Data, string Wallet, string Token);
 
         //Base Market
-        void PairData(VolumeDataRespose Data,string Base);
-        void MarketTicker(VolumeDataRespose Data, string Base);
+        Task PairData(VolumeDataRespose Data,string Base);
+        Task MarketTicker(VolumeDataRespose Data, string Base);
     }
 }

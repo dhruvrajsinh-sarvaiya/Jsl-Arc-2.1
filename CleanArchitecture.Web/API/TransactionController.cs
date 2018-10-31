@@ -159,19 +159,19 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("Withdrawal")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> Withdrawal([FromBody]WithdrawalRequest Request)
         {
             //Do Process for CreateOrder
             //For Testing Purpose
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = enTrnType.Withdraw;
-            Req.MemberID = user.Id;
-            Req.MemberMobile = user.Mobile;
-            //Req.MemberID = 16;
-            //Req.MemberMobile = "1234567890";
+            //Req.MemberID = user.Id;
+            //Req.MemberMobile = user.Mobile;
+            Req.MemberID = 16;
+            Req.MemberMobile = "1234567890";
             Req.SMSCode = Request.asset;
             Req.TransactionAccount = Request.address;
             Req.Amount = Request.Amount;

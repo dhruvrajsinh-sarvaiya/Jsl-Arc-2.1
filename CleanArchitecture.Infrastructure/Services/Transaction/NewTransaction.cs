@@ -5,6 +5,8 @@ using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
@@ -36,6 +38,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly IWebApiSendRequest _IWebApiSendRequest;
         private readonly IWebApiData _IWebApiData;
         WebApiParseResponse _WebApiParseResponseObj;
+        private readonly IFrontTrnRepository _frontTrnRepository; //komal 31-10-2018
+        private readonly ISignalRService _signalRService; //komal 31-10-2018 SignalR service
 
         public BizResponse _Resp;        
         public BizResponse _CreateTransactionResp;
@@ -66,7 +70,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ICommonRepository<TransactionRequest> TransactionRequest, IGetWebRequest IGetWebRequest,
             IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData,
             ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
-            ICommonRepository<TradeBuyRequest> TradeBuyRequest)
+            ICommonRepository<TradeBuyRequest> TradeBuyRequest, IFrontTrnRepository frontTrnRepository,
+            ISignalRService signalRService)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -86,6 +91,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _PoolOrder = PoolOrder;
             _TradePoolMaster = TradePoolMaster;
             _TradeBuyRequest = TradeBuyRequest;
+            _frontTrnRepository = frontTrnRepository;
+            _signalRService = signalRService;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -109,12 +116,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             return new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess };
             //return _Resp;
         }
-        public async void MiddleWare()
+        public async Task<BizResponse> MiddleWare()
         {
-           var dsfd = await Task.Run(() => CombineAllInitTransactionAsync());
+           return await Task.Run(() => CombineAllInitTransactionAsync());
         }
 
-        public Task<BizResponse> CombineAllInitTransactionAsync()
+        public async Task<BizResponse> CombineAllInitTransactionAsync()
         {
             _Resp = new BizResponse();
             try
@@ -122,13 +129,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 //Helpers.JsonSerialize(null);
                 //=========================PROCESS
                 //Check balance here
-                var Validation = ValidateTransaction(_Resp);                
+                var Validation = await ValidateTransaction(_Resp);                
 
-                if (!Validation.Result) //validation and balance check success
+                if (!Validation) //Validation.Result//validation and balance check success
                 {
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Validation fail" + _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
-                    return Task.FromResult(_Resp);
+                    //return Task.FromResult(_Resp);
+                    return _Resp;
                 }
                 var BalResult = _WalletService.WalletBalanceCheck(Req.Amount, Req.DebitAccountID); //DI of Wallet for balance check
                 if (!BalResult) //validation and balance check success
@@ -138,7 +146,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     _Resp.ErrorCode = enErrorCode.ProcessTrn_InsufficientBalance;
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Balance check Fail" + _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
-                    return Task.FromResult(_Resp);
+                    return _Resp;
                 }
                 //Deduct balance here
                 if (Req.TrnType == enTrnType.Transaction)
@@ -167,33 +175,34 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     _Resp.ErrorCode = enErrorCode.ProcessTrn_WalletDebitFail;
                     MarkTransactionSystemFail(_Resp.ReturnMsg, _Resp.ErrorCode);
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Balance Deduction Fail" + _Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
-                    return Task.FromResult(_Resp);
+                    return _Resp;
                 }
                 //===================================Make txn HOLD as balance debited=======================
                 MarkTransactionHold(EnResponseMessage.ProcessTrn_HoldMsg, enErrorCode.ProcessTrn_Hold);
                 if (Req.TrnType == enTrnType.Transaction || Req.TrnType == enTrnType.Withdraw)
                 {
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Transaction/Withdraw Process Start" + "##TrnNo:" + Req.TrnNo);
-                    CallWebAPI(_Resp);
-                    return Task.FromResult(_Resp);
+                    _Resp = await CallWebAPI(_Resp);
+                    return _Resp;
                 }
                 else//Trading process here
                 {
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Start" + "##TrnNo:" + Req.TrnNo);
                     //Make Trading Data Entry
-                    TradingDataInsert(_Resp);
-
+                    _Resp = await TradingDataInsert(_Resp);
+                    return _Resp;
                     //Start Settlement Here
                 }
 
                 //=========================UPDATE
-                return null;
+                //return null;
             }
             catch (Exception ex)
             {
                 //_log.LogError(ex, "exception,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 HelperForLog.WriteErrorLog("CombineAllInitTransactionAsync:##TrnNo " + Req.TrnNo, ControllerName, ex);
-                return Task.FromResult((new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionProcessInternalError }));
+                //return Task.FromResult((new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionProcessInternalError }));
+                return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError, ErrorCode = enErrorCode.TransactionProcessInternalError });
             }            
         }
 
@@ -616,13 +625,49 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         public void MarkTransactionHold(string StatusMsg, enErrorCode ErrorCode)
         {
+            
             try
             {
                 //var Txn = _TransactionRepository.GetById(Req.TrnNo);
                 Newtransaction.MakeTransactionHold();
                 Newtransaction.SetTransactionStatusMsg(StatusMsg);
                 Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TransactionRepository.Update(Newtransaction);              
+                _TransactionRepository.Update(Newtransaction);
+
+                //komal 31-10-2018 Socket call
+                GetBuySellBook BuySellmodel = new GetBuySellBook();
+                List<GetBuySellBook> list = new List<GetBuySellBook>();
+
+                if (NewTradetransaction.TrnType == 4)//Buy
+                {
+                    list = _frontTrnRepository.GetBuyerBook(NewTradetransaction.PairID, NewTradetransaction.BidPrice);
+                    foreach (var model in list)
+                    {
+                        BuySellmodel = model;
+                        break;
+                    }
+                    _signalRService.BuyerBook(BuySellmodel, NewTradetransaction.PairName);
+                }
+                else//Sell
+                {
+                    list = _frontTrnRepository.GetSellerBook(NewTradetransaction.PairID, NewTradetransaction.AskPrice);
+                    foreach (var model in list)
+                    {
+                        BuySellmodel = model;
+                        break;
+                    }
+                    _signalRService.SellerBook(BuySellmodel, NewTradetransaction.PairName);
+                }
+                ActiveOrderInfo OpenOrder = new ActiveOrderInfo();
+                OpenOrder.Id = Newtransaction.Id;
+                OpenOrder.TrnDate = Newtransaction.TrnDate;
+                OpenOrder.Type = (NewTradetransaction.TrnType == 4) ? "BUY" : "SELL";
+                OpenOrder.Order_Currency = NewTradetransaction.Order_Currency;
+                OpenOrder.Delivery_Currency = NewTradetransaction.Delivery_Currency;
+                OpenOrder.Amount = (NewTradetransaction.BuyQty == 0) ? NewTradetransaction.SellQty : (NewTradetransaction.SellQty == 0) ? NewTradetransaction.BuyQty : NewTradetransaction.BuyQty;
+                OpenOrder.Price = (NewTradetransaction.BidPrice == 0) ? NewTradetransaction.AskPrice : (NewTradetransaction.AskPrice == 0) ? NewTradetransaction.BidPrice : NewTradetransaction.BidPrice;
+                OpenOrder.IsCancelled = NewTradetransaction.IsCancelled;
+                _signalRService.OpenOrder(OpenOrder," Token"); //komal 31-10-2018 push token here
             }
             catch (Exception ex)
             {
@@ -657,7 +702,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public void CallWebAPI(BizResponse _Resp)
+        public Task<BizResponse> CallWebAPI(BizResponse _Resp)
         {
             //TransactionRequest TransactionRequestObj=new TransactionRequest(); 
             ThirdPartyAPIRequest ThirdPartyAPIRequestOnj;
@@ -757,6 +802,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 HelperForLog.WriteErrorLog("CallWebAPI:##TrnNo " + Req.TrnNo, ControllerName, ex);
 
             }
+            return Task.FromResult(_Resp);
         }
         public long InsertTransactionRequest(TransactionProviderResponse listObj, string Request)
         {
@@ -887,7 +933,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
-        public void TradingDataInsert(BizResponse _Resp)
+        public Task<BizResponse> TradingDataInsert(BizResponse _Resp)
         {
             try
             {
@@ -918,6 +964,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
                     break;
                 }
+                return Task.FromResult(_Resp);
             }
             catch (Exception ex)
             {
