@@ -75,8 +75,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData,
             ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeSellerList> TradeSellerList,
-            ICommonRepository<TradeBuyerList> TradeBuyerList)
-            ICommonRepository<TradeBuyRequest> TradeBuyRequest, IFrontTrnRepository frontTrnRepository,
+            ICommonRepository<TradeBuyerList> TradeBuyerList,IFrontTrnRepository frontTrnRepository,
             ISignalRService signalRService)
         {
             _log = log;
