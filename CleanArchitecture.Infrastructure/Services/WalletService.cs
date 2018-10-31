@@ -788,8 +788,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (isBaseService == 0)    //uday 25-10-2018 When Service is add create default wallet of org not generate the address
                 {
                     var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
+                    if(addressClass.address!=null)
+                    {
+                        walletMaster.WalletPublicAddress(addressClass.address);
+                    }
                     //walletMaster.PublicAddress = addressClass.address;
-                    walletMaster.WalletPublicAddress(addressClass.address);
+                    walletMaster.WalletPublicAddress("NotGenerate");
                     _commonRepository.Update(walletMaster);
                 }
                 //vsolanki 26-10-2018 insert and limitConfigration
