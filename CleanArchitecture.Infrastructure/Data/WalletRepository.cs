@@ -41,7 +41,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //    }
         //    catch (Exception ex)
         //    {
-        //        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         //        throw ex;
         //    }
         //}
@@ -54,7 +54,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //    }
         //    catch (Exception ex)
         //    {
-        //        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         //        throw ex;
         //    }
         //}
@@ -70,7 +70,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //    }
         //    catch (Exception ex)
         //    {
-        //        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         //        throw ex;
         //    }
         //}
@@ -84,7 +84,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //    }
         //    catch (Exception ex)
         //    {
-        //        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         //        throw ex;
         //    }
         //}
@@ -98,7 +98,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //    }
         //    catch (Exception ex)
         //    {
-        //        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         //        throw ex;
         //    }
         //}
@@ -114,7 +114,7 @@ namespace CleanArchitecture.Infrastructure.Data
         //    }
         //    catch (Exception ex)
         //    {
-        //        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         //        throw ex;
         //    }
         //}
@@ -127,7 +127,7 @@ namespace CleanArchitecture.Infrastructure.Data
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+               HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -150,7 +150,7 @@ namespace CleanArchitecture.Infrastructure.Data
             catch (Exception ex)
             {
                 _dbContext.Database.RollbackTransaction();
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+               HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -171,7 +171,7 @@ namespace CleanArchitecture.Infrastructure.Data
             catch (Exception ex)
             {
                 _dbContext.Database.RollbackTransaction();
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+               HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -195,7 +195,7 @@ namespace CleanArchitecture.Infrastructure.Data
             catch (Exception ex)
             {
                 _dbContext.Database.RollbackTransaction();
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+               HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -477,7 +477,7 @@ namespace CleanArchitecture.Infrastructure.Data
             catch (Exception ex)
             {
                 _dbContext.Database.RollbackTransaction();
-                _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+               HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -919,7 +919,7 @@ public bool BeneficiaryBulkEdit(BulkBeneUpdateReq arryTrnID)
     catch (Exception ex)
     {
         _dbContext.Database.RollbackTransaction();
-        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
@@ -1117,7 +1117,7 @@ public int CreateDefaulWallet(long UserId)
     }
     catch (Exception ex)
     {
-        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
@@ -1136,7 +1136,7 @@ public string RandomGenerateWalletId(long userID, byte isDefaultWallet)
     }
     catch (Exception ex)
     {
-        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
@@ -1243,7 +1243,7 @@ public int CreateWalletForAllUser_NewService(string WalletType)
     }
     catch (Exception ex)
     {
-        _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
@@ -1308,7 +1308,7 @@ public long getOrgID()
     }
     catch (Exception ex)
     {
-        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
@@ -1322,7 +1322,7 @@ public WalletTransactionQueue GetTransactionQueue(long TrnNo)
     }
     catch (Exception ex)
     {
-        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
@@ -1349,7 +1349,7 @@ public bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, Transact
     catch (Exception ex)
     {
         _dbContext.Database.RollbackTransaction();
-        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
@@ -1370,7 +1370,7 @@ public long GetTypeMappingObj(long userid)
     }
     catch (Exception ex)
     {
-        _log.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+       HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         throw ex;
     }
 }
