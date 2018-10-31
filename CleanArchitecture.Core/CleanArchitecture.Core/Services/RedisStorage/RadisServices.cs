@@ -102,12 +102,26 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
                 throw ex;
             }
         }
-
+        
         public T GetData(string key)
         {
             try
             {
                 return this.Context.Cache.GetObject<T>(key);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public string GetHashData(string Key,string Field)
+        {
+            try
+            {
+                //string Data = this.Context.Cache.GetHashed<string,string>(Key, Field);
+                string Data = this.Db.HashGet(Key,Field).ToString();
+                return Data;
             }
             catch (Exception ex)
             {

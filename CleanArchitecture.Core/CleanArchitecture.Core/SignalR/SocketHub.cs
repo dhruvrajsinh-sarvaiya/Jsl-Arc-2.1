@@ -92,7 +92,42 @@ namespace CleanArchitecture.Core.SignalR
         //    //Groups.AddToGroupAsync(Context.ConnectionId, "BroadCast");
         //}
 
-        public Task OnConnected(string Token, string Username)
+        //public Task OnConnected(string Token, string Username)
+        //{
+        //    try
+        //    {
+        //        // var Redis = new RadisServices<ConnetedClientList>(this._fact);
+        //        // Redis.SaveToHash(Context.ConnectionId, new ConnetedClientList { ConnectionId = Context.ConnectionId }, Token);
+
+        //        var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+        //        Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = Token }, Token,Context.ConnectionId);
+        //        return Task.FromResult(0);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        return Task.FromResult(0);
+        //    }
+
+        //}
+
+        //public Task OnTokenChange(string NewToken,string OldToken)
+        //{
+        //    try
+        //    {
+        //        var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+        //        Redis.DeleteTag("Users:" + Context.ConnectionId, OldToken);
+        //        Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = NewToken }, NewToken);
+        //        return Task.FromResult(0);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        return Task.FromResult(0);
+        //    }            
+        //}
+
+        public Task OnConnected(string Token)
         {
             try
             {
@@ -100,7 +135,8 @@ namespace CleanArchitecture.Core.SignalR
                 // Redis.SaveToHash(Context.ConnectionId, new ConnetedClientList { ConnectionId = Context.ConnectionId }, Token);
 
                 var Redis = new RadisServices<ConnetedClientToken>(this._fact);
-                Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = Token }, Token,Context.ConnectionId);
+                string AccessToken = Redis.GetHashData(Token, "accessToken");
+                Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = AccessToken }, AccessToken);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -108,23 +144,26 @@ namespace CleanArchitecture.Core.SignalR
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 return Task.FromResult(0);
             }
-            
+
         }
 
-        public Task OnTokenChange(string NewToken,string OldToken)
+        public Task OnTokenChange(string Token)
         {
             try
             {
                 var Redis = new RadisServices<ConnetedClientToken>(this._fact);
-                Redis.DeleteTag("Users:" + Context.ConnectionId, OldToken);
-                Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = NewToken }, NewToken);
+                string AccessToken = Redis.GetHashData(Token, "accessToken");
+                ConnetedClientToken ClientToken = new ConnetedClientToken();
+                ClientToken = Redis.GetData("Users:" + Context.ConnectionId);
+                Redis.DeleteTag("Users:" + Context.ConnectionId, ClientToken.Token);
+                Redis.SaveToHash("Users:" + Context.ConnectionId, new ConnetedClientToken { Token = AccessToken }, AccessToken);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 return Task.FromResult(0);
-            }            
+            }
         }
 
         public override Task OnDisconnectedAsync(System.Exception exception)
