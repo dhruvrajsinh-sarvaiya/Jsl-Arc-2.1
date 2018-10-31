@@ -599,15 +599,15 @@ namespace DepositStatusCheckApp
                         if (string.IsNullOrEmpty(queryResult))
                         {
                             // ntrivedi temperory 29-10-2018
-                            //SqlStr = "UPDATE DepositHistory SET StatusMsg='Address Not found',Status=9,IsProcessing = 0 WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
-                            //(new DataCommon()).ExecuteQuery(SqlStr);
-                            //CommonMethod.DMemberID = 0;
-                            //continue;
-
-                            SqlStr = "INSERT INTO [dbo].[AddressMasters]([CreatedDate],[CreatedBy],[UpdatedBy],[UpdatedDate] " +
-                                    ",[Status],[WalletId],[Address],[IsDefaultAddress],[SerProID],[AddressLable]) "  +
-                                    " VALUES(dbo.GetISTDate(),900,900, dbo.GetISTDate(),1,'"+ queryResult + "', "+ item.address +",0,0,'test')";
+                            SqlStr = "UPDATE DepositHistory SET StatusMsg='Address Not found',Status=9,IsProcessing = 0 WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
                             (new DataCommon()).ExecuteQuery(SqlStr);
+                            CommonMethod.DMemberID = 0;
+                            continue;
+
+                            //SqlStr = "INSERT INTO [dbo].[AddressMasters]([CreatedDate],[CreatedBy],[UpdatedBy],[UpdatedDate] " +
+                            //        ",[Status],[WalletId],[Address],[IsDefaultAddress],[SerProID],[AddressLable]) "  +
+                            //        " VALUES(dbo.GetISTDate(),900,900, dbo.GetISTDate(),1,'"+ queryResult + "', "+ item.address +",0,0,'test')";
+                            //(new DataCommon()).ExecuteQuery(SqlStr);
                         }
                         else
                         {
@@ -699,7 +699,7 @@ namespace DepositStatusCheckApp
                         //    WriteRequestLog("Order Already Intialized | " + item.txid, "TradeDepositHistoryUpdationForCryptoCoin", CommonMethod.SMSCode, Action: 2);
                         //}
 
-                        SqlStr = "UPDATE DepositHistory SET IsProcessing = 0 WHERE AutoNo=" + item.id; //TrnID = '" + item.txid + "'";
+                        SqlStr = "UPDATE DepositHistory SET IsProcessing = 0 WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
                         (new DataCommon()).ExecuteQuery(SqlStr);
                     }
                 }

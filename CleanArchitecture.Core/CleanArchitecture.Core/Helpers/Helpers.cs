@@ -42,6 +42,10 @@ namespace CleanArchitecture.Core.Helpers
                 throw ex;
             }
         }
+        public static string GetTimeStamp()
+        {
+            return UTC_To_IST().ToString("ddMMyyyyHHmmss");
+        }
 
         public static string GetUTCTime()
         {
