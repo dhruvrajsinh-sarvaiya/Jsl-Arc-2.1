@@ -192,13 +192,7 @@ namespace CleanArchitecture.Web.API
             try
             {
               
-                var usdata = await _userManager.FindByIdAsync("45");
-                
-
-
-
-
-                var user1 = _userManager.GenerateTwoFactorTokenAsync(usdata,model.Code);
+               
 
         
 

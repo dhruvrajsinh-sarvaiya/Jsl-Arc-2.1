@@ -222,6 +222,7 @@ namespace CleanArchitecture.Web.API
                     byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);
                     string ctokenlink = _configuration["ConfirmMailURL"].ToString() + Convert.ToBase64String(plainTextBytes);
 
+
                     var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 
                     SendEmailRequest request = new SendEmailRequest();
