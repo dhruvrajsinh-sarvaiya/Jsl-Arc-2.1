@@ -398,7 +398,8 @@ namespace CleanArchitecture.Core.Enums
         Alert = 1,
         Nofification = 2,
         GrpMsg = 3,
-        Channel = 4
+        Channel = 4,
+        BroadCast = 5
     }
     
     public enum enSubscriptionType
@@ -485,6 +486,7 @@ namespace CleanArchitecture.Core.Enums
         //Base Market
         RecievePairData = 12,
         RecieveMarketTicker = 13,
+        BroadcastMessage = 14
     }
     public enum enCheckWithdrawalBene
     {
