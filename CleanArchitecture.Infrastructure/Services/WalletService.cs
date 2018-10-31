@@ -581,6 +581,8 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //return new CreateWalletAddressRes { ErrorCode = enErrorCode.InternalError, ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError };
+
                 throw ex;
             }
         }
@@ -2376,7 +2378,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     walletLedger2.PreBal = currentBalance;
-                    walletLedger2.PostBal = currentBalance + drAmount;
+                    walletLedger2.PostBal = currentBalance + crAmount;
                 }
                 return walletLedger2;
             }
