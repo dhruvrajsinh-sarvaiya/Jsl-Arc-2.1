@@ -1549,6 +1549,86 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("PoolOrder");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.SettledTradeTransactionQueue", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("AskPrice");
+
+                    b.Property<decimal>("BidPrice");
+
+                    b.Property<decimal>("BuyQty");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<decimal>("DeliveryTotalQty");
+
+                    b.Property<long>("DeliveryWalletID");
+
+                    b.Property<string>("Delivery_Currency");
+
+                    b.Property<short>("IsCancelled");
+
+                    b.Property<long>("MemberID");
+
+                    b.Property<decimal>("OrderTotalQty");
+
+                    b.Property<long>("OrderWalletID");
+
+                    b.Property<string>("Order_Currency");
+
+                    b.Property<long>("PairID");
+
+                    b.Property<string>("PairName")
+                        .IsRequired();
+
+                    b.Property<long>("ProductID");
+
+                    b.Property<int>("RoutID");
+
+                    b.Property<decimal>("SellQty");
+
+                    b.Property<long>("SerProID");
+
+                    b.Property<long>("ServiceID");
+
+                    b.Property<decimal>("SettledBuyQty");
+
+                    b.Property<DateTime?>("SettledDate");
+
+                    b.Property<decimal>("SettledSellQty");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long>("StatusCode");
+
+                    b.Property<string>("StatusMsg");
+
+                    b.Property<decimal>("TakerPer");
+
+                    b.Property<DateTime>("TrnDate");
+
+                    b.Property<long>("TrnNo");
+
+                    b.Property<long?>("TrnRefNo");
+
+                    b.Property<short>("TrnType");
+
+                    b.Property<string>("TrnTypeName");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SettledTradeTransactionQueue");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.TradeBuyerList", b =>
                 {
                     b.Property<long>("Id")
@@ -1562,6 +1642,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
+
+                    b.Property<short>("IsProcessing");
 
                     b.Property<long>("PaidServiceID");
 
@@ -1694,6 +1776,9 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long>("TranNo");
 
+                    b.Property<decimal>("BidPrice")
+                        .HasColumnType("decimal(18, 8)");
+
                     b.Property<decimal>("ChangePer")
                         .HasColumnType("decimal(18, 8)");
 
@@ -1725,6 +1810,9 @@ namespace CleanArchitecture.Web.Migrations
                         .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("PairId");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<short>("Status");
 
@@ -1896,6 +1984,29 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("TradePairStastics");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.TradePoolConfiguration", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CountPerPrice");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TradePoolConfiguration");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.TradePoolMaster", b =>
                 {
                     b.Property<long>("Id")
@@ -1951,6 +2062,41 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("TradePoolMaster");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.TradePoolQueue", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<decimal>("MakerQty")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<long>("MakerTrnNo");
+
+                    b.Property<long>("PoolID");
+
+                    b.Property<long>("SellerListID");
+
+                    b.Property<short>("Status");
+
+                    b.Property<decimal>("TakerQty")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<long>("TakerTrnNo");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TradePoolQueue");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.TradeSellerList", b =>
                 {
                     b.Property<long>("TrnNo");
@@ -1967,10 +2113,15 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<short>("IsProcessing");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 8)");
 
                     b.Property<decimal>("Qty")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<decimal>("RemainQty")
                         .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("SellServiceID");
@@ -2204,6 +2355,37 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TransactionRequest");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.TransactionStatus", b =>
+                {
+                    b.Property<long>("TrnNo");
+
+                    b.Property<long>("ServiceID");
+
+                    b.Property<long>("SerProID");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("StatusMsg");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("TrnNo", "ServiceID", "SerProID");
+
+                    b.HasAlternateKey("SerProID", "ServiceID", "TrnNo");
+
+                    b.ToTable("TransactionStatus");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.TrnAcBatch", b =>
@@ -2930,15 +3112,19 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.WalletLimitConfiguration", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("TrnType");
+
+                    b.Property<long>("WalletId");
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
 
                     b.Property<double?>("EndTimeUnix");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal?>("LifeTime");
 
@@ -2952,15 +3138,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("Status");
 
-                    b.Property<int>("TrnType");
-
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime?>("UpdatedDate");
 
-                    b.Property<long>("WalletId");
-
-                    b.HasKey("Id");
+                    b.HasKey("TrnType", "WalletId");
 
                     b.ToTable("WalletLimitConfiguration");
                 });
@@ -2973,7 +3155,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<double>("EndTime");
+                    b.Property<double>("EndTimeUnix");
 
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2987,7 +3169,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal>("LimitPerTransaction");
 
-                    b.Property<double>("StartTime");
+                    b.Property<double>("StartTimeUnix");
 
                     b.Property<short>("Status");
 

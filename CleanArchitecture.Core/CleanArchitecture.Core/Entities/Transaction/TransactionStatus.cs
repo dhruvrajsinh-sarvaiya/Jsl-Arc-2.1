@@ -9,6 +9,8 @@ namespace CleanArchitecture.Core.Entities
 {
     public  class TransactionStatus : BizBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
         [Key]
         [Required]
         public long TrnNo { get; set; }
