@@ -547,7 +547,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProDetailID);
                 string apiResponse = _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 180000, thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
                 // parse response logic 
-                if (string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
+                if (!string.IsNullOrEmpty(apiResponse) && thirdPartyAPIRequest.DelayAddress == 1)
                 {
                     delayAddressesObj = GetTradeBitGoDelayAddresses(walletMaster.Id, walletMaster.WalletTypeID, TrnID, address, thirdPartyAPIRequest.walletID, walletMaster.CreatedBy, CoinSpecific, 0, 0);
                     delayAddressesObj = _bitgoDelayRepository.Add(delayAddressesObj);
@@ -2499,7 +2499,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 var type = _WalletTypeMasterRepository.GetSingle(t=>t.WalletTypeName== Coin);
                 var walletObj = _commonRepository.FindBy(t => t.UserID == orgid && t.IsDefaultWallet==1&& t.WalletTypeID== type.Id).FirstOrDefault();
                 for (int i = 0; i <= AddressCount; i++)
-                {
+                {    
                      addr =GenerateAddress(walletObj.AccWalletID, Coin);
                     if(addr.address==null)
                     {
