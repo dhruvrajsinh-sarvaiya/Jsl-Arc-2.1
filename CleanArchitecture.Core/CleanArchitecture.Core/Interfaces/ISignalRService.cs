@@ -16,7 +16,7 @@ namespace CleanArchitecture.Core.Interfaces
         Task TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair);
         Task ChartData(List<GetGraphResponse> Data, string Pair);
         Task MarketData(MarketCapData Data, string Pair);
-        Task LastPrice(Decimal Price,string Pair);
+        Task LastPrice(LastPriceViewModel Data,string Pair);
 
         //user wise
         Task OpenOrder(ActiveOrderInfo Data, string Token);

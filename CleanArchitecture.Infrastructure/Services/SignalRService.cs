@@ -156,17 +156,17 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public async Task LastPrice(decimal Price, string Pair)
+        public async Task LastPrice(LastPriceViewModel Data, string Pair)
         {
             try
             {
-                SignalRComm<Decimal> CommonData = new SignalRComm<Decimal>();
+                SignalRComm<LastPriceViewModel> CommonData = new SignalRComm<LastPriceViewModel>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.Price);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveLastPrice);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
-                CommonData.Data = Price;
+                CommonData.Data = Data;
                 CommonData.Parameter = Pair;
 
                 SignalRData SendData = new SignalRData();
