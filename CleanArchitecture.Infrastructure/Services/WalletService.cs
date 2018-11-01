@@ -1233,7 +1233,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.Balance = dWalletobj.Balance;
                 walletMasterObj.WalletName = dWalletobj.Walletname;
                 walletMasterObj.PublicAddress = dWalletobj.PublicAddress;
-                walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
+                walletMasterObj.IsDefaultWallet = dWalletobj.IsDefaultWallet;
                 walletMasterObj.CoinName = coinName;
 
                 _signalRService.OnWalletBalChange(walletMasterObj, coinName,  Token);
@@ -1351,7 +1351,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.Balance = cWalletobj.Balance;
                 walletMasterObj.WalletName = cWalletobj.Walletname;
                 walletMasterObj.PublicAddress = cWalletobj.PublicAddress;
-                walletMasterObj.AccWalletID = cWalletobj.AccWalletID;
+                walletMasterObj.IsDefaultWallet = cWalletobj.IsDefaultWallet;
                 walletMasterObj.CoinName = coinName;
 
                 _signalRService.OnWalletBalChange(walletMasterObj, coinName,Token);
