@@ -276,7 +276,7 @@ namespace CleanArchitecture.Web
             });
          */
             app.UseMvc();
-            app.UseHangfireServer();
+            //app.UseHangfireServer().;
         }
     }
 }
