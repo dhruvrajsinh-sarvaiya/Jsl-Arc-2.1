@@ -31,17 +31,17 @@ namespace CleanArchitecture.Web.Filters
                 context.Result = new MyResponse(context.ModelState);
             }
 
-            if (((Microsoft.AspNetCore.Mvc.SignInResult)context.Result).AuthenticationScheme.ToString() != "ASOS")
-            {
-                string ReturnCode = ((Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)?.ErrorCode.ToString();
-                if (ReturnCode == "Status500InternalServerError")
-                {
-                    string ReturnMsg = ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg;
-                    HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
-                    HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
-                    ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg = "Error occurred.";
-                }
-            }
+            //if (!string.IsNullOrEmpty(context.Result.ToString()))
+            //{
+            //    string ReturnCode = ((Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)?.ErrorCode.ToString();
+            //    if (ReturnCode == "Status500InternalServerError")
+            //    {
+            //        string ReturnMsg = ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg;
+            //        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+            //        HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+            //        ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg = "Error occurred.";
+            //    }
+            //}
         }
 
         public override void OnResultExecuted(ResultExecutedContext filterContext)
