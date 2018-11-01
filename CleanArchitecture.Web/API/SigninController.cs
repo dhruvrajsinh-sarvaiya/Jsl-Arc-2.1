@@ -182,7 +182,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("VerifyCode")]
         [AllowAnonymous]
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyCode(EnableAuthenticatorCodeViewModel model)
         {
             // The following code protects for brute force attacks against the two factor codes.

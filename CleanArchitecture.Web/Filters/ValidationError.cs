@@ -27,7 +27,7 @@ namespace CleanArchitecture.Web.Filters
             Field = field != string.Empty ? field : null;
             Message = message;
         }
-    }   
+    }
 
     public class MyResultModel : BizResponseClass
     {
@@ -41,18 +41,29 @@ namespace CleanArchitecture.Web.Filters
 
         public MyResultModel(ModelStateDictionary modelState)
         {
-            Message = "Validation Failed";
-            Errors = modelState.Keys
-                    .SelectMany(key => modelState[key].Errors.Select(x => new ValidationError(key, x.ErrorMessage)))
-                    .ToList();
+            try
+            {
 
-            BTErrorArray = Errors.Select(y => y.Message).FirstOrDefault();
 
-            BTActaulError = BTErrorArray.Split(",");
-                                   
-            ReturnCode = (enResponseCode)System.Enum.Parse(typeof(enResponseCode), BTActaulError[0]); 
-            ReturnMsg = BTActaulError[1];
-            ErrorCode = (enErrorCode)System.Enum.Parse(typeof(enErrorCode), BTActaulError[2]);
+                Message = "Validation Failed";
+                Errors = modelState.Keys
+                        .SelectMany(key => modelState[key].Errors.Select(x => new ValidationError(key, x.ErrorMessage)))
+                        .ToList();
+
+                BTErrorArray = Errors.Select(y => y.Message).FirstOrDefault();
+
+                BTActaulError = BTErrorArray.Split(",");
+
+                ReturnCode = (enResponseCode)System.Enum.Parse(typeof(enResponseCode), BTActaulError[0]);
+                ReturnMsg = BTActaulError[1];
+                ErrorCode = (enErrorCode)System.Enum.Parse(typeof(enErrorCode), BTActaulError[2]);
+            }
+            catch (Exception ex)
+            {
+                ReturnCode = enResponseCode.InternalError;
+                ReturnMsg = ex.ToString();
+                ErrorCode = enErrorCode.Status500InternalServerError;
+            }
         }
 
     }
