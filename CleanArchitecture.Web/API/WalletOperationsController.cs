@@ -231,6 +231,7 @@ namespace CleanArchitecture.Web.API
         //}
        // [AllowAnonymous]
         [HttpPost("{Coin}/{AccWalletID}")]
+        //[AllowAnonymous]
         public async Task<IActionResult> CreateWalletAddress(string Coin, string AccWalletID)/*[FromBody]CreateWalletAddressReq Request*/ /*Removed Temporarily as Not in use*/
         {
             try
@@ -504,8 +505,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SetUserPreferences(int? GlobalBit)
+        [HttpPost("{GlobalBit}")]
+        public async Task<IActionResult> SetUserPreferences(short GlobalBit)
         {
             UserPreferencesRes response = new UserPreferencesRes();
             response.BizResponse = new BizResponseClass();
@@ -563,12 +564,12 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 2018-10-31
-        //[AllowAnonymous]
+       // [AllowAnonymous]
         [HttpPost("{Coin}/{AddressCount}")]
         public async Task<IActionResult> CreateETHAddress(string Coin, int AddressCount)
         {
-            //ApplicationUser user = new ApplicationUser();user.Id = 1;
-            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+          //  ApplicationUser user = new ApplicationUser();user.Id = 1;
+           ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             try
             {
                 CreateWalletAddressRes responseClass=new CreateWalletAddressRes();

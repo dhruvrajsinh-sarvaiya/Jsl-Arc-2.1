@@ -48,9 +48,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         [HttpPost("UpdateServiceConfiguration")]
@@ -81,9 +79,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         [HttpGet("GetServiceConfiguration/{ServiceId}")]
@@ -113,9 +109,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         [HttpGet("GetAllServiceConfiguration")]
@@ -139,9 +133,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -167,9 +159,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         [HttpGet("GetAllServiceConfigurationByBase/{Base}")]
@@ -195,9 +185,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         [HttpPost("SetActiveService/{ServiceId}")]
@@ -227,9 +215,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         [HttpPost("SetInActiveService/{ServiceId}")]
@@ -258,9 +244,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -286,9 +270,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -311,9 +293,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -336,9 +316,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -372,9 +350,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -393,9 +369,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -414,9 +388,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         #endregion
@@ -440,9 +412,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -465,9 +435,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -491,9 +459,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -530,9 +496,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -555,9 +519,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -580,9 +542,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -608,9 +568,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -634,9 +592,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -660,9 +616,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
             
         }
@@ -699,9 +653,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
            
         }
@@ -724,9 +676,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -748,9 +698,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -776,9 +724,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -802,9 +748,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -841,9 +785,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -866,9 +808,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -890,9 +830,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         #endregion
@@ -917,9 +855,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -943,9 +879,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -982,9 +916,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -1007,9 +939,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -1031,9 +961,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         #endregion
@@ -1059,9 +987,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -1100,9 +1026,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
 
         }
@@ -1125,9 +1049,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -1173,9 +1095,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -1198,9 +1118,7 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -1222,9 +1140,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1254,9 +1171,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("UpdateProductConfiguration")]
@@ -1281,9 +1197,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpGet("GetProductConfiguration/{ProductId}")]
@@ -1307,9 +1222,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpGet("GetAllProductConfiguration")]
@@ -1333,9 +1247,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("SetActiveProduct/{ProductId}")]
@@ -1358,9 +1271,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("SetInActiveProduct/{ProductId}")]
@@ -1383,9 +1295,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         #endregion
@@ -1413,9 +1324,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("UpdateRouteConfiguration")]
@@ -1440,9 +1350,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1467,9 +1376,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpGet("GetAllRouteConfiguration")]
@@ -1493,9 +1401,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("SetActiveRoute/{RouteId}")]
@@ -1518,9 +1425,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("SetInActiveRoute/{RouteId}")]
@@ -1543,9 +1449,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         #endregion
@@ -1570,9 +1475,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1594,9 +1498,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1621,9 +1524,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1659,9 +1561,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
 
         }
@@ -1684,9 +1585,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1709,9 +1609,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         #endregion
@@ -1736,9 +1635,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1760,9 +1658,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1787,9 +1684,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1825,9 +1721,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
 
         }
@@ -1850,9 +1745,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1875,9 +1769,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -1906,9 +1799,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("UpdatePairConfiguration")]
@@ -1939,9 +1831,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpGet("GetPairConfiguration")]
@@ -1971,9 +1862,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpGet("GetAllPairConfiguration")]
@@ -1997,9 +1887,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("SetActivePair/PairId")]
@@ -2028,9 +1917,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpPost("SetInActivePair/PairId")]
@@ -2059,9 +1947,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -2089,9 +1976,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         [HttpGet("GetAllTransactionType")]
@@ -2115,9 +2001,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         #endregion
@@ -2142,9 +2027,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -2166,9 +2050,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -2193,9 +2076,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                Response.ReturnCode = enResponseCode.InternalError;
-                return Ok(Response);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -2231,9 +2113,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
 
         }
@@ -2256,9 +2137,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
 
@@ -2281,9 +2161,8 @@ namespace CleanArchitecture.Web.API.Configuration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                res.ReturnCode = enResponseCode.InternalError;
-                return Ok(res);
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
         #endregion

@@ -34,11 +34,10 @@ namespace CleanArchitecture.Core.Interfaces
 
 
         //Event Call
-        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, String Token);
-
-        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction,short IsPop=0);
-        void GetAndSendOrderHistory(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
-        void GetAndSendTradeHistoryByUser(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction);
-        void GetAndSendTradeHistoryByPair(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction);
+        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token);
+        void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData);
+        void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token);
+        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
+        GetTradeHistoryInfo GetAndSendGetTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
     }
 }
