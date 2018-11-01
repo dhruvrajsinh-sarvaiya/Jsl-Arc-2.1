@@ -211,12 +211,14 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeDepositCompletedTrn>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi 30102018 https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
             modelBuilder.Entity<TradeBuyerList>().HasKey(e => new {e.Id, e.TrnNo });
             modelBuilder.Entity<TradeSellerList>().HasKey(e => new { e.TrnNo, e.PoolID });
+            modelBuilder.Entity<TradeBitGoDelayAddresses>().HasKey(e => new { e.TrnID, e.Address });
             modelBuilder.Entity<WalletLimitConfiguration>().HasKey(e => new { e.TrnType, e.WalletId }); // ntrivedi 31102018
             modelBuilder.Entity<WalletLimitConfiguration>().Property(x => x.TrnType).ValueGeneratedNever();// ntrivedi 31102018
+            modelBuilder.Entity<UserPreferencesMaster>().Property(x => x.UserID).ValueGeneratedNever();// ntrivedi 31102018
             modelBuilder.Entity<WalletLimitConfiguration>().Property(x => x.WalletId).ValueGeneratedNever();// ntrivedi 31102018
             modelBuilder.Entity<WalletLimitConfiguration>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi 30102018 https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
-
-
+            modelBuilder.Entity<UserPreferencesMaster>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
+            modelBuilder.Entity<TradeBitGoDelayAddresses>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
         }
 
         /// <summary>

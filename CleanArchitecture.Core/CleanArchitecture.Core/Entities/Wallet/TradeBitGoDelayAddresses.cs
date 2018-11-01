@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using CleanArchitecture.Core.Events;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Core.Entities
 {
     public class TradeBitGoDelayAddresses : BizBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new  long Id { get; set; }
+
         [Required]
         public long WalletId { get; set; }
 
@@ -17,10 +21,12 @@ namespace CleanArchitecture.Core.Entities
 
         [Required]
         [StringLength(100)]
+        [Key]
         public string TrnID { get; set; }
 
         [Required]
         [StringLength(100)]
+        [Key]
         public string Address { get; set; }
 
         [Required]
