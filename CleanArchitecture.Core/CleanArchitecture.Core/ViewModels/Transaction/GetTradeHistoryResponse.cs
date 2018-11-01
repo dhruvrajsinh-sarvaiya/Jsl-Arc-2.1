@@ -22,5 +22,6 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public String PairName { get; set; }
         public Decimal ChargeRs { get; set; }
         public short  IsCancel { get; set; }
+        public string OrderType { get; set; }
     }
 }

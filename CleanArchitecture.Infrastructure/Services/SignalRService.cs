@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels.Transaction;
@@ -20,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class SignalRService : Controller, ISignalRService
+    public class SignalRService :ISignalRService
     {
         private readonly ILogger<SignalRService> _logger;
         private readonly IMediator _mediator;
@@ -425,7 +426,6 @@ namespace CleanArchitecture.Infrastructure.Services
         }
         #endregion
 
-
         public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token)
         {
             try
@@ -461,7 +461,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 else if (Status == Convert.ToInt16(enTransactionStatus.Success))
                 {
                     GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
-                    historyInfo = GetAndSendGetTradeHistoryInfoData(Newtransaction, NewTradeTransaction);
+                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction);
 
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);//with amount 0
                     OrderHistory(historyInfo, Token);
@@ -512,7 +512,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -533,6 +533,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     OpenOrderModel.Amount = (NewTradeTransaction.BuyQty == 0) ? NewTradeTransaction.SellQty : (NewTradeTransaction.SellQty == 0) ? NewTradeTransaction.BuyQty : NewTradeTransaction.BuyQty;
                 OpenOrderModel.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
                 OpenOrderModel.IsCancelled = NewTradeTransaction.IsCancelled;
+                
 
                 OpenOrder(OpenOrderModel, Token);
                 if (IsPop != 1)//send notification
@@ -545,12 +546,12 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
 
-        public GetTradeHistoryInfo GetAndSendGetTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
+        public GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
         {
             try
             {
@@ -567,15 +568,17 @@ namespace CleanArchitecture.Infrastructure.Services
                 model.PairName = NewTradeTransaction.PairName;
                 model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
                 model.IsCancel = NewTradeTransaction.IsCancelled;
-
+                //model.OrderType=
                 return model;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
 
+        
     }
+    
 }

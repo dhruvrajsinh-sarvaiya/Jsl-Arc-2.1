@@ -22,6 +22,7 @@ namespace CleanArchitecture.Core.Entities.Transaction
         //public long MemberID { get; set; }
         [Key]
         public long TrnNo { get; set; }
+        public long UserID { get; set; }
         [Required]
         public long PairID { get; set; }
         public long ServiceID { get; set; }
