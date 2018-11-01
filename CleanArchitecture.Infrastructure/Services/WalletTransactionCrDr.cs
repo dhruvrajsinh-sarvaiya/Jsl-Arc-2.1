@@ -43,7 +43,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IWalletRepository _walletRepository1;
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
         private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository;
-
+        private readonly IWalletService _walletService;
         //private readonly IWalletService _walletService;
         //private readonly IWebApiRepository _webApiRepository;
         //private readonly IWebApiSendRequest _webApiSendRequest;
@@ -55,9 +55,10 @@ namespace CleanArchitecture.Infrastructure.Services
            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,          
            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository,
-           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService) : base(logger)
+           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, IWalletService walletService) : base(logger)
         {
-           // _log = log;
+            _walletService = walletService;
+            // _log = log;
             _commonRepository = commonRepository;
             _walletOrderRepository = walletOrderRepository;
             //_walletRepository = repository;
@@ -150,6 +151,13 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
+                //vsolanki 208-11-1
+                var charge = _walletService.GetServiceLimitChargeValue(enTrnType.Deposit, coinName);//for deposit
+                if (charge.MaxAmount >= amount && charge.MinAmount <= amount)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
+                }
+
                 int count = CheckTrnRefNo(TrnRefNo, enWalletTranx, trnType);
                 if (count != 0)
                 {
