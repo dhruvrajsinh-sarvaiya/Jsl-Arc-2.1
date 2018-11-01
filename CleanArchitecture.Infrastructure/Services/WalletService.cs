@@ -1135,7 +1135,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return walletTransactionQueue;
         }
 
-        public WalletDrCrResponse GetWalletDeductionNew(string coinName, string timestamp, enWalletTranxOrderType orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, string Token,enTrnType enTrnType)
+        public WalletDrCrResponse GetWalletDeductionNew(string coinName, string timestamp, enWalletTranxOrderType orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, string Token = "")
         {
             try
             {
@@ -1207,11 +1207,11 @@ namespace CleanArchitecture.Infrastructure.Services
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
                 //vsolanki 208-11-1
-                var charge=GetServiceLimitChargeValue(enTrnType, coinName);
-                if(charge.MaxAmount>= amount && charge.MinAmount<=amount)
-                {
-                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
-                }
+                //var charge=GetServiceLimitChargeValue(enTrnType1, coinName);
+                //if(charge.MaxAmount>= amount && charge.MinAmount<=amount)
+                //{
+                //    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
+                //}
 
                 int count = CheckTrnRefNo(TrnRefNo, orderType, trnType);
                 if (count != 0)
@@ -1262,7 +1262,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return count;
         }
 
-        public WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType,string Token="")
+        public WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, string Token = "")
         {
             WalletTransactionQueue tqObj = new WalletTransactionQueue();
             WalletTransactionOrder woObj = new WalletTransactionOrder();
@@ -2581,6 +2581,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 //return false;
             }
         }
+
+      
     }
 
 }
