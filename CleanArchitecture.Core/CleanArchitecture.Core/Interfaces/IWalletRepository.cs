@@ -103,5 +103,8 @@ namespace CleanArchitecture.Core.Interfaces
         // ntrivedi 29102018
         bool WalletCreditDebitwithTQ(WalletLedger wl1, WalletLedger wl2, TransactionAccount ta1, TransactionAccount ta2, WalletMaster wm2, WalletMaster wm1, WalletTransactionQueue wtq1, WalletTransactionQueue wtq2, WalletTransactionOrder order);
         //List<BalanceResponseLimit> (long userid);
+
+        decimal GetLedgerLastPostBal(long walletId);
+
     }
 }
