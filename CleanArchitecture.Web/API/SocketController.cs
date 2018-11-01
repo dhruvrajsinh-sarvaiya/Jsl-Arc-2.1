@@ -46,9 +46,9 @@ namespace CleanArchitecture.Web.API
             _signalRService = signalRService;
             //_signalRTestService = signalRTestService;
         }
-        
+
         [HttpGet("BuyerBook/{Data}/{Pair}")]
-        public async Task<IActionResult> BuyerBook(string Data,String Pair)
+        public async Task<IActionResult> BuyerBook(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -62,9 +62,9 @@ namespace CleanArchitecture.Web.API
                 SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.BuyerBook);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod .RecieveBuyerBook);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne );
-                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType .PairName );
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerBook);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
                 CommonData.Parameter = Pair;// "INR_BTC";
 
@@ -99,7 +99,7 @@ namespace CleanArchitecture.Web.API
                 SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerBook);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook );
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
@@ -130,7 +130,7 @@ namespace CleanArchitecture.Web.API
                 GetTradeHistoryInfo model = new GetTradeHistoryInfo();
                 model.Amount = 20;
                 model.ChargeRs = 1;
-                model.DateTime = DateTime.Now; 
+                model.DateTime = DateTime.Now;
                 model.IsCancel = 1;
                 model.PairName = "INR_BTC";
                 model.Price = 150;
@@ -144,7 +144,7 @@ namespace CleanArchitecture.Web.API
                 SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistoryByPair);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory );
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
@@ -487,7 +487,7 @@ namespace CleanArchitecture.Web.API
                 model.PublicAddress = "";
 
                 WalletMasterResponse temp = JsonConvert.DeserializeObject<WalletMasterResponse>(Data);
-                
+
                 SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerSideWallet);
@@ -529,7 +529,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Data;
-                CommonData.Parameter =null;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.ActivityNotification;
@@ -567,7 +567,7 @@ namespace CleanArchitecture.Web.API
                 model.PairName = "INR_BTC";
                 model.UpDownBit = 0;
                 model.Volume24 = 1406;
-               
+
 
                 VolumeDataRespose temp = JsonConvert.DeserializeObject<VolumeDataRespose>(Data);
                 string a = temp.PairName.Split("_")[1];
@@ -578,7 +578,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.Base);
                 CommonData.Data = temp;
-                CommonData.Parameter =a;
+                CommonData.Parameter = a;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.PairData;
@@ -595,7 +595,7 @@ namespace CleanArchitecture.Web.API
                 return Ok();
             }
         }
-
+    
         //[HttpGet("MarketTicker/{Data}")]
         //public async Task<IActionResult> MarketTicker(string Data)
         //{
@@ -690,5 +690,5 @@ namespace CleanArchitecture.Web.API
     //            return Ok();
     //        }
     //    }
-    //}
+    }
 }
