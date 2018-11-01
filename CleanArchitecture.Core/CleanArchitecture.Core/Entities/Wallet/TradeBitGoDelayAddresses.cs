@@ -25,8 +25,7 @@ namespace CleanArchitecture.Core.Entities
         public string TrnID { get; set; }
 
         [Required]
-        [StringLength(100)]
-        [Key]
+        [StringLength(100)]      
         public string Address { get; set; }
 
         [Required]
