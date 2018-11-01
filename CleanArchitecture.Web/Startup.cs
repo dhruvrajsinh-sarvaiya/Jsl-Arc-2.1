@@ -156,7 +156,7 @@ namespace CleanArchitecture.Web
 
             services.AddMediatR(typeof(Startup));
 
-            services.AddHangfire(config => config.UseSqlServerStorage(Configuration["Data:SqlServerConnectionString"]));
+            //services.AddHangfire(config => config.UseSqlServerStorage(Configuration["Data:SqlServerConnectionString"]));
 
             Container container = new Container();
 
@@ -276,7 +276,7 @@ namespace CleanArchitecture.Web
             });
          */
             app.UseMvc();
-            app.UseHangfireServer();
+            //app.UseHangfireServer();
         }
     }
 }
