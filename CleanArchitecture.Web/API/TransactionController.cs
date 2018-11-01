@@ -290,6 +290,7 @@ namespace CleanArchitecture.Web.API
                         Response.ErrorCode = enErrorCode.InvalidMarketType;
                         return BadRequest(Response);
                     }
+                    sCondition += " AND TSL.ordertype=" + marketType;
                 }
                 if (!string.IsNullOrEmpty(request.FromDate))
                 {

@@ -8,6 +8,7 @@ using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.Data;
+using CleanArchitecture.Infrastructure.Data.Transaction;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -32,18 +33,21 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<TradePoolMaster> _TradePoolMaster; 
         private readonly ICommonRepository<TradeBuyRequest> _TradeBuyRequest; 
         private readonly ICommonRepository<TradeSellerList> _TradeSellerList; 
-        private readonly ICommonRepository<TradeBuyerList> _TradeBuyerList;
+        private readonly ICommonRepository<TradeBuyerList> _TradeBuyerList; 
+        //private readonly ICommonRepository<TradePoolQueue> _TradePoolQueue; 
         private readonly ILogger<NewTransaction> _log;
         private readonly IWalletService _WalletService;
         private readonly IWebApiRepository _WebApiRepository;
         private readonly ICommonRepository<TransactionRequest> _TransactionRequest;
         private readonly IGetWebRequest _IGetWebRequest;
         private readonly IWebApiSendRequest _IWebApiSendRequest;
-        private readonly IWebApiData _IWebApiData;
-        WebApiParseResponse _WebApiParseResponseObj;
+        private readonly IWebApiData _IWebApiData; 
+        private readonly ISettlementRepository<BizResponse> _SettlementRepository; 
+
+         WebApiParseResponse _WebApiParseResponseObj;
 
         public BizResponse _Resp;        
-        public BizResponse _CreateTransactionResp;
+        //public BizResponse _CreateTransactionResp;
         public TradePairMaster _TradePairObj;
         public TradePairDetail _TradePairDetailObj;
         public List<TransactionProviderResponse> TxnProviderList;
@@ -61,8 +65,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         TradePoolMaster TradePoolMasterObj;
         TradeBuyRequest TradeBuyRequestObj;
         TradeSellerList TradeSellerListObj;
-        TradeBuyerList TradeBuyerListObj;
-        TradePoolConfiguration TradePoolConfigurationObj;
+        //TradeBuyerList TradeBuyerListObj;
+        //TradePoolConfiguration TradePoolConfigurationObj;
+        //TradePoolQueue TradePoolQueueObj;
         private string ControllerName = "TradingTransaction";
 
         public NewTransaction(ILogger<NewTransaction> log, ICommonRepository<TradePairMaster> TradePairMaster,
@@ -114,6 +119,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
             //MiddleWare();
             return await Task.Run(() => CombineAllInitTransactionAsync());
+
+            //BackgroundJob.Enqueue(() => EmailService(Request));
 
             //return await Task.FromResult(new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success, ErrorCode = enErrorCode.TransactionProcessSuccess });
             //_Resp = await MethodRespTsk;            
@@ -197,10 +204,31 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Done " +_Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
 
                     //Start Settlement Here
-                    if(_Resp.ReturnCode==enResponseCodeService.Success)
+                    var HoldTrnNos = new List<long> { };
+                    if (_Resp.ReturnCode==enResponseCodeService.Success)
+                    {
+                        _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, TradeBuyRequestObj,ref HoldTrnNos);
+                    }
+
+                    try
+                    {//This try catch create wrapper for current transaction
+                        foreach (long HoldTrnNo in HoldTrnNos)
+                        {
+                            var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == HoldTrnNo && item.IsProcessing == 0 &&
+                                                                            (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
+                                                                            item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
+                            if (NewBuyRequestObj != null)
+                            {
+                                var HoldTrnNosNotExec = new List<long> { };
+                                _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, NewBuyRequestObj, ref HoldTrnNosNotExec);
+                            }
+                        }
+                    }
+                    catch(Exception ex)
                     {
 
                     }
+                   
                     return _Resp;
                 }
 
@@ -585,7 +613,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         return Task.FromResult(false);
                     }
                 }
-                TxnProviderList = _WebApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { amount = Req.Amount, SMSCode = Req.SMSCode, APIType = enWebAPIRouteType.TransactionAPI, trnType = Convert.ToInt32(Req.TrnType) });
+                TxnProviderList = _WebApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { amount = Req.Amount, SMSCode = Req.SMSCode, APIType = enWebAPIRouteType.TransactionAPI, trnType = Req.TrnType ==enTrnType.Sell_Trade?Convert.ToInt32(enTrnType.Buy_Trade):Convert.ToInt32(Req.TrnType)});
                 if (TxnProviderList == null)
                 {
                     _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_ServiceProductNotAvailableMsg;
@@ -909,6 +937,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     CreatedDate = Helpers.UTC_To_IST(),
                     PickupDate = Helpers.UTC_To_IST(),
                     CreatedBy = Req.MemberID,
+                    UserID = Req.MemberID,
                     TrnNo = Req.TrnNo,
                     PairID = Req.PairID,                   
                     ServiceID = _TransactionObj.Delivery_ServiceID,
@@ -941,7 +970,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
-                TradeBuyerListObj = new TradeBuyerList()
+               var TradeBuyerListObj = new TradeBuyerList()
                 {
                     CreatedDate = Helpers.UTC_To_IST(),
                     CreatedBy = Req.MemberID,
@@ -965,6 +994,70 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
 
         }
+        //public void InsertTradePoolQueue(long MakerTrnNo,long PoolID,decimal MakerQty, decimal MakerPrice, long TakerTrnNo, decimal TakerQty, decimal TakerPrice, decimal TakerDisc,decimal TakerLoss)
+        //{
+        //    try
+        //    {
+        //        TradePoolQueueObj = new TradePoolQueue()
+        //        {
+        //            CreatedDate = Helpers.UTC_To_IST(),
+        //            CreatedBy = Req.MemberID,
+        //            MakerTrnNo = MakerTrnNo,
+        //            PoolID = PoolID,
+        //            MakerQty = MakerQty,
+        //            MakerPrice = MakerPrice,
+        //            TakerTrnNo = TakerTrnNo,
+        //            TakerQty = TakerQty,
+        //            TakerPrice = TakerPrice,
+        //            TakerDisc = TakerDisc,
+        //            TakerLoss= TakerLoss,
+        //            Status = Convert.ToInt16(enTransactionStatus.Success),//always etry after settlement done
+        //        };
+        //        TradePoolQueueObj = _TradePoolQueue.Add(TradePoolQueueObj);
+        //        //return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        HelperForLog.WriteErrorLog("InsertTradePoolQueue:##TrnNo " + Req.TrnNo, ControllerName, ex);
+        //        //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
+        //        throw ex;
+        //    }
+
+        //}
+        //public void CreatePoolOrderForSettlement(long OMemberID,long DMemberID,long UserID,long PoolID,long TrnNo,decimal Amount)
+        //{
+        //    try
+        //    {
+        //        PoolOrderObj = new PoolOrder()
+        //        {
+        //            CreatedDate = Helpers.UTC_To_IST(),
+        //            CreatedBy = UserID,
+        //            UserID = UserID,
+        //            DMemberID = DMemberID, //Pool gives Amount to Member/User
+        //            OMemberID = OMemberID, //Member/User Take Amount from Pool
+        //            TrnNo = TrnNo,
+        //            TrnMode = Req.TrnMode,
+        //            PayMode = Convert.ToInt16(enWebAPIRouteType.TradeServiceLocal),
+        //            ORemarks = "Order Created",
+        //            OrderAmt = Amount,
+        //            DiscPer = 0,
+        //            DiscRs = 0,
+        //            Status = Convert.ToInt16(enTransactionStatus.Initialize),//txn type status
+        //            UserWalletID = Req.CreditWalletID,
+        //            UserWalletAccID = Req.CreditAccountID,
+        //        };
+        //        PoolOrderObj = _PoolOrder.Add(PoolOrderObj);
+
+        //        //return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        HelperForLog.WriteErrorLog("CreatePoolOrder:##TrnNo " + Req.TrnNo, ControllerName, ex);
+        //        //return (new BizResponse { ReturnMsg = EnResponseMessage.CommFailMsgInternal, ReturnCode = enResponseCodeService.InternalError });
+        //        throw ex;
+        //    }
+
+        //}
         public Task<BizResponse> TradingDataInsert(BizResponse _Resp)
         {
             try
@@ -990,15 +1083,19 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         Tradepoolmaster();
                         _Resp.ReturnMsg = "PoolMaster Record Inserted";
                     }
+                    //Insert into seller list
+                    InsertSellerList();
+                    _Resp.ReturnMsg = "Seller Entry Inserted";
+
                     PoolOrderObj.PoolID = TradePoolMasterObj.Id;
                     PoolOrderObj.OMemberID = TradePoolMasterObj.Id;//Pool takes amount from member
                     PoolOrderObj.DeliveryAmt = Req.Amount;
                     PoolOrderObj.DRemarks = "Delivery Success with " + _TransactionObj.BidPrice_TQ;
+                    PoolOrderObj.Status = Convert.ToInt16(enTransactionStatus.Success);                    
                     _PoolOrder.Update(PoolOrderObj);
                     _Resp.ReturnMsg = "Pool Order Updated Inserted";
 
-                    //Insert into seller list
-                    InsertSellerList();
+                    
                     //=======================Buy Request
                     TradeBuyRequest();
                     InsertBuyerList();
@@ -1020,64 +1117,99 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         #endregion
 
 
-        #region ==============================PROCESS SETLLEMENT========================
-        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp)
-        {
-            try
-            {
-                TradeBuyRequestObj.Status = Convert.ToInt16(enTransactionStatus.Pending);
-                TradeBuyRequestObj.UpdatedDate = Helpers.UTC_To_IST();
-                TradeBuyRequestObj.IsPartialProceed = 1;
-                _TradeBuyRequest.Update(TradeBuyRequestObj);
+        //#region ==============================PROCESS SETLLEMENT========================
+        //public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp)
+        //{
+        //    try
+        //    {
+        //        TradeBuyRequestObj.Status = Convert.ToInt16(enTransactionStatus.Hold);
+        //        TradeBuyRequestObj.UpdatedDate = Helpers.UTC_To_IST();
+        //        TradeBuyRequestObj.IsProcessing = 1;
+        //        _TradeBuyRequest.Update(TradeBuyRequestObj);
 
-                TradeBuyerListObj.Status = Convert.ToInt16(enTransactionStatus.Pending);
-                TradeBuyerListObj.UpdatedDate = Helpers.UTC_To_IST();
-                TradeBuyerListObj.IsProcessing = 1;
-                _TradeBuyerList.Update(TradeBuyerListObj);
+        //        TradeBuyerListObj.Status = Convert.ToInt16(enTransactionStatus.Hold);
+        //        TradeBuyerListObj.UpdatedDate = Helpers.UTC_To_IST();
+        //        TradeBuyerListObj.IsProcessing = 1;
+        //        _TradeBuyerList.Update(TradeBuyerListObj);
 
-                //SortedList<TradeSellerList, TradeSellerList>
-                var MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0 
-                                                        && item.BuyServiceID== TradeBuyRequestObj.PaidServiceID &&
-                                                        item.SellServiceID== TradeBuyRequestObj.ServiceID 
-                                                        && (item.Status== Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Pending))
-                                                        && item.RemainQty>0);//Pending after partial Qty remain
+        //        //SortedList<TradeSellerList, TradeSellerList>
+        //        var MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0 
+        //                                                && item.BuyServiceID== TradeBuyRequestObj.PaidServiceID &&
+        //                                                item.SellServiceID== TradeBuyRequestObj.ServiceID 
+        //                                                && (item.Status== Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Pending))
+        //                                                && item.RemainQty>0);//Pending after partial Qty remain
 
-                var MatchSellerList = MatchSellerListBase.OrderBy(x => x.TrnNo).OrderBy(x => x.Price);
+        //        var MatchSellerList = MatchSellerListBase.OrderBy(x => x.TrnNo).OrderBy(x => x.Price);
 
-                foreach (TradeSellerList SellerList in MatchSellerList)
-                {
-                    SellerList.IsProcessing = 1;
-                    _TradeSellerList.Update(SellerList);
-                    var PoolMst = _TradePoolMaster.GetById(SellerList.PoolID);
+        //        foreach (TradeSellerList SellerList in MatchSellerList)
+        //        {
+        //            if (SellerList.IsProcessing == 1)
+        //                continue;
 
-                    if(SellerList.RemainQty<= TradeBuyRequestObj.PendingQty)
-                    {
-                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SellerList.RemainQty;
-                        TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SellerList.RemainQty;
+        //            SellerList.IsProcessing = 1;
+        //            _TradeSellerList.Update(SellerList);
+        //            var PoolMst = _TradePoolMaster.GetById(SellerList.PoolID);
 
-                        SellerList.RemainQty = SellerList.RemainQty- SellerList.RemainQty;//take all
-                        SellerList.Status = Convert.ToInt16(enTransactionStatus.Success);
-                        SellerList.IsProcessing = 0;
+        //            if (SellerList.RemainQty <= TradeBuyRequestObj.PendingQty)
+        //            {
+        //                CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, SellerList.RemainQty);
+        //                TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SellerList.RemainQty;
+        //                TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SellerList.RemainQty;
 
-                        _TradeBuyRequest.Update(TradeBuyRequestObj);
-                        _TradeSellerList.Update(SellerList);
-                    }
-                    else
-                    {
+        //                //Here Bid Price of pool always low then user given in Order , base on above Query
+        //                decimal TakeDisc = 0;
+        //                if (SellerList.Price < TradeBuyRequestObj.BidPrice)
+        //                {
+        //                    TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * SellerList.RemainQty;
+        //                }
+        //                InsertTradePoolQueue(SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SellerList.RemainQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
 
-                    }
-                }
+        //                SellerList.RemainQty = SellerList.RemainQty - SellerList.RemainQty;//take all
+        //                SellerList.Status = Convert.ToInt16(enTransactionStatus.Success);
+        //                SellerList.IsProcessing = 0;//release as fully Empty
+        //                PoolMst.TotalQty = PoolMst.TotalQty - SellerList.RemainQty;
 
-            }
-            catch(Exception ex)
-            {
-                HelperForLog.WriteErrorLog("PROCESSSETLLEMENT:##TrnNo " + Req.TrnNo, ControllerName, ex);
-                _Resp.ReturnCode = enResponseCodeService.Fail;
-                _Resp.ReturnMsg = ex.Message;
-            }
-            return Task.FromResult(_Resp);
-        }
-        #endregion
+        //                _TradeBuyRequest.Update(TradeBuyRequestObj);
+        //                _TradeSellerList.Update(SellerList);
+        //                _TradePoolMaster.Update(PoolMst);
+        //                //Continuew as record Partially settled
+        //            }
+        //            else if (SellerList.RemainQty > TradeBuyRequestObj.PendingQty)//FULL SETTLEMENT TO MEMBER
+        //            {
+        //                SellerList.RemainQty = SellerList.RemainQty - TradeBuyRequestObj.PendingQty;//Update first as updated value in below line
+        //                SellerList.Status = Convert.ToInt16(enTransactionStatus.Hold);
+        //                SellerList.IsProcessing = 0;
+        //                PoolMst.TotalQty = PoolMst.TotalQty - TradeBuyRequestObj.PendingQty;
+
+        //                //Here Bid Price of pool always low then user given in Order , base on above Query
+        //                decimal TakeDisc = 0;
+        //                if (SellerList.Price < TradeBuyRequestObj.BidPrice)
+        //                {
+        //                    TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * TradeBuyRequestObj.PendingQty;
+        //                }
+        //                InsertTradePoolQueue(SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, TradeBuyRequestObj.PendingQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
+
+        //                TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + TradeBuyRequestObj.PendingQty;
+        //                TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - TradeBuyRequestObj.PendingQty;//take all
+        //                TradeBuyRequestObj.IsProcessing = 0;//release as fully settled
+        //                _TradeBuyRequest.Update(TradeBuyRequestObj);
+        //                _TradeSellerList.Update(SellerList);
+        //                _TradePoolMaster.Update(PoolMst);
+        //                break;//record settled
+        //            }
+                   
+        //        }
+
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        HelperForLog.WriteErrorLog("PROCESSSETLLEMENT:##TrnNo " + Req.TrnNo, ControllerName, ex);
+        //        _Resp.ReturnCode = enResponseCodeService.Fail;
+        //        _Resp.ReturnMsg = ex.Message;
+        //    }
+        //    return Task.FromResult(_Resp);
+        //}
+        //#endregion
 
     }
 }

@@ -87,15 +87,19 @@ namespace CleanArchitecture.Core.ApiModels
         public String PairName { get; set; }
         public Decimal ChargeRs { get; set; }
         public short IsCancelled { get; set; }
+        public short ordertype { get; set; }
     }
-    public class RecentOrderRespose
+    public class RecentOrderRespose 
     {
+        public short ordertype { get; set; }
         public long TrnNo { get; set; }
         public string Type { get; set; }
         public Decimal Price { get; set; }
         public Decimal Qty { get; set; }
         public DateTime DateTime { get; set; }
         public short Status { get; set; }
+        public string PairName { get; set; }
+        public long PairId { get; set; }
     }
     public class GetGraphResponse
     {

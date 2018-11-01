@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using System;
@@ -38,6 +39,6 @@ namespace CleanArchitecture.Core.Interfaces
         void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData);
         void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token);
         void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
-        GetTradeHistoryInfo GetAndSendGetTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
+        GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
     }
 }

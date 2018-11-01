@@ -17,5 +17,8 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public Decimal Qty { get; set; }
         public DateTime DateTime { get; set; }
         public string Status { get; set; }
+        public string PairName { get; set; }
+        public long PairId { get; set; }
+        public string OrderType { get; set; }
     }
 }

@@ -19,10 +19,24 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Column(TypeName = "decimal(18, 8)")]
         public decimal MakerQty { get; set; }
 
+        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
+        public decimal MakerPrice { get; set; }
+
         public long TakerTrnNo { get; set; }
 
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal TakerQty { get; set; }
+
+        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
+        public decimal TakerPrice { get; set; }
+
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal TakerDisc { get; set; }
+
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal TakerLoss { get; set; }
     }
 }
