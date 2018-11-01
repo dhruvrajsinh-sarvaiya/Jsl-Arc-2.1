@@ -518,6 +518,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 string TrnID = null;
                 string Respaddress = null;
 
+                var wallettype = _WalletTypeMasterRepository.GetSingle(t=>t.WalletTypeName==coin);
+
+                if(wallettype.Id!=walletMaster.WalletTypeID)
+                {
+                    return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
+                }
                 if (walletMaster == null)
                 {
                     //return false enResponseCodeService.Fail
@@ -545,7 +551,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidThirdpartyID, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ItemOrThirdprtyNotFound };
                 }
                 thirdPartyAPIRequest = _getWebRequest.MakeWebRequest(transactionProviderResponses[0].RouteID, transactionProviderResponses[0].ThirPartyAPIID, transactionProviderResponses[0].SerProDetailID);
-                string apiResponse =  "{\"id\":\"5bd9ab812bbbb45d53b0385d5cb94d0c\",\"chain\":0,\"index\":702,\"coin\":\"eth\",\"lastNonce\":0,\"wallet\":\"5aa26641ec78254a07fe076b2eef3a9a\",\"coinSpecific\":{\"nonce\":-1,\"updateTime\":\"2018-10-31T13:17:53.508Z\",\"txCount\":0,\"pendingChainInitialization\":true,\"creationFailure\":[]}}";  /*_webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 180000, thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType)*/;
+                string apiResponse = _webApiSendRequest.SendAPIRequestAsync(thirdPartyAPIRequest.RequestURL, thirdPartyAPIRequest.RequestBody, thirdPartyAPIConfiguration.ContentType, 180000, thirdPartyAPIRequest.keyValuePairsHeader, thirdPartyAPIConfiguration.MethodType);
                 // parse response logic 
 
 
@@ -569,6 +575,8 @@ namespace CleanArchitecture.Infrastructure.Services
                             return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCode.Fail, ReturnMsg = "please try after some time" };
                         }
                         address = delayGeneratedAddressesObj.Address;
+                        Respaddress= delayGeneratedAddressesObj.Address;
+
                         delayGeneratedAddressesObj.WalletId = walletMaster.Id;
                         delayGeneratedAddressesObj.UpdatedBy = walletMaster.UserID;
                         delayGeneratedAddressesObj.UpdatedDate = UTC_To_IST();
