@@ -8,6 +8,9 @@ using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Data;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -17,14 +20,14 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class SignalRService : ISignalRService
+    public class SignalRService : Controller, ISignalRService
     {
         private readonly ILogger<SignalRService> _logger;
         private readonly IMediator _mediator;
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly IFrontTrnRepository _frontTrnRepository;
-        public String Token;
+        public String Token=null;
         public SignalRService(ILogger<SignalRService> logger, IMediator mediator, EFCommonRepository<TransactionQueue> TransactionRepository, IFrontTrnRepository frontTrnRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository)
         {
@@ -33,8 +36,8 @@ namespace CleanArchitecture.Infrastructure.Services
             _TransactionRepository = TransactionRepository;
             _frontTrnRepository = frontTrnRepository;
             _TradeTransactionRepository = TradeTransactionRepository;
+           
         }
-
         #region Pairwise
         public void BuyerBook(GetBuySellBook Data, string Pair)
         {
@@ -422,6 +425,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
         #endregion
 
+
         public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token)
         {
             try
@@ -452,7 +456,7 @@ namespace CleanArchitecture.Infrastructure.Services
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
                         }
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction);
-                    ActivityNotification(EnResponseMessage.SignalRTrnSuccessfullyCreated, Token);
+                    
                 }
                 else if (Status == Convert.ToInt16(enTransactionStatus.Success))
                 {
@@ -463,7 +467,12 @@ namespace CleanArchitecture.Infrastructure.Services
                     OrderHistory(historyInfo, Token);
                     TradeHistoryByUser(historyInfo, Token);
                     TradingHistoryByPair(historyInfo, NewTradeTransaction.PairName);
-
+                    
+                    var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
+                    msg = msg.Replace("#Price#",historyInfo.Price .ToString());
+                    msg = msg.Replace("#Qty#", historyInfo.Amount .ToString());
+                    msg = msg.Replace("#Total#", historyInfo.Total .ToString());
+                    ActivityNotification(msg,Token);
                 }
             }
             catch (Exception ex)
@@ -472,6 +481,42 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
+        public void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData)
+        {
+            try
+            {
+                if(volumeData!=null && capData!= null)
+                {
+                    LastPriceViewModel lastPriceData = new LastPriceViewModel();
+                    lastPriceData.LTP = capData.LastPrice;
+                    string Base = volumeData.PairName.Split("_")[1];
+                    PairData(volumeData, Base);
+                    MarketData(capData, volumeData.PairName);
+                    LastPrice(lastPriceData, volumeData.PairName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token)
+        {
+            try
+            {
+                BuyerSideWalletBal(Data, WalletTypeName, Token);
+                SellerSideWalletBal(Data, WalletTypeName, Token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
         public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
         {
             try
@@ -490,6 +535,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 OpenOrderModel.IsCancelled = NewTradeTransaction.IsCancelled;
 
                 OpenOrder(OpenOrderModel, Token);
+                if (IsPop != 1)//send notification
+                {
+                    var msg = EnResponseMessage.SignalRTrnSuccessfullyCreated;
+                    msg = msg.Replace("#Price#", OpenOrderModel.Price.ToString());
+                    msg = msg.Replace("#Qty#", OpenOrderModel.Amount.ToString());
+                    ActivityNotification(msg, Token);
+                }
             }
             catch (Exception ex)
             {
@@ -525,26 +577,5 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData)
-        {
-            try
-            {
-                if(volumeData!=null && capData!= null)
-                {
-                    LastPriceViewModel lastPriceData = new LastPriceViewModel();
-                    lastPriceData.LTP = capData.LastPrice;
-                    string Base = volumeData.PairName.Split("_")[1];
-                    PairData(volumeData, Base);
-                    MarketData(capData, volumeData.PairName);
-                    LastPrice(lastPriceData, volumeData.PairName);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-        
     }
 }
