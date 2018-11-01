@@ -238,11 +238,11 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 2018-10-24
         [HttpGet("{WalletId}")]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         public async Task<IActionResult> GetAvailableBalance(string WalletId)
         {
-           ApplicationUser user = new ApplicationUser(); user.Id = 1;
-           // ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           //ApplicationUser user = new ApplicationUser(); user.Id = 1;
+          ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
