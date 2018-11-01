@@ -456,8 +456,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else if (Status == Convert.ToInt16(enTransactionStatus.Success))
                 {
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);
+                    GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
+                    historyInfo = GetAndSendGetTradeHistoryInfoData(Newtransaction, NewTradeTransaction);
 
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);//with amount 0
+                    OrderHistory(historyInfo, Token);
+                    TradeHistoryByUser(historyInfo, Token);
+                    TradingHistoryByPair(historyInfo, NewTradeTransaction.PairName);
 
                 }
             }
@@ -467,7 +472,6 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
         public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
         {
             try
@@ -494,34 +498,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void GetAndSendOrderHistory(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
-        {
-            try
-            {
-                var OrderHistoryList = _frontTrnRepository.GetTradeHistory(0, "", "", "", 0, 0, Newtransaction.Id);
-                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
-                model.TrnNo = NewTradeTransaction.TrnNo;
-                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
-                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
-                model.Amount = (NewTradeTransaction.TrnType == 4) ? NewTradeTransaction.SettledBuyQty : NewTradeTransaction.SettledSellQty;
-                model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
-                model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
-                model.Status = NewTradeTransaction.Status;
-                model.StatusText = NewTradeTransaction.StatusMsg;
-                model.PairName = NewTradeTransaction.PairName;
-                model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
-                model.IsCancel = NewTradeTransaction.IsCancelled;
-
-                OrderHistory(model, Token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-
-        public void GetAndSendTradeHistoryByUser(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction)
+        public GetTradeHistoryInfo GetAndSendGetTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
         {
             try
             {
@@ -539,7 +516,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
                 model.IsCancel = NewTradeTransaction.IsCancelled;
 
-                TradeHistoryByUser(model, Token);
+                return model;
             }
             catch (Exception ex)
             {
@@ -548,25 +525,19 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void GetAndSendTradeHistoryByPair(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction)
+        public void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData)
         {
             try
             {
-                //var OrderHistoryList = _frontTrnRepository.GetTradeHistory(0, "", "", "", 0, 0, Newtransaction.Id);
-                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
-                model.TrnNo = NewTradeTransaction.TrnNo;
-                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
-                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
-                model.Amount = (NewTradeTransaction.TrnType == 4) ? NewTradeTransaction.SettledBuyQty : NewTradeTransaction.SettledSellQty;
-                model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
-                model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
-                model.Status = NewTradeTransaction.Status;
-                model.StatusText = NewTradeTransaction.StatusMsg;
-                model.PairName = NewTradeTransaction.PairName;
-                model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
-                model.IsCancel = NewTradeTransaction.IsCancelled;
-
-                TradingHistoryByPair(model, model.PairName);
+                if(volumeData!=null && capData!= null)
+                {
+                    LastPriceViewModel lastPriceData = new LastPriceViewModel();
+                    lastPriceData.LTP = capData.LastPrice;
+                    string Base = volumeData.PairName.Split("_")[1];
+                    PairData(volumeData, Base);
+                    MarketData(capData, volumeData.PairName);
+                    LastPrice(lastPriceData, volumeData.PairName);
+                }
             }
             catch (Exception ex)
             {
@@ -574,5 +545,6 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+        
     }
 }
