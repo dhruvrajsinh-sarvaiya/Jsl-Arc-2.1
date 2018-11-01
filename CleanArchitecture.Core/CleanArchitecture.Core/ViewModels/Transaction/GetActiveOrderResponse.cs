@@ -20,6 +20,9 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         public decimal Amount { get; set; }
         public decimal Price { get; set; }
         public short IsCancelled { get; set; }
+        public string PairName { get; set; }
+        public long PairId { get; set; }
+        public string OrderType { get; set; }
     }
     public class GetActiveOrderRequest
     {
