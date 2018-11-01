@@ -70,7 +70,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -106,7 +106,7 @@ namespace CleanArchitecture.Web.API
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
                 Response.ReturnCode = enResponseCode.InternalError;
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -139,7 +139,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -172,7 +172,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -202,7 +202,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -232,16 +232,17 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
         //vsolanki 2018-10-24
         [HttpGet("{WalletId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAvailableBalance(string WalletId)
         {
-           // ApplicationUser user = new ApplicationUser(); user.Id = 1;
-            ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
+           ApplicationUser user = new ApplicationUser(); user.Id = 1;
+           // ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             ListBalanceResponse Response = new ListBalanceResponse();
             Response.BizResponseObj = new Core.ApiModels.BizResponseClass();
             try
@@ -262,7 +263,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
         [HttpGet]
@@ -290,7 +291,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -321,7 +322,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -350,7 +351,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -381,7 +382,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -411,7 +412,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
@@ -661,7 +662,7 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 //HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, ex.ToString());
-                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = EnResponseMessage.InternalError, ErrorCode = enErrorCode.Status500InternalServerError });
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 
