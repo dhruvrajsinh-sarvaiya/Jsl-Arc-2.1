@@ -29,6 +29,7 @@ using CleanArchitecture.Core.Services.Session;
 using CleanArchitecture.Core.SignalR;
 using Newtonsoft.Json.Serialization;
 using CleanArchitecture.Web.Filters;
+using Hangfire;
 
 namespace CleanArchitecture.Web
 {
@@ -77,7 +78,8 @@ namespace CleanArchitecture.Web
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddSingleton<RedisSessionStorage>();
+            services.AddSingleton<RedisSessionStorage>();            
+
             ////debugging environment
             services.AddPreRenderDebugging(HostingEnvironment);
 
@@ -153,6 +155,8 @@ namespace CleanArchitecture.Web
             //services.Configure<SMSSetting>(Configuration.GetSection("SMS"));
 
             services.AddMediatR(typeof(Startup));
+
+            services.AddHangfire(config => config.UseSqlServerStorage(Configuration["Data:SqlServerConnectionString"]));
 
             Container container = new Container();
 
@@ -272,6 +276,7 @@ namespace CleanArchitecture.Web
             });
          */
             app.UseMvc();
+            app.UseHangfireServer();
         }
     }
 }

@@ -130,7 +130,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     long PairId = MemberID;
                     if (PairId != 999)
                         sCon = "and TTQ.PairID ="+ PairId;
-                    if (PairId != 0)
+                    if (TrnNo != 0)
                         sCon = "and TQ.TrnNo =" + TrnNo;
 
                     qry = "Select top 100 TTQ.TrnNo,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type, "+
