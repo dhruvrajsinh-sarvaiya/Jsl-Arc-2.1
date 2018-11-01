@@ -25,6 +25,7 @@ using Newtonsoft.Json;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class TwoFASettingController : BaseController
     {
         #region Field 

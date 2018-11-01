@@ -26,7 +26,8 @@ namespace CleanArchitecture.Infrastructure.Services
 {
     public class WalletTransactionCrDr : BasePage , IWalletTransactionCrDr
     {
-       // private readonly ILogger<WalletService> _log;
+        // private readonly ILogger<WalletService> _log;
+        private readonly ISignalRService _signalRService;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
         //private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
        // private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
@@ -42,7 +43,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IWalletRepository _walletRepository1;
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
         private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository;
-
+        private readonly IWalletService _walletService;
         //private readonly IWalletService _walletService;
         //private readonly IWebApiRepository _webApiRepository;
         //private readonly IWebApiSendRequest _webApiSendRequest;
@@ -54,9 +55,10 @@ namespace CleanArchitecture.Infrastructure.Services
            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,          
            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository,
-           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository) : base(logger)
+           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, IWalletService walletService) : base(logger)
         {
-           // _log = log;
+            _walletService = walletService;
+            // _log = log;
             _commonRepository = commonRepository;
             _walletOrderRepository = walletOrderRepository;
             //_walletRepository = repository;
@@ -78,6 +80,7 @@ namespace CleanArchitecture.Infrastructure.Services
             //_BeneficiarycommonRepository = BeneficiaryMasterRepo;
             //_UserPreferencescommonRepository = UserPreferenceRepo;
             _TransactionAccountsRepository = TransactionAccountsRepository;
+            _signalRService = signalRService;
         }
 
         public WalletDrCrResponse InsertWalletTQDebit(string timestamp, long walletID, string coinName, decimal amount, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enWalletTranxOrderType enWalletTranx, enWalletLimitType enWalletLimit)
@@ -148,6 +151,13 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
+                //vsolanki 208-11-1
+                var charge = _walletService.GetServiceLimitChargeValue(enTrnType.Deposit, coinName);//for deposit
+                if (charge.MaxAmount >= amount && charge.MinAmount <= amount)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
+                }
+
                 int count = CheckTrnRefNo(TrnRefNo, enWalletTranx, trnType);
                 if (count != 0)
                 {
@@ -173,7 +183,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public WalletDrCrResponse DepositionWalletOperation(string timestamp, string address, string coinName, decimal amount, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enWalletTranxOrderType enWalletTranx, enWalletLimitType enWalletLimit)
+        public WalletDrCrResponse DepositionWalletOperation(string timestamp, string address, string coinName, decimal amount, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enWalletTranxOrderType enWalletTranx, enWalletLimitType enWalletLimit,string Token="")
         {
             try
             {
@@ -249,6 +259,35 @@ namespace CleanArchitecture.Infrastructure.Services
                 woObj.UpdatedDate = UTC_To_IST();
                 objTQDr.SettedAmt = amount;
                 _walletRepository1.WalletCreditDebitwithTQ(walletLedgerDr, walletLedgerCr, tranxAccountCr, tranxAccounDrt, dWalletobj, cWalletObj, objTQCr, objTQDr, woObj);
+
+                //vsolanki 2018-11-1---------------socket method   --------------------------
+                //WalletMasterResponse walletMasterObj = new WalletMasterResponse();
+                //walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
+                //walletMasterObj.Balance = dWalletobj.Balance;
+                //walletMasterObj.WalletName = dWalletobj.Walletname;
+                //walletMasterObj.PublicAddress = dWalletobj.PublicAddress;
+                //walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
+                //walletMasterObj.CoinName = coinName;
+                //_signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
+                //// OnWalletBalChange(walletMasterObj, coinName,  Token);
+                ////-------------------------------
+
+
+                ////vsolanki 2018-11-1---------------socket method   --------------------------
+                //WalletMasterResponse walletMasterObj1 = new WalletMasterResponse();
+                //walletMasterObj.AccWalletID = cWalletObj.AccWalletID;
+                //walletMasterObj.Balance = cWalletObj.Balance;
+                //walletMasterObj.WalletName = cWalletObj.Walletname;
+                //walletMasterObj.PublicAddress = cWalletObj.PublicAddress;
+                //walletMasterObj.AccWalletID = cWalletObj.AccWalletID;
+                //walletMasterObj.CoinName = coinName;
+                //_signalRService.OnWalletBalChange(walletMasterObj1, coinName, Token);
+
+                // OnWalletBalChange(walletMasterObj, coinName,  Token);
+                //-------------------------------
+
+
+
                 //CreditWalletDrArryTrnID[] arryTrnID = new CreditWalletDrArryTrnID [1];
                 //arryTrnID[0].Amount = amount;
                 //arryTrnID[0].DrTrnRefNo = TrnRefNo;

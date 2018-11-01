@@ -2,12 +2,16 @@
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Data;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -17,14 +21,14 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class SignalRService : ISignalRService
+    public class SignalRService :ISignalRService
     {
         private readonly ILogger<SignalRService> _logger;
         private readonly IMediator _mediator;
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly IFrontTrnRepository _frontTrnRepository;
-        public String Token;
+        public String Token=null;
         public SignalRService(ILogger<SignalRService> logger, IMediator mediator, EFCommonRepository<TransactionQueue> TransactionRepository, IFrontTrnRepository frontTrnRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository)
         {
@@ -33,8 +37,8 @@ namespace CleanArchitecture.Infrastructure.Services
             _TransactionRepository = TransactionRepository;
             _frontTrnRepository = frontTrnRepository;
             _TradeTransactionRepository = TradeTransactionRepository;
+           
         }
-
         #region Pairwise
         public void BuyerBook(GetBuySellBook Data, string Pair)
         {
@@ -452,18 +456,63 @@ namespace CleanArchitecture.Infrastructure.Services
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
                         }
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction);
-                    ActivityNotification(EnResponseMessage.SignalRTrnSuccessfullyCreated, Token);
+                    
                 }
                 else if (Status == Convert.ToInt16(enTransactionStatus.Success))
                 {
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);
+                    GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
+                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction);
 
-
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);//with amount 0
+                    OrderHistory(historyInfo, Token);
+                    TradeHistoryByUser(historyInfo, Token);
+                    TradingHistoryByPair(historyInfo, NewTradeTransaction.PairName);
+                    
+                    var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
+                    msg = msg.Replace("#Price#",historyInfo.Price .ToString());
+                    msg = msg.Replace("#Qty#", historyInfo.Amount .ToString());
+                    msg = msg.Replace("#Total#", historyInfo.Total .ToString());
+                    ActivityNotification(msg,Token);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData)
+        {
+            try
+            {
+                if(volumeData!=null && capData!= null)
+                {
+                    LastPriceViewModel lastPriceData = new LastPriceViewModel();
+                    lastPriceData.LTP = capData.LastPrice;
+                    string Base = volumeData.PairName.Split("_")[1];
+                    PairData(volumeData, Base);
+                    MarketData(capData, volumeData.PairName);
+                    LastPrice(lastPriceData, volumeData.PairName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token)
+        {
+            try
+            {
+                BuyerSideWalletBal(Data, WalletTypeName, Token);
+                SellerSideWalletBal(Data, WalletTypeName, Token);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -484,44 +533,25 @@ namespace CleanArchitecture.Infrastructure.Services
                     OpenOrderModel.Amount = (NewTradeTransaction.BuyQty == 0) ? NewTradeTransaction.SellQty : (NewTradeTransaction.SellQty == 0) ? NewTradeTransaction.BuyQty : NewTradeTransaction.BuyQty;
                 OpenOrderModel.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
                 OpenOrderModel.IsCancelled = NewTradeTransaction.IsCancelled;
+                
 
                 OpenOrder(OpenOrderModel, Token);
+                if (IsPop != 1)//send notification
+                {
+                    var msg = EnResponseMessage.SignalRTrnSuccessfullyCreated;
+                    msg = msg.Replace("#Price#", OpenOrderModel.Price.ToString());
+                    msg = msg.Replace("#Qty#", OpenOrderModel.Amount.ToString());
+                    ActivityNotification(msg, Token);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
 
-        public void GetAndSendOrderHistory(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
-        {
-            try
-            {
-                var OrderHistoryList = _frontTrnRepository.GetTradeHistory(0, "", "", "", 0, 0, Newtransaction.Id);
-                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
-                model.TrnNo = NewTradeTransaction.TrnNo;
-                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
-                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
-                model.Amount = (NewTradeTransaction.TrnType == 4) ? NewTradeTransaction.SettledBuyQty : NewTradeTransaction.SettledSellQty;
-                model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
-                model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
-                model.Status = NewTradeTransaction.Status;
-                model.StatusText = NewTradeTransaction.StatusMsg;
-                model.PairName = NewTradeTransaction.PairName;
-                model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
-                model.IsCancel = NewTradeTransaction.IsCancelled;
-
-                OrderHistory(model, Token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-
-        public void GetAndSendTradeHistoryByUser(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction)
+        public GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
         {
             try
             {
@@ -538,41 +568,17 @@ namespace CleanArchitecture.Infrastructure.Services
                 model.PairName = NewTradeTransaction.PairName;
                 model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
                 model.IsCancel = NewTradeTransaction.IsCancelled;
-
-                TradeHistoryByUser(model, Token);
+                //model.OrderType=
+                return model;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
 
-        public void GetAndSendTradeHistoryByPair(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction)
-        {
-            try
-            {
-                //var OrderHistoryList = _frontTrnRepository.GetTradeHistory(0, "", "", "", 0, 0, Newtransaction.Id);
-                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
-                model.TrnNo = NewTradeTransaction.TrnNo;
-                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
-                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
-                model.Amount = (NewTradeTransaction.TrnType == 4) ? NewTradeTransaction.SettledBuyQty : NewTradeTransaction.SettledSellQty;
-                model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
-                model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
-                model.Status = NewTradeTransaction.Status;
-                model.StatusText = NewTradeTransaction.StatusMsg;
-                model.PairName = NewTradeTransaction.PairName;
-                model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
-                model.IsCancel = NewTradeTransaction.IsCancelled;
-
-                TradingHistoryByPair(model, model.PairName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
+        
     }
+    
 }

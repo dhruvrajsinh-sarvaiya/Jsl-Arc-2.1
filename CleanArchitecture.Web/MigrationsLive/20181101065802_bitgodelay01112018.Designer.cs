@@ -4,14 +4,16 @@ using CleanArchitecture.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    partial class CleanArchitectureContextModelSnapshot : ModelSnapshot
+    [Migration("20181101065802_bitgodelay01112018")]
+    partial class bitgodelay01112018
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1642,9 +1644,6 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<decimal>("DeliveredQty")
-                        .HasColumnType("decimal(18, 8)");
-
                     b.Property<short>("IsProcessing");
 
                     b.Property<long>("PaidServiceID");
@@ -1720,8 +1719,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime?>("UpdatedDate");
-
-                    b.Property<long>("UserID");
 
                     b.HasKey("Id", "TrnNo");
 
@@ -2076,9 +2073,6 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<decimal>("MakerPrice")
-                        .HasColumnType("decimal(18, 8)");
-
                     b.Property<decimal>("MakerQty")
                         .HasColumnType("decimal(18, 8)");
 
@@ -2089,15 +2083,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long>("SellerListID");
 
                     b.Property<short>("Status");
-
-                    b.Property<decimal>("TakerDisc")
-                        .HasColumnType("decimal(18, 8)");
-
-                    b.Property<decimal>("TakerLoss")
-                        .HasColumnType("decimal(18, 8)");
-
-                    b.Property<decimal>("TakerPrice")
-                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<decimal>("TakerQty")
                         .HasColumnType("decimal(18, 8)");

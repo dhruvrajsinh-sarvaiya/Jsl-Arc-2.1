@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using System;
@@ -34,11 +35,10 @@ namespace CleanArchitecture.Core.Interfaces
 
 
         //Event Call
-        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, String Token);
-
-        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction,short IsPop=0);
-        void GetAndSendOrderHistory(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
-        void GetAndSendTradeHistoryByUser(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction);
-        void GetAndSendTradeHistoryByPair(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction);
+        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token);
+        void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData);
+        void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token);
+        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
+        GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
     }
 }

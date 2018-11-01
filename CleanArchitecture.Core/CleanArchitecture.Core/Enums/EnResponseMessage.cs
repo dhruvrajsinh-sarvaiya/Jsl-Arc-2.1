@@ -244,7 +244,8 @@ namespace CleanArchitecture.Core.Enums
         public static string TwoFactorActiveRequest = "User two factor authentication reguest successfully send.";
 
         // ================================ SignalR ========================= //
-        public static string SignalRTrnSuccessfullyCreated = "Transacton Successfully created.";
+        public static string SignalRTrnSuccessfullyCreated = "Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
+        public static string SignalRTrnSuccessfullySettled = "Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
     }
 
 

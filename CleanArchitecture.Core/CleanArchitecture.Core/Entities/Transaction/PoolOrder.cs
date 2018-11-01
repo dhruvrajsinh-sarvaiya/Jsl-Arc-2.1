@@ -1,4 +1,6 @@
-﻿using CleanArchitecture.Core.SharedKernel;
+﻿using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Events;
+using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -73,6 +75,29 @@ namespace CleanArchitecture.Core.Entities.Transaction
         ////public long CouponNo { get; set; }
         //public bool IsChargeAccepted { get; set; }
         //public bool IsDebited { get; set; }
-
+        public void MakeTransactionInProcess()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.Pending);
+            AddValueChangeEvent();
+        }
+        public void MakeTransactionSuccess()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.Success);
+            AddValueChangeEvent();
+        }
+        public void MakeTransactionHold()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.Hold);
+            AddValueChangeEvent();
+        }
+        public void MakeTransactionOperatorFail()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.OperatorFail);
+            AddValueChangeEvent();
+        }
+        public void AddValueChangeEvent()
+        {
+            Events.Add(new ServiceStatusEvent<PoolOrder>(this));
+        }
     }
 }

@@ -46,9 +46,9 @@ namespace CleanArchitecture.Web.API
             _signalRService = signalRService;
             //_signalRTestService = signalRTestService;
         }
-        
+
         [HttpGet("BuyerBook/{Data}/{Pair}")]
-        public async Task<IActionResult> BuyerBook(string Data,String Pair)
+        public async Task<IActionResult> BuyerBook(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -62,9 +62,9 @@ namespace CleanArchitecture.Web.API
                 SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.BuyerBook);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod .RecieveBuyerBook);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne );
-                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType .PairName );
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerBook);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
                 CommonData.Parameter = Pair;// "INR_BTC";
 
@@ -99,7 +99,7 @@ namespace CleanArchitecture.Web.API
                 SignalRComm<GetBuySellBook> CommonData = new SignalRComm<GetBuySellBook>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerBook);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook );
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
@@ -130,7 +130,7 @@ namespace CleanArchitecture.Web.API
                 GetTradeHistoryInfo model = new GetTradeHistoryInfo();
                 model.Amount = 20;
                 model.ChargeRs = 1;
-                model.DateTime = DateTime.Now; 
+                model.DateTime = DateTime.Now;
                 model.IsCancel = 1;
                 model.PairName = "INR_BTC";
                 model.Price = 150;
@@ -144,7 +144,7 @@ namespace CleanArchitecture.Web.API
                 SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistoryByPair);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory );
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
@@ -298,7 +298,8 @@ namespace CleanArchitecture.Web.API
                 model.Amount = 100;
                 model.Price = 1400;
                 model.IsCancelled = 1;
-
+                model.PairName = "INR_BTC";
+                model.PairId = 10021001;
                 ActiveOrderInfo temp = JsonConvert.DeserializeObject<ActiveOrderInfo>(Data);
 
                 SignalRComm<ActiveOrderInfo> CommonData = new SignalRComm<ActiveOrderInfo>();
@@ -487,7 +488,7 @@ namespace CleanArchitecture.Web.API
                 model.PublicAddress = "";
 
                 WalletMasterResponse temp = JsonConvert.DeserializeObject<WalletMasterResponse>(Data);
-                
+
                 SignalRComm<WalletMasterResponse> CommonData = new SignalRComm<WalletMasterResponse>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SellerSideWallet);
@@ -529,7 +530,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Data;
-                CommonData.Parameter =null;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.ActivityNotification;
@@ -567,7 +568,7 @@ namespace CleanArchitecture.Web.API
                 model.PairName = "INR_BTC";
                 model.UpDownBit = 0;
                 model.Volume24 = 1406;
-               
+
 
                 VolumeDataRespose temp = JsonConvert.DeserializeObject<VolumeDataRespose>(Data);
                 string a = temp.PairName.Split("_")[1];
@@ -578,7 +579,7 @@ namespace CleanArchitecture.Web.API
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.Base);
                 CommonData.Data = temp;
-                CommonData.Parameter =a;
+                CommonData.Parameter = a;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.PairData;
@@ -595,7 +596,6 @@ namespace CleanArchitecture.Web.API
                 return Ok();
             }
         }
-
         //[HttpGet("MarketTicker/{Data}")]
         //public async Task<IActionResult> MarketTicker(string Data)
         //{
@@ -651,26 +651,61 @@ namespace CleanArchitecture.Web.API
         //    string ReciveMethod = "";
         //    try
         //    {
-        //        var accessToken = "CfDJ8MB8DXV9k79JrEe_PIsRHuoXYoktXaP7EjFqGuVjEiiaoDD4xLApH2bywCk5ehhm8--MqkgUUfQs5aZG7CHzBOaKL6PRj_D807rvIwwaAFtAntn9ZIdvSKXnPOoBgqJ2eKHn23BuXL7mhB046b6dssHLWqKoWPnqzR98h5whdupq3FnlbKIqggRZ_4TDO60_h4Qnan7TWq4Keki3QysUwBK2Ozc2QsrqTevt9lG7Zo-1kV_8AB4XVb86cvuioiRQUFrHyF6o6VqNimPW882kzoktQFc1gI0qlCkHD8z0f7iFWs1e56r94mUOIqjXtIbL-yWQpoo5edgzcMZpool-L-cttcx-enWXcx91ziL_PBGC3Uko1EcuqFPGRqNKVc6ABFv4igSkyV1cnScMrertxYAU_ito2LlFqSlwhiLjDP2WghLMDPYI7KX76VVeSDKaLWJcYlKX3f272229tMEkyGVNfcqYkVvndLF5mgEtvk6XCXQ22w51pArBwtRkxxD3u2MYDN51VIpCvi7vkD1pyrQEidBhttBB5ySs0cF8aV8YXRBAYqLa9Dqyb1fuqu4kbrmHKgpEVhbT9H5d2ERnhEzowF7Q_doO-rPmc9RM2_h_28GTH1M0OD8BDiSpxaRIhKROm34Lof6DcmcHHF68biccOTjAk78sficf6NEVSj0zamO1KvvYcgtXX2ueTgXCcx7QUzQwG8mVEVgNVYwXs3Hzi7ycCcImwsvoihGDtgCb";
-        //        //await HttpContext.GetTokenAsync("access_token");
-        //        //_signalRTestService.MarkTransactionHold(ID, accessToken);
-        //        TransactionQueue Newtransaction = new TransactionQueue();
-        //        Newtransaction.TrnType = 4;
-        //        Newtransaction.Id = 91;
-        //        Newtransaction.TrnDate = DateTime.Now;
+        //        //var accessToken = "CfDJ8MB8DXV9k79JrEe_PIsRHuoXYoktXaP7EjFqGuVjEiiaoDD4xLApH2bywCk5ehhm8--MqkgUUfQs5aZG7CHzBOaKL6PRj_D807rvIwwaAFtAntn9ZIdvSKXnPOoBgqJ2eKHn23BuXL7mhB046b6dssHLWqKoWPnqzR98h5whdupq3FnlbKIqggRZ_4TDO60_h4Qnan7TWq4Keki3QysUwBK2Ozc2QsrqTevt9lG7Zo-1kV_8AB4XVb86cvuioiRQUFrHyF6o6VqNimPW882kzoktQFc1gI0qlCkHD8z0f7iFWs1e56r94mUOIqjXtIbL-yWQpoo5edgzcMZpool-L-cttcx-enWXcx91ziL_PBGC3Uko1EcuqFPGRqNKVc6ABFv4igSkyV1cnScMrertxYAU_ito2LlFqSlwhiLjDP2WghLMDPYI7KX76VVeSDKaLWJcYlKX3f272229tMEkyGVNfcqYkVvndLF5mgEtvk6XCXQ22w51pArBwtRkxxD3u2MYDN51VIpCvi7vkD1pyrQEidBhttBB5ySs0cF8aV8YXRBAYqLa9Dqyb1fuqu4kbrmHKgpEVhbT9H5d2ERnhEzowF7Q_doO-rPmc9RM2_h_28GTH1M0OD8BDiSpxaRIhKROm34Lof6DcmcHHF68biccOTjAk78sficf6NEVSj0zamO1KvvYcgtXX2ueTgXCcx7QUzQwG8mVEVgNVYwXs3Hzi7ycCcImwsvoihGDtgCb";
+        //        //var accessToken = await HttpContext.GetTokenAsync("access_token");
+        //        ////_signalRTestService.MarkTransactionHold(ID, accessToken);
+        //        //TransactionQueue Newtransaction = new TransactionQueue();
+        //        //Newtransaction.TrnType = 4;
+        //        //Newtransaction.Id = 91;
+        //        //Newtransaction.TrnDate = DateTime.Now;
 
-        //        TradeTransactionQueue NewTradeTransaction = new TradeTransactionQueue();
-        //        NewTradeTransaction.PairName = "INR_BTC";
-        //        NewTradeTransaction.BidPrice = 1450;
-        //        NewTradeTransaction.PairID = 10021001;
-        //        NewTradeTransaction.AskPrice = 1500;
-        //        NewTradeTransaction.TrnType = 4;
-        //        NewTradeTransaction.Order_Currency = "BTC";
-        //        NewTradeTransaction.Delivery_Currency = "INR";
-        //        NewTradeTransaction.BuyQty = 2;
-        //        NewTradeTransaction.SellQty = 1;
-        //        NewTradeTransaction.IsCancelled = 0;
-        //        _signalRService.OnStatusChange(4, Newtransaction, NewTradeTransaction, accessToken);
+        //        //TradeTransactionQueue NewTradeTransaction = new TradeTransactionQueue();
+        //        //NewTradeTransaction.PairName = "INR_BTC";
+        //        //NewTradeTransaction.BidPrice = 1450;
+        //        //NewTradeTransaction.PairID = 10021001;
+        //        //NewTradeTransaction.AskPrice = 1500;
+        //        //NewTradeTransaction.TrnType = 4;
+        //        //NewTradeTransaction.Order_Currency = "BTC";
+        //        //NewTradeTransaction.Delivery_Currency = "INR";
+        //        //NewTradeTransaction.BuyQty = 2;
+        //        //NewTradeTransaction.SellQty = 1;
+        //        //NewTradeTransaction.IsCancelled = 0;
+        //        //_signalRService.OnStatusChange(4, Newtransaction, NewTradeTransaction, accessToken);
+        //        //_signalRService.OnStatusChange(1, Newtransaction, NewTradeTransaction, accessToken);
+
+        //        //WalletMasterResponse model = new WalletMasterResponse();
+        //        //model.WalletName = "LTC Default";
+        //        //model.AccWalletID = "1053841474000201";
+        //        //model.Balance = 201200;
+        //        //model.CoinName = "LTC";
+        //        //model.IsDefaultWallet = 1;
+        //        //model.PublicAddress = "";
+        //        //_signalRService.OnWalletBalChange(model, model.CoinName, accessToken);
+        //        VolumeDataRespose model = new VolumeDataRespose();
+        //        model.ChangePer = 20;
+        //        model.Currentrate = 1;
+        //        model.High24Hr = 1814;
+        //        model.High52Week = 1744;
+        //        model.HighWeek = 1800;
+        //        model.Low24Hr = 1812;
+        //        model.Low52Week = 1725;
+        //        model.LowWeek = 1700;
+        //        model.PairId = 10021001;
+        //        model.PairName = "INR_BTC";
+        //        model.UpDownBit = 0;
+        //        model.Volume24 = 1406;
+
+        //        MarketCapData model2 = new MarketCapData();
+        //        model2.Change24 = 1;
+        //        model2.ChangePer = 3;
+        //        model2.High24 = 1153;
+        //        model2.Low24 = 1125;
+        //        model2.LastPrice = 1137;
+        //        model2.Volume24 = 253;
+        //        Task.Factory.StartNew (()=> _signalRService.OnVolumeChange(model, model2));
+        //        Task.Factory.StartNew (()=> _signalRService.OnVolumeChange(model, model2));
+        //        Task.Factory.StartNew (()=> _signalRService.OnVolumeChange(model, model2));
+                
         //        return Ok(new { ReciveMethod = ReciveMethod });
         //    }
         //    catch (Exception ex)

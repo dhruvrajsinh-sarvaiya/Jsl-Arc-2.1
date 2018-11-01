@@ -20,7 +20,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         bool IsValidWallet(long walletId);
 
-        CreateWalletAddressRes GenerateAddress(string walletid,string coin);
+        CreateWalletAddressRes GenerateAddress(string walletid,string coin, int GenaratePendingbit = 0);
 
         //vsolanki 8-10-2018
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();
@@ -37,7 +37,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         ListWalletResponse GetWalletById(long userid, string coin,string walletId);
 
-        WalletDrCrResponse GetWalletDeductionNew(string coinName, string timestamp, enWalletTranxOrderType orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType);
+        WalletDrCrResponse GetWalletDeductionNew(string coinName, string timestamp, enWalletTranxOrderType orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, string Token = "");
 
         ListWalletAddressResponse ListAddress(string AccWalletID);
 
@@ -48,7 +48,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
 
         //ntrivedi 16-10-2018
-        WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType);
+        WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, string Token = "" );
 
         //Rushabh 16-10-2018
         LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long userID);
