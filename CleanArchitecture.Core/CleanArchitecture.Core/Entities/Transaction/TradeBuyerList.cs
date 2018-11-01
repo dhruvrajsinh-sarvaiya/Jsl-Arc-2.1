@@ -22,6 +22,9 @@ namespace CleanArchitecture.Core.Entities.Transaction
         public decimal Price { get; set; }
         [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
         public decimal Qty { get; set; }
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal DeliveredQty { get; set; }
         public short IsProcessing { get; set; }
 
         public void MakeTransactionInProcess()
