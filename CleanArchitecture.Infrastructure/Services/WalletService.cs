@@ -1040,8 +1040,11 @@ namespace CleanArchitecture.Infrastructure.Services
                     {
                         listWalletResponse.IsWhitelisting = UserPrefobj.IsWhitelisting;
                     }
+                    else
+                    {
+                        listWalletResponse.IsWhitelisting = 0;
+                    }
                     listWalletResponse.Wallets = walletResponse;
-                    listWalletResponse.IsWhitelisting =0;
                     listWalletResponse.ReturnCode = enResponseCode.Success;
                     listWalletResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }

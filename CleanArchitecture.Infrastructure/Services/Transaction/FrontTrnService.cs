@@ -187,14 +187,169 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public void GetPairAdditionalVal(long PairId, decimal CurrentRate,long TrnNo)
+        //public void GetPairAdditionalVal(long PairId, decimal CurrentRate,long TrnNo)
+        //{
+        //    try
+        //    {
+        //        //Calucalte ChangePer
+        //        decimal Volume24 = 0, ChangePer = 0,High24Hr=0,Low24Hr=0;
+        //        short UpDownBit = 0;
+        //        decimal tradeprice = 0,todayopen,todayclose;
+        //        var tradedata = _tradeTransactionQueueRepository.GetSingle(x => x.TrnDate > _basePage.UTC_To_IST().AddDays(-1) && x.PairID == PairId && x.Status == 1);
+        //        if (tradedata != null)
+        //        {
+        //            if (tradedata.TrnType == 4)
+        //            {
+        //                tradeprice = tradedata.BidPrice;
+        //            }
+        //            else if (tradedata.TrnType == 5)
+        //            {
+        //                tradeprice = tradedata.AskPrice;
+        //            }
+        //            if (CurrentRate > 0 && tradeprice > 0)
+        //                ChangePer = ((CurrentRate * 100) / tradeprice) - 100;
+        //            else if (CurrentRate > 0 && tradeprice == 0)
+        //            {
+        //                ChangePer = 100;
+        //            }
+        //            else
+        //                ChangePer = 0;
+        //        }
+        //        else
+        //        {
+        //            ChangePer = 0;
+        //        }
+
+        //        //Calculate Volume24
+        //        tradeprice = 0;
+        //        decimal tradeqty = 0, sum = 0;
+        //        var tradedata1 = _tradeTransactionQueueRepository.FindBy(x => x.TrnDate >= _basePage.UTC_To_IST().AddDays(-1) && x.TrnDate <= DateTime.Now && x.PairID == PairId && x.Status == 1 && (x.TrnType == 4 || x.TrnType == 5));
+        //        if (tradedata1 != null)
+        //        {
+        //            foreach (var trade in tradedata1)
+        //            {
+        //                if (trade.TrnType == 4)
+        //                {
+        //                    tradeprice = trade.BidPrice;
+        //                    tradeqty = trade.BuyQty;
+        //                }
+        //                else if (trade.TrnType == 5)
+        //                {
+        //                    tradeprice = trade.AskPrice;
+        //                    tradeqty = trade.SellQty;
+        //                }
+        //                else
+        //                {
+        //                    tradeprice = 0;
+        //                    tradeqty = 0;
+        //                }
+        //                sum += (tradeprice * tradeqty);
+        //            }
+        //            Volume24 = sum;
+        //        }
+        //        else
+        //        {
+        //            Volume24 = 0;
+        //        }
+
+        //        //Calculate High24Hr,Low24Hr,UpDownBit
+        //        var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
+        //        if(pairData.High24Hr == 0 && pairData.Low24Hr == 0 && pairData.UpDownBit == 0)
+        //        {
+        //            High24Hr = CurrentRate;
+        //            Low24Hr = CurrentRate;
+        //            UpDownBit = 1;
+        //        }
+        //        else
+        //        {
+        //            if(CurrentRate > pairData.High24Hr)
+        //            {
+        //                High24Hr = CurrentRate;
+        //                Low24Hr = pairData.Low24Hr;
+        //                UpDownBit = 1;
+        //            }
+        //            else if(CurrentRate < pairData.Low24Hr)
+        //            {
+        //                Low24Hr = CurrentRate;
+        //                High24Hr = pairData.High24Hr;
+        //                UpDownBit = 0;
+        //            }
+        //            else
+        //            {
+        //                Low24Hr = pairData.Low24Hr;
+        //                High24Hr = pairData.High24Hr;
+        //                if(CurrentRate < pairData.LTP)
+        //                {
+        //                    UpDownBit = 0;
+        //                }
+        //                else if(CurrentRate > pairData.LTP)
+        //                {
+        //                    UpDownBit = 1;
+        //                }
+        //            }
+        //        }
+
+        //        //Update Pair Statstics Data
+        //        pairData.ChangePer24 = ChangePer;
+        //        pairData.ChangeVol24 = Volume24;
+        //        pairData.High24Hr = High24Hr;
+        //        pairData.Low24Hr = Low24Hr;
+        //        pairData.UpDownBit = UpDownBit;
+        //        pairData.LTP = CurrentRate;
+        //        pairData.CurrentRate = CurrentRate;
+        //        _tradePairStastics.Update(pairData);
+
+
+        //        //Calculate TodayOpen,TodayClose
+        //        var now = _basePage.UTC_To_IST();
+        //        DateTime startDateTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
+        //        DateTime endDateTime = _basePage.UTC_To_IST();
+
+        //        var tradegraphdetail = _graphDetailRepository.FindBy(x => x.DataDate >= startDateTime && x.DataDate <= endDateTime).OrderBy(x => x.TranNo).FirstOrDefault();
+        //        if(tradegraphdetail != null)
+        //        {
+        //            todayopen = tradegraphdetail.LTP;
+        //            todayclose = CurrentRate;
+        //        }
+        //        else
+        //        {
+        //            todayopen = CurrentRate;
+        //            todayclose = CurrentRate;
+        //        }
+
+        //        //Add Data Into Graph Table
+        //        var tradegraph = new TradeGraphDetail()
+        //        {
+        //            PairId = PairId,
+        //            TranNo = TrnNo,
+        //            DataDate = _basePage.UTC_To_IST(),
+        //            ChangePer = ChangePer,
+        //            Volume = Volume24,
+        //            High24Hr = High24Hr,
+        //            Low24Hr = Low24Hr,
+        //            LTP = CurrentRate,
+        //            TodayOpen = todayopen,
+        //            TodayClose = todayclose,
+        //            CreatedBy = 1,
+        //            CreatedDate = _basePage.UTC_To_IST()
+        //        };
+        //        _graphDetailRepository.Add(tradegraph);
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        throw ex;
+        //    }
+        //}
+        public void GetPairAdditionalVal(long PairId, decimal CurrentRate, long TrnNo,decimal Quantity)
         {
             try
             {
                 //Calucalte ChangePer
-                decimal Volume24 = 0, ChangePer = 0,High24Hr=0,Low24Hr=0;
+                decimal Volume24 = 0, ChangePer = 0, High24Hr = 0, Low24Hr = 0, WeekHigh = 0,WeekLow =0,Week52High=0,Week52Low=0;
                 short UpDownBit = 0;
-                decimal tradeprice = 0,todayopen,todayclose;
+                decimal tradeprice = 0, todayopen, todayclose;
                 var tradedata = _tradeTransactionQueueRepository.GetSingle(x => x.TrnDate > _basePage.UTC_To_IST().AddDays(-1) && x.PairID == PairId && x.Status == 1);
                 if (tradedata != null)
                 {
@@ -252,63 +407,92 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     Volume24 = 0;
                 }
 
-                //Calculate High24Hr,Low24Hr,UpDownBit
-                var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
-                if(pairData.High24Hr == 0 && pairData.Low24Hr == 0 && pairData.UpDownBit == 0)
+
+                //Insert In GraphDetail Only BidPrice
+                var tradegraph = new TradeGraphDetail()
                 {
-                    High24Hr = CurrentRate;
-                    Low24Hr = CurrentRate;
-                    UpDownBit = 1;
+                    PairId = PairId,
+                    TranNo = TrnNo,
+                    DataDate = _basePage.UTC_To_IST(),
+                    ChangePer = ChangePer,
+                    Volume = Volume24,
+                    BidPrice = CurrentRate,
+                    LTP = CurrentRate,
+                    Quantity = Quantity,
+                    CreatedBy = 1,
+                    CreatedDate = _basePage.UTC_To_IST()
+                };
+                tradegraph = _graphDetailRepository.Add(tradegraph);
+
+
+                //Calculate High Low Data For 24Hr
+                var tradegraphdetail = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-1) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
+                High24Hr = CurrentRate;
+                Low24Hr = CurrentRate;
+                if (tradegraphdetail.Count > 0)
+                {         
+                    foreach (TradeGraphDetail type in tradegraphdetail)
+                    {
+                        if (type.BidPrice > High24Hr)
+                        {
+                            High24Hr = type.BidPrice;
+                        }
+                        if (type.BidPrice < Low24Hr)
+                        {
+                            Low24Hr = type.BidPrice;
+                        }
+                    }                  
                 }
-                else
+              
+
+
+                //Calculate High Low Data For Week
+                var tradegraphdetail2 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-7) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
+                WeekHigh = CurrentRate;
+                WeekLow = CurrentRate;
+                if (tradegraphdetail2.Count > 0)
                 {
-                    if(CurrentRate > pairData.High24Hr)
+                    foreach (TradeGraphDetail type in tradegraphdetail2)
                     {
-                        High24Hr = CurrentRate;
-                        Low24Hr = pairData.Low24Hr;
-                        UpDownBit = 1;
-                    }
-                    else if(CurrentRate < pairData.Low24Hr)
-                    {
-                        Low24Hr = CurrentRate;
-                        High24Hr = pairData.High24Hr;
-                        UpDownBit = 0;
-                    }
-                    else
-                    {
-                        Low24Hr = pairData.Low24Hr;
-                        High24Hr = pairData.High24Hr;
-                        if(CurrentRate < pairData.LTP)
+                        if (type.BidPrice > WeekHigh)
                         {
-                            UpDownBit = 0;
+                            WeekHigh = type.BidPrice;
                         }
-                        else if(CurrentRate > pairData.LTP)
+                        if (type.BidPrice < WeekLow)
                         {
-                            UpDownBit = 1;
+                            WeekLow = type.BidPrice;
                         }
                     }
                 }
 
-                //Update Pair Statstics Data
-                pairData.ChangePer24 = ChangePer;
-                pairData.ChangeVol24 = Volume24;
-                pairData.High24Hr = High24Hr;
-                pairData.Low24Hr = Low24Hr;
-                pairData.UpDownBit = UpDownBit;
-                pairData.LTP = CurrentRate;
-                pairData.CurrentRate = CurrentRate;
-                _tradePairStastics.Update(pairData);
+                //Calculate High Low Data For 52Week
+                var tradegraphdetail3 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-365) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
+                Week52High = CurrentRate;
+                Week52Low = CurrentRate;
+                if (tradegraphdetail3.Count > 0)
+                {
+                    foreach (TradeGraphDetail type in tradegraphdetail2)
+                    {
+                        if (type.BidPrice > Week52High)
+                        {
+                            Week52High = type.BidPrice;
+                        }
+                        if (type.BidPrice < Week52Low)
+                        {
+                            Week52Low = type.BidPrice;
+                        }
+                    }
+                }              
 
-
-                //Calculate TodayOpen,TodayClose
+                //Calculate Open Close
                 var now = _basePage.UTC_To_IST();
                 DateTime startDateTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
                 DateTime endDateTime = _basePage.UTC_To_IST();
 
-                var tradegraphdetail = _graphDetailRepository.FindBy(x => x.DataDate >= startDateTime && x.DataDate <= endDateTime).OrderBy(x => x.TranNo).FirstOrDefault();
-                if(tradegraphdetail != null)
+                var tradegraphdetail1 = _graphDetailRepository.FindBy(x => x.DataDate >= startDateTime && x.DataDate <= endDateTime).OrderBy(x => x.TranNo).FirstOrDefault();
+                if (tradegraphdetail1 != null)
                 {
-                    todayopen = tradegraphdetail.LTP;
+                    todayopen = tradegraphdetail1.BidPrice;
                     todayclose = CurrentRate;
                 }
                 else
@@ -317,24 +501,53 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     todayclose = CurrentRate;
                 }
 
-                //Add Data Into Graph Table
-                var tradegraph = new TradeGraphDetail()
-                {
-                    PairId = PairId,
-                    TranNo = TrnNo,
-                    DataDate = _basePage.UTC_To_IST(),
-                    ChangePer = ChangePer,
-                    Volume = Volume24,
-                    High24Hr = High24Hr,
-                    Low24Hr = Low24Hr,
-                    LTP = CurrentRate,
-                    TodayOpen = todayopen,
-                    TodayClose = todayclose,
-                    CreatedBy = 1,
-                    CreatedDate = _basePage.UTC_To_IST()
-                };
-                _graphDetailRepository.Add(tradegraph);
 
+                //Update TradeGraph Detail Data
+
+                tradegraph.High24Hr = High24Hr;
+                tradegraph.Low24Hr = Low24Hr;
+                tradegraph.HighWeek = WeekHigh;
+                tradegraph.LowWeek = WeekLow;
+                tradegraph.High52Week = Week52High;
+                tradegraph.Low52Week = Week52Low;
+                tradegraph.LTP = CurrentRate;
+                tradegraph.TodayOpen = todayopen;
+                tradegraph.TodayClose = todayclose;                   
+                _graphDetailRepository.Update(tradegraph);
+
+
+                var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
+                pairData.ChangePer24 = ChangePer;
+                pairData.ChangeVol24 = Volume24;
+                pairData.High24Hr = High24Hr;
+                pairData.Low24Hr = Low24Hr;
+                pairData.LTP = CurrentRate;
+                pairData.CurrentRate = CurrentRate;
+                pairData.HighWeek = WeekHigh;
+                pairData.LowWeek = WeekLow;
+                pairData.High52Week = Week52High;
+                pairData.Low52Week = Week52Low;
+                
+                if (CurrentRate > pairData.High24Hr)
+                {  
+                    UpDownBit = 1;
+                }
+                else if (CurrentRate < pairData.Low24Hr)
+                {  
+                    UpDownBit = 0;
+                }
+                else
+                {
+                    if (CurrentRate < pairData.LTP)
+                    {
+                        UpDownBit = 0;
+                    }
+                    else if (CurrentRate > pairData.LTP)
+                    {
+                        UpDownBit = 1;
+                    }
+                }
+                _tradePairStastics.Update(pairData);
             }
             catch (Exception ex)
             {

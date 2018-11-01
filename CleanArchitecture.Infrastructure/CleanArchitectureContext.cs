@@ -143,6 +143,10 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<LimitRuleMaster> LimitRuleMaster { get; set; } //Uday 30-10-2018
         public DbSet<TradeBuyerList> TradeBuyerList { get; set; } //Uday 30-10-2018
         public DbSet<TradeSellerList> TradeSellerList { get; set; } //Uday 30-10-2018
+        public DbSet<SettledTradeTransactionQueue> SettledTradeTransactionQueue { get; set; } //Rita 31-10-2018
+        public DbSet<TradePoolConfiguration> TradePoolConfiguration { get; set; } //Rita 31-10-2018
+        public DbSet<TradePoolQueue> TradePoolQueue { get; set; } //Rita 31-10-2018
+        public DbSet<TransactionStatus> TransactionStatus { get; set; } //Rita 31-10-2018
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
@@ -219,6 +223,8 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<WalletLimitConfiguration>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi 30102018 https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
             modelBuilder.Entity<UserPreferencesMaster>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
             modelBuilder.Entity<TradeBitGoDelayAddresses>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
+            modelBuilder.Entity<TransactionStatus>().HasKey(e => new { e.TrnNo, e.ServiceID,e.SerProID });//Rita 31-10-2018 for composite Primary key
+
         }
 
         /// <summary>

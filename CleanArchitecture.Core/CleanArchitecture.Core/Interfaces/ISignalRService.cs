@@ -35,7 +35,9 @@ namespace CleanArchitecture.Core.Interfaces
 
         //Event Call
         void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, String Token);
-
-        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction);
+        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction,short IsPop=0);
+        GetTradeHistoryInfo GetAndSendGetTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0);
+        void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData);
+        //void OnChartDataChange(List<GetGraphResponse> dataList,string Pair);
     }
 }

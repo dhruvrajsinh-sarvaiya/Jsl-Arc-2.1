@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.Interfaces.Repository
     public interface IFrontTrnRepository
     {
         List<ActiveOrderDataResponse> GetActiveOrder(long MemberID, string sCondition, string FromDate, string TodDate, long PairId);
-        List<TradeHistoryResponce> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll);
+        List<TradeHistoryResponce> GetTradeHistory(long MemberID, string sCondition, string FromDate, string TodDate, int page, int IsAll, long TrnNo = 0);
         long GetPairIdByName(string pair);
         List<RecentOrderRespose> GetRecentOrder(long PairId, long MemberID);
         List<GetBuySellBook> GetBuyerBook(long id,decimal Price= -0);
