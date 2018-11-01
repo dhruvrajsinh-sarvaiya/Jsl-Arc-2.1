@@ -140,13 +140,13 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 CreditWalletID = TradeTransactionQueueObj.DeliveryWalletID;
                 CreditAccountID = _WalletService.GetAccWalletID(CreditWalletID);
 
-
-                TradeBuyRequestObj.Status = Convert.ToInt16(enTransactionStatus.Hold);
+                                
+                TradeBuyRequestObj.MakeTransactionHold();
                 TradeBuyRequestObj.UpdatedDate = Helpers.UTC_To_IST();
                 TradeBuyRequestObj.IsProcessing = 1;
                 _TradeBuyRequest.Update(TradeBuyRequestObj);
-
-                TradeBuyerListObj.Status = Convert.ToInt16(enTransactionStatus.Hold);
+                
+                TradeBuyerListObj.MakeTransactionHold();
                 TradeBuyerListObj.UpdatedDate = Helpers.UTC_To_IST();
                 TradeBuyerListObj.IsProcessing = 1;
                 _TradeBuyerList.Update(TradeBuyerListObj);
@@ -186,11 +186,10 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         }
                         InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SellerList.RemainQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
 
-                        SellerList.RemainQty = SellerList.RemainQty - SellerList.RemainQty;//take all
-                        SellerList.Status = Convert.ToInt16(enTransactionStatus.Success);                       
-                        PoolMst.TotalQty = PoolMst.TotalQty - SellerList.RemainQty;
-
-                        PoolOrderObj.Status = Convert.ToInt16(enTransactionStatus.Success);
+                        SellerList.RemainQty = SellerList.RemainQty - SellerList.RemainQty;//take all                        
+                        SellerList.MakeTransactionSuccess();
+                        PoolMst.TotalQty = PoolMst.TotalQty - SellerList.RemainQty;                        
+                        PoolOrderObj.MakeTransactionSuccess();
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
 
                         _dbContext.Database.BeginTransaction();
@@ -227,14 +226,16 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, TradeBuyRequestObj.PendingQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
 
                         TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + TradeBuyRequestObj.PendingQty;
-                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - TradeBuyRequestObj.PendingQty;//take all 
-                        TradeBuyRequestObj.Status = Convert.ToInt16(enTransactionStatus.Success);
-                        TradeBuyerListObj.Status = Convert.ToInt16(enTransactionStatus.Success);
+                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - TradeBuyRequestObj.PendingQty;//take all
+                        
+                        TradeBuyRequestObj.MakeTransactionSuccess();
+                        TradeBuyerListObj.MakeTransactionSuccess();                        
                         TransactionQueueObj.MakeTransactionSuccess();
                         TradeTransactionQueueObj.MakeTransactionSuccess();
+
                         TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + TradeBuyRequestObj.PendingQty;
 
-                        PoolOrderObj.Status = Convert.ToInt16(enTransactionStatus.Success);
+                        PoolOrderObj.MakeTransactionSuccess();
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
 
                         _dbContext.Database.BeginTransaction();
@@ -244,6 +245,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _dbContext.Entry(SellerList).State = EntityState.Modified;
                         _dbContext.Entry(PoolMst).State = EntityState.Modified;
                         _dbContext.Entry(TradeBuyerListObj).State = EntityState.Modified;
+                        _dbContext.Entry(TransactionQueueObj).State = EntityState.Modified;
+                        _dbContext.Entry(TradeTransactionQueueObj).State = EntityState.Modified;
                         _dbContext.SaveChanges();
 
                         _dbContext.Database.CommitTransaction();
