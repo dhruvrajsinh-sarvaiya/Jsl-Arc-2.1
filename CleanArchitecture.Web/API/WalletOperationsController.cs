@@ -504,8 +504,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SetUserPreferences(int? GlobalBit)
+        [HttpPost("{GlobalBit}")]
+        public async Task<IActionResult> SetUserPreferences(short GlobalBit)
         {
             UserPreferencesRes response = new UserPreferencesRes();
             response.BizResponse = new BizResponseClass();
