@@ -33,6 +33,8 @@ namespace CleanArchitecture.Core.Entities
         
         public short? IsDefaultWallet { get; set; }
 
+        public short? ConfirmationCount { get; set; }
+
         public void DisableStatus()
         {
             Status  = Convert.ToInt16(ServiceStatus.Disable);

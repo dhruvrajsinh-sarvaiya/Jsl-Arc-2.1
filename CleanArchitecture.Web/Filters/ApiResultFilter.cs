@@ -8,15 +8,18 @@ using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Web.Helper;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
 
 namespace CleanArchitecture.Web.Filters
 {
     public class ApiResultFilter : ActionFilterAttribute
     {
         private readonly IBasePage _basePage;
-        public ApiResultFilter(IBasePage basePage)
+        private readonly IConfiguration _configuration;
+        public ApiResultFilter(IBasePage basePage, IConfiguration configuration)
         {
             _basePage = basePage;
+            _configuration = configuration;
         }
 
         public override void OnResultExecuting(ResultExecutingContext context)
@@ -30,6 +33,19 @@ namespace CleanArchitecture.Web.Filters
                 //context.Result = new ValidationFailedResult(context.ModelState);
                 context.Result = new MyResponse(context.ModelState);
             }
+
+            if (((Microsoft.AspNetCore.Http.Internal.DefaultHttpRequest)((Microsoft.AspNetCore.Http.DefaultHttpContext)context.HttpContext).Request).Path.ToString() != _configuration["ASOSToken"].ToString())
+            {
+                string ReturnCode = ((Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)?.ErrorCode.ToString();
+                if (ReturnCode == "Status500InternalServerError")
+                {
+                    string ReturnMsg = ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg;
+                    HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+                    HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+                    ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg = "Error occurred.";
+                }
+            }
+
 
             //if (((Microsoft.AspNetCore.Mvc.SignInResult)context.Result).AuthenticationScheme.ToString() != "ASOS")
             //{

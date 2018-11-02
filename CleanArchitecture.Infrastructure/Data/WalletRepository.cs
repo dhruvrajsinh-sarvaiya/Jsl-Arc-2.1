@@ -1411,6 +1411,36 @@ namespace CleanArchitecture.Infrastructure.Data
             //    return bals.Balance;
 
         }
+
+        //vsolanki 2018-11-02
+        public List<OutgoingTrnRes> GetOutGoingTransaction(long Userid)
+        {
+            var trns = (from trn in _dbContext.WithdrawHistory
+                        join wt in _dbContext.WalletTypeMasters
+                        on trn.SMSCode equals wt.WalletTypeName
+                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid 
+                        select new OutgoingTrnRes
+                        {
+                            AutoNo = trn.Id,
+                            TrnID = trn.TrnID,
+                            WalletType = trn.SMSCode,
+                            Confirmations = trn.Confirmations,
+                            Amount = trn.Amount,
+                            Address = trn.Address,
+                            ConfirmationCount=wt.ConfirmationCount
+                        }).ToList();
+            var test = trns.Select((r, i) => new OutgoingTrnRes
+            {
+                AutoNo = i + 1,
+                TrnID = r.TrnID,
+                WalletType = r.WalletType,
+                Confirmations = r.Confirmations,
+                Amount = r.Amount,
+                Address = r.Address,
+                ConfirmationCount = r.ConfirmationCount
+            }).ToList();
+            return test;
+        }
     }
 
 }

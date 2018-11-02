@@ -468,8 +468,8 @@ namespace CleanArchitecture.Web.API
                     }
                 }
                 long MemberID =user.Id;
-                Response.responce = _frontTrnService.GetRecentOrder(PairId,MemberID);
-                if (Response.responce.Count == 0)
+                Response.response = _frontTrnService.GetRecentOrder(PairId,MemberID);
+                if (Response.response.Count == 0)
                 {
                     Response.ErrorCode = enErrorCode.NoDataFound;
                     Response.ReturnCode = enResponseCode.Success;
