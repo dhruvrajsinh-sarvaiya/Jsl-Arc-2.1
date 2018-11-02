@@ -16,17 +16,17 @@ namespace CleanArchitecture.Core.Entities.User
 
         public bool EnableStatus { get; set; }
 
-        public void SetAsUniqueKeyStatus()
+        public void SetAsPasswordStatus()
         {
             EnableStatus = true;
             Events.Add(new ServiceStatusEvent<UserKeyMaster>(this));
         }
 
-        public void SetAsUpdateDate(long Id)
-        {
-            UpdatedDate = DateTime.UtcNow;
-            UpdatedBy = Id;
-            Events.Add(new ServiceStatusEvent<UserKeyMaster>(this));
-        }
+        //public void SetAsUpdateDate(long Id)
+        //{
+        //    UpdatedDate = DateTime.UtcNow;
+        //    UpdatedBy = Id;
+        //    Events.Add(new ServiceStatusEvent<CustomPassword>(this));
+        //}
     }
 }
