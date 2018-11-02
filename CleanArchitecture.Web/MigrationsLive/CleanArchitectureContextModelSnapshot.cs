@@ -1114,6 +1114,8 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ConfirmationCount");
+
                     b.Property<decimal>("ConvertAmount")
                         .HasColumnType("decimal(18, 8)");
 
@@ -3510,6 +3512,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<short?>("ConfirmationCount");
 
                     b.Property<long>("CreatedBy");
 
