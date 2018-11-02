@@ -601,11 +601,6 @@ namespace CleanArchitecture.Infrastructure.Services
                     addressMaster = GetAddressObj(walletMaster.Id, transactionProviderResponses[0].ServiceProID, Respaddress, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
                     string responseString = Respaddress;
-                    //CreateWalletAddressRes Response = new CreateWalletAddressRes();
-                    //Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
-                    //Response.ReturnCode = enResponseCode.Success;
-                    //var respObj = JsonConvert.SerializeObject(Response);
-                    //dynamic respObjJson = JObject.Parse(respObj);
                     return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CreateAddressSuccessMsg };
                     //return respObj;
                 }
@@ -620,7 +615,6 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 HelperForLog.WriteErrorLog("GenerateAddress ", "WalletService", ex);
                 //HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Transaction/Withdraw Process Start" + "##TrnNo:" + Req.TrnNo);
-
                 throw ex;
             }
         }
@@ -1450,6 +1444,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddressResponse.ReturnCode = enResponseCode.Success;
                     AddressResponse.ErrorCode = enErrorCode.Success;
                     AddressResponse.ReturnMsg = EnResponseMessage.FindRecored;
+                    AddressResponse.ErrorCode = enErrorCode.Success;
                 }
                 return AddressResponse;
             }
@@ -1538,7 +1533,8 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.EndTimeUnix = request.EndTimeUnix;
                     newobj = _LimitcommonRepository.Add(newobj);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
-                    // Response.WalletLimitConfigurationRes = newobj;
+                    Response.ReturnCode = enResponseCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -1555,6 +1551,8 @@ namespace CleanArchitecture.Infrastructure.Services
                         IsExist.UpdatedDate = UTC_To_IST();
                         _LimitcommonRepository.Update(IsExist);
                         Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
+                        Response.ReturnCode = enResponseCode.Success;
+                        Response.ErrorCode = enErrorCode.Success;
                     }
                     else
                     {
@@ -1563,7 +1561,6 @@ namespace CleanArchitecture.Infrastructure.Services
                         Response.ErrorCode = enErrorCode.InvalidLimit;
                     }
                 }
-                Response.ReturnCode = enResponseCode.Success;
                 return Response;
             }
             catch (Exception ex)
@@ -1603,6 +1600,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     //newRes.StartTime =
                     LimitResponse.WalletLimitConfigurationRes = WalletLimitResponse;
                     LimitResponse.ReturnCode = enResponseCode.Success;
+                    LimitResponse.ErrorCode = enErrorCode.Success;
                     LimitResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
                 return LimitResponse;
@@ -2052,13 +2050,15 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddNew.WalletTypeID = walletMasters.Id;
                     AddNew = _BeneficiarycommonRepository.Add(AddNew);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
                 }
                 else
                 {
                     Response.BizResponse.ReturnMsg = EnResponseMessage.AlredyExist;
+                    Response.BizResponse.ErrorCode = enErrorCode.AlredyExist;
                     Response.BizResponse.ReturnCode = enResponseCode.Fail;
-                }
-                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                }                
                 return Response;
             }
             catch (Exception ex)
@@ -2097,6 +2097,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     Response.Beneficiaries = BeneficiaryMasterRes;
                     Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
                     Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
                     return Response;
                 }
@@ -2135,6 +2136,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     Response.Beneficiaries = BeneficiaryMasterRes;
                     Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
                     Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
                     return Response;
                 }
@@ -2280,6 +2282,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.Status = Convert.ToInt16(ServiceStatus.Active);
                     newobj = _UserPreferencescommonRepository.Add(newobj);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefSuccessMsg;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -2288,6 +2291,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     IsExist.UpdatedDate = UTC_To_IST();
                     _UserPreferencescommonRepository.Update(IsExist);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.SetUserPrefUpdateMsg;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
                 }
                 Response.BizResponse.ReturnCode = enResponseCode.Success;
                 return Response;
@@ -2316,9 +2320,10 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     Response.IsWhitelisting = IsExist.IsWhitelisting;
                     Response.UserID = IsExist.UserID;
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
                     Response.BizResponse.ReturnMsg = EnResponseMessage.FindRecored;
-                }
-                Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
+                }                
                 return Response;
             }
             catch (Exception ex)
@@ -2338,6 +2343,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (state == true)
                 {
                     Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
                 }
                 else
@@ -2380,6 +2386,8 @@ namespace CleanArchitecture.Infrastructure.Services
                     IsExist.UpdatedDate = UTC_To_IST();
                     _BeneficiarycommonRepository.Update(IsExist);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
+                    Response.BizResponse.ReturnCode = enResponseCode.Success;
+                    Response.BizResponse.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -2654,7 +2662,15 @@ namespace CleanArchitecture.Infrastructure.Services
                     return new CreateWalletAddressRes { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.OrgIDNotFound, ErrorCode = enErrorCode.OrgIDNotFound };
                 }
                 var type = _WalletTypeMasterRepository.GetSingle(t => t.WalletTypeName == Coin);
+                if(type==null)
+                {
+                    return new CreateWalletAddressRes { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidCoin, ErrorCode = enErrorCode.InvalidCoinName };
+                }
                 var walletObj = _commonRepository.FindBy(t => t.UserID == orgid && t.IsDefaultWallet == 1 && t.WalletTypeID == type.Id).FirstOrDefault();
+                if (walletObj == null)
+                {
+                    return new CreateWalletAddressRes { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
+                }
                 for (int i = 1; i <= AddressCount; i++)
                 {
                     addr = GenerateAddress(walletObj.AccWalletID, Coin,1);
@@ -2687,7 +2703,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 return Response;
             }
             var Histories = _walletRepository1.GetOutGoingTransaction(Userid, Coin);
-            if (Histories.Count() == 0)
+            if (Histories.Count() == 0 || Histories == null)
             {
                 Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
                 Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
