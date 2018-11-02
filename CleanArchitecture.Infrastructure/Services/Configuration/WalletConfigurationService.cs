@@ -1,9 +1,11 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Configuration;
 using CleanArchitecture.Core.ViewModels.WalletConfiguration;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -19,14 +21,16 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
         private readonly ILogger<WalletConfigurationService> _log;
+        private readonly IWalletRepository _walletRepository;
 
         #endregion
 
         #region "cotr"
-        public WalletConfigurationService(ILogger<WalletConfigurationService> log, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ILogger<BasePage> logger) : base(logger)
+        public WalletConfigurationService(ILogger<WalletConfigurationService> log, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ILogger<BasePage> logger, IWalletRepository walletRepository) : base(logger)
         {
             _log = log;
             _WalletTypeMasterRepository = WalletTypeMasterRepository;
+            _walletRepository = walletRepository;
         }
         #endregion
 
@@ -42,7 +46,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 IEnumerable<WalletTypeMaster> coin = new List<WalletTypeMaster>();
                 coin = _WalletTypeMasterRepository.FindBy(item => item.Status != Convert.ToInt16(ServiceStatus.Disable));
-                if(coin==null)
+                if (coin == null)
                 {
                     listWalletTypeMasterResponse.ReturnCode = enResponseCode.Fail;
                     listWalletTypeMasterResponse.ReturnMsg = EnResponseMessage.NotFound;
@@ -55,12 +59,12 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     listWalletTypeMasterResponse.ReturnCode = enResponseCode.Success;
                     listWalletTypeMasterResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
-                           
+
                 return listWalletTypeMasterResponse;
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 listWalletTypeMasterResponse.ReturnCode = enResponseCode.InternalError;
                 return listWalletTypeMasterResponse;
             }
@@ -73,23 +77,23 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             WalletTypeMaster _walletTypeMaster = new WalletTypeMaster();
             try
             {
-                if(addWalletTypeMasterRequest==null)
+                if (addWalletTypeMasterRequest == null)
                 {
-                    walletTypeMasterResponse.ReturnCode= enResponseCode.Success;
+                    walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.NotFound;
                     return walletTypeMasterResponse;
                 }
                 else
-                { 
-                _walletTypeMaster.CreatedBy = Userid;
-                _walletTypeMaster.CreatedDate = UTC_To_IST();
-                _walletTypeMaster.IsDepositionAllow = addWalletTypeMasterRequest.IsDepositionAllow;
-                _walletTypeMaster.IsTransactionWallet = addWalletTypeMasterRequest.IsTransactionWallet;
-                _walletTypeMaster.IsWithdrawalAllow = addWalletTypeMasterRequest.IsWithdrawalAllow;
-                _walletTypeMaster.WalletTypeName = addWalletTypeMasterRequest.WalletTypeName;
-                _walletTypeMaster.Discription = addWalletTypeMasterRequest.Description;
-                _walletTypeMaster.Status = Convert.ToInt16(ServiceStatus.Active);
-                _WalletTypeMasterRepository.Add(_walletTypeMaster);
+                {
+                    _walletTypeMaster.CreatedBy = Userid;
+                    _walletTypeMaster.CreatedDate = UTC_To_IST();
+                    _walletTypeMaster.IsDepositionAllow = addWalletTypeMasterRequest.IsDepositionAllow;
+                    _walletTypeMaster.IsTransactionWallet = addWalletTypeMasterRequest.IsTransactionWallet;
+                    _walletTypeMaster.IsWithdrawalAllow = addWalletTypeMasterRequest.IsWithdrawalAllow;
+                    _walletTypeMaster.WalletTypeName = addWalletTypeMasterRequest.WalletTypeName;
+                    _walletTypeMaster.Discription = addWalletTypeMasterRequest.Description;
+                    _walletTypeMaster.Status = Convert.ToInt16(ServiceStatus.Active);
+                    _WalletTypeMasterRepository.Add(_walletTypeMaster);
                     walletTypeMasterResponse.walletTypeMaster = _walletTypeMaster;
                     walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.RecordAdded;
@@ -99,7 +103,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+
                 walletTypeMasterResponse.ReturnCode = enResponseCode.InternalError;
                 return walletTypeMasterResponse;
             }
@@ -140,7 +145,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+
                 walletTypeMasterResponse.ReturnCode = enResponseCode.InternalError;
                 return walletTypeMasterResponse;
             }
@@ -152,22 +158,23 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 var _walletTypeMaster = _WalletTypeMasterRepository.GetById(WalletTypeId);
-                if(_walletTypeMaster==null)
+                if (_walletTypeMaster == null)
                 {
                     return new BizResponseClass { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
-                }         
+                }
                 else
                 {
                     //_WalletTypeMasterRepository.Delete(_walletTypeMaster);
                     _walletTypeMaster.DisableStatus();
                     _WalletTypeMasterRepository.Update(_walletTypeMaster);
-                    return new BizResponseClass {  ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordDisable };
-                }            
+                    return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordDisable };
+                }
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                return new BizResponseClass { ReturnCode = enResponseCode.InternalError,   };
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+
+                return new BizResponseClass { ReturnCode = enResponseCode.InternalError, };
             }
         }
 
@@ -177,8 +184,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             WalletTypeMasterResponse walletTypeMasterResponse = new WalletTypeMasterResponse();
             try
             {
-                var _walletTypeMaster = _WalletTypeMasterRepository.GetSingle(item => item.Id== WalletTypeId && item.Status != Convert.ToInt16(ServiceStatus.Disable));
-                if(_walletTypeMaster==null)
+                var _walletTypeMaster = _WalletTypeMasterRepository.GetSingle(item => item.Id == WalletTypeId && item.Status != Convert.ToInt16(ServiceStatus.Disable));
+                if (_walletTypeMaster == null)
                 {
                     walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.NotFound;
@@ -191,15 +198,52 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.FindRecored;
                     return walletTypeMasterResponse;
                 }
-               //return _walletTypeMaster;
+                //return _walletTypeMaster;
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Date: " + UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+
                 walletTypeMasterResponse.ReturnCode = enResponseCode.InternalError;
                 return walletTypeMasterResponse;
             }
         }
+
+        #endregion
+
+        #region "Other Methods"
+
+        //vsolanki 2018-11-2
+        public TransferInOutRes GetTransferIn(string Coin, DateTime? FromDate, DateTime? ToDate, short Status)
+        {
+            TransferInOutRes transfer = new TransferInOutRes();
+            transfer.BizResponseObj = new BizResponseClass();
+            try
+            {
+                var trans = _walletRepository.GetTransferIn(Coin, FromDate, ToDate, Status);
+                if (trans == null)
+                {
+                    transfer.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    transfer.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    transfer.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    return transfer;
+                }
+                else
+                {
+                    transfer.Transfers = trans;
+                    transfer.BizResponseObj.ReturnCode = enResponseCode.Success;
+                    transfer.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                    transfer.BizResponseObj.ErrorCode = enErrorCode.Success;  
+                    return transfer;
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
         #endregion
 
         #endregion

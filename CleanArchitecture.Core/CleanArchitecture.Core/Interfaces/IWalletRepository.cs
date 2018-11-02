@@ -107,5 +107,7 @@ namespace CleanArchitecture.Core.Interfaces
         decimal GetLedgerLastPostBal(long walletId);
 
         List<OutgoingTrnRes> GetOutGoingTransaction(long Userid, string Coin);
+
+        List<TransfersRes> GetTransferIn(string Coin, DateTime? FromDate, DateTime? ToDate, short Status);
     }
 }

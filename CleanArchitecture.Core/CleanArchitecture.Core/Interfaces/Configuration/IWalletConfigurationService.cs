@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.ViewModels.WalletConfiguration;
+using CleanArchitecture.Core.ViewModels.WalletOperations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,6 +21,13 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
         BizResponseClass DisableWalletTypeMaster(long WalletTypeId);
 
         WalletTypeMasterResponse GetWalletTypeMasterById(long WalletTypeId);
+        #endregion
+
+        #region "Other Method"
+
+        //vsoalnki 2018-11-2
+        TransferInOutRes GetTransferIn(string Coin, DateTime? FromDate, DateTime? ToDate, short Status);
+
         #endregion
     }
 }
