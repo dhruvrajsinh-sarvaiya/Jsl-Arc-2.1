@@ -35,6 +35,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<FavouritePair> _favouritePairRepository;
         private readonly IBasePage _basePage;
         private readonly ICommonRepository<TradeGraphDetail> _graphDetailRepository;
+        private readonly ISignalRService _signalRService;
 
         public FrontTrnService(IFrontTrnRepository frontTrnRepository,
             ICommonRepository<TradePairMaster> tradeMasterRepository,
@@ -47,7 +48,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ICommonRepository<Market> marketRepository,
             ICommonRepository<FavouritePair> favouritePairRepository,
             IBasePage basePage,
-            ICommonRepository<TradeGraphDetail> graphDetailRepository)
+            ICommonRepository<TradeGraphDetail> graphDetailRepository,
+            ISignalRService signalRService)
 
         {
             _frontTrnRepository = frontTrnRepository;
@@ -62,6 +64,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _favouritePairRepository = favouritePairRepository;
             _basePage = basePage;
             _graphDetailRepository = graphDetailRepository;
+            _signalRService = signalRService;
         }
 
         #region method
@@ -546,7 +549,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
                 _tradePairStastics.Update(pairData);
 
-                //void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData)
+                var VolumeData = GetVolumeDataByPair(PairId);
+                var MarketData = GetMarketCap(PairId);
+
+                _signalRService.OnVolumeChange(VolumeData, MarketData);
             }
             catch (Exception ex)
             {
