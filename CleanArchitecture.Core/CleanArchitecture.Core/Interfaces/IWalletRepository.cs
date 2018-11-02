@@ -106,5 +106,6 @@ namespace CleanArchitecture.Core.Interfaces
 
         decimal GetLedgerLastPostBal(long walletId);
 
+        List<OutgoingTrnRes> GetOutGoingTransaction(long Userid);
     }
 }

@@ -134,5 +134,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         //vsoalnki 2018-10-31
         CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId);
 
+        ListOutgoingTrnRes GetOutGoingTransaction(long Userid);
+
     }
 }

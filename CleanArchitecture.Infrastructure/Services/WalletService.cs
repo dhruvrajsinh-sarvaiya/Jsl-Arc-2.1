@@ -2582,7 +2582,24 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-      
+        //vsolanki 2018-11-02
+        public ListOutgoingTrnRes GetOutGoingTransaction(long Userid)
+        {
+            ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
+            Response.BizResponseObj = new BizResponseClass();
+            var Histories = _walletRepository1.GetOutGoingTransaction(Userid);
+            if (Histories.Count() == 0)
+            {
+                Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                return Response;
+            }
+            Response.OutGoingTransactions = Histories;
+            Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+            Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            return Response;
+        }
     }
 
 }
