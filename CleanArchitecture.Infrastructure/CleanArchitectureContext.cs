@@ -59,6 +59,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<RequestFormatMaster> RequestFormatMaster { get; set; }
         public DbSet<ServiceTypeMaster> ServiceTypeMaster { get; set; }
         public DbSet<TemplateMaster> TemplateMaster { get; set; }
+        public DbSet<UserKeyMaster> UserKeyMaster { get; set; }
         // wallet tables
         public DbSet<WalletTypeMaster> WalletTypeMasters { get; set; }
         public DbSet<WalletMaster> WalletMasters { get; set; }
