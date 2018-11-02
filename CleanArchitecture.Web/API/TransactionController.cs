@@ -218,7 +218,7 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                BizResponse MethodRespCancel = _cancelOrderProcess.ProcessCancelOrder(Request);
+                Task<BizResponse> MethodRespCancel = _cancelOrderProcess.ProcessCancelOrderAsync(Request);
                 return Ok(MethodRespCancel);
             }
             catch (Exception ex)
