@@ -140,13 +140,13 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 CreditWalletID = TradeTransactionQueueObj.DeliveryWalletID;
                 CreditAccountID = _WalletService.GetAccWalletID(CreditWalletID);
 
-
-                TradeBuyRequestObj.Status = Convert.ToInt16(enTransactionStatus.Hold);
+                                
+                TradeBuyRequestObj.MakeTransactionHold();
                 TradeBuyRequestObj.UpdatedDate = Helpers.UTC_To_IST();
                 TradeBuyRequestObj.IsProcessing = 1;
                 _TradeBuyRequest.Update(TradeBuyRequestObj);
-
-                TradeBuyerListObj.Status = Convert.ToInt16(enTransactionStatus.Hold);
+                
+                TradeBuyerListObj.MakeTransactionHold();
                 TradeBuyerListObj.UpdatedDate = Helpers.UTC_To_IST();
                 TradeBuyerListObj.IsProcessing = 1;
                 _TradeBuyerList.Update(TradeBuyerListObj);
@@ -155,7 +155,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 var MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
                                                         && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
                                                         item.SellServiceID == TradeBuyRequestObj.ServiceID
-                                                        && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Pending))
+                                                        && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
                                                         && item.RemainQty > 0);//Pending after partial Qty remain
 
                 var MatchSellerList = MatchSellerListBase.OrderBy(x => x.TrnNo).OrderBy(x => x.Price);
@@ -177,7 +177,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                         TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SellerList.RemainQty;
                         TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SellerList.RemainQty;
-
+                        TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + SellerList.RemainQty;
                         //Here Bid Price of pool always low then user given in Order , base on above Query
                         decimal TakeDisc = 0;
                         if (SellerList.Price < TradeBuyRequestObj.BidPrice)
@@ -186,12 +186,10 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         }
                         InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SellerList.RemainQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
 
-                        SellerList.RemainQty = SellerList.RemainQty - SellerList.RemainQty;//take all
-                        SellerList.Status = Convert.ToInt16(enTransactionStatus.Success);
-                        SellerList.IsProcessing = 0;//release as fully Empty
-                        PoolMst.TotalQty = PoolMst.TotalQty - SellerList.RemainQty;
-
-                        PoolOrderObj.Status = Convert.ToInt16(enTransactionStatus.Success);
+                        SellerList.RemainQty = SellerList.RemainQty - SellerList.RemainQty;//take all                        
+                        SellerList.MakeTransactionSuccess();
+                        PoolMst.TotalQty = PoolMst.TotalQty - SellerList.RemainQty;                        
+                        PoolOrderObj.MakeTransactionSuccess();
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
 
                         _dbContext.Database.BeginTransaction();
@@ -200,16 +198,13 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _dbContext.Entry(TradeBuyRequestObj).State = EntityState.Modified;
                         _dbContext.Entry(SellerList).State = EntityState.Modified;
                         _dbContext.Entry(PoolMst).State = EntityState.Modified;
+                        _dbContext.Entry(TradeBuyerListObj).State = EntityState.Modified;
                         _dbContext.SaveChanges();
 
                         _dbContext.Database.CommitTransaction();
 
                         HoldTrnNos.Add(SellerList.TrnNo);
-
-                        //_PoolOrder.Update(PoolOrderObj);
-                        //_TradeBuyRequest.Update(TradeBuyRequestObj);
-                        //_TradeSellerList.Update(SellerList);
-                        //_TradePoolMaster.Update(PoolMst);
+                      
                         //Continuew as record Partially settled
                     }
                     //====================================FULL SETTLEMENT TO MEMBER
@@ -219,8 +214,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, TradeBuyRequestObj.PendingQty, CreditWalletID, CreditAccountID);
 
                         SellerList.RemainQty = SellerList.RemainQty - TradeBuyRequestObj.PendingQty;//Update first as updated value in below line
-                        SellerList.Status = Convert.ToInt16(enTransactionStatus.Hold);
-                        SellerList.IsProcessing = 0;
+                        SellerList.MakeTransactionHold();                    
                         PoolMst.TotalQty = PoolMst.TotalQty - TradeBuyRequestObj.PendingQty;
 
                         //Here Bid Price of pool always low then user given in Order , base on above Query
@@ -233,9 +227,15 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                         TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + TradeBuyRequestObj.PendingQty;
                         TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - TradeBuyRequestObj.PendingQty;//take all
-                        TradeBuyRequestObj.IsProcessing = 0;//release as fully settled
+                        
+                        TradeBuyRequestObj.MakeTransactionSuccess();
+                        TradeBuyerListObj.MakeTransactionSuccess();                        
+                        TransactionQueueObj.MakeTransactionSuccess();
+                        TradeTransactionQueueObj.MakeTransactionSuccess();
 
-                        PoolOrderObj.Status = Convert.ToInt16(enTransactionStatus.Success);
+                        TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + TradeBuyRequestObj.PendingQty;
+
+                        PoolOrderObj.MakeTransactionSuccess();
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
 
                         _dbContext.Database.BeginTransaction();
@@ -244,14 +244,25 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _dbContext.Entry(TradeBuyRequestObj).State = EntityState.Modified;
                         _dbContext.Entry(SellerList).State = EntityState.Modified;
                         _dbContext.Entry(PoolMst).State = EntityState.Modified;
+                        _dbContext.Entry(TradeBuyerListObj).State = EntityState.Modified;
+                        _dbContext.Entry(TransactionQueueObj).State = EntityState.Modified;
+                        _dbContext.Entry(TradeTransactionQueueObj).State = EntityState.Modified;
                         _dbContext.SaveChanges();
 
                         _dbContext.Database.CommitTransaction();
-                      
+
+                        HoldTrnNos.Add(SellerList.TrnNo);
+
                         break;//record settled
                     }
+                    SellerList.IsProcessing = 0;//Release Seller List
+                    _TradeSellerList.Update(SellerList);
 
                 }
+                TradeBuyRequestObj.IsProcessing = 0;
+                _TradeBuyRequest.Update(TradeBuyRequestObj);
+                TradeBuyerListObj.IsProcessing = 0;
+                _TradeBuyerList.Update(TradeBuyerListObj);
 
             }
             catch (Exception ex)
