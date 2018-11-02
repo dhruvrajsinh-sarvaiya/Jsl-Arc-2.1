@@ -21,6 +21,6 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels.TwoFA
 
     public class DisableAuthenticatorResponse : BizResponseClass
     {
-        public DisableAuthenticatorResponse disableAuthenticatorViewModel { get; set; }
+        //public DisableAuthenticatorResponse disableAuthenticatorViewModel { get; set; }
     }
 }

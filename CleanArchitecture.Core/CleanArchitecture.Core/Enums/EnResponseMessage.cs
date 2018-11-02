@@ -60,6 +60,7 @@ namespace CleanArchitecture.Core.Enums
         public static string FavPair_NoPairFound = "No Favourites pair found";
         public static string InValidDebitAccountIDMsg = "Invalid Debit Account ID";        
         public static string InValidCreditAccountIDMsg = "Invalid Credit Account ID";
+        public static string CreateTrn_WithdrawAmountBetweenMinAndMax = "Amount Must be Between: @MIN AND @MAX";
         //============================
 
         //============================walelt=================================//       
@@ -243,6 +244,7 @@ namespace CleanArchitecture.Core.Enums
 
         public static string TwoFactorActiveRequest = "User two factor authentication reguest successfully send.";
 
+        public static string FactorKeyFail = "Invalid two factor key.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";

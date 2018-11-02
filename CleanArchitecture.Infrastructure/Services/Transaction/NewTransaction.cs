@@ -403,6 +403,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         return MarkSystemFailTransaction(WalletWhiteListResult);
                     }
 
+                    //Uday 02-11-2018 Check Wallet Amount Limit
+                    var _ServiceLimitCheckObj = _WalletService.GetServiceLimitChargeValue(Req.TrnType, Req.SMSCode);
+                    if (Req.Amount > _ServiceLimitCheckObj.MaxAmount || Req.Amount < _ServiceLimitCheckObj.MinAmount)
+                    {
+                        Req.StatusMsg = EnResponseMessage.CreateTrn_WithdrawAmountBetweenMinAndMax.Replace("@MIN", _ServiceLimitCheckObj.MinAmount.ToString()).Replace("@MAX", _ServiceLimitCheckObj.MaxAmount.ToString());
+                        return MarkSystemFailTransaction(enErrorCode.CreateTrn_NoSelfAddressWithdrawAllow);
+                    }
+
                 }
                 Req.Status = enTransactionStatus.Initialize;
                 Req.StatusCode = Convert.ToInt64(enErrorCode.TransactionInsertSuccess);
