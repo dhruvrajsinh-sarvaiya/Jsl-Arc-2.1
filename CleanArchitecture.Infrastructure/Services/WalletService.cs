@@ -201,7 +201,7 @@ namespace CleanArchitecture.Infrastructure.Services
                             {
                                 BeneficiaryMaster AddNew = new BeneficiaryMaster();
                                 AddNew.IsWhiteListed = Convert.ToInt16(enWhiteListingBit.OFF);
-                                AddNew.Status = 1;
+                                AddNew.Status = Convert.ToInt16(ServiceStatus.Active);
                                 AddNew.CreatedBy = Walletobj.UserID;
                                 AddNew.CreatedDate = UTC_To_IST();
                                 AddNew.UserID = Walletobj.UserID;
@@ -531,7 +531,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     //return false enResponseCodeService.Fail
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
-                else if (walletMaster.Status != 1)
+                else if (walletMaster.Status != Convert.ToInt16(ServiceStatus.Active))
                 {
                     //return false
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
@@ -1034,7 +1034,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var walletResponse = _walletRepository1.GetWalletMasterResponseByCoin(userid, coin);
-                var UserPrefobj = _UserPreferencescommonRepository.FindBy(item => item.UserID == userid && item.Status == 1).FirstOrDefault();
+                var UserPrefobj = _UserPreferencescommonRepository.FindBy(item => item.UserID == userid && item.Status == Convert.ToInt16(ServiceStatus.Active)).FirstOrDefault();
                 if (walletResponse.Count == 0)
                 {
                     listWalletResponse.ReturnCode = enResponseCode.Fail;
@@ -2027,7 +2027,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
                     return Response;
                 }
-                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.Id && item.Status == 1);
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.Id && item.Status == Convert.ToInt16(ServiceStatus.Active));
 
                 if (IsExist == null)
                 {
@@ -2040,7 +2040,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     {
                         AddNew.IsWhiteListed = 0;
                     }
-                    AddNew.Status = 1;
+                    AddNew.Status = Convert.ToInt16(ServiceStatus.Active);
                     AddNew.CreatedBy = UserId;
                     AddNew.CreatedDate = UTC_To_IST();
                     AddNew.UserID = UserId;
@@ -2076,7 +2076,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 //var userPreference = _UserPreferencescommonRepository.GetSingle(item => item.UserID == UserId);
-                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == 1);
+                var walletMasters = _commonRepository.GetSingle(item => item.AccWalletID == AccWalletID && item.UserID == UserId && item.Status == Convert.ToInt16(ServiceStatus.Active));
 
                 if (walletMasters == null)
                 {
@@ -2514,21 +2514,30 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 2018-10-29
         public ListIncomingTrnRes GetIncomingTransaction(long Userid, string Coin)
         {
-            ListIncomingTrnRes Response = new ListIncomingTrnRes();
-            Response.BizResponseObj = new BizResponseClass();
-            var depositHistories = _walletRepository1.GetIncomingTransaction(Userid, Coin);
-            if (depositHistories.Count() == 0)
+            try
             {
-                Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
-                Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                ListIncomingTrnRes Response = new ListIncomingTrnRes();
+                Response.BizResponseObj = new BizResponseClass();
+                var depositHistories = _walletRepository1.GetIncomingTransaction(Userid, Coin);
+                if (depositHistories.Count() == 0)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.IncomingTransactions = depositHistories;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.BizResponseObj.ErrorCode = enErrorCode.Success;
                 return Response;
             }
-            Response.IncomingTransactions = depositHistories;
-            Response.BizResponseObj.ReturnCode = enResponseCode.Success;
-            Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
-            Response.BizResponseObj.ErrorCode = enErrorCode.Success;
-            return Response;
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+
         }
 
         public WalletLedger GetWalletLedgerObj(long WalletID, long toWalletID, decimal drAmount, decimal crAmount, enWalletTrnType trnType, enServiceType serviceType, long trnNo, string remarks, decimal currentBalance, byte status)
@@ -2692,29 +2701,39 @@ namespace CleanArchitecture.Infrastructure.Services
         //vsolanki 2018-11-02
         public ListOutgoingTrnRes GetOutGoingTransaction(long Userid, string Coin)
         {
-            ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
-            Response.BizResponseObj = new BizResponseClass();
-            var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
-            if (type == null)
+            try
             {
-                Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
-                Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
+                Response.BizResponseObj = new BizResponseClass();
+                var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
+                if (type == null)
+                {
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
+                    Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                    return Response;
+                }
+                var Histories = _walletRepository1.GetOutGoingTransaction(Userid, Coin);
+                if (Histories.Count() == 0 || Histories == null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.OutGoingTransactions = Histories;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.BizResponseObj.ErrorCode = enErrorCode.Success;
                 return Response;
             }
-            var Histories = _walletRepository1.GetOutGoingTransaction(Userid, Coin);
-            if (Histories.Count() == 0 || Histories == null)
+            catch (Exception ex)
             {
-                Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
-                Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
-                return Response;
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+                //return false;
             }
-            Response.OutGoingTransactions = Histories;
-            Response.BizResponseObj.ReturnCode = enResponseCode.Success;
-            Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
-            Response.BizResponseObj.ErrorCode = enErrorCode.Success;
-            return Response;
+
         }
     }
 
