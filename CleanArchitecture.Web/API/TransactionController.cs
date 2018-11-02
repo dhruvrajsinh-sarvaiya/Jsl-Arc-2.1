@@ -209,6 +209,20 @@ namespace CleanArchitecture.Web.API
             return returnDynamicResult(Response);
         }
 
+        [HttpPost("CancelOrder")]
+        [Authorize]
+        public ActionResult CancelOrder([FromBody]CancelOrderRequest Request)
+        {
+            try
+            {
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
         [HttpGet("GetVolumeData/{BasePair}")]
         public IActionResult GetVolumeData(string BasePair)
         {
@@ -1238,22 +1252,6 @@ namespace CleanArchitecture.Web.API
         //       //new CreateOrderInfo(){ order_id = 1000001,pair_name = "ltcusd",price = 10,side = "buy",type = "stop-loss",volume = 10},
         //       //new CreateOrderInfo(){ order_id = 1000001,pair_name = "BCHEUR",price = 20,side = "sell",type = "take-profit",volume = 5},
         //       //new CreateOrderInfo(){ order_id = 1000001,pair_name = "ltcusd",price = 20.25M,side = "buy",type = "stop-loss-profit",volume = 100},
-        //    };
-
-        //    Response.ReturnCode = enResponseCode.Success;
-        //    return returnDynamicResult(Response);
-        //}
-
-        //[HttpPost("CancelOrder")]
-        //public ActionResult CancelOrder([FromBody]CancelOrderRequest Request)
-        //{
-        //    //Do Process for CreateOrder
-        //    //For Testing Purpose
-        //    CancelOrderResponse Response = new CancelOrderResponse();
-        //    Response.response = new CancelOrderInfo()
-        //    {
-        //        order_id = 100001,
-        //        message = "Order Cancelled"
         //    };
 
         //    Response.ReturnCode = enResponseCode.Success;

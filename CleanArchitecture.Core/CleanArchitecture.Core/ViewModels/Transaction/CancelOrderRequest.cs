@@ -8,6 +8,6 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
     public class CancelOrderRequest
     {
         [Required]
-        public long order_id { get; set; }
+        public long TranNo { get; set; }
     }
 }
