@@ -2173,7 +2173,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 {
                     Response.response = _transactionConfigService.GetLimitById(Id);
                     Response.ReturnCode = enResponseCode.Success;
-                    res.ErrorCode = enErrorCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
