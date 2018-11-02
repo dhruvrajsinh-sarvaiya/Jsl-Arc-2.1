@@ -11,7 +11,6 @@ using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -111,17 +110,13 @@ namespace CleanArchitecture.Web.API
             //Do Process for CreateOrder
             //For Testing Purpose
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
-
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
-            Req.accessToken = accessToken;
-
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = Request.OrderSide;
             Req.ordertype = Request.OrderType;
             Req.MemberID = user.Id;
             Req.MemberMobile = user.Mobile;
-            //Req.MemberID = 16;
+            //Req.MemberID = 5;
             //Req.MemberMobile = "1234567890";
             Req.SMSCode = Pair;
             Req.TransactionAccount = Request.CurrencyPairID.ToString();
@@ -165,22 +160,19 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("Withdrawal")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> Withdrawal([FromBody]WithdrawalRequest Request)
         {
             //Do Process for CreateOrder
             //For Testing Purpose
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
-
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
-            Req.accessToken = accessToken;
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = enTrnType.Withdraw;
-            Req.MemberID = user.Id;
-            Req.MemberMobile = user.Mobile;
-           // Req.MemberID = 16;
-            //Req.MemberMobile = "1234567890";
+            //Req.MemberID = user.Id;
+            //Req.MemberMobile = user.Mobile;
+            Req.MemberID = 16;
+            Req.MemberMobile = "1234567890";
             Req.SMSCode = Request.asset;
             Req.TransactionAccount = Request.address;
             Req.Amount = Request.Amount;
@@ -221,12 +213,12 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("CancelOrder")]
-       // [Authorize]
+        [Authorize]
         public async Task<ActionResult> CancelOrder([FromBody]CancelOrderRequest Request)
         {
             try
             {
-                BizResponse MethodRespCancel = _cancelOrderProcess.ProcessCancelOrder(Request);
+                Task<BizResponse> MethodRespCancel = _cancelOrderProcess.ProcessCancelOrderAsync(Request);
                 return Ok(MethodRespCancel);
             }
             catch (Exception ex)
