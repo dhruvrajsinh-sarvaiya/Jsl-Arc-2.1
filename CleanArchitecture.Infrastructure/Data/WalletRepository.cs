@@ -1275,7 +1275,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsolanki 2018-10-29
-        public List<IncomingTrnRes> GetIncomingTransaction(long Userid)
+        public List<IncomingTrnRes> GetIncomingTransaction(long Userid,string Coin)
         {
             //    var myResult = _dbContext.DepositHistory.Where(r => r.Status == 0)
             //.Select((r, i) => new {idx = i, TrnID = r.TrnID });
@@ -1283,7 +1283,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var trns = (from trn in _dbContext.DepositHistory
                         join wt in _dbContext.WalletTypeMasters
                        on trn.SMSCode equals wt.WalletTypeName
-                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid
+                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new IncomingTrnRes
                         {
                             AutoNo = trn.Id,
@@ -1417,12 +1417,12 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsolanki 2018-11-02
-        public List<OutgoingTrnRes> GetOutGoingTransaction(long Userid)
+        public List<OutgoingTrnRes> GetOutGoingTransaction(long Userid,string Coin)
         {
             var trns = (from trn in _dbContext.WithdrawHistory
                         join wt in _dbContext.WalletTypeMasters
                         on trn.SMSCode equals wt.WalletTypeName
-                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid 
+                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new OutgoingTrnRes
                         {
                             AutoNo = trn.Id,
