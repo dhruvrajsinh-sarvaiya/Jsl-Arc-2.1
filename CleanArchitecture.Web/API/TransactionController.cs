@@ -88,6 +88,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -244,6 +245,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -559,6 +561,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -598,6 +601,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -634,6 +638,7 @@ namespace CleanArchitecture.Web.API
                 }
                 Response.response = _frontTrnService.GetTradePairByName(id);
                 Response.ReturnCode = enResponseCode.Success;
+                Response.ErrorCode = enErrorCode.Success;
                 return Ok(Response);
             }
             catch (Exception ex)
@@ -676,6 +681,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -743,6 +749,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -781,6 +788,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -916,6 +924,7 @@ namespace CleanArchitecture.Web.API
                     {
                         Response.response = response;
                         Response.ReturnCode = enResponseCode.Success;
+                        Response.ErrorCode = enErrorCode.Success;
                     }
                     else
                     {
