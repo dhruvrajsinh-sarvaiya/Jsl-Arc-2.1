@@ -2598,6 +2598,7 @@ namespace CleanArchitecture.Infrastructure.Services
             Response.OutGoingTransactions = Histories;
             Response.BizResponseObj.ReturnCode = enResponseCode.Success;
             Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+            Response.BizResponseObj.ErrorCode = enErrorCode.Success;
             return Response;
         }
     }
