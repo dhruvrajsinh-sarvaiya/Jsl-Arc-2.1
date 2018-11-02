@@ -25,7 +25,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
-using TwoFactorAuthNet;
 
 namespace CleanArchitecture.Web.API
 {
@@ -183,7 +182,7 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("VerifyCode")]
         [AllowAnonymous]
-       // [ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyCode(EnableAuthenticatorCodeViewModel model)
         {
             // The following code protects for brute force attacks against the two factor codes.
@@ -192,32 +191,11 @@ namespace CleanArchitecture.Web.API
             //  var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
             try
             {
+              
+               
 
-                var user = await _userManager.FindByNameAsync(model.UserName);
-                if (user != null)
-                {
-                    //if (user.lo .IsLockedOut)
-                    //{
-                    //    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
-                    //}
+        
 
-                    TwoFactorAuth TFAuth = new TwoFactorAuth();
-                    //sKey = key; //TFAuth.CreateSecret(160);
-                    bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
-                    if(status)
-                    {
-                        return Ok(new VerifyCodeResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
-                        // return RedirectToLocal(model.ReturnUrl);
-                    }                    
-                    else
-                    {
-                        return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
-                    }
-
-                }
-                return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
-
-                /*
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
                 //var Key = await _custompassword.GetPassword(user.Id);
@@ -252,7 +230,7 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
 
                 }
-                */
+
 
                 // //if (result.IsLockedOut)
                 // //{
@@ -346,8 +324,8 @@ namespace CleanArchitecture.Web.API
                 {
 
                     //// Start 2FA in Custome token Create 
-                    var user = await _userManager.FindByNameAsync(model.Username);
-                    string TwoFAToken = await _custompassword.Get2FACustomToken(user.Id);
+                    //var user = await _userManager.FindByNameAsync(model.Username);
+                    //string TwoFAToken = await _custompassword.Get2FACustomToken(user.Id);
                     //// End 2FA in Custome token Create 
                     //return Ok(new StandardLogin2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
 

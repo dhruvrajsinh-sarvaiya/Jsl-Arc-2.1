@@ -21,12 +21,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using TwoFactorAuthNet;
 
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]")]
-   // [ApiExplorerSettings(IgnoreApi = true)]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class TwoFASettingController : BaseController
     {
         #region Field 
@@ -185,52 +184,27 @@ namespace CleanArchitecture.Web.API
 
                 long userlog = _iuserChangeLog.AddPassword(userChangeLogViewModel);
 
-                TwoFactorAuth TFAuth = new TwoFactorAuth();
-                //string URL;
-                string sKey = string.Empty;
-                //  string sName = string.Empty;
-                sKey = TFAuth.CreateSecret(160);
-                // sName = user.UserName; // dSetReq.Tables(0).Rows(0)("NAME");
-                sKey = TFAuth.CreateSecret(160);
-                //URL = TFAuth.GetQrCodeImageAsDataUri(sName, sKey);
-                // string value = URL + "" + sKey;
-                user.PhoneNumber = sKey;
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
+                if (string.IsNullOrEmpty(user.Email))   ////  This Condition by pankaj for when user login with molile the email field is null so.
                 {
                     var model = new EnableAuthenticatorViewModel
                     {
-                        //SharedKey = FormatKey(unformattedKey),
-                        //AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
-                       // UserName = user.UserName,
-                        AuthenticatorUri = TFAuth.GetQrCodeImageAsDataUri(user.UserName, sKey)
+                        SharedKey = FormatKey(unformattedKey),
+                        AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
                     };
                     return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, EnableAuthenticatorViewModel = model });
+
                 }
+                else
+                {
 
-                return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, ErrorCode = enErrorCode.NotFound });
+                    var model = new EnableAuthenticatorViewModel
+                    {
+                        SharedKey = FormatKey(unformattedKey),
+                        AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
+                    };
+                    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, EnableAuthenticatorViewModel = model });
 
-                //if (string.IsNullOrEmpty(user.Email))   ////  This Condition by pankaj for when user login with molile the email field is null so.
-                //{                   
-                //        var model = new EnableAuthenticatorViewModel
-                //        {
-                //            SharedKey = FormatKey(unformattedKey),
-                //            AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
-
-                //        };
-                //        return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, EnableAuthenticatorViewModel = model });                   
-                //}
-                //else
-                //{
-
-                //    var model = new EnableAuthenticatorViewModel
-                //    {
-                //        SharedKey = FormatKey(unformattedKey),
-                //        AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey)
-                //    };
-                //    return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, EnableAuthenticatorViewModel = model });
-
-                //}
+                }
 
             }
             catch (Exception ex)
@@ -245,42 +219,24 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-               // var user = await _userManager.FindByNameAsync(model.UserName);
                 var user = await GetCurrentUserAsync();
-                if (user != null)
+                // Strip spaces and hypens
+                var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+                var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+                    user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+
+                if (!is2faTokenValid)
                 {
-                    TwoFactorAuth TFAuth = new TwoFactorAuth();
-                    //sKey = key; //TFAuth.CreateSecret(160);
-                    bool st = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
-                    if (st)
-                    {
-                        user.TwoFactorEnabled = true;
-                        await _userManager.UpdateAsync(user);
-                        return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTwoFactor });
-                    }
-                    else
-                        return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification, ErrorCode = enErrorCode.Status4079TwoFAcodeInvalide });
+                    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification, ErrorCode = enErrorCode.Status4079TwoFAcodeInvalide });
                 }
-                return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification, ErrorCode = enErrorCode.Status4079TwoFAcodeInvalide });
 
-                //var user = await GetCurrentUserAsync();
-                //// Strip spaces and hypens
-                //var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
-
-                //var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
-                //    user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
-
-                //if (!is2faTokenValid)
-                //{
-                //    return BadRequest(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerification, ErrorCode = enErrorCode.Status4079TwoFAcodeInvalide });
-                //}
-
-                //await _userManager.SetTwoFactorEnabledAsync(user, true);
-                //return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTwoFactor });
+                await _userManager.SetTwoFactorEnabledAsync(user, true);               
+                return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTwoFactor });
             }
             catch (Exception ex)
             {
-
+                                
                 return BadRequest(new TwoFactorAuthResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
 
             }
