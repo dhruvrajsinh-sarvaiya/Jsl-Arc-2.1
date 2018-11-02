@@ -33,3 +33,4 @@ D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.Web\obj\Debug\netcoreapp2.
 D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.Web\obj\Debug\netcoreapp2.1\CleanArchitecture.Web.csproj.CopyComplete
 D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.Web\obj\Debug\netcoreapp2.1\CleanArchitecture.Web.dll
 D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.Web\obj\Debug\netcoreapp2.1\CleanArchitecture.Web.pdb
+D:\Nirav\Project\GitHub\Jsl-Arc-2.1\CleanArchitecture.Web\bin\Debug\netcoreapp2.1\TwoFactorAuth.Net.dll
