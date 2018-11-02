@@ -265,14 +265,17 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             return Result.ToList();
         }
 
-        public List<GetGraphResponse> GetGraphData(long id)
+        public List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData)
         {
-            IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(
-                           @"select CONVERT(BIGINT,DATEDIFF(ss,'01-01-1970 00:00:00',CAST(FORMAT(DataDate,'yyyy-MM-dd HH:mm:0') AS datetime))) * 1000 As DataDate,
-                            Low24Hr As Low,High24Hr As High,TodayOpen,TodayClose,Volume,ChangePer
-                            from TradeGraphDetail where TranNo in(
-                            SELECT MAX(TranNo) FROM TradeGraphDetail Where  PairId = {0}
-                            GROUP BY DATEADD(MI, DATEDIFF(MI, 0, DataDate),0)) order By DataDate desc", id);
+            string Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
+                           "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
+                           "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As OpenVal," +
+                           "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As CloseVal From TradeData T" +
+                           " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
+                           " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
+
+            Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
+            IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(Query,id);
 
             return Result.ToList();
         }

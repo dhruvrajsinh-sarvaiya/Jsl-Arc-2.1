@@ -24,7 +24,7 @@ namespace CleanArchitecture.Core.Interfaces
         Int16 IsValidStatus(string status);
         long GetBasePairIdByName(string BasePair);
         GetTradePairByName GetTradePairByName(long id);
-        List<GetGraphDetailInfo> GetGraphDetail(long PairId);
+        List<GetGraphDetailInfo> GetGraphDetail(long PairId,int IntervalTime,string IntervalData);
         MarketCapData GetMarketCap(long PairId);
         VolumeDataRespose GetVolumeDataByPair(long PairId);
         bool addSetteledTradeTransaction(SettledTradeTransactionQueue queueData);
@@ -33,5 +33,6 @@ namespace CleanArchitecture.Core.Interfaces
         int RemoveFromFavouritePair(long PairId, long UserId);
         List<FavouritePairInfo> GetFavouritePair(long UserId);
         void GetPairAdditionalVal(long PairId, decimal CurrentRate,long TrnNo, decimal Quantity);
+        void GetIntervalTimeValue(string Interval, ref int IntervalTime, ref string IntervalData);
     }
 }

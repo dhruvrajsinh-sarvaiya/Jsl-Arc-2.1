@@ -626,9 +626,11 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        [HttpGet("GetGraphDetail/{Pair}")]
-        public ActionResult GetGraphDetail(string Pair)
+        [HttpGet("GetGraphDetail/{Pair}/{Interval}")]
+        public ActionResult GetGraphDetail(string Pair,string Interval)
         {
+            int IntervalTime = 0;
+            string IntervalData = "";
             GetGraphDetailReponse Response = new GetGraphDetailReponse();
             try
             {
@@ -645,7 +647,14 @@ namespace CleanArchitecture.Web.API
                     Response.ErrorCode = enErrorCode.NoDataFound;
                     return Ok(Response);
                 }
-                var responsedata = _frontTrnService.GetGraphDetail(id);
+                _frontTrnService.GetIntervalTimeValue(Interval, ref IntervalTime, ref IntervalData);
+                if(IntervalTime == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ErrorCode = enErrorCode.Graph_InvalidIntervalTime;
+                    return Ok(Response);
+                }
+                var responsedata = _frontTrnService.GetGraphDetail(id, IntervalTime,IntervalData);
                 if (responsedata != null && responsedata.Count != 0)
                 {
                     Response.response = responsedata;

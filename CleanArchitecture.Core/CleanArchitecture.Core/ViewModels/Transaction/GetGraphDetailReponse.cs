@@ -19,12 +19,10 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
         public decimal Low { get; set; }
         [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
-        public decimal TodayOpen { get; set; }
+        public decimal Open { get; set; }
         [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
-        public decimal TodayClose { get; set; }
+        public decimal Close { get; set; }
         [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
         public decimal Volume { get; set; }
-        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
-        public decimal ChangePer { get; set; }
     }
 }
