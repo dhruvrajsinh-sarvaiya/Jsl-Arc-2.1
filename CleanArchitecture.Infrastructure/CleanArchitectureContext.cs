@@ -44,6 +44,8 @@ namespace CleanArchitecture.Infrastructure
         public virtual DbSet<TempUserRegister> TempUserRegister { get; set; }
         public virtual DbSet<TempOtpMaster> TempOtpMaster { get; set; }
         public virtual DbSet<OtpMaster> OtpMaster { get; set; }
+        public DbSet<IpHistory> IpHistory { get; set; } //ntrivedi 02112018 for migration
+        public DbSet<LoginHistory> LoginHistory { get; set; } //ntrivedi 02112018 for migration
         // add by nirav savariya for create password for login with mobile and email
         public virtual DbSet<CustomPassword> CustomPassword { get; set; }
         public virtual DbSet<DeviceMaster> DeviceMaster { get; set; }
