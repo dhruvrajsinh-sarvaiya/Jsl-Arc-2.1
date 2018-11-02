@@ -391,7 +391,8 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 ReturnCode = enResponseCode.Success,
                 ReturnMsg = EnResponseMessage.FindRecored,
-                Histories = items
+              ErrorCode = enErrorCode.Success,
+            Histories = items
             };
         }
 
@@ -439,7 +440,8 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 ReturnCode = enResponseCode.Success,
                 ReturnMsg = EnResponseMessage.FindRecored,
-                Histories = items
+               ErrorCode = enErrorCode.Success,
+            Histories = items
             };
         }
         public bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID)
