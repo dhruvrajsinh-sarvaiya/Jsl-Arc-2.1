@@ -212,8 +212,10 @@ namespace CleanArchitecture.Web.API
 
                         TwoFactorAuth TFAuth = new TwoFactorAuth();
                         //sKey = key; //TFAuth.CreateSecret(160);
-                        bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
-                        if (status)
+                        string code = TFAuth.GetCode(user.PhoneNumber);
+                        if (model.Code == code)
+                        //bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 1, dt);
+                        //if (status)
                         {
                             //// Valid Key and status Disable
                             _userKeyMasterService.UpdateOtp(TwoFAToken.Id);
@@ -225,6 +227,7 @@ namespace CleanArchitecture.Web.API
                         {
                             return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
                         }
+                        // }
                     }
 
                 }
@@ -528,7 +531,7 @@ namespace CleanArchitecture.Web.API
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(checkmail);
                                     //  return AppUtils.SignIn(checkmail, roles);
-                                    return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CommSuccessMsgInternal });
+                                    return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
                                 }
                                 else
                                 {
@@ -765,7 +768,7 @@ namespace CleanArchitecture.Web.API
                                         //    //string TwoFAToken = await _custompassword.Get2FACustomToken(logindata.Id);
                                         //    //// End 2FA in Custome token Create 
                                         //    //return Ok(new OtpWithMobile2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
-                                                                                                                               
+
 
 
                                         //    return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
@@ -776,7 +779,7 @@ namespace CleanArchitecture.Web.API
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(result);
-                                    return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CommSuccessMsgInternal });
+                                    return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
                                 }
                                 if (result?.AccessFailedCount < Convert.ToInt16(_configuration["MaxFailedAttempts"]))
                                 {

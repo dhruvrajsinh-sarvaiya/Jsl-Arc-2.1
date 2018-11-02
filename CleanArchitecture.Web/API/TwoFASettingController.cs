@@ -26,7 +26,7 @@ using TwoFactorAuthNet;
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]")]
-   // [ApiExplorerSettings(IgnoreApi = true)]
+    // [ApiExplorerSettings(IgnoreApi = true)]
     public class TwoFASettingController : BaseController
     {
         #region Field 
@@ -104,13 +104,17 @@ namespace CleanArchitecture.Web.API
             var user = await GetCurrentUserAsync();
             try
             {
+                if (!user.TwoFactorEnabled)
+                    return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFAalreadyDisable, ErrorCode = enErrorCode.Status4108TwoFAalreadydisable });
+
                 TwoFactorAuth TFAuth = new TwoFactorAuth();
                 //sKey = key; //TFAuth.CreateSecret(160);
-                bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
-                if (!status)
+                string code = TFAuth.GetCode(user.PhoneNumber);
+                if (model.Code != code)
+                //    bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
+                //if (!status)
                 {
                     return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerificationDisable, ErrorCode = enErrorCode.Status4071TwoFactorVerificationDisable });
-                    
                 }
                 else
                 {
@@ -139,7 +143,8 @@ namespace CleanArchitecture.Web.API
                         return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DisableTroFactorError, ErrorCode = enErrorCode.Status4055DisableTroFactorError });
                     }
                 }
-                  
+
+
 
                 /*
                 // Strip spaces and hypens
@@ -227,7 +232,7 @@ namespace CleanArchitecture.Web.API
                 //string URL;
                 string sKey = string.Empty;
                 //  string sName = string.Empty;
-                sKey = TFAuth.CreateSecret(160);
+                //sKey = TFAuth.CreateSecret(160);
                 // sName = user.UserName; // dSetReq.Tables(0).Rows(0)("NAME");
                 sKey = TFAuth.CreateSecret(160);
                 //URL = TFAuth.GetQrCodeImageAsDataUri(sName, sKey);
@@ -240,7 +245,7 @@ namespace CleanArchitecture.Web.API
                     {
                         //SharedKey = FormatKey(unformattedKey),
                         //AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
-                       // UserName = user.UserName,
+                        // UserName = user.UserName,
                         AuthenticatorUri = TFAuth.GetQrCodeImageAsDataUri(user.UserName, sKey)
                     };
                     return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.TwoFactorActiveRequest, EnableAuthenticatorViewModel = model });
@@ -283,14 +288,16 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-               // var user = await _userManager.FindByNameAsync(model.UserName);
+                // var user = await _userManager.FindByNameAsync(model.UserName);
                 var user = await GetCurrentUserAsync();
                 if (user != null)
                 {
                     TwoFactorAuth TFAuth = new TwoFactorAuth();
                     //sKey = key; //TFAuth.CreateSecret(160);
-                    bool st = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
-                    if (st)
+                    string code = TFAuth.GetCode(user.PhoneNumber);
+                    if (model.Code == code)
+                    //    bool st = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
+                    //if (st)
                     {
                         user.TwoFactorEnabled = true;
                         await _userManager.UpdateAsync(user);
