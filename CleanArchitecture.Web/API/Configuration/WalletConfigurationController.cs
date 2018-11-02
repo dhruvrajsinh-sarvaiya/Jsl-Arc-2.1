@@ -143,7 +143,7 @@ namespace CleanArchitecture.Web.API.Configuration
 
         #endregion
 
-        #region "WalletTypeMaster"
+        #region "Transfer In/Out"
 
         //vsoalnki 2018-11-2
         [HttpGet("{Coin}")]
@@ -165,8 +165,27 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
-        #endregion
+        //Rushabh 02-11-2018
+        [HttpGet("{CoinName}/{Status}")]
+        public IActionResult GetTransferOut(string CoinName, DateTime? FromDate, DateTime? ToDate, short Status)
+        {
+            try
+            {
+                var items = _walletConfigurationService.GetTransferOutHistory(CoinName, FromDate, ToDate, Status);
+                return Ok(items);                
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass
+                {
+                    ReturnCode = enResponseCode.InternalError,
+                    ReturnMsg = ex.ToString(),
+                    ErrorCode = enErrorCode.Status500InternalServerError
+                });
+            }
+        }
 
+        #endregion
 
         #endregion
     }

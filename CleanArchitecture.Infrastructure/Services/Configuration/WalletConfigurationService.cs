@@ -221,7 +221,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 var trans = _walletRepository.GetTransferIn(Coin, FromDate, ToDate, Status);
-                if (trans == null)
+                if (trans == null || trans.Count == 0)
                 {
                     transfer.BizResponseObj.ReturnCode = enResponseCode.Fail;
                     transfer.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
@@ -234,6 +234,36 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     transfer.BizResponseObj.ReturnCode = enResponseCode.Success;
                     transfer.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
                     transfer.BizResponseObj.ErrorCode = enErrorCode.Success;  
+                    return transfer;
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        public TransferInOutRes GetTransferOutHistory(string CoinName, DateTime? FromDate, DateTime? ToDate, short Status)
+        {
+            TransferInOutRes transfer = new TransferInOutRes();
+            transfer.BizResponseObj = new BizResponseClass();
+            try
+            {
+                var trans = _walletRepository.TransferOutHistory(CoinName, FromDate, ToDate, Status);
+                if (trans == null || trans.Count == 0)
+                {
+                    transfer.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    transfer.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    transfer.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    return transfer;
+                }
+                else
+                {
+                    transfer.Transfers = trans;
+                    transfer.BizResponseObj.ReturnCode = enResponseCode.Success;
+                    transfer.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                    transfer.BizResponseObj.ErrorCode = enErrorCode.Success;
                     return transfer;
                 }
             }

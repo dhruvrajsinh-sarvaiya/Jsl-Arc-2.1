@@ -1447,6 +1447,7 @@ namespace CleanArchitecture.Infrastructure.Data
         }
 
         //vsolanki 2018-11-02
+
         public List<TransfersRes> GetTransferIn(string Coin, DateTime? FromDate, DateTime? ToDate, short Status)
         {
             List<TransfersRes> trns = new List<TransfersRes>();
@@ -1458,8 +1459,7 @@ namespace CleanArchitecture.Infrastructure.Data
                             join u in _dbContext.Users
                             on trn.UserId equals u.Id
                             where trn.Status == Status && trn.Confirmations < 3 && (Coin == null || (trn.SMSCode == Coin && Coin != null))
-                             &&
-                         (trn.CreatedDate == null || (trn.CreatedDate >= FromDate && trn.CreatedDate != null)) && (trn.CreatedDate == null || (trn.CreatedDate <= ToDate && trn.CreatedDate != null))
+                             && (trn.CreatedDate == null || (trn.CreatedDate >= FromDate && trn.CreatedDate != null)) && (trn.CreatedDate == null || (trn.CreatedDate <= ToDate && trn.CreatedDate != null))
                             select new TransfersRes
                             {
                                 AutoNo = trn.Id,
@@ -1508,6 +1508,69 @@ namespace CleanArchitecture.Infrastructure.Data
                 User = r.User
             }).ToList();
             return test;
+        }
+
+
+        public List<TransfersRes> TransferOutHistory(string CoinName, DateTime? FromDate, DateTime? ToDate, short Status)
+        {
+            List<TransfersRes> History = new List<TransfersRes>();
+            if (FromDate != null && ToDate != null)
+            {
+                History = (from Wh in _dbContext.WithdrawHistory
+                        join WT in _dbContext.WalletTypeMasters
+                        on Wh.SMSCode equals WT.WalletTypeName
+                        join u in _dbContext.Users
+                        on Wh.UserId equals u.Id
+                        where Wh.Status == Status && Wh.Confirmations < 3 && (CoinName == null || (Wh.SMSCode == CoinName && CoinName != null))
+                        && (Wh.CreatedDate == null || (Wh.CreatedDate >= FromDate && Wh.CreatedDate != null)) && (Wh.CreatedDate == null || (Wh.CreatedDate <= ToDate && Wh.CreatedDate != null))
+                        select new TransfersRes
+                        {
+                            AutoNo = Wh.Id,
+                            TrnID = Wh.TrnID,
+                            WalletType = Wh.SMSCode,
+                            Confirmations = Wh.Confirmations,
+                            Amount = Wh.Amount,
+                            Address = Wh.Address,
+                            ConfirmationCount = WT.ConfirmationCount,
+                            ConfirmedTime = Wh.confirmedTime,
+                            User = u.UserName
+                        }).ToList();
+            }
+            else
+            {
+                History = (from Wh in _dbContext.DepositHistory
+                           join WT in _dbContext.WalletTypeMasters
+                           on Wh.SMSCode equals WT.WalletTypeName
+                           join u in _dbContext.Users
+                           on Wh.UserId equals u.Id
+                           where Wh.Status == Status && Wh.Confirmations < 3 && (CoinName == null || (Wh.SMSCode == CoinName && CoinName != null))
+                           select new TransfersRes
+                           {
+                                AutoNo = Wh.Id,
+                                TrnID = Wh.TrnID,
+                                WalletType = Wh.SMSCode,
+                                Confirmations = Wh.Confirmations,
+                                Amount = Wh.Amount,
+                                Address = Wh.Address,
+                                ConfirmationCount = WT.ConfirmationCount,
+                                ConfirmedTime = Wh.ConfirmedTime,
+                                User = u.UserName
+                           }).ToList();
+
+            }
+            var dump = History.Select((rec, i) => new TransfersRes
+            {
+                AutoNo = i + 1,
+                TrnID = rec.TrnID,
+                WalletType = rec.WalletType,
+                Confirmations = rec.Confirmations,
+                Amount = rec.Amount,
+                Address = rec.Address,
+                ConfirmationCount = rec.ConfirmationCount,
+                ConfirmedTime = rec.ConfirmedTime,
+                User = rec.User
+            }).ToList();
+            return dump;
         }
     }
 

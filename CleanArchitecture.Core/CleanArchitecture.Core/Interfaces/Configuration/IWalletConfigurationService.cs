@@ -25,8 +25,8 @@ namespace CleanArchitecture.Core.Interfaces.Configuration
 
         #region "Other Method"
 
-        //vsoalnki 2018-11-2
         TransferInOutRes GetTransferIn(string Coin, DateTime? FromDate, DateTime? ToDate, short Status);
+        TransferInOutRes GetTransferOutHistory(string coinName, DateTime? FromDate, DateTime? ToDate, short status);
 
         #endregion
     }

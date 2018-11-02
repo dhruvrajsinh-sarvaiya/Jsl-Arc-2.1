@@ -109,5 +109,7 @@ namespace CleanArchitecture.Core.Interfaces
         List<OutgoingTrnRes> GetOutGoingTransaction(long Userid, string Coin);
 
         List<TransfersRes> GetTransferIn(string Coin, DateTime? FromDate, DateTime? ToDate, short Status);
+
+        List<TransfersRes> TransferOutHistory(string CoinName, DateTime? FromDate, DateTime? ToDate, short Status);
     }
 }
