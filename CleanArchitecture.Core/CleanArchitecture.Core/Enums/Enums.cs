@@ -189,6 +189,7 @@ namespace CleanArchitecture.Core.Enums
         FavPair_NoPairFound = 4623,
         InValidDebitAccountID= 4624,
         InValidCreditAccountID = 4625,
+        Graph_InvalidIntervalTime = 4626,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

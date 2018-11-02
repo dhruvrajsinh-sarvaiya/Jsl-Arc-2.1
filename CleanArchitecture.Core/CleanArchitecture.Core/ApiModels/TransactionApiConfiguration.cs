@@ -103,13 +103,12 @@ namespace CleanArchitecture.Core.ApiModels
     }
     public class GetGraphResponse
     {
-        public long DataDate { get; set; }
+        public DateTime DataDate { get; set; }
         public decimal High { get; set; }
         public decimal Low { get; set; }
-        public decimal TodayOpen { get; set; }
-        public decimal TodayClose { get; set; }
+        public decimal OpenVal { get; set; }
+        public decimal CloseVal { get; set; }
         public decimal Volume { get; set; }
-        public decimal ChangePer { get; set; }
     }
     public class GetTradingSummary
     {

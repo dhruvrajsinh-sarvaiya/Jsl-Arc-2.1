@@ -173,13 +173,13 @@ namespace CleanArchitecture.Web.API
             try
             {
                 GetGraphResponse model = new GetGraphResponse();
-                model.ChangePer = 20;
-                model.DataDate = 20180203073000;
-                model.High = 1199;
-                model.Low = 1177;
-                model.TodayClose = 1452;
-                model.TodayOpen = 1477;
-                model.Volume = 173;
+                //model.ChangePer = 20;
+                //model.DataDate = 20180203073000;
+                //model.High = 1199;
+                //model.Low = 1177;
+                //model.OpenVal = 1452;
+                //model.TodayOpen = 1477;
+                //model.Volume = 173;
 
                 List<GetGraphResponse> temp = JsonConvert.DeserializeObject<List<GetGraphResponse>>(Data);
 

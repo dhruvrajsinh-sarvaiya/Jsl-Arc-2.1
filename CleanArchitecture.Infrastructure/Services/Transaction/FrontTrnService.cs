@@ -424,7 +424,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 };
                 tradegraph = _graphDetailRepository.Add(tradegraph);
 
-
                 //Calculate High Low Data For 24Hr
                 var tradegraphdetail = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-1) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
                 High24Hr = CurrentRate;
@@ -443,77 +442,75 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         }
                     }                  
                 }
-              
+
+                ////Calculate High Low Data For Week
+                //var tradegraphdetail2 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-7) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
+                //WeekHigh = CurrentRate;
+                //WeekLow = CurrentRate;
+                //if (tradegraphdetail2.Count > 0)
+                //{
+                //    foreach (TradeGraphDetail type in tradegraphdetail2)
+                //    {
+                //        if (type.BidPrice > WeekHigh)
+                //        {
+                //            WeekHigh = type.BidPrice;
+                //        }
+                //        if (type.BidPrice < WeekLow)
+                //        {
+                //            WeekLow = type.BidPrice;
+                //        }
+                //    }
+                //}
+
+                ////Calculate High Low Data For 52Week
+                //var tradegraphdetail3 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-365) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
+                //Week52High = CurrentRate;
+                //Week52Low = CurrentRate;
+                //if (tradegraphdetail3.Count > 0)
+                //{
+                //    foreach (TradeGraphDetail type in tradegraphdetail2)
+                //    {
+                //        if (type.BidPrice > Week52High)
+                //        {
+                //            Week52High = type.BidPrice;
+                //        }
+                //        if (type.BidPrice < Week52Low)
+                //        {
+                //            Week52Low = type.BidPrice;
+                //        }
+                //    }
+                //}              
+
+                ////Calculate Open Close
+                //var now = _basePage.UTC_To_IST();
+                //DateTime startDateTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
+                //DateTime endDateTime = _basePage.UTC_To_IST();
+
+                //var tradegraphdetail1 = _graphDetailRepository.FindBy(x => x.DataDate >= startDateTime && x.DataDate <= endDateTime).OrderBy(x => x.TranNo).FirstOrDefault();
+                //if (tradegraphdetail1 != null)
+                //{
+                //    todayopen = tradegraphdetail1.BidPrice;
+                //    todayclose = CurrentRate;
+                //}
+                //else
+                //{
+                //    todayopen = CurrentRate;
+                //    todayclose = CurrentRate;
+                //}
 
 
-                //Calculate High Low Data For Week
-                var tradegraphdetail2 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-7) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
-                WeekHigh = CurrentRate;
-                WeekLow = CurrentRate;
-                if (tradegraphdetail2.Count > 0)
-                {
-                    foreach (TradeGraphDetail type in tradegraphdetail2)
-                    {
-                        if (type.BidPrice > WeekHigh)
-                        {
-                            WeekHigh = type.BidPrice;
-                        }
-                        if (type.BidPrice < WeekLow)
-                        {
-                            WeekLow = type.BidPrice;
-                        }
-                    }
-                }
+                ////Update TradeGraph Detail Data
 
-                //Calculate High Low Data For 52Week
-                var tradegraphdetail3 = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-365) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.TranNo).ToList();
-                Week52High = CurrentRate;
-                Week52Low = CurrentRate;
-                if (tradegraphdetail3.Count > 0)
-                {
-                    foreach (TradeGraphDetail type in tradegraphdetail2)
-                    {
-                        if (type.BidPrice > Week52High)
-                        {
-                            Week52High = type.BidPrice;
-                        }
-                        if (type.BidPrice < Week52Low)
-                        {
-                            Week52Low = type.BidPrice;
-                        }
-                    }
-                }              
-
-                //Calculate Open Close
-                var now = _basePage.UTC_To_IST();
-                DateTime startDateTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
-                DateTime endDateTime = _basePage.UTC_To_IST();
-
-                var tradegraphdetail1 = _graphDetailRepository.FindBy(x => x.DataDate >= startDateTime && x.DataDate <= endDateTime).OrderBy(x => x.TranNo).FirstOrDefault();
-                if (tradegraphdetail1 != null)
-                {
-                    todayopen = tradegraphdetail1.BidPrice;
-                    todayclose = CurrentRate;
-                }
-                else
-                {
-                    todayopen = CurrentRate;
-                    todayclose = CurrentRate;
-                }
-
-
-                //Update TradeGraph Detail Data
-
-                tradegraph.High24Hr = High24Hr;
-                tradegraph.Low24Hr = Low24Hr;
-                tradegraph.HighWeek = WeekHigh;
-                tradegraph.LowWeek = WeekLow;
-                tradegraph.High52Week = Week52High;
-                tradegraph.Low52Week = Week52Low;
-                tradegraph.LTP = CurrentRate;
-                tradegraph.TodayOpen = todayopen;
-                tradegraph.TodayClose = todayclose;                   
-                _graphDetailRepository.Update(tradegraph);
+                //tradegraph.High24Hr = High24Hr;
+                //tradegraph.Low24Hr = Low24Hr;
+                //tradegraph.HighWeek = WeekHigh;
+                //tradegraph.LowWeek = WeekLow;
+                //tradegraph.High52Week = Week52High;
+                //tradegraph.Low52Week = Week52Low;
+                //tradegraph.LTP = CurrentRate;
+                //tradegraph.TodayOpen = todayopen;
+                //tradegraph.TodayClose = todayclose;                   
+                //_graphDetailRepository.Update(tradegraph);
 
 
                 var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
@@ -548,8 +545,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
                 }
                 _tradePairStastics.Update(pairData);
-
-
 
                 //void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData)
             }
@@ -795,22 +790,24 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
-        public List<GetGraphDetailInfo> GetGraphDetail(long PairId)
+        public List<GetGraphDetailInfo> GetGraphDetail(long PairId, int IntervalTime, string IntervalData)
         {
             try
             {
                 List<GetGraphDetailInfo> responseData = new List<GetGraphDetailInfo>();
-                var list = _frontTrnRepository.GetGraphData(PairId);
+                var list = _frontTrnRepository.GetGraphData(PairId,IntervalTime,IntervalData).OrderBy(x => x.DataDate);
+                DateTime dt2 = new DateTime(1970, 1, 1);
+
                 responseData = list.Select(a => new GetGraphDetailInfo()
                 {
-                    DataDate = a.DataDate,
+                    DataDate = Convert.ToInt64(a.DataDate.Subtract(dt2).TotalMilliseconds),
                     High = a.High,
                     Low = a.Low,
-                    TodayClose = a.TodayOpen,
-                    TodayOpen = a.TodayOpen,
+                    Open = a.OpenVal,
+                    Close = a.OpenVal,
                     Volume = a.Volume,
-                    ChangePer = a.ChangePer
                 }).ToList();
+
                 return responseData;
             }
             catch (Exception ex)
@@ -819,6 +816,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+
+
         public MarketCapData GetMarketCap(long PairId)
         {
             try
@@ -1137,6 +1136,88 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             }
         }
 
+        public void GetIntervalTimeValue(string Interval, ref int IntervalTime, ref string IntervalData)
+        {
+            try
+            {
+                if(Interval.Equals("1m"))
+                {
+                    IntervalTime = 1;
+                    IntervalData = "MINUTE";
+                }
+                else if(Interval.Equals("3m"))
+                {
+                    IntervalTime = 3;
+                    IntervalData = "MINUTE";
+                }
+                else if (Interval.Equals("5m"))
+                {
+                    IntervalTime = 5;
+                    IntervalData = "MINUTE";
+                }
+                else if (Interval.Equals("15m"))
+                {
+                    IntervalTime = 15;
+                    IntervalData = "MINUTE";
+                }
+                else if (Interval.Equals("30m"))
+                {
+                    IntervalTime = 30;
+                    IntervalData = "MINUTE";
+                }
+                else if (Interval.Equals("1H"))
+                {
+                    IntervalTime = 1;
+                    IntervalData = "HOUR";
+                }
+                else if (Interval.Equals("2H"))
+                {
+                    IntervalTime = 2;
+                    IntervalData = "HOUR";
+                }
+                else if (Interval.Equals("4H"))
+                {
+                    IntervalTime = 4;
+                    IntervalData = "HOUR";
+                }
+                else if (Interval.Equals("6H"))
+                {
+                    IntervalTime = 6;
+                    IntervalData = "HOUR";
+                }
+                else if (Interval.Equals("12H"))
+                {
+                    IntervalTime = 12;
+                    IntervalData = "HOUR";
+                }
+                else if (Interval.Equals("1D"))
+                {
+                    IntervalTime = 1;
+                    IntervalData = "DAY";
+                }
+                else if (Interval.Equals("1W"))
+                {
+                    IntervalTime = 1;
+                    IntervalData = "WEEK";
+                }
+                else if (Interval.Equals("1M"))
+                {
+                    IntervalTime = 1;
+                    IntervalData = "MONTH";
+                }
+                else
+                {
+                    IntervalTime = 0;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+       
         #endregion
     }
 }
