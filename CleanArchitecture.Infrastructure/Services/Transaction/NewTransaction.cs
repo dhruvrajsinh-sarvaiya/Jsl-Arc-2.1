@@ -205,8 +205,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     HelperForLog.WriteLogIntoFile("CombineAllInitTransactionAsync", ControllerName, "Trading Data Entry Done " +_Resp.ReturnMsg + "##TrnNo:" + Req.TrnNo);
 
                     //Start Settlement Here
-                    var HoldTrnNos = new List<long> { };
-                    HoldTrnNos.Add(0);
+                    var HoldTrnNos = new List<long> { };                   
                     if (_Resp.ReturnCode==enResponseCodeService.Success)
                     {
                         _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, TradeBuyRequestObj,ref HoldTrnNos);
@@ -214,9 +213,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         {//This try catch create wrapper for current transaction
                             BizResponse _Resp1 = new BizResponse();
                             foreach (long HoldTrnNo in HoldTrnNos)
-                            {
-                                if (HoldTrnNo == 0)
-                                    continue;
+                            {                               
                                 var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == HoldTrnNo && item.IsProcessing == 0 &&
                                                                                 (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
                                                                                 item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
