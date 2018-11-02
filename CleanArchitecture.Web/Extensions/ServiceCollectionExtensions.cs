@@ -406,6 +406,9 @@ namespace CleanArchitecture.Web.Extensions
             services.AddScoped<IUserChangeLog, UserChangeLogServices>();
             services.AddScoped<IUserConfiguration, UserConfigurationService>();
             services.AddTransient<ICancelOrderProcess, CancelOrderProcess>();
+            //Login History and Ip History added by nirav savariya on 02-11-2018
+            services.AddScoped<IipHistory, IpHistoryService>();
+            services.AddScoped<ILoginHistory, LoginHistoryService>();
             return services;
         }
     }

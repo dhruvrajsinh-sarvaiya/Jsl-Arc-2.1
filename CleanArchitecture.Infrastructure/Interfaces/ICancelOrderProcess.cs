@@ -9,6 +9,6 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 {
     public interface ICancelOrderProcess
     {
-        BizResponse ProcessCancelOrder(CancelOrderRequest Req);
+        Task<BizResponse> ProcessCancelOrderAsync(CancelOrderRequest Req);
     }
 }

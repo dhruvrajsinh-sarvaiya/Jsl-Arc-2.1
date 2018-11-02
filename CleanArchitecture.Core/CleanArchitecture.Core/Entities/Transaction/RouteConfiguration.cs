@@ -61,7 +61,11 @@ namespace CleanArchitecture.Core.Entities
 
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
-        public decimal ConvertAmount { get; set; }        
+        public decimal ConvertAmount { get; set; }      
+        
+        // ntrivedi 01-11-2018 for confirmation count
+        [DefaultValue(3)]
+        public int ConfirmationCount { get; set; }
 
         public void SetActiveRoute()
         {

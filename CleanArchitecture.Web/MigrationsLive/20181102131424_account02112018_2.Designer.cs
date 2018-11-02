@@ -4,18 +4,20 @@ using CleanArchitecture.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    partial class CleanArchitectureContextModelSnapshot : ModelSnapshot
+    [Migration("20181102131424_account02112018_2")]
+    partial class account02112018_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -1180,6 +1182,8 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ConfirmationCount");
+
                     b.Property<decimal>("ConvertAmount")
                         .HasColumnType("decimal(18, 8)");
 
@@ -2101,7 +2105,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<short>("IsSleepMode");
 
                     b.Property<decimal>("Landing")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("decimal(37, 16)");
 
                     b.Property<short>("OnProcessing");

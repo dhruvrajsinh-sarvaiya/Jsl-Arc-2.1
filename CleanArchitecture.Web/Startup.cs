@@ -30,6 +30,7 @@ using CleanArchitecture.Core.SignalR;
 using Newtonsoft.Json.Serialization;
 using CleanArchitecture.Web.Filters;
 using Hangfire;
+using CleanArchitecture.Infrastructure.DTOClasses;
 
 namespace CleanArchitecture.Web
 {
@@ -193,6 +194,7 @@ namespace CleanArchitecture.Web
                 // added by nirav savariya for common repository on 10-04-2018
                 config.For(typeof(ICustomRepository<>)).Add(typeof(CustomRepository<>));
                 config.For(typeof(ITransactionProcess)).Add(typeof(NewTransaction));
+                config.For(typeof(ISettlementRepository<BizResponse>)).Add(typeof(SettlementRepository));//Rita 2-11-2018 for settlement
                 config.For(typeof(IWebApiData)).Add(typeof(TransactionWebAPIConfiguration));
 
 

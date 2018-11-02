@@ -31,14 +31,22 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Column(TypeName = "decimal(18, 8)")]
         public decimal TotalQty { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        //[Column(TypeName = "decimal(37, 16)")]
+        //public decimal Landing
+        //{
+        //    get { return BidPrice * TotalQty; }
+        //    private set ;
+        //}
+        //[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Column(TypeName = "decimal(37, 16)")]
         public decimal Landing
         {
-            get { return BidPrice * TotalQty; }
-            private set { }
+            get => BidPrice * TotalQty;
+            set => Convert.ToDecimal(BidPrice * TotalQty);
         }
-
+        //[Required]
+        //public decimal Landing { get; set; }
         [Required]
         public short OnProcessing { get; set; }
         [Required]

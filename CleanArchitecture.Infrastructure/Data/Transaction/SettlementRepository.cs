@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.Entities;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
@@ -151,6 +152,12 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 TradeBuyerListObj.IsProcessing = 1;
                 _TradeBuyerList.Update(TradeBuyerListObj);
 
+                if(TradeTransactionQueueObj.IsCancelled==1)
+                {
+                    //Code for settlement
+                    return Task.FromResult(_Resp);
+                }
+
                 //SortedList<TradeSellerList, TradeSellerList>
                 var MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
                                                         && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
@@ -165,6 +172,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     if (SellerList.IsProcessing == 1)
                         continue;
 
+                    decimal SettlementQty = 0;
+                    List<CreditWalletDrArryTrnID> CreditWalletDrArryTrnIDList = new List<CreditWalletDrArryTrnID>();
                     SellerList.IsProcessing = 1;
                     _TradeSellerList.Update(SellerList);
                     var PoolMst = _TradePoolMaster.GetById(SellerList.PoolID);
@@ -172,25 +181,28 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     //====================================Partial SETTLEMENT TO MEMBER
                     if (SellerList.RemainQty <= TradeBuyRequestObj.PendingQty)
                     {
+                        SettlementQty = SellerList.RemainQty;//Take all Seller's Qty
                         //Topup Order create
-                        PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, SellerList.RemainQty,CreditWalletID,CreditAccountID);
+                        PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, SettlementQty, CreditWalletID,CreditAccountID);
 
-                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SellerList.RemainQty;
-                        TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SellerList.RemainQty;
-                        TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + SellerList.RemainQty;
+                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SettlementQty;
+                        TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SettlementQty;
+                        TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + SettlementQty;
                         //Here Bid Price of pool always low then user given in Order , base on above Query
                         decimal TakeDisc = 0;
                         if (SellerList.Price < TradeBuyRequestObj.BidPrice)
                         {
-                            TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * SellerList.RemainQty;
+                            TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * SettlementQty;
                         }
-                        InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SellerList.RemainQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
+                        InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SettlementQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
 
-                        SellerList.RemainQty = SellerList.RemainQty - SellerList.RemainQty;//take all                        
+                        SellerList.RemainQty = SellerList.RemainQty - SettlementQty;//this will give result 0
                         SellerList.MakeTransactionSuccess();
-                        PoolMst.TotalQty = PoolMst.TotalQty - SellerList.RemainQty;                        
+                        PoolMst.TotalQty = PoolMst.TotalQty - SettlementQty;                        
                         PoolOrderObj.MakeTransactionSuccess();
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
+
+                        CreditWalletDrArryTrnIDList.Add(new CreditWalletDrArryTrnID { DrTrnRefNo = SellerList.TrnNo, Amount = SettlementQty });
 
                         _dbContext.Database.BeginTransaction();
 
@@ -199,44 +211,57 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _dbContext.Entry(SellerList).State = EntityState.Modified;
                         _dbContext.Entry(PoolMst).State = EntityState.Modified;
                         _dbContext.Entry(TradeBuyerListObj).State = EntityState.Modified;
-                        _dbContext.SaveChanges();
-
-                        _dbContext.Database.CommitTransaction();
-
+                       var CreditWalletResult =_WalletService.GetWalletCreditNew(TradeTransactionQueueObj.Delivery_Currency, Helpers.GetTimeStamp(), 
+                                                        enWalletTrnType.Cr_Buy_Trade, SettlementQty, TradeBuyRequestObj.UserID,
+                                                        CreditAccountID, CreditWalletDrArryTrnIDList.ToArray(), TradeBuyRequestObj.TrnNo, 0, 
+                                                        enWalletTranxOrderType.Credit, enServiceType.Trading);
+                        if(CreditWalletResult.ReturnCode==enResponseCode.Fail)
+                        {
+                            HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                            _dbContext.Database.RollbackTransaction();
+                        }
+                        else
+                        {
+                            _dbContext.SaveChanges();
+                            _dbContext.Database.CommitTransaction();
+                        }
                         HoldTrnNos.Add(SellerList.TrnNo);
-                      
+                        HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT", ControllerName, "Partial Settlement Done with " + SellerList.TrnNo + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
                         //Continuew as record Partially settled
                     }
                     //====================================FULL SETTLEMENT TO MEMBER
                     else if (SellerList.RemainQty > TradeBuyRequestObj.PendingQty)
                     {
+                        SettlementQty = TradeBuyRequestObj.PendingQty;
                         //Topup Order create
-                        PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, TradeBuyRequestObj.PendingQty, CreditWalletID, CreditAccountID);
+                        PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, SettlementQty, CreditWalletID, CreditAccountID);
 
-                        SellerList.RemainQty = SellerList.RemainQty - TradeBuyRequestObj.PendingQty;//Update first as updated value in below line
+                        SellerList.RemainQty = SellerList.RemainQty - SettlementQty;//Update first as updated value in below line
                         SellerList.MakeTransactionHold();                    
-                        PoolMst.TotalQty = PoolMst.TotalQty - TradeBuyRequestObj.PendingQty;
+                        PoolMst.TotalQty = PoolMst.TotalQty - SettlementQty;
 
                         //Here Bid Price of pool always low then user given in Order , base on above Query
                         decimal TakeDisc = 0;
                         if (SellerList.Price < TradeBuyRequestObj.BidPrice)
                         {
-                            TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * TradeBuyRequestObj.PendingQty;
+                            TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * SettlementQty;
                         }
-                        InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, TradeBuyRequestObj.PendingQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
+                        InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SettlementQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0);
 
-                        TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + TradeBuyRequestObj.PendingQty;
-                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - TradeBuyRequestObj.PendingQty;//take all
+                        TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SettlementQty;//Fully settled Here
+                        TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SettlementQty;//this will 0
                         
                         TradeBuyRequestObj.MakeTransactionSuccess();
                         TradeBuyerListObj.MakeTransactionSuccess();                        
                         TransactionQueueObj.MakeTransactionSuccess();
                         TradeTransactionQueueObj.MakeTransactionSuccess();
 
-                        TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + TradeBuyRequestObj.PendingQty;
+                        TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + SettlementQty;
 
                         PoolOrderObj.MakeTransactionSuccess();
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
+
+                        CreditWalletDrArryTrnIDList.Add(new CreditWalletDrArryTrnID { DrTrnRefNo = SellerList.TrnNo, Amount = SettlementQty });
 
                         _dbContext.Database.BeginTransaction();
 
@@ -247,19 +272,30 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _dbContext.Entry(TradeBuyerListObj).State = EntityState.Modified;
                         _dbContext.Entry(TransactionQueueObj).State = EntityState.Modified;
                         _dbContext.Entry(TradeTransactionQueueObj).State = EntityState.Modified;
-                        _dbContext.SaveChanges();
-
-                        _dbContext.Database.CommitTransaction();
+                        var CreditWalletResult = _WalletService.GetWalletCreditNew(TradeTransactionQueueObj.Delivery_Currency, Helpers.GetTimeStamp(),
+                                                         enWalletTrnType.Cr_Buy_Trade, SettlementQty, TradeBuyRequestObj.UserID,
+                                                         CreditAccountID, CreditWalletDrArryTrnIDList.ToArray(), TradeBuyRequestObj.TrnNo, 0,
+                                                         enWalletTranxOrderType.Credit, enServiceType.Trading);
+                        if (CreditWalletResult.ReturnCode == enResponseCode.Fail)
+                        {
+                            HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                            _dbContext.Database.RollbackTransaction();
+                        }
+                        else
+                        {
+                            _dbContext.SaveChanges();
+                            _dbContext.Database.CommitTransaction();
+                        }
 
                         HoldTrnNos.Add(SellerList.TrnNo);
-
+                        HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT", ControllerName, "Full Settlement Done with " + SellerList.TrnNo + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
                         break;//record settled
                     }
                     SellerList.IsProcessing = 0;//Release Seller List
                     _TradeSellerList.Update(SellerList);
 
                 }
-                TradeBuyRequestObj.IsProcessing = 0;
+                TradeBuyRequestObj.IsProcessing = 0;//Release Buy Order
                 _TradeBuyRequest.Update(TradeBuyRequestObj);
                 TradeBuyerListObj.IsProcessing = 0;
                 _TradeBuyerList.Update(TradeBuyerListObj);

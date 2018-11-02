@@ -31,7 +31,7 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Range(0, 9999999999.99999999)]
         public decimal? DeliverBidPrice { get; set; }
 
-        public short Status { get; set; }
+        //public short Status { get; set; }
 
         [Required]
         public string StatusMsg { get; set; }
