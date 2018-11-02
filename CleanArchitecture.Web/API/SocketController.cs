@@ -73,7 +73,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveBuyerBook";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -110,7 +110,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveSellerBook";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -121,8 +121,8 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("TradingHistory/{Data}/{Pair}")]
-        public async Task<IActionResult> TradingHistory(string Data, String Pair)
+        [HttpGet("OrderHistory/{Data}/{Pair}")]
+        public async Task<IActionResult> OrderHistory(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
@@ -143,15 +143,15 @@ namespace CleanArchitecture.Web.API
 
                 SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
-                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistoryByPair);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OrderHistory);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOrderHistory);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = temp;
                 CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
-                SendData.Method = enMethodName.TradeHistoryByPair;
+                SendData.Method = enMethodName.OrderHistory;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
@@ -181,9 +181,9 @@ namespace CleanArchitecture.Web.API
                 //model.TodayOpen = 1477;
                 //model.Volume = 173;
 
-                List<GetGraphResponse> temp = JsonConvert.DeserializeObject<List<GetGraphResponse>>(Data);
+                List<GetGraphDetailInfo> temp = JsonConvert.DeserializeObject<List<GetGraphDetailInfo>>(Data);
 
-                SignalRComm<List<GetGraphResponse>> CommonData = new SignalRComm<List<GetGraphResponse>>();
+                SignalRComm<List<GetGraphDetailInfo>> CommonData = new SignalRComm<List<GetGraphDetailInfo>>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ChartData);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData);
@@ -250,18 +250,19 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpGet("LastPrice/{Data}/{Pair}")]
-        public async Task<IActionResult> LastPrice(decimal Data, String Pair)
+        public async Task<IActionResult> LastPrice(string Data, String Pair)
         {
             string ReciveMethod = "";
             try
             {
-                SignalRComm<Decimal> CommonData = new SignalRComm<Decimal>();
+                LastPriceViewModel temp = JsonConvert.DeserializeObject<LastPriceViewModel>(Data);
+                SignalRComm<LastPriceViewModel> CommonData = new SignalRComm<LastPriceViewModel>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.Price);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveLastPrice);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
-                CommonData.Data = Data;
+                CommonData.Data = temp;
                 CommonData.Parameter = Pair;// "INR_BTC";
 
                 SignalRData SendData = new SignalRData();
@@ -270,7 +271,7 @@ namespace CleanArchitecture.Web.API
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveLastPrice";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -317,7 +318,7 @@ namespace CleanArchitecture.Web.API
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveOpenOrder";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -328,9 +329,9 @@ namespace CleanArchitecture.Web.API
             }
         }
 
-        [HttpGet("OrderHistory/{Data}")]
+        [HttpGet("TradeHistory/{Data}")]
         [Authorize]
-        public async Task<IActionResult> OrderHistory(string Data)
+        public async Task<IActionResult> TradeHistory(string Data)
         {
             string ReciveMethod = "";
             try
@@ -354,54 +355,6 @@ namespace CleanArchitecture.Web.API
 
                 SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
-                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OrderHistory);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOrderHistory);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
-                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
-                CommonData.Data = temp;
-                CommonData.Parameter = null;
-
-                SignalRData SendData = new SignalRData();
-                SendData.Method = enMethodName.OrderHistory;
-                SendData.Parameter = accessToken;// CommonData.Parameter;
-                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-
-                await _mediator.Send(SendData);
-                ReciveMethod = "RecieveOrderHistory";
-                return Ok(new { ReciveMethod = ReciveMethod });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-
-                return Ok();
-            }
-        }
-
-        [HttpGet("TradeHistoryByUser/{Data}")]
-        [Authorize]
-        public async Task<IActionResult> TradeHistoryByUser(string Data)
-        {
-            string ReciveMethod = "";
-            try
-            {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                GetTradeHistoryInfo model = new GetTradeHistoryInfo();
-                model.TrnNo = 90;
-                model.Type = "SELL";
-                model.Price = 1400;
-                model.Amount = 1000;
-                model.Total = 140000;
-                model.DateTime = DateTime.UtcNow;
-                model.Status = 1;
-                model.StatusText = "Success";
-                model.PairName = "INR_BTC";
-                model.ChargeRs = 10;
-
-                GetTradeHistoryInfo temp = JsonConvert.DeserializeObject<GetTradeHistoryInfo>(Data);
-
-                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
-                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistory);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradeHistory);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
@@ -415,7 +368,54 @@ namespace CleanArchitecture.Web.API
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveTradeHistory";
+                ReciveMethod = CommonData.ReturnMethod;
+                return Ok(new { ReciveMethod = ReciveMethod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+                return Ok();
+            }
+        }
+
+        [HttpGet("RecentOrder/{Data}")]
+        [Authorize]
+        public async Task<IActionResult> RecentOrder(string Data)
+        {
+            string ReciveMethod = "";
+            try
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                RecentOrderInfo model = new RecentOrderInfo();
+                //model.TrnNo = 90;
+                //model.Type = "SELL";
+                //model.Price = 1400;
+                //model.Qty = 1000;
+                //model.DateTime = DateTime.UtcNow;
+                //model.Status = 1;
+                //model.StatusText = "Success";
+                //model.PairName = "INR_BTC";
+                //model.ChargeRs = 10;
+
+                RecentOrderInfo temp = JsonConvert.DeserializeObject<RecentOrderInfo>(Data);
+
+                SignalRComm<RecentOrderInfo> CommonData = new SignalRComm<RecentOrderInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.RecentOrder);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveRecentOrder);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = temp;
+                CommonData.Parameter = null;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.RecentOrder;
+                SendData.Parameter = accessToken;// CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                await _mediator.Send(SendData);
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -460,7 +460,7 @@ namespace CleanArchitecture.Web.API
                 SendData.WalletName = temp.CoinName;
 
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveBuyerSideWalletBal";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -504,7 +504,7 @@ namespace CleanArchitecture.Web.API
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = temp.CoinName;
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveSellerSideWalletBal";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -538,7 +538,7 @@ namespace CleanArchitecture.Web.API
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveNotification";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -586,7 +586,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecievePairData";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)

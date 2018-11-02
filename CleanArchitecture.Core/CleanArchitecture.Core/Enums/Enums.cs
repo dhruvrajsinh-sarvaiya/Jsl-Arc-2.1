@@ -413,13 +413,13 @@ namespace CleanArchitecture.Core.Enums
     public enum enMethodName
     {
         OpenOrder = 1,
-        OrderHistory = 2,
-        TradeHistory = 3,
+        TradeHistory = 2,
+        RecentOrder = 3,
         ActivityNotification = 4,
         //PairWise
         BuyerBook = 5,
         SellerBook = 6,
-        TradeHistoryByPair = 7,
+        OrderHistory = 7,
         MarketData = 8,
         Price = 9,
         BuyerSideWallet = 10,
@@ -434,29 +434,7 @@ namespace CleanArchitecture.Core.Enums
         Announcement = 17,
         Time = 18
     }
-    public enum PairWiseMethodName
-    {
-        BuyerBook = 5,
-        SellerBook = 6,
-        TradingHistory = 7,
-        MarketData = 8,
-        Price = 9,
-        BuyerSideWallet = 10,
-        SellerSideWallet = 11,
-        ChartData = 12
-    }
-    public enum MarketWiseMethodName
-    {
-        PairData = 13,
-        MarketTicker = 14
-    }
-    public enum GlobalMethodName
-    {
-        Chat = 15,
-        News = 16,
-        Announcement = 17,
-        Time = 18
-    }
+    
     public enum enValidateWalletLimit
     {
         Success = 1,
@@ -472,16 +450,16 @@ namespace CleanArchitecture.Core.Enums
     {
         //user specific
         RecieveOpenOrder = 1,
-        RecieveOrderHistory = 2,
-        RecieveTradeHistory = 3,
+        RecieveTradeHistory = 2,
+        RecieveRecentOrder = 3,
         RecieveBuyerSideWalletBal = 4,
         RecieveSellerSideWalletBal = 5,
-        RecieveNotification=14,
+        RecieveNotification = 14,
 
         //pair wise
         RecieveBuyerBook = 6,
         RecieveSellerBook = 7,
-        RecieveTradingHistory = 8,
+        RecieveOrderHistory = 8,
         RecieveMarketData = 9,
         RecieveChartData = 10,
         RecieveLastPrice = 11,

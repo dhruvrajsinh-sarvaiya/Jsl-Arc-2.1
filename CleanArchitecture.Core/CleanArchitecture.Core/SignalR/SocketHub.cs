@@ -6,6 +6,7 @@ using CleanArchitecture.Core.ApiModels.Chat;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using CleanArchitecture.Core.Enums;
 
 namespace CleanArchitecture.Core.SignalR
 {
@@ -44,7 +45,7 @@ namespace CleanArchitecture.Core.SignalR
             try
             {
                 string Pair = "INR_BTC";
-                string BaseCurrency = "XRP";
+                string BaseCurrency = "BTC";
                 var Redis = new RadisServices<ConnetedClientList>(this._fact);
                 Redis.SaveTagsToSetMember("Pairs:" + Pair, Context.ConnectionId, Pair); 
                 Redis.SaveTagsToSetMember("Markets:" + BaseCurrency, Context.ConnectionId, BaseCurrency);
@@ -402,10 +403,38 @@ namespace CleanArchitecture.Core.SignalR
             }            
         }
 
-#endregion
+        public Task BroadCastNews(string Data)
+        {
+            try
+            {
+                _chatHubContext.Clients.Group("BroadCast").SendAsync("RecieveNews", Data);
+                return Task.FromResult(0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return Task.FromResult(0);
+            }
+        }
+
+        public Task BroadCastAnnouncement(string Data)
+        {
+            try
+            {
+                _chatHubContext.Clients.Group("BroadCast").SendAsync("RecieveAnnouncement", Data);
+                return Task.FromResult(0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return Task.FromResult(0);
+            }
+        }
+
+        #endregion
 
         #region "User Specific Updates"
-
+        //open order
         public Task OpenOrder(string Token, string Order)
         {
             try
@@ -420,7 +449,7 @@ namespace CleanArchitecture.Core.SignalR
                 {
                     var key = s;
                     key = key.Split(":")[1].ToString();
-                    _chatHubContext.Clients.Client(key).SendAsync("RecieveOpenOrder", Order);
+                    _chatHubContext.Clients.Client(key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOpenOrder), Order);
                 }
                 // _chatHubContext.Clients.Client(str.ToList().AsReadOnly()).SendAsync("RecieveOpenOrder", Order);
                 return Task.FromResult(0);
@@ -431,8 +460,8 @@ namespace CleanArchitecture.Core.SignalR
                 return Task.FromResult(0);
             }            
         }
-
-        public Task OrderHistory(string Token, string Order)
+        //OrderHistory
+        public Task TradeHistory(string Token, string Order)
         {
             try
             {
@@ -446,7 +475,7 @@ namespace CleanArchitecture.Core.SignalR
                 {
                     var key = s;
                     key = key.Split(":")[1].ToString();
-                    _chatHubContext.Clients.Client(key).SendAsync("RecieveOrderHistory", Order);
+                    _chatHubContext.Clients.Client(key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradeHistory), Order);
                 }
                 return Task.FromResult(0);  
             }
@@ -456,8 +485,8 @@ namespace CleanArchitecture.Core.SignalR
                 return Task.FromResult(0);
             }           
         }
-
-        public Task TradeHistoryByUser(string Token, string Order)
+        //TradeHistoryByUser
+        public Task RecentOrder(string Token, string Order)
         {
             try
             {
@@ -471,7 +500,7 @@ namespace CleanArchitecture.Core.SignalR
                 {
                     var key = s;
                     key = key.Split(":")[1].ToString();
-                    _chatHubContext.Clients.Client(key).SendAsync("RecieveTradeHistory", Order);
+                    _chatHubContext.Clients.Client(key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveRecentOrder), Order);
                 }
                 return Task.FromResult(0);
             }
@@ -502,7 +531,7 @@ namespace CleanArchitecture.Core.SignalR
                     string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
                     if (Pair.ToUpper().Contains(WalletName.ToUpper()))
                     {
-                        _chatHubContext.Clients.Client(Key).SendAsync("RecieveBuyerSideWalletBal", Data);
+                        _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerSideWalletBal), Data);
                     }
                     else
                     {
@@ -537,7 +566,7 @@ namespace CleanArchitecture.Core.SignalR
                     string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
                     if (Pair.ToUpper().Contains(WalletName.ToUpper()))
                     {
-                        _chatHubContext.Clients.Client(Key).SendAsync("RecieveSellerSideWalletBal", Data);
+                        _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerSideWalletBal), Data);
                     }
                     else
                     {
@@ -564,7 +593,7 @@ namespace CleanArchitecture.Core.SignalR
                 {
                     var key = s;
                     key = key.Split(":")[1].ToString();
-                    _chatHubContext.Clients.Client(key).SendAsync("RecieveNotification", Message);
+                    _chatHubContext.Clients.Client(key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveNotification), Message);
                 }
                 return Task.FromResult(0);
             }
@@ -584,7 +613,7 @@ namespace CleanArchitecture.Core.SignalR
             try
             {
                 //_chatHubContext.Clients.Clients(GetConnectedClient(Pair)).SendAsync("RecieveBuyerBook", Helpers.Helpers.JsonSerialize(Data));
-                _chatHubContext.Clients.Group("BuyerBook:" + Pair).SendAsync("RecieveBuyerBook", Data);
+                _chatHubContext.Clients.Group("BuyerBook:" + Pair).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerBook), Data);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -616,7 +645,7 @@ namespace CleanArchitecture.Core.SignalR
         {
             try
             {
-                _chatHubContext.Clients.Group("SellerBook:" + Pair).SendAsync("RecieveSellerBook", Data);
+                _chatHubContext.Clients.Group("SellerBook:" + Pair).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerBook), Data);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -628,11 +657,12 @@ namespace CleanArchitecture.Core.SignalR
         }
 
         // Global Trades settelment
-        public Task TradeHistoryByPair(string Pair, string Data)
+        //TradeHistoryByPair
+        public Task OrderHistory(string Pair, string Data)
         {
             try
             {
-                _chatHubContext.Clients.Group("TradingHistory:" + Pair).SendAsync("RecieveTradingHistory", Data);
+                _chatHubContext.Clients.Group("TradingHistory:" + Pair).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOrderHistory), Data);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -646,7 +676,7 @@ namespace CleanArchitecture.Core.SignalR
         {
             try
             {
-                _chatHubContext.Clients.Group("MarketData:" + Pair).SendAsync("RecieveMarketData", Data);
+                _chatHubContext.Clients.Group("MarketData:" + Pair).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveMarketData), Data);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -660,7 +690,7 @@ namespace CleanArchitecture.Core.SignalR
         {
             try
             {
-                _chatHubContext.Clients.Group("Price:" + Pair).SendAsync("RecieveLastPrice", Data);
+                _chatHubContext.Clients.Group("Price:" + Pair).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveLastPrice), Data);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -674,7 +704,7 @@ namespace CleanArchitecture.Core.SignalR
         {
             try
             {
-                _chatHubContext.Clients.Group("ChartData:" + Pair).SendAsync("RecieveChartData", Data);
+                _chatHubContext.Clients.Group("ChartData:" + Pair).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData), Data);
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -692,7 +722,7 @@ namespace CleanArchitecture.Core.SignalR
         {
             try
             {
-                _chatHubContext.Clients.Group("PairData:" + BaseCurrency).SendAsync("RecievePairData", Data);
+                _chatHubContext.Clients.Group("PairData:" + BaseCurrency).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecievePairData), Data);
                 return Task.FromResult(0);
             }
             catch (Exception ex)

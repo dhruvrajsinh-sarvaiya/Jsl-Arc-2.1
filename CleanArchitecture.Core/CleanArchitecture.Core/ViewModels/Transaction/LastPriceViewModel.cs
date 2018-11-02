@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
         //for socket method
         [Required]
         [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
-        public decimal LTP { get; set; }
-        //public short UpDownBit { get; set; }
+        public decimal LastPrice { get; set; }
+        public short UpDownBit { get; set; }
     }
 }
