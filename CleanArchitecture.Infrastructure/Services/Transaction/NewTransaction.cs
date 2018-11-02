@@ -208,7 +208,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     var HoldTrnNos = new List<long> { };                   
                     if (_Resp.ReturnCode==enResponseCodeService.Success)
                     {
-                        _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, TradeBuyRequestObj,ref HoldTrnNos);
+                        _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, TradeBuyRequestObj,ref HoldTrnNos,Req.accessToken);
                         try
                         {//This try catch create wrapper for current transaction
                             BizResponse _Resp1 = new BizResponse();
@@ -220,7 +220,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                                 if (NewBuyRequestObj != null)
                                 {
                                     var HoldTrnNosNotExec = new List<long> { };
-                                    _Resp1 = await _SettlementRepository.PROCESSSETLLEMENT(_Resp1, NewBuyRequestObj, ref HoldTrnNosNotExec);
+                                    _Resp1 = await _SettlementRepository.PROCESSSETLLEMENT(_Resp1, NewBuyRequestObj, ref HoldTrnNosNotExec);// no access tocken as no login this member in this request
                                 }
                             }
                         }

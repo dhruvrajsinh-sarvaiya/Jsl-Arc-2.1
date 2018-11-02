@@ -195,7 +195,7 @@ namespace CleanArchitecture.Infrastructure
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
-            modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
+            //modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
             modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
 
             modelBuilder.Entity<WithdrawHistory>().HasKey(e => new {  e.TrnID, e.Address }); // vsolanki 2018-10-29 composite primary key
@@ -216,7 +216,7 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeDepositCompletedTrn>().Property(x => x.Address).ValueGeneratedNever(); // ntrivedi 30-10-2018 
             modelBuilder.Entity<TradeDepositCompletedTrn>().Property(x => x.TrnID).ValueGeneratedNever(); // ntrivedi 30-10-2018 pk and autoid are different
             modelBuilder.Entity<TradeDepositCompletedTrn>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore; // ntrivedi 30102018 https://github.com/aspnet/EntityFrameworkCore/issues/7380 29-10-2018
-            modelBuilder.Entity<TradeBuyerList>().HasKey(e => new {e.Id, e.TrnNo });
+            //modelBuilder.Entity<TradeBuyerList>().HasKey(e => new {e.Id, e.TrnNo });
             modelBuilder.Entity<TradeSellerList>().HasKey(e => new { e.TrnNo, e.PoolID });            
             modelBuilder.Entity<WalletLimitConfiguration>().HasKey(e => new { e.TrnType, e.WalletId }); // ntrivedi 31102018
             modelBuilder.Entity<WalletLimitConfiguration>().Property(x => x.TrnType).ValueGeneratedNever();// ntrivedi 31102018
@@ -226,7 +226,8 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<UserPreferencesMaster>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
             modelBuilder.Entity<TradeBitGoDelayAddresses>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
             modelBuilder.Entity<TradeBitGoDelayAddresses>().Property(x => x.TrnID).ValueGeneratedNever();// ntrivedi 31102018
-
+            modelBuilder.Entity<TradeBuyerList>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 2-11-2018 for error cannot update identity column id
+            modelBuilder.Entity<TradeTransactionQueue>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 2-11-2018 for error cannot update identity column id
             modelBuilder.Entity<TransactionStatus>().HasKey(e => new { e.TrnNo, e.ServiceID,e.SerProID });//Rita 31-10-2018 for composite Primary key
 
         }
