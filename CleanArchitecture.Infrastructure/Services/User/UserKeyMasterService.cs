@@ -29,7 +29,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
         public string Get2FACustomToken(long UserId)
         {
             // Status Old Custom Password UpdateStatus
-            var custompassword = GetUserUniqueKey(UserId);
+            var custompassword = GetUserUniqueKeyList(UserId);
             foreach (var item in custompassword)
             {
                 UpdateOtp(item.Id);
@@ -73,7 +73,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
         }
 
 
-        public List<UserKeyViewModel> GetUserUniqueKey(long userid)
+        public List<UserKeyViewModel> GetUserUniqueKeyList(long userid)
         {
             try
             {
@@ -94,6 +94,30 @@ namespace CleanArchitecture.Infrastructure.Services.User
             catch (Exception ex)
             {
                 // _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw;
+            }
+        }
+
+        public UserKeyViewModel GetUserUniqueKey(string useruniqueKey)
+        {
+            try
+            {
+                var data = _customRepository.Table.Where(i => i.uniqueKey == useruniqueKey && i.EnableStatus == false).LastOrDefault();
+                UserKeyViewModel model = new UserKeyViewModel();
+                if (data != null)
+                {
+                    model.UniqueKey = data.uniqueKey;
+                    model.EnableStatus = data.EnableStatus;
+                    model.UserId = data.UserId;
+                    model.Id = data.Id;
+                    return model;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+               // _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw;
             }
         }

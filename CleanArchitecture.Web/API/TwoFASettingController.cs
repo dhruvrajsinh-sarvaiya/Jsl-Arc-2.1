@@ -104,6 +104,44 @@ namespace CleanArchitecture.Web.API
             var user = await GetCurrentUserAsync();
             try
             {
+                TwoFactorAuth TFAuth = new TwoFactorAuth();
+                //sKey = key; //TFAuth.CreateSecret(160);
+                bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
+                if (!status)
+                {
+                    return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.TwoFactorVerificationDisable, ErrorCode = enErrorCode.Status4071TwoFactorVerificationDisable });
+                    
+                }
+                else
+                {
+                    //user.TwoFactorEnabled = true;
+                    //await _userManager.UpdateAsync(user);
+                    var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
+                    //return Ok(new EnableAuthenticationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.EnableTwoFactor });
+                    if (disable2faResult.Succeeded)
+                    {
+                        string oldvalue = JsonConvert.SerializeObject(user);
+                        user.TwoFactorEnabled = false;
+                        await _userManager.UpdateAsync(user);
+                        string Newvalue = JsonConvert.SerializeObject(user);
+                        UserChangeLogViewModel userChangeLogViewModel = new UserChangeLogViewModel();
+                        userChangeLogViewModel.Id = user.Id;
+                        userChangeLogViewModel.Newvalue = Newvalue;
+                        userChangeLogViewModel.Type = EnuserChangeLog.TwofactoreChange.ToString();
+                        userChangeLogViewModel.Oldvalue = oldvalue;
+
+                        long userlog = _iuserChangeLog.AddPassword(userChangeLogViewModel);
+                        //_logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
+                        return Ok(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.DisableTroFactor });
+                    }
+                    else
+                    {
+                        return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DisableTroFactorError, ErrorCode = enErrorCode.Status4055DisableTroFactorError });
+                    }
+                }
+                  
+
+                /*
                 // Strip spaces and hypens
                 var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
@@ -139,7 +177,7 @@ namespace CleanArchitecture.Web.API
                         return BadRequest(new DisableAuthenticatorResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DisableTroFactorError, ErrorCode = enErrorCode.Status4055DisableTroFactorError });
                     }
                 }
-
+                */
 
             }
             catch (Exception ex)

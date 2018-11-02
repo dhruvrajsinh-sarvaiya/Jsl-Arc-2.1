@@ -10,7 +10,8 @@ namespace CleanArchitecture.Core.Interfaces.User
 
         string Get2FACustomToken(long UserId);
         void UpdateOtp(long Id);
-        List<UserKeyViewModel> GetUserUniqueKey(long userid);
+        List<UserKeyViewModel> GetUserUniqueKeyList(long userid);
+        UserKeyViewModel GetUserUniqueKey(string useruniqueKey);
         UserKeyViewModel AddUniqueKey(UserKeyViewModel model);
     }
 }

@@ -267,7 +267,7 @@ namespace CleanArchitecture.Core.Enums
         Status4104TempUserNameExist = 4104,
         Status4105TempUserMobileExist = 4105,
         Status4106LoginFailMobileNotAvailable = 4106,
-
+        Status4107TwoFAKeyinvalid = 4107,
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

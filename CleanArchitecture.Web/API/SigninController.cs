@@ -47,6 +47,7 @@ namespace CleanArchitecture.Web.API
         private readonly Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>> _tokenProviders =
             new Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>>();
         private readonly ITempUserRegisterService _tempUserRegisterService;
+        private readonly IUserKeyMasterService _userKeyMasterService;
 
         private ApplicationUser _ApplicationUser;
 
@@ -54,7 +55,7 @@ namespace CleanArchitecture.Web.API
 
         #region Ctore
         public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage,
-            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService)
+            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService, IUserKeyMasterService userKeyMasterService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -67,6 +68,7 @@ namespace CleanArchitecture.Web.API
             _encdecAEC = encypted;
             _custompassword = custompassword;
             _tempUserRegisterService = tempUserRegisterService;
+            _userKeyMasterService = userKeyMasterService;
         }
         #endregion
 
@@ -183,8 +185,8 @@ namespace CleanArchitecture.Web.API
 
         [HttpPost("VerifyCode")]
         [AllowAnonymous]
-       // [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> VerifyCode(EnableAuthenticatorCodeViewModel model)
+        // [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> VerifyCode(TwoFACodeVerifyViewModel model)
         {
             // The following code protects for brute force attacks against the two factor codes.
             // If a user enters incorrect codes for a specified amount of time then the user account
@@ -192,31 +194,43 @@ namespace CleanArchitecture.Web.API
             //  var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
             try
             {
-
-                var user = await _userManager.FindByNameAsync(model.UserName);
-                if (user != null)
+                // var Key = await _custompassword.GetPassword(user.Id);
+                var TwoFAToken = _userKeyMasterService.GetUserUniqueKey(model.TwoFAKey);
+                if (TwoFAToken != null)
                 {
-                    //if (user.lo .IsLockedOut)
-                    //{
-                    //    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
-                    //}
-
-                    TwoFactorAuth TFAuth = new TwoFactorAuth();
-                    //sKey = key; //TFAuth.CreateSecret(160);
-                    bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
-                    if(status)
-                    {
-                        return Ok(new VerifyCodeResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
-                        // return RedirectToLocal(model.ReturnUrl);
-                    }                    
-                    else
-                    {
+                    if (TwoFAToken.UniqueKey != model.TwoFAKey)
                         return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
+
+
+                    var user = await _userManager.FindByIdAsync(TwoFAToken.UserId.ToString());
+                    if (user != null)
+                    {
+                        //if (user.lo .IsLockedOut)
+                        //{
+                        //    return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.StandardLoginLockOut, ErrorCode = enErrorCode.Status423Locked });
+                        //}
+
+                        TwoFactorAuth TFAuth = new TwoFactorAuth();
+                        //sKey = key; //TFAuth.CreateSecret(160);
+                        bool status = TFAuth.VerifyCode(user.PhoneNumber, model.Code, 5);
+                        if (status)
+                        {
+                            //// Valid Key and status Disable
+                            _userKeyMasterService.UpdateOtp(TwoFAToken.Id);
+
+                            return Ok(new VerifyCodeResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
+                            // return RedirectToLocal(model.ReturnUrl);
+                        }
+                        else
+                        {
+                            return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
+                        }
                     }
 
                 }
-                return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
+                return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorKeyFail, ErrorCode = enErrorCode.Status4107TwoFAKeyinvalid });
 
+                //return BadRequest(new VerifyCodeResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.FactorFail, ErrorCode = enErrorCode.Status4054FactorFail });
                 /*
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
@@ -347,11 +361,11 @@ namespace CleanArchitecture.Web.API
 
                     //// Start 2FA in Custome token Create 
                     var user = await _userManager.FindByNameAsync(model.Username);
-                    string TwoFAToken = await _custompassword.Get2FACustomToken(user.Id);
+                    string TwoFAToken = _userKeyMasterService.Get2FACustomToken(user.Id);
                     //// End 2FA in Custome token Create 
-                    //return Ok(new StandardLogin2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
+                    return Ok(new StandardLogin2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
 
-                    return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+                    //return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
                 }
                 if (result.IsLockedOut)
                 {
@@ -477,24 +491,37 @@ namespace CleanArchitecture.Web.API
                                     _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (checkmail.TwoFactorEnabled)
                                     {
-                                        string currenttime = DateTime.UtcNow.ToString();
+                                        //var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
+                                        //// Start 2FA in Custome token Create 
+                                        var user = await _userManager.FindByEmailAsync(model.Email);
+                                        string TwoFAToken = _userKeyMasterService.Get2FACustomToken(user.Id);
+                                        //// End 2FA in Custome token Create 
 
-                                        var newPassword = _userManager.PasswordHasher.HashPassword(checkmail, currenttime);
-                                        checkmail.PasswordHash = newPassword;
-                                        var res = await _userManager.UpdateAsync(checkmail);
-                                        if (res.Succeeded)
-                                        {
-                                            //var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
-                                            //// Start 2FA in Custome token Create 
-                                            //var user = await _userManager.FindByEmailAsync(model.Email);
-                                            //string TwoFAToken = await _custompassword.Get2FACustomToken(user.Id);
-                                            //// End 2FA in Custome token Create 
 
-                                            //return Ok(new LoginWithEmail2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
-                                            return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
-                                        }
-                                        else
-                                            return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
+                                        return Ok(new LoginWithEmail2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
+                                        // return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+
+
+
+                                        //string currenttime = DateTime.UtcNow.ToString();
+
+                                        //var newPassword = _userManager.PasswordHasher.HashPassword(checkmail, currenttime);
+                                        //checkmail.PasswordHash = newPassword;
+                                        //var res = await _userManager.UpdateAsync(checkmail);
+                                        //if (res.Succeeded)
+                                        //{
+                                        //    //var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
+                                        //    //// Start 2FA in Custome token Create 
+                                        //    var user = await _userManager.FindByEmailAsync(model.Email);
+                                        //    string TwoFAToken = _userKeyMasterService.Get2FACustomToken(user.Id);
+                                        //    //// End 2FA in Custome token Create 
+
+
+                                        //    return Ok(new LoginWithEmail2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
+                                        //    // return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+                                        //}
+                                        //else
+                                        //    return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
 
                                     }
                                     _logger.LogWarning(1, "You are successfully login.");
@@ -541,7 +568,7 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                     {
-                       // ModelState.AddModelError(string.Empty, "Error.");
+                        // ModelState.AddModelError(string.Empty, "Error.");
                         return BadRequest(new OTPWithEmailResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.LoginWithOtpLoginFailed, ErrorCode = enErrorCode.Status4086LoginWithOtpLoginFailed });
                     }
                 }
@@ -717,24 +744,34 @@ namespace CleanArchitecture.Web.API
                                     _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
                                     {
-                                        string currenttime = DateTime.UtcNow.ToString();
 
-                                        var newPassword = _userManager.PasswordHasher.HashPassword(result, currenttime);
-                                        result.PasswordHash = newPassword;
-                                        var res = await _userManager.UpdateAsync(result);
-                                        if (res.Succeeded)
-                                        {
-                                            var resultdata = await _signInManager.PasswordSignInAsync(result.UserName, currenttime, false, lockoutOnFailure: false);
+                                        ////// Start 2FA in Custome token Create                                    
+                                        string TwoFAToken = _userKeyMasterService.Get2FACustomToken(logindata.Id);
+                                        ////// End 2FA in Custome token Create 
+                                        /////
+                                        return Ok(new OtpWithMobile2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
 
-                                            //// Start 2FA in Custome token Create                                            
-                                            //string TwoFAToken = await _custompassword.Get2FACustomToken(logindata.Id);
-                                            //// End 2FA in Custome token Create 
-                                            //return Ok(new OtpWithMobile2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
 
-                                            return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
-                                        }
-                                        else
-                                            return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
+                                        //string currenttime = DateTime.UtcNow.ToString();
+
+                                        //var newPassword = _userManager.PasswordHasher.HashPassword(result, currenttime);
+                                        //result.PasswordHash = newPassword;
+                                        //var res = await _userManager.UpdateAsync(result);
+                                        //if (res.Succeeded)
+                                        //{
+                                        //    var resultdata = await _signInManager.PasswordSignInAsync(result.UserName, currenttime, false, lockoutOnFailure: false);
+
+                                        //    //// Start 2FA in Custome token Create                                            
+                                        //    //string TwoFAToken = await _custompassword.Get2FACustomToken(logindata.Id);
+                                        //    //// End 2FA in Custome token Create 
+                                        //    //return Ok(new OtpWithMobile2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
+                                                                                                                               
+
+
+                                        //    return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod });
+                                        //}
+                                        //else
+                                        //    return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
                                     }
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
@@ -946,7 +983,7 @@ namespace CleanArchitecture.Web.API
                             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                             var userdet = await _userManager.CreateAsync(user);
                             var infodet = new UserLoginInfo(model.ProviderName, model.ProviderKey, model.ProviderName);
-                             if (userdet.Succeeded)
+                            if (userdet.Succeeded)
                             {
                                 var userlogin = await _userManager.AddLoginAsync(user, infodet);
 
@@ -1189,7 +1226,7 @@ namespace CleanArchitecture.Web.API
                 //    emailConfirmCode = SubScriptionKey
                 //}, protocol: HttpContext.Request.Scheme);
                 //string ctokenlink = _configuration["ResetPaswword"].ToString() + SubScriptionKey;
-                byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);                
+                byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);
                 string ctokenlink = _configuration["ResetPaswword"].ToString() + Convert.ToBase64String(plainTextBytes);
 
                 var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">" + EnResponseMessage.ResetEmailMessage + "</a>";
