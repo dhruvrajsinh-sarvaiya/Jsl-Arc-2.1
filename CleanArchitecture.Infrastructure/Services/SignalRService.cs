@@ -96,21 +96,21 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void TradingHistoryByPair(GetTradeHistoryInfo Data, string Pair)
+        public void OrderHistory(GetTradeHistoryInfo Data, string Pair)
         {
             try
             {
                 SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
-                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.TradeHistoryByPair);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveTradingHistory);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OrderHistory);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOrderHistory);
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.Broadcast);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.PairName);
                 CommonData.Data = Data;
                 CommonData.Parameter = Pair;
 
                 SignalRData SendData = new SignalRData();
-                SendData.Method = enMethodName.TradeHistoryByPair;
+                SendData.Method = enMethodName.OrderHistory;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 _mediator.Send(SendData);
@@ -231,34 +231,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void OrderHistory(GetTradeHistoryInfo Data, string Token)
-        {
-            try
-            {
-                SignalRComm<GetTradeHistoryInfo> CommonData = new SignalRComm<GetTradeHistoryInfo>();
-                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
-                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.OrderHistory);
-                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveOrderHistory);
-                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
-                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
-                CommonData.Data = Data;
-                CommonData.Parameter = Token;
-
-                SignalRData SendData = new SignalRData();
-                SendData.Method = enMethodName.OrderHistory;
-                SendData.Parameter = CommonData.Parameter;
-                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
-
-                _mediator.Send(SendData);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
-            }
-        }
-
-        public void TradeHistoryByUser(GetTradeHistoryInfo Data, string Token)
+        public void TradeHistory(GetTradeHistoryInfo Data, string Token)
         {
             try
             {
@@ -273,6 +246,33 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.TradeHistory;
+                SendData.Parameter = CommonData.Parameter;
+                SendData.DataObj = JsonConvert.SerializeObject(CommonData);
+
+                _mediator.Send(SendData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                throw ex;
+            }
+        }
+
+        public void RecentOrder(RecentOrderInfo Data, string Token)
+        {
+            try
+            {
+                SignalRComm<RecentOrderInfo> CommonData = new SignalRComm<RecentOrderInfo>();
+                CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+                CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.RecentOrder);
+                CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveRecentOrder);
+                CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+                CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+                CommonData.Data = Data;
+                CommonData.Parameter = Token;
+
+                SignalRData SendData = new SignalRData();
+                SendData.Method = enMethodName.RecentOrder;
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
@@ -426,10 +426,11 @@ namespace CleanArchitecture.Infrastructure.Services
         }
         #endregion
 
-        public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token)
+        public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Tokene, short IsPartial)
         {
             try
             {
+                short OrderType =1;
                 if (Status == Convert.ToInt16(enTransactionStatus.Hold))
                 {
                     GetBuySellBook BuySellmodel = new GetBuySellBook();
@@ -455,18 +456,18 @@ namespace CleanArchitecture.Infrastructure.Services
                             }
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
                         }
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction);
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);
                     
                 }
                 else if (Status == Convert.ToInt16(enTransactionStatus.Success))
                 {
                     GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
-                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction);
+                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
 
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);//with amount 0
                     OrderHistory(historyInfo, Token);
-                    TradeHistoryByUser(historyInfo, Token);
-                    TradingHistoryByPair(historyInfo, NewTradeTransaction.PairName);
+                    //RecentOrder(historyInfo, Token);
+                    OrderHistory(historyInfo, NewTradeTransaction.PairName);
                     
                     var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
                     msg = msg.Replace("#Price#",historyInfo.Price .ToString());
@@ -489,7 +490,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 if(volumeData!=null && capData!= null)
                 {
                     LastPriceViewModel lastPriceData = new LastPriceViewModel();
-                    lastPriceData.LTP = capData.LastPrice;
+                    lastPriceData.LastPrice = capData.LastPrice;
                     string Base = volumeData.PairName.Split("_")[1];
                     PairData(volumeData, Base);
                     MarketData(capData, volumeData.PairName);
@@ -517,7 +518,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
+        public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0)
         {
             try
             {
@@ -533,7 +534,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     OpenOrderModel.Amount = (NewTradeTransaction.BuyQty == 0) ? NewTradeTransaction.SellQty : (NewTradeTransaction.SellQty == 0) ? NewTradeTransaction.BuyQty : NewTradeTransaction.BuyQty;
                 OpenOrderModel.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
                 OpenOrderModel.IsCancelled = NewTradeTransaction.IsCancelled;
-                
+                OpenOrderModel.OrderType= Enum.GetName(typeof(enTransactionMarketType), OrderType);
 
                 OpenOrder(OpenOrderModel, Token);
                 if (IsPop != 1)//send notification
@@ -551,7 +552,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short IsPop = 0)
+        public GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0)
         {
             try
             {
@@ -568,7 +569,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 model.PairName = NewTradeTransaction.PairName;
                 model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
                 model.IsCancel = NewTradeTransaction.IsCancelled;
-                //model.OrderType=
+                model.OrderType= Enum.GetName(typeof(enTransactionMarketType), OrderType);
                 return model;
             }
             catch (Exception ex)
