@@ -57,6 +57,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     listWalletTypeMasterResponse.walletTypeMasters = coin;
                     listWalletTypeMasterResponse.ReturnCode = enResponseCode.Success;
+                    listWalletTypeMasterResponse.ErrorCode = enErrorCode.Success;
                     listWalletTypeMasterResponse.ReturnMsg = EnResponseMessage.FindRecored;
                 }
 
@@ -79,7 +80,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 if (addWalletTypeMasterRequest == null)
                 {
-                    walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
+                    walletTypeMasterResponse.ReturnCode = enResponseCode.Fail;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.NotFound;
                     return walletTypeMasterResponse;
                 }
@@ -97,6 +98,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     walletTypeMasterResponse.walletTypeMaster = _walletTypeMaster;
                     walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.RecordAdded;
+                    walletTypeMasterResponse.ErrorCode = enErrorCode.Success;
                     return walletTypeMasterResponse;
                 }
                 //return _walletTypeMaster;
@@ -120,7 +122,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 var _walletTypeMaster = _WalletTypeMasterRepository.GetById(WalletTypeId);
                 if (_walletTypeMaster == null)
                 {
-                    walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
+                    walletTypeMasterResponse.ReturnCode = enResponseCode.Fail;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.NotFound;
                     return walletTypeMasterResponse;
                 }
@@ -140,6 +142,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     walletTypeMasterResponse.walletTypeMaster = _walletTypeMaster;
                     walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
+                    walletTypeMasterResponse.ErrorCode = enErrorCode.Success;
                     return walletTypeMasterResponse;
                 }
             }
@@ -167,7 +170,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                     //_WalletTypeMasterRepository.Delete(_walletTypeMaster);
                     _walletTypeMaster.DisableStatus();
                     _WalletTypeMasterRepository.Update(_walletTypeMaster);
-                    return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordDisable };
+                    return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordDisable ,ErrorCode=enErrorCode.Success};
                 }
             }
             catch (Exception ex)
@@ -195,6 +198,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 {
                     walletTypeMasterResponse.walletTypeMaster = _walletTypeMaster;
                     walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
+                    walletTypeMasterResponse.ErrorCode = enErrorCode.Success;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.FindRecored;
                     return walletTypeMasterResponse;
                 }

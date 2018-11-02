@@ -376,7 +376,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
                 }
 
-                if (Req.Amount < 0)
+                if (Req.Amount <= 0) // ntrivedi 02-11-2018 if amount =0 then also invalid
                 {
                     Req.StatusMsg = EnResponseMessage.CreateTrnInvalidAmountMsg;
                     return MarkSystemFailTransaction(enErrorCode.CreateTrnInvalidAmount);

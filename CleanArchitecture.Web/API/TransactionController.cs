@@ -31,16 +31,18 @@ namespace CleanArchitecture.Web.API
         private readonly IFrontTrnService _frontTrnService;
         private readonly ITransactionProcess _transactionProcess;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICancelOrderProcess _cancelOrderProcess;
         string dummyResponce = "";
         static int i = 1;
 
-        public TransactionController(ILogger<TransactionController> logger, IBasePage basePage, IFrontTrnService frontTrnService, UserManager<ApplicationUser> userManager, ITransactionProcess transactionProcess)
+        public TransactionController(ILogger<TransactionController> logger, IBasePage basePage, IFrontTrnService frontTrnService, UserManager<ApplicationUser> userManager, ITransactionProcess transactionProcess, ICancelOrderProcess cancelOrderProcess)
         {
             _logger = logger;
             _basePage = basePage;
             _frontTrnService = frontTrnService;
             _transactionProcess = transactionProcess;
             _userManager = userManager;
+            _cancelOrderProcess = cancelOrderProcess;
         }
 
         private ActionResult returnDynamicResult(dynamic respObjJson)
@@ -86,6 +88,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -210,12 +213,13 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("CancelOrder")]
-        [Authorize]
-        public ActionResult CancelOrder([FromBody]CancelOrderRequest Request)
+       // [Authorize]
+        public async Task<ActionResult> CancelOrder([FromBody]CancelOrderRequest Request)
         {
             try
             {
-                return Ok(Response);
+                BizResponse MethodRespCancel = _cancelOrderProcess.ProcessCancelOrder(Request);
+                return Ok(MethodRespCancel);
             }
             catch (Exception ex)
             {
@@ -241,6 +245,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -556,6 +561,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -595,6 +601,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -631,6 +638,7 @@ namespace CleanArchitecture.Web.API
                 }
                 Response.response = _frontTrnService.GetTradePairByName(id);
                 Response.ReturnCode = enResponseCode.Success;
+                Response.ErrorCode = enErrorCode.Success;
                 return Ok(Response);
             }
             catch (Exception ex)
@@ -673,6 +681,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responsedata;
                     Response.ReturnCode = enResponseCode.Success;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -740,6 +749,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -778,6 +788,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.ReturnCode = enResponseCode.Success;
                     Response.response = responsedata;
+                    Response.ErrorCode = enErrorCode.Success;
                 }
                 else
                 {
@@ -913,6 +924,7 @@ namespace CleanArchitecture.Web.API
                     {
                         Response.response = response;
                         Response.ReturnCode = enResponseCode.Success;
+                        Response.ErrorCode = enErrorCode.Success;
                     }
                     else
                     {
