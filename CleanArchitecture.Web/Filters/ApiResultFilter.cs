@@ -26,30 +26,27 @@ namespace CleanArchitecture.Web.Filters
         {
             try
             {
+                //_logger.LogWarning("ClassFilter OnResultExecuting");
+                // _logger.LogWarning(((string[])((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)[0]);
+                //base.OnResultExecuting(context);
 
-            
-            //_logger.LogWarning("ClassFilter OnResultExecuting");
-            // _logger.LogWarning(((string[])((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)[0]);
-            //base.OnResultExecuting(context);
-
-            if (!context.ModelState.IsValid)
-            {
-                //context.Result = new ValidationFailedResult(context.ModelState);
-                context.Result = new MyResponse(context.ModelState);
-            }
-
-            if (((Microsoft.AspNetCore.Http.Internal.DefaultHttpRequest)((Microsoft.AspNetCore.Http.DefaultHttpContext)context.HttpContext).Request).Path.ToString() != _configuration["ASOSToken"].ToString())
-            {
-                string ReturnCode = ((Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)?.ErrorCode.ToString();
-                if (ReturnCode == "Status500InternalServerError")
+                if (!context.ModelState.IsValid)
                 {
-                    string ReturnMsg = ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg;
-                    HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
-                    HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
-                    ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg = "Error occurred.";
+                    //context.Result = new ValidationFailedResult(context.ModelState);
+                    context.Result = new MyResponse(context.ModelState);
                 }
-            }
 
+                if (((Microsoft.AspNetCore.Http.Internal.DefaultHttpRequest)((Microsoft.AspNetCore.Http.DefaultHttpContext)context.HttpContext).Request).Path.ToString() != _configuration["ASOSToken"].ToString())
+                {
+                    string ReturnCode = ((Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)?.ErrorCode.ToString();
+                    if (ReturnCode == "Status500InternalServerError")
+                    {
+                        string ReturnMsg = ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg;
+                        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+                        HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+                        ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg = "Error occurred.";
+                    }
+                }
 
                 //if (((Microsoft.AspNetCore.Mvc.SignInResult)context.Result).AuthenticationScheme.ToString() != "ASOS")
                 //{
