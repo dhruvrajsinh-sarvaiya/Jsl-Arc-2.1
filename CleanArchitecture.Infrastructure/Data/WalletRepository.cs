@@ -521,7 +521,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                                LimitPerTransaction = u.LimitPerTransaction,
                                                                AccWalletID = c.AccWalletID,
                                                                EndTime = u.EndTimeUnix,
-                                                               LifeTime = u.LifeTime,
+                                                               LifeTime = u.LifeTime != null ? u.LifeTime:0,
                                                                StartTime = u.StartTimeUnix
                                                            }).AsEnumerable().ToList();
 

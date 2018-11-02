@@ -40,6 +40,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Interfaces.UserChangeLog;
 using CleanArchitecture.Infrastructure.Services.UserChangeLog;
+using CleanArchitecture.Infrastructure.Interfaces;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -404,6 +405,7 @@ namespace CleanArchitecture.Web.Extensions
             services.AddScoped<ICustomPassword, CustomPasswordService>();
             services.AddScoped<IUserChangeLog, UserChangeLogServices>();
             services.AddScoped<IUserConfiguration, UserConfigurationService>();
+            services.AddTransient<ICancelOrderProcess, CancelOrderProcess>();
             return services;
         }
     }
