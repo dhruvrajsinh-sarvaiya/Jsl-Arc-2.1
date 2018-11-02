@@ -80,7 +80,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData,
             ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeSellerList> TradeSellerList,
-            ICommonRepository<TradeBuyerList> TradeBuyerList, ISettlementRepository<BizResponse> SettlementRepository)
+            ICommonRepository<TradeBuyerList> TradeBuyerList)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -102,7 +102,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TradeBuyRequest = TradeBuyRequest;
             _TradeSellerList = TradeSellerList;
             _TradeBuyerList = TradeBuyerList;
-            _SettlementRepository = SettlementRepository;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -206,32 +205,29 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
                     //Start Settlement Here
                     var HoldTrnNos = new List<long> { };
-                    HoldTrnNos.Add(0);
                     if (_Resp.ReturnCode==enResponseCodeService.Success)
                     {
                         _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, TradeBuyRequestObj,ref HoldTrnNos);
-                        try
-                        {//This try catch create wrapper for current transaction
-                            BizResponse _Resp1 = new BizResponse();
-                            foreach (long HoldTrnNo in HoldTrnNos)
+                    }
+
+                    try
+                    {//This try catch create wrapper for current transaction
+                        foreach (long HoldTrnNo in HoldTrnNos)
+                        {
+                            var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == HoldTrnNo && item.IsProcessing == 0 &&
+                                                                            (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
+                                                                            item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
+                            if (NewBuyRequestObj != null)
                             {
-                                if (HoldTrnNo == 0)
-                                    continue;
-                                var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == HoldTrnNo && item.IsProcessing == 0 &&
-                                                                                (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
-                                                                                item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
-                                if (NewBuyRequestObj != null)
-                                {
-                                    var HoldTrnNosNotExec = new List<long> { };
-                                    _Resp1 = await _SettlementRepository.PROCESSSETLLEMENT(_Resp1, NewBuyRequestObj, ref HoldTrnNosNotExec);
-                                }
+                                var HoldTrnNosNotExec = new List<long> { };
+                                _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, NewBuyRequestObj, ref HoldTrnNosNotExec);
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            HelperForLog.WriteErrorLog("CombineAllInitTransactionAsync:##TrnNo " + Req.TrnNo, ControllerName, ex);
-                        }
-                    }                   
+                    }
+                    catch(Exception ex)
+                    {
+
+                    }
                    
                     return _Resp;
                 }
@@ -894,7 +890,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     CountPerPrice = 0,
                     Status = Convert.ToInt16(ServiceStatus.Active),//Record Type Status
                     TotalQty = Req.Amount,
-                    OnProcessing = 0,                   
+                    OnProcessing = 0,
                     TPSPickupStatus = 0,
                     IsSleepMode = 0,
                     GUID = Guid.NewGuid(),
