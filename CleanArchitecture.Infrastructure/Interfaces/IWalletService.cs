@@ -110,7 +110,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         int CheckTrnRefNo(long TrnRefNo, enWalletTranxOrderType TrnType, enWalletTrnType wType);
 
         //vsolanki 2018-10-29
-        ListIncomingTrnRes GetIncomingTransaction(long Userid);
+        ListIncomingTrnRes GetIncomingTransaction(long Userid, string Coin);
 
         // ntrivedi 29102018
         long GetWalletByAddress(string address);
@@ -134,7 +134,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         //vsoalnki 2018-10-31
         CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId);
 
-        ListOutgoingTrnRes GetOutGoingTransaction(long Userid);
+        ListOutgoingTrnRes GetOutGoingTransaction(long Userid, string Coin);
 
     }
 }

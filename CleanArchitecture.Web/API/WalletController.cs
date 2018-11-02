@@ -756,9 +756,9 @@ namespace CleanArchitecture.Web.API
         //vsolanki 2018-10-29
         //[AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetIncomingTransaction()
+        public async Task<IActionResult> GetIncomingTransaction(string Coin)
         {
-           // ApplicationUser user = new ApplicationUser(); user.Id = 35;
+           //ApplicationUser user = new ApplicationUser(); user.Id = 35;
             ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListIncomingTrnRes Response = new ListIncomingTrnRes();
             try
@@ -771,7 +771,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.GetIncomingTransaction(user.Id);
+                    Response = _walletService.GetIncomingTransaction(user.Id,Coin);
                 }
                 //HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
@@ -811,12 +811,12 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 2018-11-02
-        [AllowAnonymous]
+       // [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetOutGoingTransaction()
+        public async Task<IActionResult> GetOutGoingTransaction(string Coin)
         {
-            ApplicationUser user = new ApplicationUser(); user.Id = 35;
-            //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            //ApplicationUser user = new ApplicationUser(); user.Id = 35;
+            ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
             try
             {
@@ -828,7 +828,7 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    Response = _walletService.GetOutGoingTransaction(user.Id);
+                    Response = _walletService.GetOutGoingTransaction(user.Id,Coin);
                 }
                 //HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), this.ControllerContext.RouteData.Values["action"].ToString(), this.GetType().Name, JsonConvert.SerializeObject(Response), "");
                 return Ok(Response);
