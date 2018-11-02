@@ -24,6 +24,10 @@ namespace CleanArchitecture.Web.Filters
 
         public override void OnResultExecuting(ResultExecutingContext context)
         {
+            try
+            {
+
+            
             //_logger.LogWarning("ClassFilter OnResultExecuting");
             // _logger.LogWarning(((string[])((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)[0]);
             //base.OnResultExecuting(context);
@@ -47,17 +51,22 @@ namespace CleanArchitecture.Web.Filters
             }
 
 
-            //if (((Microsoft.AspNetCore.Mvc.SignInResult)context.Result).AuthenticationScheme.ToString() != "ASOS")
-            //{
-            //    string ReturnCode = ((Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)?.ErrorCode.ToString();
-            //    if (ReturnCode == "Status500InternalServerError")
-            //    {
-            //        string ReturnMsg = ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg;
-            //        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
-            //        HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
-            //        ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg = "Error occurred.";
-            //    }
-            //}
+                //if (((Microsoft.AspNetCore.Mvc.SignInResult)context.Result).AuthenticationScheme.ToString() != "ASOS")
+                //{
+                //    string ReturnCode = ((Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)?.ErrorCode.ToString();
+                //    if (ReturnCode == "Status500InternalServerError")
+                //    {
+                //        string ReturnMsg = ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg;
+                //        HelperForLog.WriteLogIntoFile(2, _basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+                //        HelperForLog.WriteErrorLog(_basePage.UTC_To_IST(), context.HttpContext.Request.Path.ToString(), context.HttpContext.Request.Path.ToString(), ReturnMsg);
+                //        ((CleanArchitecture.Core.ApiModels.BizResponseClass)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).ReturnMsg = "Error occurred.";
+                //    }
+                //}
+            }
+            catch (Exception ex)
+            {
+                ex.ToString();
+            }
         }
 
         public override void OnResultExecuted(ResultExecutedContext filterContext)
