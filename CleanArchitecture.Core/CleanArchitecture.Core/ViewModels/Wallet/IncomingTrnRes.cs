@@ -23,5 +23,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
         public long Confirmations { get; set; }
 
         public decimal Amount { get; set; }
+
+        public short? ConfirmationCount { get; set; }
     }
 }
