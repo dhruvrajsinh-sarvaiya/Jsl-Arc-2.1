@@ -11,6 +11,7 @@ using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -110,7 +111,11 @@ namespace CleanArchitecture.Web.API
             //Do Process for CreateOrder
             //For Testing Purpose
             var user = await _userManager.GetUserAsync(HttpContext.User);
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
+            Req.accessToken = accessToken;
+
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = Request.OrderSide;
             Req.ordertype = Request.OrderType;
@@ -166,7 +171,10 @@ namespace CleanArchitecture.Web.API
             //Do Process for CreateOrder
             //For Testing Purpose
             var user = await _userManager.GetUserAsync(HttpContext.User);
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
+            Req.accessToken = accessToken;
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = enTrnType.Withdraw;
             Req.MemberID = user.Id;
