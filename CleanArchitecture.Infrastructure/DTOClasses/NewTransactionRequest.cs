@@ -65,6 +65,7 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
         public enWhiteListingBit WhitelistingBit { get; set; }
 
         public string AddressLabel { get; set; }
+        public string accessToken { get; set; }
 
     }
 

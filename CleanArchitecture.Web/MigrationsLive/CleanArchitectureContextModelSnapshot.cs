@@ -868,6 +868,37 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("DeviceMaster");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Log.IpHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(15);
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(250);
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IpHistory");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Log.IpMaster", b =>
                 {
                     b.Property<long>("Id")
@@ -900,6 +931,41 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("IpMaster");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Log.LoginHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("Device")
+                        .IsRequired()
+                        .HasMaxLength(2000);
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(15);
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(2000);
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LoginHistory");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Log.LoginLog", b =>
@@ -2037,7 +2103,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<short>("IsSleepMode");
 
                     b.Property<decimal>("Landing")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("decimal(37, 16)");
 
                     b.Property<short>("OnProcessing");
@@ -2708,6 +2773,34 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TempUserRegister");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User.UserKeyMaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<bool>("EnableStatus");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<long>("UserId");
+
+                    b.Property<string>("uniqueKey")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserKeyMaster");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.UserChangeLog.UserLogChange", b =>
