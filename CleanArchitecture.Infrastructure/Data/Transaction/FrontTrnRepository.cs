@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +51,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
             
@@ -69,7 +71,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
             
@@ -110,7 +113,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -213,7 +217,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                // _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
 
@@ -221,63 +226,87 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
         public List<GetBuySellBook> GetBuyerBook(long id,decimal Price=-0)
         {
-            IQueryable<GetBuySellBook> Result;
-            if (Price != -0)
+            try
             {
-                Result = _dbContext.BuyerSellerInfo.FromSql(
-                              @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
+                IQueryable<GetBuySellBook> Result;
+                if (Price != -0)
+                {
+                    Result = _dbContext.BuyerSellerInfo.FromSql(
+                                  @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
                                 Count(TTQ.BidPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.BidPrice And TPM.PairId = TTQ.PairID) As OrderId
                                 From TradeTransactionQueue TTQ  Where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.PairID = {0}
                                 AND TTQ.IsCancelled = 0 AND TTQ.BidPrice={1} Group By TTQ.BidPrice,PairID Order By TTQ.BidPrice desc", id, Price);
-            }
-            else
-            {
-                Result = _dbContext.BuyerSellerInfo.FromSql(
-                              @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
+                }
+                else
+                {
+                    Result = _dbContext.BuyerSellerInfo.FromSql(
+                                  @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
                                 Count(TTQ.BidPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.BidPrice And TPM.PairId = TTQ.PairID) As OrderId
                                 From TradeTransactionQueue TTQ  Where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.PairID = {0}
                                 AND TTQ.IsCancelled = 0 Group By TTQ.BidPrice,PairID Order By TTQ.BidPrice desc", id);
-            }
-            
+                }
 
-            return Result.ToList();
+
+                return Result.ToList();
+            }
+            catch(Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
         }
 
         public List<GetBuySellBook> GetSellerBook(long id, decimal Price = -0)
         {
-            IQueryable<GetBuySellBook> Result;
-            if(Price != -0)
+            try
             {
-                Result = _dbContext.BuyerSellerInfo.FromSql(
-                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
+                IQueryable<GetBuySellBook> Result;
+                if (Price != -0)
+                {
+                    Result = _dbContext.BuyerSellerInfo.FromSql(
+                                @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
                               Count(TTQ.AskPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.AskPrice And TPM.PairId = TTQ.PairID) As OrderId
                               from TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
-                              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 AND TTQ.AskPrice={1} Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id,Price);
-            }
-            else
-            {
-                Result = _dbContext.BuyerSellerInfo.FromSql(
-                            @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
+                              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 AND TTQ.AskPrice={1} Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id, Price);
+                }
+                else
+                {
+                    Result = _dbContext.BuyerSellerInfo.FromSql(
+                                @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
                               Count(TTQ.AskPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.AskPrice And TPM.PairId = TTQ.PairID) As OrderId
                               from TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
                               TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id);
+                }
+                return Result.ToList();
             }
-            return Result.ToList();
+            catch(Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
         }
 
         public List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData)
         {
-            string Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
-                           "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
-                           "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As OpenVal," +
-                           "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As CloseVal From TradeData T" +
-                           " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
-                           " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
+            try
+            { 
+                string Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
+                               "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
+                               "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As OpenVal," +
+                               "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As CloseVal From TradeData T" +
+                               " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
+                               " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
 
-            Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
-            IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(Query,id);
+                Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
+                IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(Query,id);
 
-            return Result.ToList();
+                return Result.ToList();
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
         }
 
         public decimal LastPriceByPair(long PairId,ref short UpDownBit)
@@ -292,7 +321,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -355,7 +385,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //_logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }
         }
