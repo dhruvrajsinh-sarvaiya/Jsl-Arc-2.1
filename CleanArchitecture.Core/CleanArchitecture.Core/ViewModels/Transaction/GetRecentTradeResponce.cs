@@ -7,7 +7,7 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 {
     public class GetRecentTradeResponce : BizResponseClass
     {
-        public List<RecentOrderInfo> responce { get; set; }
+        public List<RecentOrderInfo> response { get; set; }
     }
     public class RecentOrderInfo
     {
