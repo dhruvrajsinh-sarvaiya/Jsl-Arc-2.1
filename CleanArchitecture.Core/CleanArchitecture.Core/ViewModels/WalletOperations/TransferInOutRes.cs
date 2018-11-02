@@ -20,6 +20,8 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
 
         public string Address { get; set; }
 
+        public string User { get; set; }
+
         public long Confirmations { get; set; }
 
         public decimal Amount { get; set; }
@@ -27,5 +29,7 @@ namespace CleanArchitecture.Core.ViewModels.WalletOperations
         public string ConfirmedTime { get; set; }
 
         public short? ConfirmationCount { get; set; }
+
+  
     }
 }
