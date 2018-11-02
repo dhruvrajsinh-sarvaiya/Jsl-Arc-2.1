@@ -2416,11 +2416,11 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 2018-10-29
-        public ListIncomingTrnRes GetIncomingTransaction(long Userid)
+        public ListIncomingTrnRes GetIncomingTransaction(long Userid, string Coin)
         {
             ListIncomingTrnRes Response = new ListIncomingTrnRes();
             Response.BizResponseObj = new BizResponseClass();
-            var depositHistories = _walletRepository1.GetIncomingTransaction(Userid);
+            var depositHistories = _walletRepository1.GetIncomingTransaction(Userid, Coin);
             if (depositHistories.Count() == 0)
             {
                 Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -2583,11 +2583,11 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 2018-11-02
-        public ListOutgoingTrnRes GetOutGoingTransaction(long Userid)
+        public ListOutgoingTrnRes GetOutGoingTransaction(long Userid, string Coin)
         {
             ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
             Response.BizResponseObj = new BizResponseClass();
-            var Histories = _walletRepository1.GetOutGoingTransaction(Userid);
+            var Histories = _walletRepository1.GetOutGoingTransaction(Userid, Coin);
             if (Histories.Count() == 0)
             {
                 Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;

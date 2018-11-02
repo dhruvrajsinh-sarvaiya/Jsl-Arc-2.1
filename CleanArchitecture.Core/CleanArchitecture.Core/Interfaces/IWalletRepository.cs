@@ -92,7 +92,7 @@ namespace CleanArchitecture.Core.Interfaces
 
         long GetTypeMappingObj(long userid);
         //vsolanki 2018-10-29
-        List<IncomingTrnRes> GetIncomingTransaction(long Userid);
+        List<IncomingTrnRes> GetIncomingTransaction(long Userid, string Coin);
 
         long getOrgID();
 
@@ -106,6 +106,6 @@ namespace CleanArchitecture.Core.Interfaces
 
         decimal GetLedgerLastPostBal(long walletId);
 
-        List<OutgoingTrnRes> GetOutGoingTransaction(long Userid);
+        List<OutgoingTrnRes> GetOutGoingTransaction(long Userid, string Coin);
     }
 }
