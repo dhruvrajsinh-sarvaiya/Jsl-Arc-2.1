@@ -351,7 +351,7 @@ namespace CleanArchitecture.Infrastructure.Data
             List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
                                                  join c in _dbContext.WalletMasters
                                                  on u.WalletId equals c.Id
-                                                 where c.AccWalletID == AccWalletID && u.Status == 1
+                                                 where c.AccWalletID == AccWalletID && u.Status == Convert.ToInt16(ServiceStatus.Active)
                                                  select new AddressMasterResponse
                                                  {
                                                      AddressLabel = u.AddressLable,
@@ -512,7 +512,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 List<WalletLimitConfigurationRes> items = (from u in _dbContext.WalletLimitConfiguration
                                                            join c in _dbContext.WalletMasters
                                                            on u.WalletId equals c.Id
-                                                           where c.AccWalletID == AccWaletID && u.Status == 1
+                                                           where c.AccWalletID == AccWaletID && u.Status == Convert.ToInt16(ServiceStatus.Active)
                                                            select new WalletLimitConfigurationRes
                                                            {
                                                                TrnType = u.TrnType,
@@ -539,7 +539,7 @@ namespace CleanArchitecture.Infrastructure.Data
             List<AddressMasterResponse> items = (from u in _dbContext.AddressMasters
                                                  join c in _dbContext.WalletMasters
                                                  on u.WalletId equals c.Id
-                                                 where c.AccWalletID == AccWalletID && u.IsDefaultAddress == 1 && u.Status == 1
+                                                 where c.AccWalletID == AccWalletID && u.IsDefaultAddress == 1 && u.Status == Convert.ToInt16(ServiceStatus.Active)
 
                                                  select new AddressMasterResponse
                                                  {
@@ -552,7 +552,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 List<AddressMasterResponse> items1 = (from u in _dbContext.AddressMasters
                                                       join c in _dbContext.WalletMasters
                                                       on u.WalletId equals c.Id
-                                                      where c.AccWalletID == AccWalletID && u.Status == 1
+                                                      where c.AccWalletID == AccWalletID && u.Status == Convert.ToInt16(ServiceStatus.Active)
                                                       orderby u.CreatedDate descending
 
                                                       select new AddressMasterResponse
@@ -576,7 +576,7 @@ namespace CleanArchitecture.Infrastructure.Data
             List<BalanceResponse> items = (from w in _dbContext.WalletMasters
                                            join wt in _dbContext.WalletTypeMasters
                                                    on w.WalletTypeID equals wt.Id
-                                           where w.Id == walletId && w.UserID == userid && w.Status == 1
+                                           where w.Id == walletId && w.UserID == userid && w.Status == Convert.ToInt16(ServiceStatus.Active)
                                            select new BalanceResponse
                                            {
                                                Balance = w.Balance,
@@ -591,7 +591,7 @@ namespace CleanArchitecture.Infrastructure.Data
             List<BalanceResponse> items = (from w in _dbContext.WalletMasters
                                            join wt in _dbContext.WalletTypeMasters
                                                    on w.WalletTypeID equals wt.Id
-                                           where w.UserID == userid && w.Status == 1
+                                           where w.UserID == userid && w.Status == Convert.ToInt16(ServiceStatus.Active)
                                            select new BalanceResponse
                                            {
                                                Balance = w.Balance,
@@ -604,7 +604,7 @@ namespace CleanArchitecture.Infrastructure.Data
         public decimal GetTotalAvailbleBal(long userid)
         {
             var total = (from w in _dbContext.WalletMasters
-                         where w.UserID == userid && w.Status == 1
+                         where w.UserID == userid && w.Status == Convert.ToInt16(ServiceStatus.Active)
                          select w.Balance
            ).Sum();
             return total;
@@ -646,7 +646,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var result = (from w in _dbContext.DepositHistory
                           join wt in _dbContext.AddressMasters
                           on w.Address equals wt.Address
-                          where wt.WalletId == walletid && w.UserId == userid && w.Status == 0
+                          where wt.WalletId == walletid && w.UserId == userid && w.Status == Convert.ToInt16(ServiceStatus.InActive)
                           select new BalanceResponse
                           {
                               Balance = w.Amount,
@@ -662,7 +662,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var result = (from w in _dbContext.DepositHistory
                           join wt in _dbContext.AddressMasters
                           on w.Address equals wt.Address
-                          where w.UserId == userid && w.Status == 0
+                          where w.UserId == userid && w.Status == Convert.ToInt16(ServiceStatus.InActive)
                           select new BalanceResponse
                           {
                               Balance = w.Amount,
@@ -678,7 +678,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var result = (from u in _dbContext.UserStacking
                           join w in _dbContext.WalletMasters
                           on u.WalletId equals w.Id
-                          where u.WalletId == walletid && w.UserID == userid && u.Status == 0
+                          where u.WalletId == walletid && w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                           select new StackingBalanceRes
                           {
                               StackingAmount = u.StackingAmount,
@@ -693,7 +693,7 @@ namespace CleanArchitecture.Infrastructure.Data
                               on u.WalletType equals w.WalletTypeID
                                join wt in _dbContext.WalletTypeMasters
                                on u.WalletType equals wt.Id
-                               where w.Id == walletid && w.UserID == userid && u.Status == 0
+                               where w.Id == walletid && w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                                select new StackingBalanceRes
                                {
                                    MaxLimitAmount = u.MaxLimitAmount,
@@ -712,7 +712,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var result = (from u in _dbContext.UserStacking
                           join w in _dbContext.WalletMasters
                           on u.WalletId equals w.Id
-                          where w.UserID == userid && u.Status == 0
+                          where w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                           select new StackingBalanceRes
                           {
                               StackingAmount = u.StackingAmount,
@@ -727,7 +727,7 @@ namespace CleanArchitecture.Infrastructure.Data
                               on u.WalletType equals w.WalletTypeID
                                join wt in _dbContext.WalletTypeMasters
                                on u.WalletType equals wt.Id
-                               where w.UserID == userid && u.Status == 0
+                               where w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                                select new StackingBalanceRes
                                {
                                    MaxLimitAmount = u.MaxLimitAmount,
@@ -748,7 +748,7 @@ namespace CleanArchitecture.Infrastructure.Data
                           on u.WalletID equals w.Id
                           join wt in _dbContext.WalletTypeMasters
                                                    on u.WalletTypeId equals wt.Id
-                          where u.WalletID == walletid && w.UserID == userid && u.Status == 0
+                          where u.WalletID == walletid && w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                           select new BalanceResponse
                           {
                               Balance = u.ShadowAmount,
@@ -765,7 +765,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                on walletid equals wt.Id
                                join wtm in _dbContext.WalletTypeMasters
                                                   on wt.WalletTypeID equals wtm.Id
-                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
+                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                                select new BalanceResponse
                                {
                                    Balance = u.ShadowLimitAmount,
@@ -785,7 +785,7 @@ namespace CleanArchitecture.Infrastructure.Data
                           on u.WalletID equals w.Id
                           join wt in _dbContext.WalletTypeMasters
                                                    on u.WalletTypeId equals wt.Id
-                          where w.UserID == userid && u.Status == 0
+                          where w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                           select new BalanceResponse
                           {
                               Balance = u.ShadowAmount,
@@ -802,7 +802,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                on u.WalletType equals wt.WalletTypeID
                                join wtm in _dbContext.WalletTypeMasters
                                on wt.WalletTypeID equals wtm.Id
-                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == 0
+                               where u.WalletType == wt.WalletTypeID && w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                                select new BalanceResponse
                                {
                                    Balance = u.ShadowLimitAmount,
@@ -824,13 +824,13 @@ namespace CleanArchitecture.Infrastructure.Data
             var availble = (from w in _dbContext.WalletMasters
                             join wt in _dbContext.WalletTypeMasters
                                     on w.WalletTypeID equals wt.Id
-                            where w.Id == walletid && w.UserID == userid && w.Status == 1
+                            where w.Id == walletid && w.UserID == userid && w.Status == Convert.ToInt16(ServiceStatus.Active)
                             select w.Balance).Sum();
 
             var UnClearedBalance = (from w in _dbContext.DepositHistory
                                     join wt in _dbContext.AddressMasters
                                     on w.Address equals wt.Address
-                                    where wt.WalletId == walletid && w.UserId == userid && w.Status == 0
+                                    where wt.WalletId == walletid && w.UserId == userid && w.Status == Convert.ToInt16(ServiceStatus.InActive)
                                     select w.Amount
                           ).Sum();
 
@@ -839,13 +839,13 @@ namespace CleanArchitecture.Infrastructure.Data
                                  on u.WalletID equals w.Id
                                  join wt in _dbContext.WalletTypeMasters
                                                           on u.WalletTypeId equals wt.Id
-                                 where u.WalletID == walletid && w.UserID == userid && u.Status == 0
+                                 where u.WalletID == walletid && w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                                  select u.ShadowAmount).Sum();
 
             var StackingBalance = (from u in _dbContext.UserStacking
                                    join w in _dbContext.WalletMasters
                                    on u.WalletId equals w.Id
-                                   where u.WalletId == walletid && w.UserID == userid && u.Status == 0
+                                   where u.WalletId == walletid && w.UserID == userid && u.Status == Convert.ToInt16(ServiceStatus.InActive)
                                    select u.StackingAmount).Sum(); ;
 
             return new Balance { UnSettledBalance = Unsettled, AvailableBalance = availble, UnClearedBalance = UnClearedBalance, ShadowBalance = ShadowBalance, StackingBalance = StackingBalance };
@@ -858,7 +858,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var result = (from w in _dbContext.WalletMasters
                           join wt in _dbContext.WalletTypeMasters
                           on w.WalletTypeID equals wt.Id
-                          where w.UserID == userid && w.Status == 1
+                          where w.UserID == userid && w.Status == Convert.ToInt16(ServiceStatus.Active)
                           group w by new { wt.WalletTypeName } into g
                           select new BalanceResponseLimit
                           {
@@ -872,7 +872,7 @@ namespace CleanArchitecture.Infrastructure.Data
         public List<BeneficiaryMasterRes> GetAllWhitelistedBeneficiaries(long WalletTypeID, long UserID)
         {
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
-                                                where b.UserID == UserID && b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != 9
+                                                where b.UserID == UserID && b.WalletTypeID == WalletTypeID && b.IsWhiteListed == 1 && b.Status != Convert.ToInt16(ServiceStatus.Disable)
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,
@@ -889,7 +889,7 @@ namespace CleanArchitecture.Infrastructure.Data
             List<BeneficiaryMasterRes> items = (from b in _dbContext.BeneficiaryMaster
                                                 join w in _dbContext.WalletTypeMasters
                                                 on b.WalletTypeID equals w.Id
-                                                where b.UserID == UserID && b.Status != 9
+                                                where b.UserID == UserID && b.Status != Convert.ToInt16(ServiceStatus.Disable)
                                                 select new BeneficiaryMasterRes
                                                 {
                                                     Name = b.Name,
@@ -1053,7 +1053,7 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 //Craete wallet
                 var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
-                                     where p.Status == 1
+                                     where p.Status == Convert.ToInt16(ServiceStatus.Active)
                                      select p).ToList();
 
                 var Wallets = from WalletTypearray in WalletTypeObj
@@ -1159,7 +1159,7 @@ namespace CleanArchitecture.Infrastructure.Data
             try
             {
                 var WalletTypeObj = (from p in _dbContext.WalletTypeMasters
-                                     where p.Status == 1 && p.WalletTypeName == WalletType
+                                     where p.Status == Convert.ToInt16(ServiceStatus.Active) && p.WalletTypeName == WalletType
                                      select p);
 
                 //var Users = (from p in _dbContext.Users
@@ -1285,7 +1285,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var trns = (from trn in _dbContext.DepositHistory
                         join wt in _dbContext.WalletTypeMasters
                        on trn.SMSCode equals wt.WalletTypeName
-                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                        where trn.Status == Convert.ToInt16(ServiceStatus.InActive) && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new IncomingTrnRes
                         {
                             AutoNo = trn.Id,
@@ -1424,7 +1424,7 @@ namespace CleanArchitecture.Infrastructure.Data
             var trns = (from trn in _dbContext.WithdrawHistory
                         join wt in _dbContext.WalletTypeMasters
                         on trn.SMSCode equals wt.WalletTypeName
-                        where trn.Status == 0 && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                        where trn.Status == Convert.ToInt16(ServiceStatus.InActive) && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new OutgoingTrnRes
                         {
                             AutoNo = trn.Id,
