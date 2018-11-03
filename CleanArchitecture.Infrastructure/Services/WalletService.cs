@@ -61,8 +61,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<ChargeRuleMaster> _chargeRuleMaster;
         private readonly ICommonRepository<LimitRuleMaster> _limitRuleMaster;
         private readonly ISignalRService _signalRService;
-        private readonly ICommonWalletFunction _commonWalletFunction;
-
+        private readonly ICommonWalletFunction _commonWalletFunction;        
 
         //private readonly IRepository<WalletTransactionOrder> _WalletAllowTrnRepository;
         //  private readonly ICommonRepository<WalletTransactionQueue> t;
@@ -591,6 +590,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     }
                     else
                     {
+                        
                         return new CreateWalletAddressRes { ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success,ReturnMsg=EnResponseMessage.CreateAddressSuccessMsg};
                     }
                 }
@@ -1218,7 +1218,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 //vsolanki 208-11-1
                 //var charge=GetServiceLimitChargeValue(enTrnType1, coinName);
-                //if(charge.MaxAmount>= amount && charge.MinAmount<=amount)
+                //if(charge.MaxAmount> amount && charge.MinAmount<amount)
                 //{
                 //    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 //}
