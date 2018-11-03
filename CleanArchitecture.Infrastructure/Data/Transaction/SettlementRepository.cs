@@ -47,7 +47,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             ICommonRepository<TradeSellerList> TradeSellerList, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<PoolOrder> PoolOrder, EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, 
-            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService)
+            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss)
         {
             _dbContext = dbContext;
             //_logger = logger;
@@ -62,6 +62,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _WalletService = WalletService;
             _ISignalRService = ISignalRService;
             _IFrontTrnService = IFrontTrnService;
+            _TradeStopLoss = TradeStopLoss;
         }
 
         #region ==============================PROCESS SETLLEMENT========================
@@ -238,7 +239,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                        var CreditWalletResult =_WalletService.GetWalletCreditNew(TradeTransactionQueueObj.Delivery_Currency, Helpers.GetTimeStamp(), 
                                                         enWalletTrnType.Cr_Buy_Trade, SettlementQty, TradeBuyRequestObj.UserID,
                                                         CreditAccountID, CreditWalletDrArryTrnIDList.ToArray(), TradeBuyRequestObj.TrnNo, 0, 
-                                                        enWalletTranxOrderType.Credit, enServiceType.Trading);
+                                                        enWalletTranxOrderType.Credit, enServiceType.Trading, (enTrnType)TransactionQueueObj.TrnType);
                         if(CreditWalletResult.ReturnCode==enResponseCode.Fail)
                         {
                             HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
@@ -248,6 +249,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         {
                             _dbContext.SaveChanges();
                             _dbContext.Database.CommitTransaction();
+
                         }
                         HoldTrnNos.Add(SellerList.TrnNo);
                         HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT", ControllerName, "Partial Settlement Done with " + SellerList.TrnNo + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
@@ -311,7 +313,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         var CreditWalletResult = _WalletService.GetWalletCreditNew(TradeTransactionQueueObj.Delivery_Currency, Helpers.GetTimeStamp(),
                                                          enWalletTrnType.Cr_Buy_Trade, SettlementQty, TradeBuyRequestObj.UserID,
                                                          CreditAccountID, CreditWalletDrArryTrnIDList.ToArray(), TradeBuyRequestObj.TrnNo, 1,
-                                                         enWalletTranxOrderType.Credit, enServiceType.Trading);
+                                                         enWalletTranxOrderType.Credit, enServiceType.Trading, (enTrnType)TransactionQueueObj.TrnType);
                         if (CreditWalletResult.ReturnCode == enResponseCode.Fail)
                         {
                             HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
@@ -344,15 +346,25 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         }
                         break;//record settled
                     }
-                    SellerList.IsProcessing = 0;//Release Seller List
-                    _TradeSellerList.Update(SellerList);
+                    var newSellerList = _TradeSellerList.GetById(SellerList.Id);
+                    //SellerList.IsProcessing = 0;//Release Seller List
+                    newSellerList.IsProcessing = 0;//Release Seller List
+                    _TradeSellerList.Update(newSellerList);
 
                 }
-                TradeBuyRequestObj.IsProcessing = 0;//Release Buy Order
-                _TradeBuyRequest.Update(TradeBuyRequestObj);
-                TradeBuyerListObj.IsProcessing = 0;
-                _TradeBuyerList.Update(TradeBuyerListObj);
-                if(TrackBit==0)//No any record Process
+                //as object may rollback so object value has wrong value
+                var NewTradeBuyRequestObj = _TradeBuyRequest.GetSingle(item=>item.TrnNo==TradeBuyRequestObj.TrnNo);
+                //TradeBuyRequestObj.IsProcessing = 0;//Release Buy Order
+                NewTradeBuyRequestObj.IsProcessing = 0;//Release Buy Order
+                //_TradeBuyRequest.Update(TradeBuyRequestObj);
+                _TradeBuyRequest.Update(NewTradeBuyRequestObj);
+
+                var NewTradeBuyerListObj = _TradeBuyerList.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
+                NewTradeBuyerListObj.IsProcessing = 0;
+                _TradeBuyerList.Update(NewTradeBuyerListObj);
+                //TradeBuyerListObj.IsProcessing = 0;
+                //_TradeBuyerList.Update(TradeBuyerListObj);
+                if (TrackBit==0)//No any record Process
                 {
                     _Resp.ErrorCode = enErrorCode.Settlement_NoSettlementRecordFound;
                     _Resp.ReturnCode = enResponseCodeService.Success;
