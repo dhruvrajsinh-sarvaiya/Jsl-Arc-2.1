@@ -231,6 +231,7 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeBuyerList>().Property(x => x.TrnNo).ValueGeneratedNever();//rita 11-3-2018
             modelBuilder.Entity<TradeBuyerList>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 2-11-2018 for error cannot update identity column id
             modelBuilder.Entity<TradeTransactionQueue>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 2-11-2018 for error cannot update identity column id
+            modelBuilder.Entity<TradeSellerList>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 3-11-2018 for error cannot update identity column id
             modelBuilder.Entity<TransactionStatus>().HasKey(e => new { e.TrnNo, e.ServiceID,e.SerProID });//Rita 31-10-2018 for composite Primary key
 
         }

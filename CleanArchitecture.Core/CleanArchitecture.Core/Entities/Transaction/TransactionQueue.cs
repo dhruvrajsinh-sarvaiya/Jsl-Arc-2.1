@@ -28,7 +28,7 @@ namespace CleanArchitecture.Core.Entities
         public short TrnType { get; set; }
         [Required]
         public long MemberID { get; set; }
-        [Required]
+        //[Required]
         public string MemberMobile { get; set; }
         //[Required]
         //public string SMSText { get; set; }
@@ -116,27 +116,32 @@ namespace CleanArchitecture.Core.Entities
         public void MakeTransactionInProcess()
         {
             Status = Convert.ToInt16(enTransactionStatus.Pending);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
 
         public void MakeTransactionSuccess()
         {
             Status = Convert.ToInt16(enTransactionStatus.Success);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void MakeTransactionSystemFail()
         {
             Status = Convert.ToInt16(enTransactionStatus.SystemFail);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void MakeTransactionHold()
         {
             Status = Convert.ToInt16(enTransactionStatus.Hold);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void MakeTransactionOperatorFail()
         {
             Status = Convert.ToInt16(enTransactionStatus.OperatorFail);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void SetTransactionCode(long statuscode)
