@@ -21,6 +21,8 @@ using CleanArchitecture.Core.ViewModels.WalletConfiguration;
 using System.Collections;
 using System.Globalization;
 using CleanArchitecture.Core.Helpers;
+using Microsoft.AspNetCore.Identity;
+using CleanArchitecture.Core.Entities.User;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -41,6 +43,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<WalletLedger> _WalletLedgersRepo;
         private readonly ICommonRepository<MemberShadowBalance> _ShadowBalRepo;
         private readonly ICommonRepository<MemberShadowLimit> _ShadowLimitRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICommonRepository<ConvertFundHistory> _ConvertFundHistory;
 
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
@@ -73,9 +76,10 @@ namespace CleanArchitecture.Infrastructure.Services
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
             ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<MemberShadowLimit> ShadowLimitRepo, ICommonRepository<MemberShadowBalance> ShadowBalRepo, ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig,
-            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, ICommonWalletFunction commonWalletFunction, ICommonRepository<ConvertFundHistory> ConvertFundHistory) : base(logger)
+            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, UserManager<ApplicationUser> userManager, ISignalRService signalRService, ICommonWalletFunction commonWalletFunction, ICommonRepository<ConvertFundHistory> ConvertFundHistory) : base(logger)
         {
             _log = log;
+            _userManager = userManager;
             _commonRepository = commonRepository;
             _walletOrderRepository = walletOrderRepository;
             //_walletRepository = repository;
@@ -509,7 +513,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public CreateWalletAddressRes GenerateAddress(string walletID, string coin ,int GenaratePendingbit = 0)
+        public CreateWalletAddressRes GenerateAddress(string walletID, string coin , string Token, int GenaratePendingbit = 0)
         {
             try
             {
@@ -526,8 +530,15 @@ namespace CleanArchitecture.Infrastructure.Services
                 string Respaddress = null;
 
                 var wallettype = _WalletTypeMasterRepository.GetSingle(t=>t.WalletTypeName==coin);
+                //var user = _userManager.GetUserAsync(HttpContext.User);
+                //if (user == null)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                //    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                //}
 
-                if(wallettype.Id!=walletMaster.WalletTypeID)
+                if (wallettype.Id!=walletMaster.WalletTypeID)
                 {
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
@@ -606,6 +617,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     addressMaster = GetAddressObj(walletMaster.Id, transactionProviderResponses[0].ServiceProID, Respaddress, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
+                    var msg = EnResponseMessage.GenerateAddressNotification;
+                    msg = msg.Replace("#WalletName#", walletMaster.Walletname);
+                    //msg = msg.Replace("#TrnType#", routeTrnType.ToString());
+                    //msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
+                    _signalRService.SendActivityNotification(msg,Token);
                     string responseString = Respaddress;
                     return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CreateAddressSuccessMsg };
                     //return respObj;
@@ -2705,7 +2721,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 for (int i = 1; i <= AddressCount; i++)
                 {
-                    addr = GenerateAddress(walletObj.AccWalletID, Coin,1);
+                    addr = GenerateAddress(walletObj.AccWalletID, Coin,"",1);
                     if (addr.address == null)
                     {
                         return addr;

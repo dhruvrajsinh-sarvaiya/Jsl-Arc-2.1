@@ -102,7 +102,7 @@ namespace CleanArchitecture.Core.Enums
         public static string InternalError = "Internal Error";
         public static string BalMismatch = "Settled Balance Mismatch";
         public static string ShadowLimitExceed = "Exceed Shadow Limit";
-
+        public static string GenerateAddressNotification = "New Address Created Successfully For Wallet:#WalletName";
 
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";

@@ -20,7 +20,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         bool IsValidWallet(long walletId);
 
-        CreateWalletAddressRes GenerateAddress(string walletid,string coin, int GenaratePendingbit = 0);
+        CreateWalletAddressRes GenerateAddress(string walletid,string coin, string Token, int GenaratePendingbit = 0);
 
         //vsolanki 8-10-2018
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();
