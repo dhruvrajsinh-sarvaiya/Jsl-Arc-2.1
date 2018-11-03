@@ -42,9 +42,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly IGetWebRequest _IGetWebRequest;
         private readonly IWebApiSendRequest _IWebApiSendRequest;
         private readonly IWebApiData _IWebApiData; 
-        private readonly ISettlementRepository<BizResponse> _SettlementRepository; 
+        private readonly ISettlementRepository<BizResponse> _SettlementRepository;
+        private readonly ISignalRService _ISignalRService;
 
-         WebApiParseResponse _WebApiParseResponseObj;
+        WebApiParseResponse _WebApiParseResponseObj;
 
         public BizResponse _Resp;        
         //public BizResponse _CreateTransactionResp;
@@ -65,6 +66,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         TradePoolMaster TradePoolMasterObj;
         TradeBuyRequest TradeBuyRequestObj;
         TradeSellerList TradeSellerListObj;
+        TradeStopLoss TradeStopLossObj;
         //TradeBuyerList TradeBuyerListObj;
         //TradePoolConfiguration TradePoolConfigurationObj;
         //TradePoolQueue TradePoolQueueObj;
@@ -80,7 +82,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData,
             ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeSellerList> TradeSellerList,
-            ICommonRepository<TradeBuyerList> TradeBuyerList, ISettlementRepository<BizResponse> SettlementRepository)
+            ICommonRepository<TradeBuyerList> TradeBuyerList, ISettlementRepository<BizResponse> SettlementRepository, ISignalRService ISignalRService)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -103,6 +105,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TradeSellerList = TradeSellerList;
             _TradeBuyerList = TradeBuyerList;
             _SettlementRepository = SettlementRepository;
+            _ISignalRService = ISignalRService;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -178,7 +181,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 }
 
                 var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode,Helpers.GetTimeStamp(), enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
-                    Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType);
+                    Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType,Req.TrnType,Req.accessToken);
 
                 if (DebitResult.ReturnCode == enResponseCode.Fail)
                 {
@@ -532,12 +535,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         {
             try
             {
-                var Newtransaction = new TradeStopLoss()
+                TradeStopLossObj = new TradeStopLoss()
                 {
                     TrnNo = Req.TrnNo,
                     ordertype = Convert.ToInt16(Req.ordertype)                   
                 };
-                _TradeStopLoss.Add(Newtransaction);
+                TradeStopLossObj =_TradeStopLoss.Add(TradeStopLossObj);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
@@ -680,6 +683,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 Newtransaction.SetTransactionStatusMsg(StatusMsg);
                 Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
                 _TransactionRepository.Update(Newtransaction);
+                try
+                {
+                    _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);
+                    //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
+                }
+                catch (Exception ex)
+                {
+                    HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                }
             }
             catch (Exception ex)
             {

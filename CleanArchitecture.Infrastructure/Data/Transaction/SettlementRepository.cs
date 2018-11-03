@@ -28,7 +28,9 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         private readonly ICommonRepository<TradeSellerList> _TradeSellerList;
         private readonly ICommonRepository<TradePoolMaster> _TradePoolMaster;
         private readonly ICommonRepository<PoolOrder> _PoolOrder;
+        private readonly ICommonRepository<TradeStopLoss> _TradeStopLoss;
         private readonly ISignalRService _ISignalRService;
+        private readonly IFrontTrnService _IFrontTrnService;
 
         private readonly IWalletService _WalletService;
 
@@ -38,12 +40,14 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         PoolOrder PoolOrderObj;
         TransactionQueue TransactionQueueObj;
         TradeTransactionQueue TradeTransactionQueueObj;
+        TradeStopLoss _TradeStopLossObj;
 
         public SettlementRepository(CleanArchitectureContext dbContext, ICommonRepository<TradePoolQueue> TradePoolQueue,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeBuyerList> TradeBuyerList,
             ICommonRepository<TradeSellerList> TradeSellerList, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<PoolOrder> PoolOrder, EFCommonRepository<TransactionQueue> TransactionRepository,
-            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, ISignalRService ISignalRService)
+            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, 
+            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService)
         {
             _dbContext = dbContext;
             //_logger = logger;
@@ -57,6 +61,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _TradeTransactionRepository = TradeTransactionRepository;
             _WalletService = WalletService;
             _ISignalRService = ISignalRService;
+            _IFrontTrnService = IFrontTrnService;
         }
 
         #region ==============================PROCESS SETLLEMENT========================
@@ -127,7 +132,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
         }
 
-        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj, ref List<long> HoldTrnNos,string accesstocken = "")
+        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj, ref List<long> HoldTrnNos,string accessToken = "")
         {
             string DebitAccountID;
             string CreditAccountID;
@@ -139,6 +144,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 TransactionQueueObj = _TransactionRepository.GetById(TradeBuyRequestObj.TrnNo);
                 TradeTransactionQueueObj = _TradeTransactionRepository.GetSingle(item=>item.TrnNo==TradeBuyRequestObj.TrnNo);
                 TradeBuyerListObj = _TradeBuyerList.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
+                _TradeStopLossObj = _TradeStopLoss.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
 
                 DebitWalletID = TradeTransactionQueueObj.OrderWalletID;
                 DebitAccountID=_WalletService.GetAccWalletID(DebitWalletID);
@@ -251,7 +257,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         //Continuew as record Partially settled
                         try
                         {
-                            _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj,accesstocken,1);//komal 
+                            _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal 
                                 //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
                         }
                         catch (Exception ex)
@@ -324,7 +330,13 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _Resp.ReturnMsg = "Full Settlement Done of TrnNo " + TradeBuyRequestObj.TrnNo + " Settled: " + TradeBuyRequestObj.DeliveredQty + " Remain:" + TradeBuyRequestObj.PendingQty;
                         try
                         {
-                            _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accesstocken, 0);//komal
+                            _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal
+                            //==============Volume update only after success
+                            if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
+                                _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.BidPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.BuyQty);
+                            else
+                                _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty);
+
                         }
                         catch (Exception ex)
                         {

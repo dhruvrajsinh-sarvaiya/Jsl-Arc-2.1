@@ -154,32 +154,34 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             try
             {
                 responsedata = new List<VolumeDataRespose>();
-                var pairMasterData = _tradeMasterRepository.FindBy(x => x.BaseCurrencyId == BasePairId);
+                //var pairMasterData = _tradeMasterRepository.FindBy(x => x.BaseCurrencyId == BasePairId);
+                var TradePairList = _frontTrnRepository.GetTradePairAsset();
+                var pairMasterData = TradePairList.Where(x => x.BaseId == BasePairId).ToList();
 
-                if (pairMasterData != null)
+                if (pairMasterData != null && pairMasterData.Count() > 0)
                 {
                     foreach (var pmdata in pairMasterData)
                     {
                         VolumeDataRespose volumedata = new VolumeDataRespose();
-                        var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
-                        var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pmdata.Id);
+                        //var pairDetailData = _tradeDetailRepository.GetSingle(x => x.PairId == pmdata.Id);
+                        //var pairStastics = _tradePairStastics.GetSingle(x => x.PairId == pmdata.Id);
                         //GetPairAdditionalVal(pmdata.Id, pairDetailData.Currentrate, ref Volume24, ref ChangePer);
 
 
-                        volumedata.PairId = pmdata.Id;
-                        volumedata.PairName = pmdata.PairName;
-                        volumedata.Currentrate = pairStastics.CurrentRate;
+                        volumedata.PairId = pmdata.PairId;
+                        volumedata.PairName = pmdata.Pairname;
+                        volumedata.Currentrate = pmdata.Currentrate;
                         //volumedata.ChangePer = System.Math.Round(Volume24, 2);
                         //volumedata.Volume24 = System.Math.Round(ChangePer, 2);
-                        volumedata.ChangePer = pairStastics.ChangePer24;
-                        volumedata.Volume24 = pairStastics.ChangeVol24;
-                        volumedata.High24Hr = pairStastics.High24Hr;
-                        volumedata.Low24Hr = pairStastics.Low24Hr;
-                        volumedata.HighWeek = pairStastics.HighWeek;
-                        volumedata.LowWeek = pairStastics.LowWeek;
-                        volumedata.High52Week = pairStastics.High52Week;
-                        volumedata.Low52Week = pairStastics.Low52Week;
-                        volumedata.UpDownBit = pairStastics.UpDownBit;
+                        volumedata.ChangePer = pmdata.ChangePer;
+                        volumedata.Volume24 = pmdata.Volume;
+                        volumedata.High24Hr = pmdata.High24Hr;
+                        volumedata.Low24Hr = pmdata.Low24Hr;
+                        volumedata.HighWeek = pmdata.HighWeek;
+                        volumedata.LowWeek = pmdata.LowWeek;
+                        volumedata.High52Week = pmdata.High52Week;
+                        volumedata.Low52Week = pmdata.Low52Week;
+                        volumedata.UpDownBit = pmdata.UpDownBit;
 
                         responsedata.Add(volumedata);
                     }
