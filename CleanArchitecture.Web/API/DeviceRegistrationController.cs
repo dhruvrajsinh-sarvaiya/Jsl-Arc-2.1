@@ -45,8 +45,8 @@ namespace CleanArchitecture.Web.API
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        [HttpPost("SubscibePushNotification")]
-        public async Task<IActionResult> SubscibePushNotification([FromBody]string DeviceID)
+        [HttpPost("SubscribePushNotification")]
+        public async Task<IActionResult> SubscribePushNotification([FromBody]string DeviceID)
         {
             ApplicationUser user =await _userManager.GetUserAsync(HttpContext.User);
             DeviceRegistrationRequest Request = new DeviceRegistrationRequest();
@@ -64,7 +64,7 @@ namespace CleanArchitecture.Web.API
                     Request.DeviceID = DeviceID;
                     Request.UserID = user.Id;
                     Request.SubsscrptionType = EnDeviceSubsscrptionType.Subsscribe;
-                    await _mediator.Send(Request);
+                    Response = await _mediator.Send(Request);
                 }
                 return Ok(Response);
             }
@@ -81,8 +81,8 @@ namespace CleanArchitecture.Web.API
         /// <param name="Request"></param>
         /// <returns></returns>
 
-        [HttpPost("UnsubscibePushNotification")]
-        public async Task<IActionResult> UnsubscibePushNotification([FromBody]string DeviceID)
+        [HttpPost("UnsubscribePushNotification")]
+        public async Task<IActionResult> UnsubscribePushNotification([FromBody]string DeviceID)
         {
             ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             DeviceRegistrationRequest Request = new DeviceRegistrationRequest();
@@ -100,7 +100,7 @@ namespace CleanArchitecture.Web.API
                     Request.DeviceID = DeviceID;
                     Request.UserID = user.Id;
                     Request.SubsscrptionType = EnDeviceSubsscrptionType.UnSubsscribe;
-                    await _mediator.Send(Request);
+                    Response = await _mediator.Send(Request);
                 }
                 return Ok(Response);
             }

@@ -10,6 +10,6 @@ namespace CleanArchitecture.Core.Interfaces
     {
         Task<IQueryable> GetAPIConfigurationAsync(long ServiceTypeID, long CommServiceTypeID);
         
-        Task GetTemplateConfigurationAsync(long ServiceTypeID, long CommServiceID,int TemplateID);
+        Task<IQueryable> GetTemplateConfigurationAsync(long ServiceTypeID, int TemplateID, long CommServiceID);
     }
 }
