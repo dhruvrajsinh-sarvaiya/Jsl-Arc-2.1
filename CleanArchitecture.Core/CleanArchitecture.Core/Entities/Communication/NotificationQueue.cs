@@ -64,7 +64,7 @@ namespace CleanArchitecture.Core.Entities
 
         public void InActive()
         {
-            Status = Convert.ToInt16(ServiceStatus.InActive);
+            Status = Convert.ToInt16(ServiceStatus.Disable);
             Events.Add(new ServiceStatusEvent<DeviceStore>(this));
         }        
 
