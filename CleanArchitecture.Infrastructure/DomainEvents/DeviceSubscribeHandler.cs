@@ -18,10 +18,12 @@ namespace CleanArchitecture.Infrastructure.Services
     public class DeviceSubscribeHandler : IRequestHandler<DeviceRegistrationRequest, CommunicationResponse>
     {
         private readonly IMessageRepository<DeviceStore> _MessageRepository;
+        private readonly CleanArchitectureContext _dbContext;
 
-        public DeviceSubscribeHandler(IMessageRepository<DeviceStore> MessageRepository)
+        public DeviceSubscribeHandler(IMessageRepository<DeviceStore> MessageRepository, CleanArchitectureContext dbContext)
         {
             _MessageRepository = MessageRepository;
+            _dbContext = dbContext;
         }
 
         public async Task<CommunicationResponse> Handle(DeviceRegistrationRequest Request, CancellationToken cancellationToken)
@@ -36,7 +38,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 else if (Request.SubsscrptionType == EnDeviceSubsscrptionType.UnSubsscribe)
                 {
-                    Response = await SubscibePushNotification(Request);
+                    Response = await UnsbscibePushNotification(Request);
                     return Response;
                 }
                 return await Task.FromResult(new CommunicationResponse
@@ -62,7 +64,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var DeviceStore = new DeviceStore();
-                DeviceStore = _MessageRepository.GetById(Request.UserID);
+                DeviceStore = _dbContext.Set<DeviceStore>().SingleOrDefault(e => e.UserID == Request.UserID);
                 if (DeviceStore != null && DeviceStore.UserID > 0)
                 {
                     DeviceStore.Active();
@@ -103,7 +105,7 @@ namespace CleanArchitecture.Infrastructure.Services
             try
             {
                 var DeviceStore = new DeviceStore();
-                DeviceStore = _MessageRepository.GetById(Request.UserID);
+                DeviceStore = _dbContext.Set<DeviceStore>().SingleOrDefault(e => e.UserID == Request.UserID);
                 DeviceStore.InActive();
                 _MessageRepository.Update(DeviceStore);
                 return await Task.FromResult(new CommunicationResponse

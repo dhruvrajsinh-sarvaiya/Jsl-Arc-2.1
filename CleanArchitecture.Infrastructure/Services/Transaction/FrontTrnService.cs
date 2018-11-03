@@ -730,7 +730,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 List<GetBuySellBook> responce = new List<GetBuySellBook>();
                 if (list != null)
                 {
-                    responce = list;
+                    foreach(var data in list)
+                    {
+                        if(data.Price != 0 && data.Amount != 0)
+                        {
+                            responce.Add(data);
+                        }
+                    }
                 }
                 return responce;
             }
@@ -748,7 +754,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 List<GetBuySellBook> responce = new List<GetBuySellBook>();
                 if (list != null)
                 {
-                    responce = list;
+                    foreach (var data in list)
+                    {
+                        if (data.Price != 0 && data.Amount != 0)
+                        {
+                            responce.Add(data);
+                        }
+                    }
                 }
                 return responce;
             }

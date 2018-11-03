@@ -48,7 +48,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
 
         //ntrivedi 16-10-2018
-        WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, string Token = "");
+        WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType,enTrnType routeTrnType ,  string Token = "");
 
         //Rushabh 16-10-2018
         LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long userID,string Token);

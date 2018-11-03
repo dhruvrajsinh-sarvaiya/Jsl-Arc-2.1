@@ -64,10 +64,14 @@ namespace CleanArchitecture.Infrastructure.Services
 
             return Task.FromResult(Result);
         }
-
-        public Task GetTemplateConfigurationAsync(long ServiceTypeID, long CommServiceID, int TemplateID)
+        //enCommunicationServiceType == ServiceTypeID
+        //EnTemplateType === TemplateID
+        // currently not used CommServiceID
+        public Task<IQueryable> GetTemplateConfigurationAsync(long ServiceTypeID, int TemplateID, long CommServiceID = 0)
         {
-            return Task.FromResult(0);
+            IQueryable Result = _dbContext.CommunicationProviderList.FromSql(
+                    @"select Top 1 * from TemplateMaster TM inner join CommServiceTypeMaster ST on ST.CommServiceTypeID = TM.CommServiceTypeID where TemplateID = {0} and ST.CommServiceTypeID = {1}", TemplateID, ServiceTypeID);
+            return Task.FromResult(Result);
         }
     }
 }
