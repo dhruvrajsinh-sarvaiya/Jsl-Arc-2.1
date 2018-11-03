@@ -73,7 +73,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         }
 
-        public long LoginHistory(LoginhistoryViewModel model)
+        public long AddLoginHistory(LoginhistoryViewModel model)
         {
             try
             {

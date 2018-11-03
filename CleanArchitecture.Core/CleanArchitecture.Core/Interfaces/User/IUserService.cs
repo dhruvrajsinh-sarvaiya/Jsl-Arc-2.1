@@ -15,6 +15,7 @@ namespace CleanArchitecture.Core.Interfaces.User
         Task<TempUserRegister> FindByEmail(string Email);
         Task<bool> IsValidPhoneNumber(string Mobilenumber, string CountryCode);
         Task<string> GetCountryByIP(string ipAddress);
+        Task<string> GetLocationByIP(string ipAddress);
         string GenerateRandomOTPWithPassword(PasswordOptions opts = null);
         SocialCustomPasswordViewMoel GenerateRandomSocialPassword(string ProvideKey);
         Task<ApplicationUser> FindUserDataByUserNameEmailMobile(string UserName);

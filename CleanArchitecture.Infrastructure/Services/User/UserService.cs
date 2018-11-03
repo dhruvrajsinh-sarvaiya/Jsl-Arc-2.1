@@ -370,5 +370,46 @@ namespace CleanArchitecture.Infrastructure.Services.User
 
         }
 
+
+        public async Task<string> GetLocationByIP(string ipAddress)
+        {
+            try
+            {
+                var url = "http://ip-api.com/xml/" + ipAddress;
+                var request = System.Net.WebRequest.Create(url);
+                string strReturnVal;
+                using (WebResponse wrs = request.GetResponse())
+                using (Stream stream = wrs.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    string response = reader.ReadToEnd();
+
+                    XmlDocument ipInfoXML = new XmlDocument();
+                    ipInfoXML.LoadXml(response);
+                    XmlNodeList responseXML = ipInfoXML.GetElementsByTagName("query");
+                    NameValueCollection dataXML = new NameValueCollection();
+
+                    dataXML.Add(responseXML.Item(0).ChildNodes[2].InnerText, responseXML.Item(0).ChildNodes[2].Value);
+
+                    //strReturnVal = responseXML.Item(0).ChildNodes[1].InnerText.ToString(); // Contry
+                    //strReturnVal += "(" +responseXML.Item(0).ChildNodes[2].InnerText.ToString() + ")";  // Contry Code 
+                    string Status = responseXML.Item(0).ChildNodes[0].InnerText.ToString();
+                    if (!string.IsNullOrEmpty(Status) && Status == "fail")
+                        return Status;
+
+                    strReturnVal = responseXML.Item(0).ChildNodes[5].InnerText.ToString();  // City name 
+                    strReturnVal +="," + responseXML.Item(0).ChildNodes[4].InnerText.ToString();/// State name
+                    strReturnVal += "," + responseXML.Item(0).ChildNodes[1].InnerText.ToString(); ///  Contry name
+                    return strReturnVal;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+
+        }
+
     }
 }

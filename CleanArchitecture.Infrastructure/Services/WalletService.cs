@@ -2735,6 +2735,46 @@ namespace CleanArchitecture.Infrastructure.Services
             }
 
         }
+
+        //vsolanki 2018-11-03
+        public ListTokenConvertHistoryRes ConvertFundHistory(long Userid,DateTime FromDate,DateTime ToDate,string Coin)
+        {
+            try
+            {
+                ListTokenConvertHistoryRes Response = new ListTokenConvertHistoryRes();
+                Response.BizResponseObj = new BizResponseClass();
+                if(Coin!=null)
+                {
+                    var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
+                    if (type == null)
+                    {
+                        Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                        Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
+                        Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                        return Response;
+                    }
+                } 
+                var Histories = _walletRepository1.ConvertFundHistory(Userid,FromDate,ToDate, Coin);
+                if (Histories.Count() == 0 || Histories == null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.HistoryRes = Histories;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.BizResponseObj.ErrorCode = enErrorCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+
+        }
     }
 
 }
