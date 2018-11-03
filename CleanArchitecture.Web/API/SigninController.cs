@@ -919,7 +919,7 @@ namespace CleanArchitecture.Web.API
                                     var IpHistorydet = new IpHistoryViewModel()
                                     {
                                         IpAddress = model.IPAddress,
-                                        Location = "",
+                                        Location = Location,
                                         UserId = result.Id,
                                     };
                                     _iipHistory.AddIpHistory(IpHistorydet);
