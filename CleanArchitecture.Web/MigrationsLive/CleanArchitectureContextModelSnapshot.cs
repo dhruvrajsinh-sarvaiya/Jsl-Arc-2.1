@@ -445,7 +445,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("SMSCode")
                         .IsRequired()
-                        .HasMaxLength(5);
+                        .HasMaxLength(6);
 
                     b.Property<short>("ServiceType");
 
@@ -3694,7 +3694,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("WalletTypeName")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasMaxLength(7);
 
                     b.HasKey("Id");
 
