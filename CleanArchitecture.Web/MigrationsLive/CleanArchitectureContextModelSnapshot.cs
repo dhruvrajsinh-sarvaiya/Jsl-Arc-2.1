@@ -1464,10 +1464,6 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.TradeTransactionQueue", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
                     b.Property<long>("TrnNo");
 
                     b.Property<decimal>("AskPrice");
@@ -1485,6 +1481,10 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long>("DeliveryWalletID");
 
                     b.Property<string>("Delivery_Currency");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<short>("IsCancelled");
 
@@ -1529,7 +1529,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime?>("UpdatedDate");
 
-                    b.HasKey("Id", "TrnNo");
+                    b.HasKey("TrnNo");
 
                     b.ToTable("TradeTransactionQueue");
                 });
@@ -1698,10 +1698,6 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Transaction.TradeBuyerList", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
                     b.Property<long>("TrnNo");
 
                     b.Property<long>("BuyReqID");
@@ -1712,6 +1708,10 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal>("DeliveredQty")
                         .HasColumnType("decimal(18, 8)");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<short>("IsProcessing");
 
@@ -1731,9 +1731,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime?>("UpdatedDate");
 
-                    b.HasKey("Id", "TrnNo");
-
-                    b.HasAlternateKey("TrnNo");
+                    b.HasKey("TrnNo");
 
                     b.ToTable("TradeBuyerList");
                 });
@@ -2525,6 +2523,8 @@ namespace CleanArchitecture.Web.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AccessFailedCount");
+
+                    b.Property<string>("AliasKey");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
