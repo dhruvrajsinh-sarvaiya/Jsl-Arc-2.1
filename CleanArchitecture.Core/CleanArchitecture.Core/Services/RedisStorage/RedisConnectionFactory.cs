@@ -15,7 +15,10 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
 
         public RedisConnectionFactory(IOptions<RedisConfiguration> redis)
         {
-            this._connection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(redis.Value.Host));
+            if (redis != null && !string.IsNullOrEmpty(redis.Value.Host))
+            {
+                this._connection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(redis.Value.Host));
+            }
         }
 
         public ConnectionMultiplexer Connection()

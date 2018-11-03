@@ -44,7 +44,8 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
         private readonly ICommonRepository<TransactionAccount> _TransactionAccountsRepository;
         private readonly IWalletService _walletService;
-        //private readonly IWalletService _walletService;
+
+        private readonly ICommonWalletFunction _commonWalletFunction;
         //private readonly IWebApiRepository _webApiRepository;
         //private readonly IWebApiSendRequest _webApiSendRequest;
         //private readonly IGetWebRequest _getWebRequest;
@@ -55,7 +56,7 @@ namespace CleanArchitecture.Infrastructure.Services
            ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,          
            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository,
-           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, IWalletService walletService) : base(logger)
+           ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, IWalletService walletService, ICommonWalletFunction commonWalletFunction) : base(logger)
         {
             _walletService = walletService;
             // _log = log;
@@ -81,6 +82,7 @@ namespace CleanArchitecture.Infrastructure.Services
             //_UserPreferencescommonRepository = UserPreferenceRepo;
             _TransactionAccountsRepository = TransactionAccountsRepository;
             _signalRService = signalRService;
+            _commonWalletFunction = commonWalletFunction;
         }
 
         public WalletDrCrResponse InsertWalletTQDebit(string timestamp, long walletID, string coinName, decimal amount, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enWalletTranxOrderType enWalletTranx, enWalletLimitType enWalletLimit)
@@ -150,6 +152,13 @@ namespace CleanArchitecture.Infrastructure.Services
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
+                }
+                // ntrivedi 03-11-2018
+                if (_commonWalletFunction.CheckShadowLimit(Walletobj.Id, amount) != enErrorCode.Success)
+                {
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), enWalletTranxOrderType.Debit, amount, TrnRefNo, UTC_To_IST(), null, Walletobj.Id, coinName, Walletobj.UserID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InsufficantBal, trnType);
+                    objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ShadowLimitExceed, ErrorCode = enErrorCode.ShadowBalanceExceed, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
                 //vsolanki 208-11-1
                 var charge = _walletService.GetServiceLimitChargeValue(enTrnType.Deposit, coinName);//for deposit

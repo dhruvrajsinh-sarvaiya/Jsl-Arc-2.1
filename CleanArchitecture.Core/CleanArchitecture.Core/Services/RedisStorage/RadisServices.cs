@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using CleanArchitecture.Core.Entities.User;
 
 namespace CleanArchitecture.Core.Services.RadisDatabase
 {   
@@ -69,6 +70,24 @@ namespace CleanArchitecture.Core.Services.RadisDatabase
                 throw ex;
             }
             
+        }
+
+        public void SaveWithOrigionalKey(string key, T obj)
+        {
+            try
+            {
+                if (obj != null)
+                {
+                    var hash = this.GenerateHash(obj);
+                    this.Db.HashSet(key, hash);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
         }
 
         public void Delete(string key)

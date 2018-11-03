@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,6 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData);
         decimal LastPriceByPair(long PairId, ref short UpDownBit);
         PairRatesResponse GetPairRates(long PairId);
+        List<TradePairTableResponse> GetTradePairAsset();
     }
 }
