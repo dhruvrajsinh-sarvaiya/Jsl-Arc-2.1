@@ -536,4 +536,10 @@ namespace CleanArchitecture.Core.Enums
         Fixed = 1,
         Pecentage = 2
     }
+
+    public enum EnDeviceSubsscrptionType
+    {
+        Subsscribe = 1,
+        UnSubsscribe = 2
+    }
 }

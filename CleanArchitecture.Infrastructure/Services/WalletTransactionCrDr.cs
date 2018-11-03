@@ -24,13 +24,13 @@ using CleanArchitecture.Core.Helpers;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
-    public class WalletTransactionCrDr : BasePage , IWalletTransactionCrDr
+    public class WalletTransactionCrDr : BasePage, IWalletTransactionCrDr
     {
         // private readonly ILogger<WalletService> _log;
         private readonly ISignalRService _signalRService;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
         //private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
-       // private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
+        // private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
         private readonly ICommonRepository<WalletOrder> _walletOrderRepository;
         private readonly ICommonRepository<AddressMaster> _addressMstRepository;
         private readonly ICommonRepository<TrnAcBatch> _trnBatch;
@@ -52,8 +52,8 @@ namespace CleanArchitecture.Infrastructure.Services
         //private readonly WebApiParseResponse _WebApiParseResponse;
 
 
-        public WalletTransactionCrDr( ICommonRepository<WalletMaster> commonRepository,
-           ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,          
+        public WalletTransactionCrDr(ICommonRepository<WalletMaster> commonRepository,
+           ICommonRepository<TrnAcBatch> BatchLogger, ICommonRepository<WalletOrder> walletOrderRepository, IWalletRepository walletRepository,
            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository,
            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, IWalletService walletService, ICommonWalletFunction commonWalletFunction) : base(logger)
@@ -122,13 +122,13 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
-                
+
                 if (!CheckUserBalance(Walletobj.Id))
                 {
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(),enWalletTranxOrderType.Debit , amount, TrnRefNo, UTC_To_IST(), null, Walletobj.Id, coinName, Walletobj.UserID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.BalMismatch, trnType);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), enWalletTranxOrderType.Debit, amount, TrnRefNo, UTC_To_IST(), null, Walletobj.Id, coinName, Walletobj.UserID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.BalMismatch, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.SettedBalanceMismatch, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
-                }                
+                }
                 if (TrnRefNo == 0) // sell 13-10-2018
                 {
                     // insert with status=2 system failed
@@ -192,7 +192,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public WalletDrCrResponse DepositionWalletOperation(string timestamp, string address, string coinName, decimal amount, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enWalletTranxOrderType enWalletTranx, enWalletLimitType enWalletLimit,string Token="")
+        public WalletDrCrResponse DepositionWalletOperation(string timestamp, string address, string coinName, decimal amount, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enWalletTranxOrderType enWalletTranx, enWalletLimitType enWalletLimit, enTrnType routeTrnType, string Token = "")
         {
             try
             {
@@ -236,7 +236,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 }
                 resp = InsertWalletTQDebit(timestamp, dWalletobj.Id, coinName, amount, TrnRefNo, serviceType, enWalletTrnType.Dr_Debit, enWalletTranx, enWalletLimit);
-                if (resp.ReturnCode !=0 || resp.Status != enTransactionStatus.Initialize)
+                if (resp.ReturnCode != 0 || resp.Status != enTransactionStatus.Initialize)
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = resp.StatusMsg, ErrorCode = resp.ErrorCode };
                 }
@@ -253,7 +253,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 DrRemarks = "Debit for Deposition TrnNo:" + TrnRefNo;
                 WalletLedger walletLedgerDr = GetWalletLedgerObj(dWalletobj.Id, cWalletObj.Id, amount, 0, enWalletTrnType.Dr_Debit, serviceType, objTQDr.TrnNo, DrRemarks, dWalletobj.Balance, 1);
                 TransactionAccount tranxAccounDrt = GetTransactionAccount(dWalletobj.Id, 1, batchObj.Id, amount, 0, objTQDr.TrnNo, DrRemarks, 1);
-                dWalletobj.DebitBalance(amount);                
+                dWalletobj.DebitBalance(amount);
                 objTQDr.Status = enTransactionStatus.Success;
                 objTQDr.StatusMsg = "Success";
                 DrRemarks = "Credit for Deposition TrnNo:" + TrnRefNo;
@@ -283,7 +283,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
                 walletMasterObj.CoinName = coinName;
                 _signalRService.OnWalletBalChange(walletMasterObj, coinName, dWalletobj.UserID.ToString(), 2);
-                _signalRService.SendActivityNotification("Deposition found for Address @Address for @Coin", dWalletobj.UserID.ToString(), 2);
+                var msg = EnResponseMessage.CreditWalletMsg;
+                msg = msg.Replace("#Coin#", coinName);
+                msg = msg.Replace("#TrnType#", routeTrnType.ToString());
+                msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
+                _signalRService.SendActivityNotification(msg, dWalletobj.UserID.ToString(), 2);
                 // OnWalletBalChange(walletMasterObj, coinName,  Token);
                 //-------------------------------
 

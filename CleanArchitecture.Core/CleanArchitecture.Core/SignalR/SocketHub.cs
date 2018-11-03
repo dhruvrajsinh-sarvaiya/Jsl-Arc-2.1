@@ -584,6 +584,36 @@ namespace CleanArchitecture.Core.SignalR
             
         }
 
+        //public Task WalletBalChange(string Token, string WalletName, string Data)
+        //{
+        //    try
+        //    { 
+        //        var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+        //        IEnumerable<string> ClientList = Redis.GetKey(Token);
+        //        foreach (string s in ClientList.ToList())
+        //        {
+        //            var Key = s;
+        //            Key = Key.Split(":")[1].ToString();
+        //            string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
+        //            if (Pair.Split("_")[0].ToString() == WalletName)
+        //            {
+        //                SellerSideWalletBal(Token,WalletName,Data);
+        //            }
+        //            else if(Key.Split("_")[1].ToString() == WalletName)
+        //            {
+        //                BuyerSideWalletBal(Token, WalletName, Data);
+        //            }
+
+
+        //        }
+        //        return Task.FromResult(0);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        return Task.FromResult(0);
+        //    }
+        //}
         public Task ActivityNotification(string Token, string Message)
         {
             try

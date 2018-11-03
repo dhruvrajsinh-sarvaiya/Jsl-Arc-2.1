@@ -102,6 +102,8 @@ namespace CleanArchitecture.Core.Enums
         public static string InternalError = "Internal Error";
         public static string BalMismatch = "Settled Balance Mismatch";
         public static string ShadowLimitExceed = "Exceed Shadow Limit";
+        public static string CreditWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
+        public static string DebitWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
         public static string GenerateAddressNotification = "New Address Created Successfully For Wallet:#WalletName";
 
         //========================My Account===============================//
@@ -246,7 +248,7 @@ namespace CleanArchitecture.Core.Enums
         public static string TwoFAalreadyDisable = "Two factor authentication already disable.";
         public static string FactorKeyFail = "Invalid two factor key.";
         public static string SuccessGetIpHistory = "Success full Get Ip History.";
-        public static string SuccessGetLoginHistory = "Success full Get Ip History.";
+        public static string SuccessGetLoginHistory = "Success full Get Login History.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";

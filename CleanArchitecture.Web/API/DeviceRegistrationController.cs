@@ -63,6 +63,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Request.DeviceID = DeviceID;
                     Request.UserID = user.Id;
+                    Request.SubsscrptionType = EnDeviceSubsscrptionType.Subsscribe;
                     await _mediator.Send(Request);
                 }
                 return Ok(Response);
@@ -98,6 +99,7 @@ namespace CleanArchitecture.Web.API
                 {
                     Request.DeviceID = DeviceID;
                     Request.UserID = user.Id;
+                    Request.SubsscrptionType = EnDeviceSubsscrptionType.UnSubsscribe;
                     await _mediator.Send(Request);
                 }
                 return Ok(Response);
