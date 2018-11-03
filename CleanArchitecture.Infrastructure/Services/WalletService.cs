@@ -988,7 +988,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 else
                 {
                     walletLedger2.PreBal = currentBalance;
-                    walletLedger2.PostBal = currentBalance + drAmount;
+                    walletLedger2.PostBal = currentBalance + crAmount;
                 }
                 return walletLedger2;
             }
@@ -1174,7 +1174,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 WalletTransactionQueue objTQ;
                 //long walletTypeID;
                 WalletDrCrResponse resp = new WalletDrCrResponse();
-                if (string.IsNullOrEmpty(accWalletID) || coinName == string.Empty || userID == 0)
+                HelperForLog.WriteLogIntoFile("GetWalletDeductionNew", "WalletService", "timestamp:" + timestamp + "," + "coinName:" + coinName + ",accWalletID=" + accWalletID + ",TrnRefNo=" + TrnRefNo.ToString() + ",userID=" + userID + ",amount=" + amount.ToString());
+                if (string.IsNullOrEmpty(accWalletID) || coinName == string.Empty || userID == 0) 
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidReq, ErrorCode = enErrorCode.InvalidWalletOrUserIDorCoinName };
                 }
@@ -1297,7 +1298,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return count;
         }
 
-        public WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, string Token = "")
+        public WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, enTrnType routeTrnType, string Token = "")
         {
             WalletTransactionQueue tqObj = new WalletTransactionQueue();
             WalletTransactionOrder woObj = new WalletTransactionOrder();
@@ -1397,6 +1398,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.CoinName = coinName;
 
                 _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
+                // ntrivedi 03-11-2018
+                var msg = EnResponseMessage.CreditWalletMsg;
+                msg = msg.Replace("#Coin#", coinName);
+                msg = msg.Replace("#TrnType#", routeTrnType.ToString());
+                msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
+                _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);               
+
                 //-------------------------------
 
                 return new WalletDrCrResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessCredit, ErrorCode = enErrorCode.Success, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
