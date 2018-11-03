@@ -219,7 +219,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Data;
-                CommonData.Parameter = Token;
+                CommonData.Parameter = null;
 
                 //SignalRDataOpenOrder SendData = new SignalRDataOpenOrder();
                 SignalRData SendData = new SignalRData();
@@ -247,7 +247,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Data;
-                CommonData.Parameter = Token;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.TradeHistory;
@@ -274,7 +274,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Data;
-                CommonData.Parameter = Token;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.RecentOrder;
@@ -301,7 +301,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Data;
-                CommonData.Parameter = Token;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.BuyerSideWallet;
@@ -329,7 +329,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Data;
-                CommonData.Parameter = Token;
+                CommonData.Parameter = null;
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.SellerSideWallet;
@@ -602,20 +602,20 @@ namespace CleanArchitecture.Infrastructure.Services
                 GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
                 GetBuySellBook BuySellmodel = new GetBuySellBook();
                 //update Recent Order
-                //update OpenOrder
+                //pop OpenOrder
                 //add tradehistory
                 //add orderhistory
-                //update Buyer/seller book
+                
                 if(string.IsNullOrEmpty(Token))
                 {
-                    Token = GetTokenByUserID(Token);
+                    Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
                 }
                 if (!string.IsNullOrEmpty(Token))
                 {
                     List<GetBuySellBook> list = new List<GetBuySellBook>();
 
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);//update OpenOrder
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType,1);//update OpenOrder
 
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     OrderHistory(historyInfo, historyInfo.PairName);//Order
@@ -625,26 +625,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
                     msg = msg.Replace("#Total#", historyInfo.Total.ToString());
                     ActivityNotification(msg, Token);
-                    if (NewTradeTransaction.TrnType == 4)//Buy
-                    {
-                        list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
-                        foreach (var model in list)
-                        {
-                            BuySellmodel = model;
-                            break;
-                        }
-                        BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                    }
-                    else//Sell
-                    {
-                        list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
-                        foreach (var model in list)
-                        {
-                            BuySellmodel = model;
-                            break;
-                        }
-                        SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                    }
+                    
 
                 }
             }
@@ -654,38 +635,19 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
         public void OnStatusPartialSuccess(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType)
         {
             try
             {
-                GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
                 GetBuySellBook BuySellmodel = new GetBuySellBook();
-
-                //update Recent Order
-                //update OpenOrder
-                //add tradehistory
-                //add orderhistory
                 //update Buyer/seller book
                 if (string.IsNullOrEmpty(Token))
                 {
-                    Token = GetTokenByUserID(Token);
+                    Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
                 }
                 if (!string.IsNullOrEmpty(Token))
                 {
                     List<GetBuySellBook> list = new List<GetBuySellBook>();
-
-                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);//update OpenOrder
-
-                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
-                    OrderHistory(historyInfo, historyInfo.PairName);//Order
-                    TradeHistory(historyInfo, Token);//TradeHistory
-                    var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
-                    msg = msg.Replace("#Price#", historyInfo.Price.ToString());
-                    msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
-                    msg = msg.Replace("#Total#", historyInfo.Total.ToString());
-                    ActivityNotification(msg, Token);
                     if (NewTradeTransaction.TrnType == 4)//Buy
                     {
                         list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
@@ -726,7 +688,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 if (string.IsNullOrEmpty(Token))
                 {
-                    Token = GetTokenByUserID(Token);
+                    Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
                 }
                 List<GetBuySellBook> list = new List<GetBuySellBook>();
                 if (!string.IsNullOrEmpty(Token))
@@ -765,20 +727,18 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
-
         public void OnStatusCancel(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType)
         {
             try
             {
                 GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
-                GetBuySellBook BuySellmodel = new GetBuySellBook();
-
+                
                 //pop from OpenOrder
                 //update Recent order
                 //add Trade history
                 if (string.IsNullOrEmpty(Token))
                 {
-                    Token = GetTokenByUserID(Token);
+                    Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
                 }
                 if (!string.IsNullOrEmpty(Token))
                 {

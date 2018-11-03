@@ -41,6 +41,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<WalletLedger> _WalletLedgersRepo;
         private readonly ICommonRepository<MemberShadowBalance> _ShadowBalRepo;
         private readonly ICommonRepository<MemberShadowLimit> _ShadowLimitRepo;
+        private readonly ICommonRepository<ConvertFundHistory> _ConvertFundHistory;
 
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
         private readonly IWalletRepository _walletRepository1;
@@ -72,7 +73,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
             ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<MemberShadowLimit> ShadowLimitRepo, ICommonRepository<MemberShadowBalance> ShadowBalRepo, ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig,
-            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, ICommonWalletFunction commonWalletFunction) : base(logger)
+            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, ICommonWalletFunction commonWalletFunction, ICommonRepository<ConvertFundHistory> ConvertFundHistory) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -102,6 +103,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _TransactionAccountsRepository = TransactionAccountsRepository;
             _signalRService = signalRService;
             _commonWalletFunction = commonWalletFunction;
+            _ConvertFundHistory = ConvertFundHistory;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -2528,6 +2530,17 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 ListIncomingTrnRes Response = new ListIncomingTrnRes();
                 Response.BizResponseObj = new BizResponseClass();
+                var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
+                if (Coin != null)
+                {
+                    if (type == null)
+                    {
+                        Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                        Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
+                        Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                        return Response;
+                    }
+                }
                 var depositHistories = _walletRepository1.GetIncomingTransaction(Userid, Coin);
                 if (depositHistories.Count() == 0)
                 {
@@ -2716,12 +2729,15 @@ namespace CleanArchitecture.Infrastructure.Services
                 ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
                 Response.BizResponseObj = new BizResponseClass();
                 var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
-                if (type == null)
+                if (Coin != null)
                 {
-                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
-                    Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
-                    return Response;
+                    if (type == null)
+                    {
+                        Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                        Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
+                        Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                        return Response;
+                    }
                 }
                 var Histories = _walletRepository1.GetOutGoingTransaction(Userid, Coin);
                 if (Histories.Count() == 0 || Histories == null)
@@ -2784,6 +2800,54 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
 
+        }
+
+        //vsolanki 2018-11-03
+        public decimal ConvertFund(decimal SourcePrice)
+        {
+            try
+            {
+                if(SourcePrice>0)
+                {
+                    decimal total = (SourcePrice * 10) / 100;
+                    return total;
+                }     
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        public BizResponseClass AddIntoConvertFund(ConvertTockenReq Request,long userid)
+        {
+            try
+            {
+                ConvertFundHistory h = new ConvertFundHistory();
+                h.CreatedBy = userid;
+                h.CreatedDate = UTC_To_IST();
+                h.UpdatedBy = userid;
+                h.UpdatedDate = UTC_To_IST();
+                h.Status = Convert.ToInt16(ServiceStatus.InActive);
+                h.SourcePrice = Request.SourcePrice;
+                h.DestinationPrice = Request.DestinationPrice;
+                h.FromWalletId = Request.SourceWalletId;
+                h.ToWalletId = Request.DestinationWalletId;
+                h.Price = 10;
+                h.TrnDate = UTC_To_IST();
+                _ConvertFundHistory.Add(h);
+                return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordAdded, ErrorCode = enErrorCode.Success }; 
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
         }
     }
 
