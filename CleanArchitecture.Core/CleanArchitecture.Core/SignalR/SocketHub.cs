@@ -530,7 +530,7 @@ namespace CleanArchitecture.Core.SignalR
                     var Key = s;
                     Key = Key.Split(":")[1].ToString();
                     string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
-                    if (Pair.ToUpper().Contains(WalletName.ToUpper()))
+                    if (Pair.Split("_")[1].ToString() == WalletName)
                     {
                         _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerSideWalletBal), Data);
                     }
@@ -565,7 +565,7 @@ namespace CleanArchitecture.Core.SignalR
                     var Key = s;
                     Key = Key.Split(":")[1].ToString();
                     string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
-                    if (Pair.ToUpper().Contains(WalletName.ToUpper()))
+                    if (Pair.Split("_")[0].ToString() == WalletName)
                     {
                         _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerSideWalletBal), Data);
                     }
