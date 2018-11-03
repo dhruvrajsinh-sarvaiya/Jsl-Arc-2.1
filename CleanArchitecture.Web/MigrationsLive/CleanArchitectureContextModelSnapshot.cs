@@ -2524,8 +2524,6 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<string>("AliasKey");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
