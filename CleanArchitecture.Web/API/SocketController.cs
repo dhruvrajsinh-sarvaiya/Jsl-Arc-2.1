@@ -155,7 +155,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveTradingHistory";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
@@ -181,9 +181,9 @@ namespace CleanArchitecture.Web.API
                 //model.TodayOpen = 1477;
                 //model.Volume = 173;
 
-                List<GetGraphDetailInfo> temp = JsonConvert.DeserializeObject<List<GetGraphDetailInfo>>(Data);
+                GetGraphDetailInfo temp = JsonConvert.DeserializeObject<GetGraphDetailInfo>(Data);
 
-                SignalRComm<List<GetGraphDetailInfo>> CommonData = new SignalRComm<List<GetGraphDetailInfo>>();
+                SignalRComm<GetGraphDetailInfo> CommonData = new SignalRComm<GetGraphDetailInfo>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ChartData);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData);

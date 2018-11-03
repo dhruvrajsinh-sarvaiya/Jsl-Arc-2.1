@@ -237,13 +237,14 @@ namespace CleanArchitecture.Web.API
                 sKey = TFAuth.CreateSecret(160);
                 //URL = TFAuth.GetQrCodeImageAsDataUri(sName, sKey);
                 // string value = URL + "" + sKey;
+             // string code123 = TFAuth.GetQrCodeImageAsDataUri(, string secret)
                 user.PhoneNumber = sKey;
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
                     var model = new EnableAuthenticatorViewModel
                     {
-                        //SharedKey = FormatKey(unformattedKey),
+                        SharedKey = FormatKey(sKey),
                         //AuthenticatorUri = GenerateQrCodeUri(user.UserName, unformattedKey)
                         // UserName = user.UserName,
                         AuthenticatorUri = TFAuth.GetQrCodeImageAsDataUri(user.UserName, sKey)

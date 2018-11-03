@@ -13,7 +13,7 @@ namespace CleanArchitecture.Core.Entities
     public class WalletTypeMaster : BizBase
     {
         [Required]
-        [StringLength(50)]
+        [StringLength(7)]
         [JsonProperty(PropertyName = "CoinName")]
         public string WalletTypeName { get; set; }
 

@@ -15,7 +15,7 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         List<RecentOrderRespose> GetRecentOrder(long PairId, long MemberID);
         List<GetBuySellBook> GetBuyerBook(long id,decimal Price= -0);
         List<GetBuySellBook> GetSellerBook(long id, decimal Price = -0);
-        List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData);
+        List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData, DateTime Minute, int socket = 0);
         decimal LastPriceByPair(long PairId, ref short UpDownBit);
         PairRatesResponse GetPairRates(long PairId);
         List<TradePairTableResponse> GetTradePairAsset();

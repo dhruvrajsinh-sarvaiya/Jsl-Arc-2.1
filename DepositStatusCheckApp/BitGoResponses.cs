@@ -17,7 +17,7 @@ namespace DepositStatusCheckApp
         public DateTime date { get; set; }
         public int confirmations { get; set; }
         public string type { get; set; }
-        public int value { get; set; }
+        public decimal value { get; set; }
         public string valueString { get; set; }
         public string feeString { get; set; }
         public int payGoFee { get; set; }

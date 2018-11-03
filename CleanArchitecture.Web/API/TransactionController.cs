@@ -225,7 +225,10 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                Task<BizResponse> MethodRespCancel = _cancelOrderProcess.ProcessCancelOrderAsync(Request);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var accessToken = await HttpContext.GetTokenAsync("access_token");                
+                
+                Task<BizResponse> MethodRespCancel = _cancelOrderProcess.ProcessCancelOrderAsync(Request, accessToken);
                 return Ok(MethodRespCancel);
             }
             catch (Exception ex)

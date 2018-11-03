@@ -132,6 +132,7 @@ namespace DepositStatusCheckApp
             public List<RespLocalCoin> RespLocalCoins { get; set; }
             public decimal ConvertAmt { get; set; } // ntrivedi
             public string ProviderWalletID { get; set; }
+            public int ConfirmationCount { get; set; }
 
             //private readonly IWalletService _walletService;
 
@@ -429,6 +430,7 @@ namespace DepositStatusCheckApp
                         amount = 0;
                         autono = Convert.ToInt64(dRow["ID"]);
                         WriteRequestLog("New Loop TrnID :" + dRow["TrnID"].ToString() + " IsProcessing :" + IsProcessing.ToString() + "", "GetHistory", CommonMethod.SMSCode, Convert.ToInt16(Configuration["AllowLog"]), Action: 2);
+                        
                         String Response = CallThirdPartyAPI(ref CommonMethod, trnID, CommonMethod.Authorization, CommonMethod.enterprise, dSet); // Generate ThirdParty API Response
 
                         ; /*CallThirdPartyCryptoAPI(ref CommonMethod, dRow["Address"].ToString(), dRow["TrnID"].ToString(), dRow["AutoNo"].ToString())*/
@@ -624,7 +626,7 @@ namespace DepositStatusCheckApp
                         //}
 
                         // Delivery Process Order
-                        if (item.confirmations >= 3) ////ntrivedi 11-05-2018 
+                        if (item.confirmations >= CommonMethod.ConfirmationCount && CommonMethod.ConfirmationCount > 0) ////ntrivedi 11-05-2018 
                         {
                             //DeliveryProcessOrder(ref CommonMethod, item, 1, CommonMethod.DMemberID);
                             // trn pr , status ,date 
@@ -664,6 +666,7 @@ namespace DepositStatusCheckApp
                              //.AddSingleton<ICommonRepository<WalletTypeMaster>, EFCommonRepository<WalletTypeMaster>>()
                              //.AddSingleton<ICommonRepository<WalletAllowTrn>, EFCommonRepository<WalletAllowTrn>>()
                              .AddSingleton<IWalletRepository, WalletRepository>()
+                             .AddSingleton<ICommonWalletFunction, CommonWalletFunction>()
                              .AddSingleton<IWebApiRepository, WebApiDataRepository>()
                              //.AddSingleton<IWebApiParseResponse, WebApiParseResponse>()
                              .AddSingleton<IWebApiSendRequest, WebAPISendRequest>()
@@ -678,7 +681,7 @@ namespace DepositStatusCheckApp
                                                         
                             var bar = serviceProvider.GetService<IWalletTransactionCrDr>();
                            //long id= bar.getOrgID();
-                          WalletDrCrResponse walletDrCrResponse =  bar.DepositionWalletOperation(UTC_To_IST().ToString("ddMMyyyyHHmmss"), item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit);
+                           WalletDrCrResponse walletDrCrResponse =  bar.DepositionWalletOperation(UTC_To_IST().ToString("ddMMyyyyHHmmss"), item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit,"");
 
                             if (walletDrCrResponse.ReturnCode == 0)
                             {
@@ -893,6 +896,10 @@ namespace DepositStatusCheckApp
                         else if (CommonMethod.TrnLeftTitle.Contains("providerwalletid")) //Read RequestBody
                         {
                             CommonMethod.ProviderWalletID = line.Substring(line.IndexOf(CommonMethod.MainSaperator) + 1);
+                        }
+                        else if (CommonMethod.TrnLeftTitle.Contains("confirmation")) //Read RequestBody
+                        {
+                            CommonMethod.ConfirmationCount = Convert.ToInt16( line.Substring(line.IndexOf(CommonMethod.MainSaperator) + 1));
                         }
                         //Console.WriteLine(CommonMethod.Str_URL + CommonMethod.Str_RequestType + CommonMethod.ContentType);
                     }

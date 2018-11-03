@@ -48,4 +48,30 @@ namespace CleanArchitecture.Core.Entities
             Events.Add(new ServiceStatusEvent<NotificationQueue>(this));
         }
     }
+
+    public class DeviceStore : BizBase
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new long Id { get; set; }
+
+        [Key]
+        [Required]
+        public long UserID { get; set; }
+
+        [Required]
+        [StringLength(500)]
+        public string DeviceID { get; set; }        
+
+        public void InActive()
+        {
+            Status = Convert.ToInt16(ServiceStatus.InActive);
+            Events.Add(new ServiceStatusEvent<DeviceStore>(this));
+        }        
+
+        public void Active()
+        {
+            Status = Convert.ToInt16(ServiceStatus.Active);
+            Events.Add(new ServiceStatusEvent<DeviceStore>(this));
+        }
+    }
 }

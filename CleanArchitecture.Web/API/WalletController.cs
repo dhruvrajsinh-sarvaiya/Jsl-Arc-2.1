@@ -756,7 +756,7 @@ namespace CleanArchitecture.Web.API
         //vsolanki 2018-10-29
         //[AllowAnonymous]
         //[AllowAnonymous]
-        [HttpGet("{Coin}")]
+        [HttpGet]
         public async Task<IActionResult> GetIncomingTransaction(string Coin)
         {
             //ApplicationUser user = new ApplicationUser(); user.Id = 35;
