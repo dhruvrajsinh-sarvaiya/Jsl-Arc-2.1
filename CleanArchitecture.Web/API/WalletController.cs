@@ -844,11 +844,11 @@ namespace CleanArchitecture.Web.API
 
         //vsoalnki 2018-11-3
         [HttpGet("{FromDate}/{ToDate}")]
-        //[AllowAnonymous]
+        [AllowAnonymous]
         public async Task<IActionResult> ConvertFundHistory(DateTime FromDate, DateTime ToDate, string Coin)
         {
-            //ApplicationUser user = new ApplicationUser(); user.Id = 35;
-             ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            ApplicationUser user = new ApplicationUser(); user.Id = 35;
+            // ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListTokenConvertHistoryRes Response = new ListTokenConvertHistoryRes();
             try
             {

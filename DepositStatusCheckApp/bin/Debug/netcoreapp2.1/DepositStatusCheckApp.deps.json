@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1",
-    "signature": "f5c2885c9f5ed10997709f39f783f38093479788"
+    "signature": "b743dc289ddc3b1f6133829478b66cfe5105a042"
   },
   "compilationOptions": {},
   "targets": {
@@ -158,11 +158,11 @@
           }
         }
       },
-      "libphonenumber-csharp/8.9.14": {
+      "libphonenumber-csharp/8.9.15": {
         "runtime": {
           "lib/netstandard2.0/PhoneNumbers.dll": {
-            "assemblyVersion": "8.9.14.0",
-            "fileVersion": "8.9.14.0"
+            "assemblyVersion": "8.9.15.0",
+            "fileVersion": "8.9.15.0"
           }
         }
       },
@@ -275,7 +275,7 @@
           "Microsoft.AspNetCore.ApplicationInsights.HostingStartup": "2.1.0",
           "Microsoft.AspNetCore.AzureAppServices.HostingStartup": "2.1.0",
           "Microsoft.AspNetCore.AzureAppServicesIntegration": "2.1.0",
-          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.3",
+          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.2",
           "Microsoft.AspNetCore.DataProtection.AzureKeyVault": "2.1.0",
           "Microsoft.AspNetCore.DataProtection.AzureStorage": "2.1.0",
           "Microsoft.AspNetCore.Http.Connections": "1.0.4",
@@ -343,14 +343,14 @@
           }
         }
       },
-      "Microsoft.AspNetCore.Connections.Abstractions/2.1.3": {
+      "Microsoft.AspNetCore.Connections.Abstractions/2.1.2": {
         "dependencies": {
           "System.IO.Pipelines": "4.5.1"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AspNetCore.Connections.Abstractions.dll": {
-            "assemblyVersion": "2.1.3.0",
-            "fileVersion": "2.1.3.18207"
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.18180"
           }
         }
       },
@@ -390,7 +390,7 @@
       },
       "Microsoft.AspNetCore.Http.Connections.Common/1.0.4": {
         "dependencies": {
-          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.3"
+          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.2"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AspNetCore.Http.Connections.Common.dll": {
@@ -504,7 +504,7 @@
       },
       "Microsoft.AspNetCore.SignalR.Common/1.0.4": {
         "dependencies": {
-          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.3"
+          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.2"
         },
         "runtime": {
           "lib/netcoreapp2.1/Microsoft.AspNetCore.SignalR.Common.dll": {
@@ -836,7 +836,7 @@
         "runtime": {
           "lib/netstandard1.3/Microsoft.Extensions.PlatformAbstractions.dll": {
             "assemblyVersion": "1.1.0.0",
-            "fileVersion": "1.1.0.30427"
+            "fileVersion": "1.1.0.21115"
           }
         }
       },
@@ -1385,7 +1385,6 @@
           "AutoMapper": "7.0.1",
           "CachingFramework.Redis": "10.0.2",
           "MediatR": "5.1.0",
-          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.3",
           "Microsoft.AspNetCore.Mvc.ViewFeatures": "2.1.2",
           "Microsoft.AspNetCore.SignalR": "1.0.4",
           "Microsoft.Extensions.Identity.Core": "2.1.3",
@@ -1401,16 +1400,14 @@
           "CleanArchitecture.Core": "1.0.0",
           "Hangfire": "1.6.20",
           "Microsoft.AspNetCore.All": "2.1.0",
-          "Microsoft.AspNetCore.Connections.Abstractions": "2.1.3",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "2.1.3",
           "Microsoft.EntityFrameworkCore": "2.1.3",
           "Microsoft.EntityFrameworkCore.Design": "2.1.3",
           "Microsoft.Extensions.Identity.Stores": "2.1.3",
-          "NLog.Config": "4.5.10",
           "OpenIddict": "2.0.0-rc2-final",
           "OpenIddict.EntityFrameworkCore": "2.0.0-rc2-final",
           "StructureMap": "4.7.0",
-          "libphonenumber-csharp": "8.9.14"
+          "libphonenumber-csharp": "8.9.15"
         },
         "runtime": {
           "CleanArchitecture.Infrastructure.dll": {}
@@ -1508,12 +1505,12 @@
       "path": "hangfire.sqlserver/1.6.20",
       "hashPath": "hangfire.sqlserver.1.6.20.nupkg.sha512"
     },
-    "libphonenumber-csharp/8.9.14": {
+    "libphonenumber-csharp/8.9.15": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8jT29ELMoVvuev+SRB2r8YMhLj+iifj1aufGiNCpMwyjSrKLY/EhHnC2V9GZCxFMYyNzX6gKq8J6pCuXosrUdw==",
-      "path": "libphonenumber-csharp/8.9.14",
-      "hashPath": "libphonenumber-csharp.8.9.14.nupkg.sha512"
+      "sha512": "sha512-tOHOyZmQ+01IGDGG5Mum8+RoolbgaazRN9kL1RY3h/mGBA02rckbhg11cjvfAYuWy20MVBpRkdQIJonT1tf4Og==",
+      "path": "libphonenumber-csharp/8.9.15",
+      "hashPath": "libphonenumber-csharp.8.9.15.nupkg.sha512"
     },
     "Libuv/1.10.0": {
       "type": "package",
@@ -1585,12 +1582,12 @@
       "path": "microsoft.aspnetcore.azureappservicesintegration/2.1.0",
       "hashPath": "microsoft.aspnetcore.azureappservicesintegration.2.1.0.nupkg.sha512"
     },
-    "Microsoft.AspNetCore.Connections.Abstractions/2.1.3": {
+    "Microsoft.AspNetCore.Connections.Abstractions/2.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-/Gjn8YAitnxcab1utQyUTZAzjNhhI4p72pIk/E/xQlxOVcCpkSezTwrFniairdPwhz+RV7BKdCZshbZwfhB0aA==",
-      "path": "microsoft.aspnetcore.connections.abstractions/2.1.3",
-      "hashPath": "microsoft.aspnetcore.connections.abstractions.2.1.3.nupkg.sha512"
+      "sha512": "sha512-O/dAVpldQyJEzzrY1f6Ki+s4DeAk8qtvcSK8Pk+zJLYB9tZKdWMQ68ob+fy7CsYCdLyhbT/vro0TSBK1teit7g==",
+      "path": "microsoft.aspnetcore.connections.abstractions/2.1.2",
+      "hashPath": "microsoft.aspnetcore.connections.abstractions.2.1.2.nupkg.sha512"
     },
     "Microsoft.AspNetCore.DataProtection.AzureKeyVault/2.1.0": {
       "type": "package",
@@ -1840,7 +1837,7 @@
     "Microsoft.Extensions.Identity.Core/2.1.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OTSekwbBiy4AUvDMZq7qJiFkTe6ckewRwPxsmvDfTHeIPoaTAE8iOZqkZDJQw9TdKNPN7YYVRHB7KhH3z1FgJg==",
+      "sha512": "sha512-G0mb8hbRPwX6vibebsAdRKgYR5BYXSXaffY4QxvUE4He0yKv83Adigh6fmvlg6Zd+z0EAb1xEBnZ1esj6VcPFw==",
       "path": "microsoft.extensions.identity.core/2.1.3",
       "hashPath": "microsoft.extensions.identity.core.2.1.3.nupkg.sha512"
     },
@@ -1861,7 +1858,7 @@
     "Microsoft.Extensions.PlatformAbstractions/1.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-UMlN++q5qqzQ2HH+uOrKxN5fmBXMQDhrYkSaPJxhmyzfJaFPirrVr1raim/Ocq1psAZoB9+7JSAf0GDAX35wUg==",
+      "sha512": "sha512-H6ZsQzxYw/6k2DfEQRXdC+vQ6obd6Uba3uGJrnJ2vG4PRXjQZ7seB13JdCfE72abp8E6Fk3gGgDzfJiLZi5ZpQ==",
       "path": "microsoft.extensions.platformabstractions/1.1.0",
       "hashPath": "microsoft.extensions.platformabstractions.1.1.0.nupkg.sha512"
     },
