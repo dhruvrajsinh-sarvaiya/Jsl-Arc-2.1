@@ -105,23 +105,23 @@ namespace CleanArchitecture.Web.API
         }
 
         [HttpPost("CreateTransactionOrder/{Pair}")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> CreateTransactionOrder([FromBody]CreateTransactionRequest Request, string Pair)
         {
             //Do Process for CreateOrder
             //For Testing Purpose
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
+           // var user = await _userManager.GetUserAsync(HttpContext.User);
+           // var accessToken = await HttpContext.GetTokenAsync("access_token");
 
             NewTransactionRequestCls Req = new NewTransactionRequestCls();
-            Req.accessToken = accessToken;
+           // Req.accessToken = accessToken;
             Req.TrnMode = Request.TrnMode;
             Req.TrnType = Request.OrderSide;
             Req.ordertype = Request.OrderType;
-            Req.MemberID = user.Id;
-            Req.MemberMobile = user.Mobile;
-            //Req.MemberID = 5;
-            //Req.MemberMobile = "1234567890";
+            //Req.MemberID = user.Id;
+            //Req.MemberMobile = user.Mobile;
+            Req.MemberID = 16;
+            Req.MemberMobile = "8128748841";
             Req.SMSCode = Pair;
             Req.TransactionAccount = Request.CurrencyPairID.ToString();
             Req.Amount = Request.Total;

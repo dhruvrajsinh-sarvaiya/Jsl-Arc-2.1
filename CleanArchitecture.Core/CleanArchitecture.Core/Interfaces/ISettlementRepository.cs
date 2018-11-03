@@ -8,6 +8,6 @@ namespace CleanArchitecture.Core.Interfaces
 {
     public interface ISettlementRepository<T>
     {
-        Task<T> PROCESSSETLLEMENT(T _Resp, TradeBuyRequest TradeBuyRequestObj,ref List<long> HoldTrnNos);
+        Task<T> PROCESSSETLLEMENT(T _Resp, TradeBuyRequest TradeBuyRequestObj,ref List<long> HoldTrnNos,string accesstocken="");
     }
 }

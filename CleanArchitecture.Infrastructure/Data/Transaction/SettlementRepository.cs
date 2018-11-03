@@ -124,7 +124,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
         }
 
-        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj, ref List<long> HoldTrnNos)
+        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj, ref List<long> HoldTrnNos,string accesstocken = "")
         {
             string DebitAccountID;
             string CreditAccountID;
@@ -133,8 +133,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             try
             {
                 TransactionQueueObj = _TransactionRepository.GetById(TradeBuyRequestObj.TrnNo);
-                TradeTransactionQueueObj = _TradeTransactionRepository.GetById(TradeBuyRequestObj.TrnNo);
-                TradeBuyerListObj = _TradeBuyerList.GetById(TradeBuyRequestObj.TrnNo);
+                TradeTransactionQueueObj = _TradeTransactionRepository.GetSingle(item=>item.TrnNo==TradeBuyRequestObj.TrnNo);
+                TradeBuyerListObj = _TradeBuyerList.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
 
                 DebitWalletID = TradeTransactionQueueObj.OrderWalletID;
                 DebitAccountID=_WalletService.GetAccWalletID(DebitWalletID);
