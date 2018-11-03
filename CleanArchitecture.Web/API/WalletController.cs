@@ -813,7 +813,7 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 2018-11-02
        // [AllowAnonymous]
-        [HttpGet("{Coin}")]
+        [HttpGet]
        // [AllowAnonymous]
         public async Task<IActionResult> GetOutGoingTransaction(string Coin)
         {
