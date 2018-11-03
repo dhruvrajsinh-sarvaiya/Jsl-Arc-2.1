@@ -569,14 +569,14 @@ namespace CleanArchitecture.Web.API
                                         };
                                         _iipHistory.AddIpHistory(IpHistory);
 
-                                        var LoginhistoryViewModel = new LoginhistoryViewModel()
+                                        var Loginhistory = new LoginhistoryViewModel()
                                         {
                                             UserId = user.Id,
                                             IpAddress = model.IPAddress,
                                             Device = model.DeviceId,
                                             Location = Location
                                         };
-                                        _loginHistory.AddLoginHistory(LoginhistoryViewModel);
+                                        _loginHistory.AddLoginHistory(Loginhistory);
 
                                         string TwoFAToken = _userKeyMasterService.Get2FACustomToken(user.Id);
                                         //// End 2FA in Custome token Create 
@@ -877,14 +877,14 @@ namespace CleanArchitecture.Web.API
                                         };
                                         _iipHistory.AddIpHistory(IpHistory);
 
-                                        var LoginhistoryViewModel = new LoginhistoryViewModel()
+                                        var Loginhistory= new LoginhistoryViewModel()
                                         {
                                             UserId = result.Id,
                                             IpAddress = model.IPAddress,
                                             Device = model.DeviceId,
                                             Location = Location
                                         };
-                                        _loginHistory.AddLoginHistory(LoginhistoryViewModel);
+                                        _loginHistory.AddLoginHistory(Loginhistory);
 
                                         ////// Start 2FA in Custome token Create                                    
                                         string TwoFAToken = _userKeyMasterService.Get2FACustomToken(logindata.Id);
