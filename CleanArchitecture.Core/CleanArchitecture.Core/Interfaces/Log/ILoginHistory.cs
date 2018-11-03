@@ -7,7 +7,7 @@ namespace CleanArchitecture.Core.Interfaces.Log
 {
    public interface ILoginHistory
     {
-         long LoginHistory(LoginhistoryViewModel model);
+         long AddLoginHistory(LoginhistoryViewModel model);
         List<LoginhistoryViewModel> GetLoginHistoryByUserId(long UserId, int pageIndex, int pageSize);
     }
 }
