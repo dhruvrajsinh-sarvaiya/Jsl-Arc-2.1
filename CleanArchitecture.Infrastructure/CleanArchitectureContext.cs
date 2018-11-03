@@ -226,6 +226,8 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<UserPreferencesMaster>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
             modelBuilder.Entity<TradeBitGoDelayAddresses>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
             modelBuilder.Entity<TradeBitGoDelayAddresses>().Property(x => x.TrnID).ValueGeneratedNever();// ntrivedi 31102018
+            modelBuilder.Entity<TradeTransactionQueue>().Property(x => x.TrnNo).ValueGeneratedNever();//rita 11-3-2018 ,error : The properties 'TradeTransactionQueue.TrnNo', 'TradeTransactionQueue.Id' are configured to use 'Identity' value generator
+            modelBuilder.Entity<TradeBuyerList>().Property(x => x.TrnNo).ValueGeneratedNever();//rita 11-3-2018
             modelBuilder.Entity<TradeBuyerList>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 2-11-2018 for error cannot update identity column id
             modelBuilder.Entity<TradeTransactionQueue>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 2-11-2018 for error cannot update identity column id
             modelBuilder.Entity<TransactionStatus>().HasKey(e => new { e.TrnNo, e.ServiceID,e.SerProID });//Rita 31-10-2018 for composite Primary key
