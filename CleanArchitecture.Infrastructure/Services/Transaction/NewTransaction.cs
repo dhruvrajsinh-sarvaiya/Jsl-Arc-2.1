@@ -665,7 +665,15 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 NewTradetransaction.MakeTransactionSystemFail();
                 NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
                 NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TradeTransactionRepository.Update(NewTradetransaction);                
+                _TradeTransactionRepository.Update(NewTradetransaction);
+                try
+                {
+                    _ISignalRService.SendActivityNotification("Transaction Validation Fail TrnNo:" + Req.TrnNo, Req.accessToken);
+                }
+                catch (Exception ex)
+                {
+                    HelperForLog.WriteLogIntoFile("ISignalRService Notification Error-System fail", ControllerName, ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                }
             }
             catch(Exception ex)
             {
@@ -683,15 +691,24 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 Newtransaction.SetTransactionStatusMsg(StatusMsg);
                 Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
                 _TransactionRepository.Update(Newtransaction);
-                try
+                if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
-                    _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);
-                    //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
+                    NewTradetransaction.MakeTransactionHold();
+                    NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
+                    NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                    _TradeTransactionRepository.Update(NewTradetransaction);
+                    try
+                    {
+                        _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);
+                        //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
+                    }
+                    catch (Exception ex)
+                    {
+                        HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                    }
+
                 }
-                catch (Exception ex)
-                {
-                    HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
-                }
+                
             }
             catch (Exception ex)
             {
@@ -719,6 +736,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
                 _WalletService.GetWalletCreditNew(Req.SMSCode, Helpers.GetTimeStamp(), enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
                 Req.DebitAccountID, CreditWalletDrArryTrnIDList.ToArray(), Req.TrnNo,1, enWalletTranxOrderType.Credit, Req.ServiceType);
+                try
+                {
+                    _ISignalRService.SendActivityNotification("Transaction Failed TrnNo:" + Req.TrnNo, Req.accessToken);
+                }
+                catch (Exception ex)
+                {
+                    HelperForLog.WriteLogIntoFile("ISignalRService Notification Error--Operator fail", ControllerName, ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                }
             }
             catch (Exception ex)
             {
@@ -800,6 +825,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         Newtransaction.SetTransactionStatusMsg(WebAPIParseResponseClsObj.StatusMsg);                        
                         _TransactionRepository.Update(Newtransaction);
                         IsTxnProceed = 1;//no further call next API
+                        try
+                        {
+                            _ISignalRService.SendActivityNotification("Transaction Success TrnNo:"+ Req.TrnNo, Req.accessToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            HelperForLog.WriteLogIntoFile("ISignalRService Notification Error-Success", ControllerName, ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                        }
                         break;
                     }
                     else if (WebAPIParseResponseClsObj.Status == enTransactionStatus.OperatorFail)
