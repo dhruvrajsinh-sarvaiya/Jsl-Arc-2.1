@@ -58,7 +58,7 @@ namespace CleanArchitecture.Web.API
 
         #region Ctore
         public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage,
-            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService, IUserKeyMasterService userKeyMasterService, IipHistory iipHistory,ILoginHistory loginHistory)
+            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService, IUserKeyMasterService userKeyMasterService, IipHistory iipHistory, ILoginHistory loginHistory)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -370,7 +370,7 @@ namespace CleanArchitecture.Web.API
                     _ApplicationUser = user;
                     var roles = await _userManager.GetRolesAsync(user);
 
-                    
+
                     //// added by nirav savariya for ip history user wise on 11-03-2018
                     var IpHistory = new IpHistoryViewModel()
                     {
@@ -877,7 +877,7 @@ namespace CleanArchitecture.Web.API
                                         };
                                         _iipHistory.AddIpHistory(IpHistory);
 
-                                        var Loginhistory= new LoginhistoryViewModel()
+                                        var Loginhistory = new LoginhistoryViewModel()
                                         {
                                             UserId = result.Id,
                                             IpAddress = model.IPAddress,
@@ -1451,7 +1451,7 @@ namespace CleanArchitecture.Web.API
         "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
         "abcdefghijkmnopqrstuvwxyz",    // lowercase
         "0123456789",                   // digits
-        "!@#$%^&*"                        // non-alphanumeric
+         "!@$^*"                        // non-alphanumeric
     };
             Random rand = new Random(Environment.TickCount);
             List<char> chars = new List<char>();
