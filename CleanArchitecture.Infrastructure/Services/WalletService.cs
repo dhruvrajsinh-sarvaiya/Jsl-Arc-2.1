@@ -1280,6 +1280,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.CoinName = coinName;
 
                 _signalRService.OnWalletBalChange(walletMasterObj, coinName,  Token);
+                var msg = EnResponseMessage.CreditWalletMsg;
+                msg = msg.Replace("#Coin#", coinName);
+                msg = msg.Replace("#TrnType#", routeTrnType.ToString());
+                msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
+                _signalRService.SendActivityNotification(msg, Token);
                 //-------------------------------
                 return new WalletDrCrResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDebit, ErrorCode = enErrorCode.Success, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
 
