@@ -418,11 +418,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
 
                 //Insert In GraphDetail Only BidPrice
+                var DataDate = _basePage.UTC_To_IST();
                 var tradegraph = new TradeGraphDetail()
                 {
                     PairId = PairId,
                     TranNo = TrnNo,
-                    DataDate = _basePage.UTC_To_IST(),
+                    DataDate = DataDate,
                     ChangePer = ChangePer,
                     Volume = Volume24,
                     BidPrice = CurrentRate,
@@ -566,6 +567,24 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
                     var VolumeData = GetVolumeDataByPair(PairId);
                     var MarketData = GetMarketCap(PairId);
+                    var GraphDataList = _frontTrnRepository.GetGraphData(PairId, 1, "MINUTE", DataDate, 1);
+                    if(GraphDataList.Count() > 0)
+                    {
+                        DateTime dt2 = new DateTime(1970, 1, 1);
+                        List<GetGraphDetailInfo> responseData = new List<GetGraphDetailInfo>();
+
+                        responseData = GraphDataList.Select(a => new GetGraphDetailInfo()
+                        {
+                            DataDate = Convert.ToInt64(a.DataDate.Subtract(dt2).TotalMilliseconds),
+                            High = a.High,
+                            Low = a.Low,
+                            Open = a.OpenVal,
+                            Close = a.OpenVal,
+                            Volume = a.Volume,
+                        }).ToList();
+
+                        var GraphData = responseData.FirstOrDefault();
+                    }
 
                     _signalRService.OnVolumeChange(VolumeData, MarketData);
                 }
@@ -817,7 +836,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             try
             {
                 List<GetGraphDetailInfo> responseData = new List<GetGraphDetailInfo>();
-                var list = _frontTrnRepository.GetGraphData(PairId,IntervalTime,IntervalData).OrderBy(x => x.DataDate);
+                var list = _frontTrnRepository.GetGraphData(PairId,IntervalTime,IntervalData,_basePage.UTC_To_IST()).OrderBy(x => x.DataDate);
                 DateTime dt2 = new DateTime(1970, 1, 1);
 
                 responseData = list.Select(a => new GetGraphDetailInfo()

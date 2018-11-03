@@ -196,6 +196,9 @@ namespace CleanArchitecture.Core.Enums
         Settlement_FullSettlementDone = 1,
         Settlement_SettlementInternalError = 1,
         Settlement_NoSettlementRecordFound = 1,
+        CancelOrder_NoRecordFound = 1,
+        CancelOrder_InternalError = 1,
+        CancelOrder_TrnNotHold = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

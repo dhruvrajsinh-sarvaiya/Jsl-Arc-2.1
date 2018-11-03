@@ -287,20 +287,38 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
         }
 
-        public List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData)
+        public List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData,DateTime Minute,int socket = 0)
         {
             try
-            { 
-                string Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
-                               "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
-                               "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
-                               "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +
-                               " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
-                               " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
+            {
+                string Query = "";
+                IQueryable<GetGraphResponse> Result;
+                if (socket == 0)
+                {
+                    Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
+                                   "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
+                                   "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
+                                   "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +
+                                   " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
+                                   " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
 
-                Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
-                IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(Query,id);
+                    Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
+                    Result = _dbContext.GetGraphResponse.FromSql(Query, id);
+                }
+                else
+                {
+                    Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
+                                   "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
+                                   "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
+                                   "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +
+                                   " Where PairId = {0} And DataDate = {1} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
+                                   " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
 
+                    Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
+                    string MinuteData =  Minute.ToString("yyyy-MM-dd HH:mm:00:000");
+
+                    Result = _dbContext.GetGraphResponse.FromSql(Query,id,MinuteData);
+                }
                 return Result.ToList();
             }
             catch (Exception ex)
