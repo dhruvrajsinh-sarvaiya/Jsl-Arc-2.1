@@ -107,7 +107,13 @@ namespace CleanArchitecture.Core.Enums
         public static string ShadowLimitExceed = "Exceed Shadow Limit";
         public static string CreditWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
         public static string DebitWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
-        public static string GenerateAddressNotification = "New Address Created Successfully For Wallet:#WalletName";
+        public static string GenerateAddressNotification = "New Address Created Successfully For Wallet:#WalletName#";
+        public static string CWalletLimitNotification = "New Limit Created Successfully For Wallet:#WalletName#";
+        public static string UWalletLimitNotification = "New Limit Updated Successfully For Wallet:#WalletName#";
+        public static string AddBeneNotification = "New Beneficiary Added Successfully For Wallet Type:#WalletName#";
+        public static string UpBeneNotification = "Beneficiary Details Updated Successfully For Wallet Type:#WalletName#";
+        public static string UserPreferencesNotification = "Your Whitelisting Switched Successfully";
+        //public static string AddBeneNotification = "New Beneficiary Added Successfully For Wallet Type:#WalletName#";
 
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";

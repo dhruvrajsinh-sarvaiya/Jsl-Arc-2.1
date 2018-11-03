@@ -51,7 +51,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, string Token = "");
 
         //Rushabh 16-10-2018
-        LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long userID);
+        LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long userID,string Token);
 
         //Rushabh 16-10-2018
         LimitResponse GetWalletLimitConfig(string accWalletID);
@@ -81,13 +81,13 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         // vsolanki 25-10-2018
         BalanceResponseWithLimit GetAvailbleBalTypeWise(long userid);
 
-        BeneficiaryResponse AddBeneficiary(string CoinName, short WhitelistingBit, string Name, string BeneficiaryAddress, long UserId);
+        BeneficiaryResponse AddBeneficiary(string CoinName, short WhitelistingBit, string Name, string BeneficiaryAddress, long UserId, string Token);
         BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
         BeneficiaryResponse ListBeneficiary(long id);
-        UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
+        UserPreferencesRes SetPreferences(long Userid, int GlobalBit,string Token);
         UserPreferencesRes GetPreferences(long Userid);
-        BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq request, long id);
-        BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request, string AccWalletID, long id);
+        BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq request, long id,string Token);
+        BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request, string AccWalletID, long id,string Token);
         //vsolanki 25-10-2018
         ListAllBalanceTypeWiseRes GetAllBalancesTypeWise(long userId, string WalletType);
 

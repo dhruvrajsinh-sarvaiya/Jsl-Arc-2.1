@@ -619,8 +619,6 @@ namespace CleanArchitecture.Infrastructure.Services
                     addressMaster = _addressMstRepository.Add(addressMaster);
                     var msg = EnResponseMessage.GenerateAddressNotification;
                     msg = msg.Replace("#WalletName#", walletMaster.Walletname);
-                    //msg = msg.Replace("#TrnType#", routeTrnType.ToString());
-                    //msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
                     _signalRService.SendActivityNotification(msg,Token);
                     string responseString = Respaddress;
                     return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CreateAddressSuccessMsg };
@@ -1521,7 +1519,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long Userid)
+        public LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long Userid,string Token)
         {
             int type = Convert.ToInt16(request.TrnType);
             WalletLimitConfiguration IsExist = new WalletLimitConfiguration();
@@ -1567,6 +1565,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     newobj.LifeTime = request.LifeTime;
                     newobj.EndTimeUnix = request.EndTimeUnix;
                     newobj = _LimitcommonRepository.Add(newobj);
+                    var msg = EnResponseMessage.CWalletLimitNotification;
+                    msg = msg.Replace("#WalletName#", walletMasters.Walletname);
+                    _signalRService.SendActivityNotification(msg, Token);
                     Response.ReturnMsg = EnResponseMessage.SetWalletLimitCreateMsg;
                     Response.ReturnCode = enResponseCode.Success;
                     Response.ErrorCode = enErrorCode.Success;
@@ -1585,6 +1586,9 @@ namespace CleanArchitecture.Infrastructure.Services
                         IsExist.UpdatedBy = Userid;
                         IsExist.UpdatedDate = UTC_To_IST();
                         _LimitcommonRepository.Update(IsExist);
+                        var msg = EnResponseMessage.UWalletLimitNotification;
+                        msg = msg.Replace("#WalletName#", walletMasters.Walletname);
+                        _signalRService.SendActivityNotification(msg, Token);
                         Response.ReturnMsg = EnResponseMessage.SetWalletLimitUpdateMsg;
                         Response.ReturnCode = enResponseCode.Success;
                         Response.ErrorCode = enErrorCode.Success;
@@ -2046,7 +2050,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse AddBeneficiary(string CoinName, short WhitelistingBit, string Name, string BeneficiaryAddress, long UserId)
+        public BeneficiaryResponse AddBeneficiary(string CoinName, short WhitelistingBit, string Name, string BeneficiaryAddress, long UserId,string Token)
         {
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
             BeneficiaryResponse Response = new BeneficiaryResponse();
@@ -2062,7 +2066,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.BizResponse.ErrorCode = enErrorCode.InvalidWalletId;
                     return Response;
                 }
-                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.Id && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                IsExist = _BeneficiarycommonRepository.GetSingle(item => item.Address == BeneficiaryAddress && item.WalletTypeID == walletMasters.Id && (item.Status == Convert.ToInt16(ServiceStatus.Active) || item.Status == Convert.ToInt16(ServiceStatus.InActive)));
 
                 if (IsExist == null)
                 {
@@ -2084,6 +2088,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     AddNew.IsWhiteListed = WhitelistingBit;
                     AddNew.WalletTypeID = walletMasters.Id;
                     AddNew = _BeneficiarycommonRepository.Add(AddNew);
+                    var msg = EnResponseMessage.AddBeneNotification;
+                    msg = msg.Replace("#WalletName#", walletMasters.WalletTypeName);
+                    _signalRService.SendActivityNotification(msg, Token);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordAdded;
                     Response.BizResponse.ErrorCode = enErrorCode.Success;
                     Response.BizResponse.ReturnCode = enResponseCode.Success;
@@ -2300,7 +2307,7 @@ namespace CleanArchitecture.Infrastructure.Services
             return res;
         }
 
-        public UserPreferencesRes SetPreferences(long Userid, int GlobalBit)
+        public UserPreferencesRes SetPreferences(long Userid, int GlobalBit,string Token)
         {
             UserPreferencesRes Response = new UserPreferencesRes();
             Response.BizResponse = new BizResponseClass();
@@ -2329,6 +2336,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     Response.BizResponse.ErrorCode = enErrorCode.Success;
                 }
                 Response.BizResponse.ReturnCode = enResponseCode.Success;
+                var msg = EnResponseMessage.UserPreferencesNotification;
+                //msg = msg.Replace("#WalletName#", walletMasters.WalletTypeName);
+                _signalRService.SendActivityNotification(msg, Token);
                 return Response;
             }
             catch (Exception ex)
@@ -2368,7 +2378,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq Request, long ID)
+        public BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq Request, long ID,string Token)
         {
             BeneficiaryResponse Response = new BeneficiaryResponse();
             Response.BizResponse = new BizResponseClass();
@@ -2377,6 +2387,9 @@ namespace CleanArchitecture.Infrastructure.Services
                 bool state = _walletRepository1.BeneficiaryBulkEdit(Request);
                 if (state == true)
                 {
+                    var msg = EnResponseMessage.UpBeneNotification;
+                    //msg = msg.Replace("#WalletName#", walletMasters.WalletTypeName);
+                    _signalRService.SendActivityNotification(msg, Token);
                     Response.BizResponse.ReturnCode = enResponseCode.Success;
                     Response.BizResponse.ErrorCode = enErrorCode.Success;
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
@@ -2396,7 +2409,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request, string AccWalletID, long UserID)
+        public BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request, string AccWalletID, long UserID,string Token)
         {
             BeneficiaryResponse Response = new BeneficiaryResponse();
             BeneficiaryMaster IsExist = new BeneficiaryMaster();
@@ -2420,6 +2433,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     IsExist.UpdatedBy = UserID;
                     IsExist.UpdatedDate = UTC_To_IST();
                     _BeneficiarycommonRepository.Update(IsExist);
+                    var msg = EnResponseMessage.UpBeneNotification;
+                    msg = msg.Replace("#WalletName#", walletMasters.Walletname);
+                    _signalRService.SendActivityNotification(msg, Token);
                     Response.BizResponse.ReturnMsg = EnResponseMessage.RecordUpdated;
                     Response.BizResponse.ReturnCode = enResponseCode.Success;
                     Response.BizResponse.ErrorCode = enErrorCode.Success;
