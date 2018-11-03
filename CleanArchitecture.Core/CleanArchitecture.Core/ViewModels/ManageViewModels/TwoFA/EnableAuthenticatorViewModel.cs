@@ -12,8 +12,8 @@ namespace CleanArchitecture.Core.ViewModels.ManageViewModels
         //[Display(Name = "Verification Code")]
         //public string Code { get; set; }
 
-        //[ReadOnly(true)]
-        //public string SharedKey { get; set; }
+        [ReadOnly(true)]
+        public string SharedKey { get; set; }
 
         //public string UserName { get; set; }
         public string AuthenticatorUri { get; set; }

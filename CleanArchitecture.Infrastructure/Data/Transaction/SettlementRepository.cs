@@ -28,6 +28,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         private readonly ICommonRepository<TradeSellerList> _TradeSellerList;
         private readonly ICommonRepository<TradePoolMaster> _TradePoolMaster;
         private readonly ICommonRepository<PoolOrder> _PoolOrder;
+        private readonly ISignalRService _ISignalRService;
 
         private readonly IWalletService _WalletService;
 
@@ -42,7 +43,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeBuyerList> TradeBuyerList,
             ICommonRepository<TradeSellerList> TradeSellerList, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<PoolOrder> PoolOrder, EFCommonRepository<TransactionQueue> TransactionRepository,
-            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService)
+            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, ISignalRService ISignalRService)
         {
             _dbContext = dbContext;
             //_logger = logger;
@@ -55,6 +56,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _TransactionRepository = TransactionRepository;
             _TradeTransactionRepository = TradeTransactionRepository;
             _WalletService = WalletService;
+            _ISignalRService = ISignalRService;
         }
 
         #region ==============================PROCESS SETLLEMENT========================
@@ -156,6 +158,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                 if(TradeTransactionQueueObj.IsCancelled==1)
                 {
+
                     //Code for settlement
                     return Task.FromResult(_Resp);
                 }
@@ -187,6 +190,12 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     _TradeSellerList.Update(SellerList);
                     var PoolMst = _TradePoolMaster.GetById(SellerList.PoolID);
 
+                    //====================take always latest object from DB 
+                    //==========as if txn not commit so dbnot change and object value changes , so take object value from DB
+                    TradeBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
+                    TransactionQueueObj = _TransactionRepository.GetById(TradeBuyRequestObj.TrnNo);
+                    TradeTransactionQueueObj = _TradeTransactionRepository.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
+                    TradeBuyerListObj = _TradeBuyerList.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
                     //====================================Partial SETTLEMENT TO MEMBER
                     if (SellerList.RemainQty < TradeBuyRequestObj.PendingQty)
                     {
@@ -240,6 +249,15 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _Resp.ReturnCode = enResponseCodeService.Success;
                         _Resp.ReturnMsg = "Partial Settlement Done of TrnNo "+ TradeBuyRequestObj.TrnNo + " Settled: "+ TradeBuyRequestObj.DeliveredQty + " Remain:"+ TradeBuyRequestObj.PendingQty;                        
                         //Continuew as record Partially settled
+                        try
+                        {
+                            _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj,accesstocken,1);//komal 
+                                //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
+                        }
+                        catch (Exception ex)
+                        {
+                            HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                        }
                     }
                     //====================================FULL SETTLEMENT TO MEMBER
                     else if (SellerList.RemainQty >= TradeBuyRequestObj.PendingQty && TradeBuyRequestObj.PendingQty!=0)
@@ -304,6 +322,14 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _Resp.ErrorCode = enErrorCode.Settlement_FullSettlementDone;
                         _Resp.ReturnCode = enResponseCodeService.Success;
                         _Resp.ReturnMsg = "Full Settlement Done of TrnNo " + TradeBuyRequestObj.TrnNo + " Settled: " + TradeBuyRequestObj.DeliveredQty + " Remain:" + TradeBuyRequestObj.PendingQty;
+                        try
+                        {
+                            _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accesstocken, 0);//komal
+                        }
+                        catch (Exception ex)
+                        {
+                            HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Full Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                        }
                         break;//record settled
                     }
                     SellerList.IsProcessing = 0;//Release Seller List
@@ -332,5 +358,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             return Task.FromResult(_Resp);
         }
         #endregion
+
+
     }
 }
