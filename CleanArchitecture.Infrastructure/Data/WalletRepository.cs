@@ -1575,6 +1575,7 @@ namespace CleanArchitecture.Infrastructure.Data
             return dump;
         }
 
+        //vsolanki 2018-11-03
         public List<TokenConvertHistoryRes> ConvertFundHistory(long Userid, DateTime FromDate, DateTime ToDate, string Coin)
         {
             var h = (from c in _dbContext.ConvertFundHistory
@@ -1582,7 +1583,7 @@ namespace CleanArchitecture.Infrastructure.Data
                      on c.FromWalletId equals w.Id
                      join wt in _dbContext.WalletTypeMasters
                      on w.WalletTypeID equals wt.Id
-                     where w.UserID == Userid && (Coin == null || (wt.WalletTypeName == Coin && Coin != null)) && c.TrnDate >= FromDate && c.TrnDate <= ToDate
+                     where w.UserID == Userid && (Coin == null || (wt.WalletTypeName == Coin && Coin != null)) && c.TrnDate >= FromDate && c.TrnDate <= ToDate && c.Status==Convert.ToInt16(ServiceStatus.Active)
                      select new TokenConvertHistoryRes
                      {
                          CoinName = wt.WalletTypeName,
@@ -1592,7 +1593,7 @@ namespace CleanArchitecture.Infrastructure.Data
                          Date = c.TrnDate
                      }).ToList();
             return h;
-        }
+        }     
     }
 
 }
