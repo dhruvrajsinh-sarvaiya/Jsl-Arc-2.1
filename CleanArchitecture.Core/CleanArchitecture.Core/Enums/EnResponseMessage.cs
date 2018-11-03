@@ -66,6 +66,9 @@ namespace CleanArchitecture.Core.Enums
         //============================walelt=================================//       
 
         public static string CreateWalletSuccessMsg = "Wallet is Successfully Created.";
+        public static string DefaultCreateWalletSuccessMsg = "Default Wallets are Successfully Created.";
+        public static string NewCreateWalletSuccessMsg = "Wallet: #WalletName# Successfully Created.";
+        public static string ConvertFund = "Convert #SourcePrice# to #DestinationPrice# Submit Successfully!!";
         public static string SetWalletLimitCreateMsg = "Limit Created Successfully";
         public static string SetUserPrefSuccessMsg = "User Preference is Successfully Created.";
         public static string SetWalletLimitUpdateMsg = "Limit Updated Successfully";
@@ -104,6 +107,7 @@ namespace CleanArchitecture.Core.Enums
         public static string ShadowLimitExceed = "Exceed Shadow Limit";
         public static string CreditWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
         public static string DebitWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
+        public static string GenerateAddressNotification = "New Address Created Successfully For Wallet:#WalletName";
 
         //========================My Account===============================//
         public static string SendMailSubject = "Registration confirmation email";

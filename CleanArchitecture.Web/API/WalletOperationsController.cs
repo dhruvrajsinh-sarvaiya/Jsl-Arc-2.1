@@ -39,16 +39,23 @@ namespace CleanArchitecture.Web.API
         }
         
         [HttpPost("{Coin}/{AccWalletID}")]
-        //[AllowAnonymous]
         public async Task<IActionResult> CreateWalletAddress(string Coin, string AccWalletID)/*[FromBody]CreateWalletAddressReq Request*/ /*Removed Temporarily as Not in use*/
         {
+            CreateWalletAddressRes Response = new CreateWalletAddressRes();
             try
             {
-                CreateWalletAddressRes Response = _walletService.GenerateAddress(AccWalletID, Coin);
-                //string responseString = "{'address':'2Mz7x1a5df8380e0e30yYc6e','coin':'tbtc','label':'My address','wallet':'585c51a5df8380e0e3082e46','coinSpecific':{'chain':0,'index':1,'redeemScript':'522101a5df8380e0e30453ae'}}";
-                //CreateWalletAddressRes Response = new CreateWalletAddressRes();
-                //Response = JsonConvert.DeserializeObject<CreateWalletAddressRes>(responseString);
-                //Response.ReturnCode = enResponseCode.Success;
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _walletService.GenerateAddress(AccWalletID, Coin, accessToken);
+                }                
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
                 return Ok(respObjJson);
@@ -399,7 +406,8 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    responseClass = _walletService.CreateETHAddress(Coin, AddressCount,user.Id);
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    responseClass = _walletService.CreateETHAddress(Coin, AddressCount,user.Id, accessToken);
                 }
              
                 //var respObj = JsonConvert.SerializeObject(Response);

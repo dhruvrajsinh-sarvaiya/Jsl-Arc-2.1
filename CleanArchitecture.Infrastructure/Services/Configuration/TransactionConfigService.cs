@@ -204,7 +204,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
 
                 ////Add Into WalletMaster For Default Organization
                 int[] AllowTrnType = new int[3] { Convert.ToInt16(enTrnType.Deposit), Convert.ToInt16(enTrnType.Withdraw), Convert.ToInt16(enTrnType.Transaction) };
-                var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org " + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1,1);
+                var walletMaster = _walletService.InsertIntoWalletMaster(" Default Org " + Request.SMSCode, Request.SMSCode,1, AllowTrnType, 1, null, 1);
 
                 //Add BaseCurrency In MarketEntity
                 if (Request.IsBaseCurrency == 1)

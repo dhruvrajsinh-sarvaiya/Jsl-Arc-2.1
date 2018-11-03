@@ -21,6 +21,8 @@ using CleanArchitecture.Core.ViewModels.WalletConfiguration;
 using System.Collections;
 using System.Globalization;
 using CleanArchitecture.Core.Helpers;
+using Microsoft.AspNetCore.Identity;
+using CleanArchitecture.Core.Entities.User;
 
 namespace CleanArchitecture.Infrastructure.Services
 {
@@ -41,6 +43,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<WalletLedger> _WalletLedgersRepo;
         private readonly ICommonRepository<MemberShadowBalance> _ShadowBalRepo;
         private readonly ICommonRepository<MemberShadowLimit> _ShadowLimitRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICommonRepository<ConvertFundHistory> _ConvertFundHistory;
 
         //readonly ICommonRepository<WalletLedger> _walletLedgerRepository;
@@ -73,9 +76,10 @@ namespace CleanArchitecture.Infrastructure.Services
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
             ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<MemberShadowLimit> ShadowLimitRepo, ICommonRepository<MemberShadowBalance> ShadowBalRepo, ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig,
-            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, ICommonWalletFunction commonWalletFunction, ICommonRepository<ConvertFundHistory> ConvertFundHistory) : base(logger)
+            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, UserManager<ApplicationUser> userManager, ISignalRService signalRService, ICommonWalletFunction commonWalletFunction, ICommonRepository<ConvertFundHistory> ConvertFundHistory) : base(logger)
         {
             _log = log;
+            _userManager = userManager;
             _commonRepository = commonRepository;
             _walletOrderRepository = walletOrderRepository;
             //_walletRepository = repository;
@@ -509,7 +513,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public CreateWalletAddressRes GenerateAddress(string walletID, string coin, int GenaratePendingbit = 0)
+        public CreateWalletAddressRes GenerateAddress(string walletID, string coin , string Token, int GenaratePendingbit = 0)
         {
             try
             {
@@ -525,9 +529,16 @@ namespace CleanArchitecture.Infrastructure.Services
                 string TrnID = null;
                 string Respaddress = null;
 
-                var wallettype = _WalletTypeMasterRepository.GetSingle(t => t.WalletTypeName == coin);
+                var wallettype = _WalletTypeMasterRepository.GetSingle(t=>t.WalletTypeName==coin);
+                //var user = _userManager.GetUserAsync(HttpContext.User);
+                //if (user == null)
+                //{
+                //    Response.ReturnCode = enResponseCode.Fail;
+                //    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                //    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                //}
 
-                if (wallettype.Id != walletMaster.WalletTypeID)
+                if(wallettype.Id!=walletMaster.WalletTypeID)
                 {
                     return new CreateWalletAddressRes { ErrorCode = enErrorCode.InvalidWallet, ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet };
                 }
@@ -606,6 +617,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     addressMaster = GetAddressObj(walletMaster.Id, transactionProviderResponses[0].ServiceProID, Respaddress, "Self Address", walletMaster.UserID, 0, 1);
                     addressMaster = _addressMstRepository.Add(addressMaster);
+                    var msg = EnResponseMessage.GenerateAddressNotification;
+                    msg = msg.Replace("#WalletName#", walletMaster.Walletname);
+                    //msg = msg.Replace("#TrnType#", routeTrnType.ToString());
+                    //msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
+                    _signalRService.SendActivityNotification(msg,Token);
                     string responseString = Respaddress;
                     return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.Success, ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.CreateAddressSuccessMsg };
                     //return respObj;
@@ -768,7 +784,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsolanki 10-10-2018 Insert into WalletMaster table
-        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId, int isBaseService = 0)
+        public CreateWalletResponse InsertIntoWalletMaster(string Walletname, string CoinName, byte IsDefaultWallet, int[] AllowTrnType, long userId, string accessToken = null, int isBaseService = 0)
         {
             bool IsValid = true;
             decimal Balance = 0;
@@ -816,7 +832,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //genrate address and update in walletmaster
                 if (isBaseService == 0)    //uday 25-10-2018 When Service is add create default wallet of org not generate the address
                 {
-                    var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
+                    var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName,accessToken);
                     if (addressClass.address != null)
                     {
                         walletMaster.WalletPublicAddress(addressClass.address);
@@ -853,6 +869,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 createWalletResponse.ReturnCode = enResponseCode.Success;
                 createWalletResponse.ReturnMsg = EnResponseMessage.CreateWalletSuccessMsg;
                 createWalletResponse.ErrorCode = enErrorCode.Success;
+
+                if (accessToken != null)
+                {
+                    var msg = EnResponseMessage.NewCreateWalletSuccessMsg;
+                    msg = msg.Replace("#WalletName#", walletMaster.Walletname);
+                    _signalRService.SendActivityNotification(msg, accessToken);
+                }
                 return createWalletResponse;
             }
             catch (Exception ex)
@@ -1255,12 +1278,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.IsDefaultWallet = dWalletobj.IsDefaultWallet;
                 walletMasterObj.CoinName = coinName;
 
-                var msg = EnResponseMessage.DebitWalletMsg;
-                msg = msg.Replace("#Coin#", coinName);
-                msg = msg.Replace("#TrnType#", routeTrnType.ToString());
-                msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
-                _signalRService.SendActivityNotification(msg, dWalletobj.UserID.ToString(), 2);
-                _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
+                _signalRService.OnWalletBalChange(walletMasterObj, coinName,  Token);
                 //-------------------------------
                 return new WalletDrCrResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessDebit, ErrorCode = enErrorCode.Success, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
 
@@ -2452,8 +2470,9 @@ namespace CleanArchitecture.Infrastructure.Services
 
 
         //vsolanki 27-10-2018
-        public BizResponseClass CreateDefaulWallet(long UserID)
+        public BizResponseClass CreateDefaulWallet(long UserID, string accessToken = null)
         {
+            
             var res = _walletRepository1.CreateDefaulWallet(UserID);
             if (res != 1)
             {
@@ -2463,6 +2482,16 @@ namespace CleanArchitecture.Infrastructure.Services
                     ReturnMsg = EnResponseMessage.CreateWalletFailMsg,
                     ReturnCode = enResponseCode.InternalError
                 };
+            }
+            AddBizUserTypeMappingReq req = new AddBizUserTypeMappingReq();
+            req.UserID = UserID;
+            req.UserType = enUserType.User;
+            AddBizUserTypeMapping(req);
+            if (accessToken != null)
+            {
+                var msg = EnResponseMessage.DefaultCreateWalletSuccessMsg;
+                //msg = msg.Replace("#WalletName#", walletMaster.Walletname);
+                _signalRService.SendActivityNotification(msg, accessToken);
             }
             return new BizResponseClass
             {
@@ -2677,7 +2706,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsoalnki 2018-10-31
-        public CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId)
+        public CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId,string token)
         {
             try
             {
@@ -2699,7 +2728,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 for (int i = 1; i <= AddressCount; i++)
                 {
-                    addr = GenerateAddress(walletObj.AccWalletID, Coin, 1);
+                    addr = GenerateAddress(walletObj.AccWalletID, Coin, token,1);
                     if (addr.address == null)
                     {
                         return addr;
@@ -2818,7 +2847,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BizResponseClass AddIntoConvertFund(ConvertTockenReq Request, long userid)
+        public BizResponseClass AddIntoConvertFund(ConvertTockenReq Request, long userid, string accessToken = null)
         {
             try
             {
@@ -2835,7 +2864,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 h.Price = 10;
                 h.TrnDate = UTC_To_IST();
                 _ConvertFundHistory.Add(h);
-                return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordAdded, ErrorCode = enErrorCode.Success };
+                if(accessToken!=null)
+                {
+                    var msg = EnResponseMessage.ConvertFund;
+                    msg = msg.Replace("#SourcePrice#", h.SourcePrice.ToString());
+                    msg = msg.Replace("#DestinationPrice#", h.DestinationPrice.ToString());
+                    _signalRService.SendActivityNotification(msg, accessToken);
+                }
+                return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordAdded, ErrorCode = enErrorCode.Success }; 
             }
             catch (Exception ex)
             {
