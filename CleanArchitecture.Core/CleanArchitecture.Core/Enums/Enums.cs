@@ -191,6 +191,11 @@ namespace CleanArchitecture.Core.Enums
         InValidCreditAccountID = 4625,
         Graph_InvalidIntervalTime = 4626,
         CreateTrn_WithdrawAmountBetweenMinAndMax = 4627,
+        Settlement_AlreadySettled = 1,
+        Settlement_PartialSettlementDone = 1,
+        Settlement_FullSettlementDone = 1,
+        Settlement_SettlementInternalError = 1,
+        Settlement_NoSettlementRecordFound = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,

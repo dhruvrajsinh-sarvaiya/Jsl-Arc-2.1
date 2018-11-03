@@ -31,21 +31,25 @@ namespace CleanArchitecture.Core.Entities.Transaction
         public void MakeTransactionInProcess()
         {
             Status = Convert.ToInt16(enTransactionStatus.Pending);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void MakeTransactionSuccess()
         {
             Status = Convert.ToInt16(enTransactionStatus.Success);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void MakeTransactionHold()
         {
             Status = Convert.ToInt16(enTransactionStatus.Hold);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void MakeTransactionOperatorFail()
         {
             Status = Convert.ToInt16(enTransactionStatus.OperatorFail);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
         public void AddValueChangeEvent()
