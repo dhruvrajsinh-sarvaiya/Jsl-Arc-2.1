@@ -132,7 +132,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceProviderType> ServiceProviderType { get; set; }
         public DbSet<ServiceProviderMaster> ServiceProviderMaster { get; set; }
         public DbSet<TradeStopLoss> TradeStopLoss { get; set; }
-       public DbSet<IpMaster> IpMaster { get; set; }
+        public DbSet<IpMaster> IpMaster { get; set; }
 
         public DbSet<TradeBuyRequest> TradeBuyRequest { get; set; }
         public DbSet<CountryMaster> CountryMaster { get; set; } //uday 17-10-2018
@@ -153,6 +153,8 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<TradePoolConfiguration> TradePoolConfiguration { get; set; } //Rita 31-10-2018
         public DbSet<TradePoolQueue> TradePoolQueue { get; set; } //Rita 31-10-2018
         public DbSet<TransactionStatus> TransactionStatus { get; set; } //Rita 31-10-2018
+        public DbSet<DeviceStore> DeviceStore { get; set; } //Khushali 03-11-2018
+
         public CleanArchitectureContext(DbContextOptions<CleanArchitectureContext> options, UserResolveService userService) : base(options)
         {
             _userService = userService;
@@ -235,7 +237,7 @@ namespace CleanArchitecture.Infrastructure
             modelBuilder.Entity<TradeTransactionQueue>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 2-11-2018 for error cannot update identity column id
             modelBuilder.Entity<TradeSellerList>().Property(e => e.Id).Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;//rita 3-11-2018 for error cannot update identity column id
             modelBuilder.Entity<TransactionStatus>().HasKey(e => new { e.TrnNo, e.ServiceID,e.SerProID });//Rita 31-10-2018 for composite Primary key
-
+            modelBuilder.Entity<DeviceStore>().HasKey(e => new { e.Id, e.UserID,});//Khushali 03-11-2018 for composite Primary key
         }
 
         /// <summary>

@@ -792,6 +792,35 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("DepositHistory");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.DeviceStore", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("UserID");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("DeviceID")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("Id", "UserID");
+
+                    b.HasAlternateKey("UserID");
+
+                    b.ToTable("DeviceStore");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.EmailQueue", b =>
                 {
                     b.Property<long>("Id")
