@@ -49,6 +49,7 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly IGetWebRequest _getWebRequest;
         private readonly WebApiParseResponse _WebApiParseResponse;
 
+
         //vsolanki 8-10-2018 
         private readonly ICommonRepository<WalletTypeMaster> _WalletTypeMasterRepository;
         private readonly ICommonRepository<DepositHistory> _DepositHistoryRepository;
@@ -60,6 +61,8 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly ICommonRepository<ChargeRuleMaster> _chargeRuleMaster;
         private readonly ICommonRepository<LimitRuleMaster> _limitRuleMaster;
         private readonly ISignalRService _signalRService;
+        private readonly ICommonWalletFunction _commonWalletFunction;
+
 
         //private readonly IRepository<WalletTransactionOrder> _WalletAllowTrnRepository;
         //  private readonly ICommonRepository<WalletTransactionQueue> t;
@@ -70,7 +73,7 @@ namespace CleanArchitecture.Infrastructure.Services
             IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
             ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository, ICommonRepository<WalletAllowTrn> WalletAllowTrnRepository,
             ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<MemberShadowLimit> ShadowLimitRepo, ICommonRepository<MemberShadowBalance> ShadowBalRepo, ICommonRepository<WalletLimitConfigurationMaster> WalletConfigMasterRepo, ICommonRepository<BeneficiaryMaster> BeneficiaryMasterRepo, ICommonRepository<UserPreferencesMaster> UserPreferenceRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig,
-            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService) : base(logger)
+            ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ISignalRService signalRService, ICommonWalletFunction commonWalletFunction) : base(logger)
         {
             _log = log;
             _commonRepository = commonRepository;
@@ -99,6 +102,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _limitRuleMaster = limitRuleMaster;
             _TransactionAccountsRepository = TransactionAccountsRepository;
             _signalRService = signalRService;
+            _commonWalletFunction = commonWalletFunction;
         }
 
         public decimal GetUserBalance(long walletId)
@@ -225,50 +229,50 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public enErrorCode CheckShadowLimit(long WalletID, decimal Amount)
-        {
-            try
-            {
-                var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID);
-                if (Walletobj != null)
-                {
-                    var Balobj = _ShadowBalRepo.GetSingle(item => item.WalletID == WalletID);
-                    if (Balobj != null)
-                    {
-                        if ((Balobj.ShadowAmount + Amount) < Walletobj.Balance)
-                        {
-                            return enErrorCode.Success;
-                        }
-                        return enErrorCode.InsufficientBalance;
-                    }
-                    else
-                    {
-                        var typeobj = _walletRepository1.GetTypeMappingObj(Walletobj.UserID);
-                        if (typeobj != 0)
-                        {
-                            var Limitobj = _ShadowLimitRepo.GetSingle(item => item.MemberTypeId == typeobj);
-                            if (Limitobj != null)
-                            {
-                                if ((Limitobj.ShadowLimitAmount + Amount) < Walletobj.Balance)
-                                {
-                                    return enErrorCode.Success;
-                                }
-                                return enErrorCode.InsufficientBalance;
-                            }
-                            return enErrorCode.NotFoundLimit;
-                        }
-                        return enErrorCode.MemberTypeNotFound;
-                    }
-                }
-                return enErrorCode.WalletNotFound;
-            }
-            catch (Exception ex)
-            {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+        //public enErrorCode CheckShadowLimit(long WalletID, decimal Amount)
+        //{
+        //    try
+        //    {
+        //        var Walletobj = _commonRepository.GetSingle(item => item.Id == WalletID);
+        //        if (Walletobj != null)
+        //        {
+        //            var Balobj = _ShadowBalRepo.GetSingle(item => item.WalletID == WalletID);
+        //            if (Balobj != null)
+        //            {
+        //                if ((Balobj.ShadowAmount + Amount) <= Walletobj.Balance)
+        //                {
+        //                    return enErrorCode.Success;
+        //                }
+        //                return enErrorCode.InsufficientBalance;
+        //            }
+        //            else
+        //            {
+        //                var typeobj = _walletRepository1.GetTypeMappingObj(Walletobj.UserID);
+        //                if (typeobj != 0)
+        //                {
+        //                    var Limitobj = _ShadowLimitRepo.GetSingle(item => item.MemberTypeId == typeobj);
+        //                    if (Limitobj != null)
+        //                    {
+        //                        if ((Limitobj.ShadowLimitAmount + Amount) <= Walletobj.Balance)
+        //                        {
+        //                            return enErrorCode.Success;
+        //                        }
+        //                        return enErrorCode.InsufficientBalance;
+        //                    }
+        //                    return enErrorCode.NotFoundLimit;
+        //                }
+        //                return enErrorCode.MemberTypeNotFound;
+        //            }
+        //        }
+        //        return enErrorCode.WalletNotFound;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
 
-                throw ex;
-            }
-        }
+        //        throw ex;
+        //    }
+        //}
 
         public enValidateWalletLimit ValidateWalletLimit(enTrnType TranType, decimal PerDayAmt, decimal PerHourAmt, decimal PerTranAmt, long WalletID)
         {
@@ -1206,6 +1210,12 @@ namespace CleanArchitecture.Infrastructure.Services
 
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InsufficantBal, ErrorCode = enErrorCode.InsufficantBal, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
+                if(_commonWalletFunction.CheckShadowLimit(dWalletobj.Id, amount) != enErrorCode.Success)
+                {
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InsufficantBal, trnType);
+                    objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ShadowLimitExceed, ErrorCode = enErrorCode.ShadowBalanceExceed, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
+                }
                 //vsolanki 208-11-1
                 //var charge=GetServiceLimitChargeValue(enTrnType1, coinName);
                 //if(charge.MaxAmount>= amount && charge.MinAmount<=amount)
@@ -1312,7 +1322,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, TotalAmount, TrnRefNo, UTC_To_IST(), null, cWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InvalidAmt, trnType);
                     tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 1);
-                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidTradeRefNo, ErrorCode = enErrorCode.InvalidTradeRefNo, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidAmt, ErrorCode = enErrorCode.InvalidAmount, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg };
                 }
                 int count = CheckTrnRefNoForCredit(TrnRefNo, enWalletTranxOrderType.Debit); // check whether for this refno wallet is pre decuted or not
                 if (count == 0)
@@ -2732,6 +2742,46 @@ namespace CleanArchitecture.Infrastructure.Services
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
                 //return false;
+            }
+
+        }
+
+        //vsolanki 2018-11-03
+        public ListTokenConvertHistoryRes ConvertFundHistory(long Userid,DateTime FromDate,DateTime ToDate,string Coin)
+        {
+            try
+            {
+                ListTokenConvertHistoryRes Response = new ListTokenConvertHistoryRes();
+                Response.BizResponseObj = new BizResponseClass();
+                if(Coin!=null)
+                {
+                    var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
+                    if (type == null)
+                    {
+                        Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                        Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
+                        Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                        return Response;
+                    }
+                } 
+                var Histories = _walletRepository1.ConvertFundHistory(Userid,FromDate,ToDate, Coin);
+                if (Histories.Count() == 0 || Histories == null)
+                {
+                    Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.NotFound;
+                    return Response;
+                }
+                Response.HistoryRes = Histories;
+                Response.BizResponseObj.ReturnCode = enResponseCode.Success;
+                Response.BizResponseObj.ReturnMsg = EnResponseMessage.FindRecored;
+                Response.BizResponseObj.ErrorCode = enErrorCode.Success;
+                return Response;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
             }
 
         }

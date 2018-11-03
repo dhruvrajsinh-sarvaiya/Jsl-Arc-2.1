@@ -1,10 +1,12 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ApiModels.Chat;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Core.Services.RadisDatabase;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Data;
@@ -28,10 +30,13 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
         private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly IFrontTrnRepository _frontTrnRepository;
+        private RedisConnectionFactory _fact;
         public String Token=null;
+
         public SignalRService(ILogger<SignalRService> logger, IMediator mediator, EFCommonRepository<TransactionQueue> TransactionRepository, IFrontTrnRepository frontTrnRepository,
-            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository)
+            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, RedisConnectionFactory Factory)
         {
+            _fact = Factory;
             _logger = logger;
             _mediator = mediator;
             _TransactionRepository = TransactionRepository;
@@ -426,14 +431,20 @@ namespace CleanArchitecture.Infrastructure.Services
         }
         #endregion
 
-        public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Tokene, short IsPartial)
+        public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
         {
             try
             {
-                short OrderType =1;
+                GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
+                GetBuySellBook BuySellmodel = new GetBuySellBook();
+                //short OrderType =1;
                 if (Status == Convert.ToInt16(enTransactionStatus.Hold))
                 {
-                    GetBuySellBook BuySellmodel = new GetBuySellBook();
+                    //add buyer/seller book
+                    //add OpenOrder
+                    //add recent order
+                     
+                    
                     List<GetBuySellBook> list = new List<GetBuySellBook>();
                     if (!string.IsNullOrEmpty(Token))
                         if (NewTradeTransaction.TrnType == 4)//Buy
@@ -457,24 +468,92 @@ namespace CleanArchitecture.Infrastructure.Services
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
                         }
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);
-                    
+                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);
                 }
                 else if (Status == Convert.ToInt16(enTransactionStatus.Success))
                 {
-                    GetTradeHistoryInfo historyInfo = new GetTradeHistoryInfo();
-                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
+                    //pop openOrder
+                    //update RecentOrder
+                    //add OrderHistory
+                    //add TradeHistory
 
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, 1);//with amount 0
-                    OrderHistory(historyInfo, Token);
-                    //RecentOrder(historyInfo, Token);
-                    OrderHistory(historyInfo, NewTradeTransaction.PairName);
-                    
-                    var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
-                    msg = msg.Replace("#Price#",historyInfo.Price .ToString());
-                    msg = msg.Replace("#Qty#", historyInfo.Amount .ToString());
-                    msg = msg.Replace("#Total#", historyInfo.Total .ToString());
-                    ActivityNotification(msg,Token);
+                    if (!string.IsNullOrEmpty(Token))
+                    {
+                        GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType, 1);//with amount 0, remove from OpenOrder
+                        GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
+                        historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
+                        OrderHistory(historyInfo, historyInfo.PairName);//Order
+                        TradeHistory(historyInfo, Token);//TradeHistory
+
+                        var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
+                        msg = msg.Replace("#Price#", historyInfo.Price.ToString());
+                        msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
+                        msg = msg.Replace("#Total#", historyInfo.Total.ToString());
+                        ActivityNotification(msg, Token);
+                    }
+                        
                 }
+                else if (Status == Convert.ToInt16(enTransactionStatus.Success) && IsPartial==1)//Partial settled
+                {
+                    //update Recent Order
+                    //update OpenOrder
+                    //add tradehistory
+                    //add orderhistory
+                    //update Buyer/seller book
+                    if (!string.IsNullOrEmpty(Token))
+                    {
+                        List<GetBuySellBook> list = new List<GetBuySellBook>();
+
+                        GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
+                        GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);//update OpenOrder
+
+                        historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
+                        OrderHistory(historyInfo, historyInfo.PairName);//Order
+                        TradeHistory(historyInfo, Token);//TradeHistory
+                        var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
+                        msg = msg.Replace("#Price#", historyInfo.Price.ToString());
+                        msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
+                        msg = msg.Replace("#Total#", historyInfo.Total.ToString());
+                        ActivityNotification(msg, Token);
+                        if (NewTradeTransaction.TrnType == 4)//Buy
+                        {
+                            list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
+                            foreach (var model in list)
+                            {
+                                BuySellmodel = model;
+                                break;
+                            }
+                            BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
+                        else//Sell
+                        {
+                            list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
+                            foreach (var model in list)
+                            {
+                                BuySellmodel = model;
+                                break;
+                            }
+                            SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
+                    }
+                    
+                }
+                else if (Status == Convert.ToInt16(enTransactionStatus.SystemFail))
+                {
+                    //pop from OpenOrder
+                    //update Recent order
+                    //add Trade history
+                    if (!string.IsNullOrEmpty(Token))
+                    {
+                        GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType, 1);//with amount 0, remove from OpenOrder
+                        GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
+                        historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
+                        TradeHistory(historyInfo, Token);//TradeHistory
+                    }
+                       
+                }
+
+
             }
             catch (Exception ex)
             {
@@ -504,12 +583,20 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token)
+        public void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token, short TokenType=1)
         {
             try
             {
-                BuyerSideWalletBal(Data, WalletTypeName, Token);
-                SellerSideWalletBal(Data, WalletTypeName, Token);
+                if(TokenType ==Convert.ToInt16(enTokenType.ByUserID))
+                {
+                    Token = GetTokenByUserID(Token);
+                }
+                if (!string.IsNullOrEmpty(Token))
+                {
+                    BuyerSideWalletBal(Data, WalletTypeName, Token);
+                    SellerSideWalletBal(Data, WalletTypeName, Token);
+                }
+                    
             }
             catch (Exception ex)
             {
@@ -579,7 +666,88 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        public void GetAndSendRecentOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0)
+        {
+            try
+            {
+                RecentOrderInfo model = new RecentOrderInfo();
+                model.TrnNo = NewTradeTransaction.TrnNo;
+                model.Type = (NewTradeTransaction.TrnType == 4) ? "BUY" : "SELL";
+                model.Price = (NewTradeTransaction.BidPrice == 0) ? NewTradeTransaction.AskPrice : (NewTradeTransaction.AskPrice == 0) ? NewTradeTransaction.BidPrice : NewTradeTransaction.BidPrice;
+                model.Qty = (NewTradeTransaction.BuyQty == 0) ? NewTradeTransaction.SellQty : (NewTradeTransaction.SellQty == 0) ? NewTradeTransaction.BuyQty : NewTradeTransaction.BuyQty;
+                model.DateTime = Newtransaction .TrnDate ;
+                model.Status = NewTradeTransaction.StatusMsg;
+                model.PairId = NewTradeTransaction.PairID;
+                model.PairName = NewTradeTransaction.PairName;
+                model.OrderType = Enum.GetName(typeof(enTransactionMarketType), OrderType);
+                RecentOrder(model, Token);
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        public void SendActivityNotification(string Msg, string Token, short TokenType = 1)
+        {
+            try
+            {
+                if (TokenType == Convert.ToInt16(enTokenType.ByUserID))
+                {
+                    Token = GetTokenByUserID(Token);
+                }
+                if (!string.IsNullOrEmpty(Token))
+                {
+                    ActivityNotification(Msg, Token);
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        public string GetTokenByUserID(string ID)
+        {
+            try
+            {
+                var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+                string AccessToken = Redis.GetHashData("Tokens:" + ID.ToString(), "Token");
+                return AccessToken;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
         
+
+        //public void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName, long UserID)
+        //{
+        //    try
+        //    {
+        //        //string str = "clientId=cleanarchitecture&grant_type=password&username=user@user.com&password=P@ssw0rd!&scope=openid profile email offline_access client_id roles phone";
+        //        //str = str.Replace("=","\":\"");
+        //        //str = str.Replace("&", "\",\"");
+        //        //str = "{\"" + str + "\"}";
+        //        //var obj = JsonConvert.DeserializeObject(str);
+        //        //var jsonData= JsonConvert.SerializeObject(obj);
+        //        var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+        //        string AccessToken = Redis.GetHashData("Tokens:" + UserID.ToString(), "Token");
+        //        Token = AccessToken;
+        //        BuyerSideWalletBal(Data, WalletTypeName, Token);
+        //        SellerSideWalletBal(Data, WalletTypeName, Token);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+        //        throw ex;
+        //    }
+        //}
     }
     
 }

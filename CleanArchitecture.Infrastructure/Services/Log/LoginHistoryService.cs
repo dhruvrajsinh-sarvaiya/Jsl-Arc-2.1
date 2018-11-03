@@ -17,7 +17,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             _CustomLoginRepository = customRepository;
         }
 
-        public List<LoginhistoryViewModel> GetLoginHistoryByUserId(long UserId, int pageIndex, int pageSize)
+        public List<LoginHistoryDataViewModel> GetLoginHistoryByUserId(long UserId, int pageIndex, int pageSize)
         {
             try
             {
@@ -27,19 +27,17 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                     return null;
                 }
 
-                var LoginHistory = new List<LoginhistoryViewModel>();
+                var LoginHistory = new List<LoginHistoryDataViewModel>();
                 foreach (var item in LoginHistoryList)
                 {
-                    LoginhistoryViewModel loginhistoryViewModel = new LoginhistoryViewModel()
+                    LoginHistoryDataViewModel loginhistoryViewModel = new LoginHistoryDataViewModel()
                     {
-                        Id = item.Id,
-                        Device = item.Device,
                         IpAddress = item.IpAddress,
+                        Device = item.Device,
                         Location = item.Location,
-                        UserId = item.UserId
+                        Date = item.CreatedDate
                     };
-                    LoginHistory.Add(loginhistoryViewModel);
-                                        
+                    LoginHistory.Add(loginhistoryViewModel);                
                 }
 
                 var total = LoginHistory.Count();
@@ -73,7 +71,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         }
 
-        public long LoginHistory(LoginhistoryViewModel model)
+        public long AddLoginHistory(LoginhistoryViewModel model)
         {
             try
             {

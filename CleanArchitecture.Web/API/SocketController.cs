@@ -181,9 +181,9 @@ namespace CleanArchitecture.Web.API
                 //model.TodayOpen = 1477;
                 //model.Volume = 173;
 
-                List<GetGraphDetailInfo> temp = JsonConvert.DeserializeObject<List<GetGraphDetailInfo>>(Data);
+                GetGraphDetailInfo temp = JsonConvert.DeserializeObject<GetGraphDetailInfo>(Data);
 
-                SignalRComm<List<GetGraphDetailInfo>> CommonData = new SignalRComm<List<GetGraphDetailInfo>>();
+                SignalRComm<GetGraphDetailInfo> CommonData = new SignalRComm<GetGraphDetailInfo>();
                 CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
                 CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.ChartData);
                 CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveChartData);
@@ -596,6 +596,7 @@ namespace CleanArchitecture.Web.API
                 return Ok();
             }
         }
+
         //[HttpGet("MarketTicker/{Data}")]
         //public async Task<IActionResult> MarketTicker(string Data)
         //{
@@ -644,6 +645,38 @@ namespace CleanArchitecture.Web.API
         //    }
         //}
 
+        //[HttpGet("SendGroupMessage/{Data}")]
+        //public async Task<IActionResult> SendGroupMessage(string Data)
+        //{
+        //    string ReciveMethod = "";
+        //    try
+        //    {
+                
+        //        SignalRComm<String> CommonData = new SignalRComm<String>();
+        //        CommonData.EventType = Enum.GetName(typeof(enSignalREventType), enSignalREventType.Channel);
+        //        CommonData.Method = Enum.GetName(typeof(enMethodName), enMethodName.SendGroupMessage);
+        //        CommonData.ReturnMethod = Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveNotification);
+        //        CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
+        //        CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
+        //        CommonData.Data = Data;
+        //        CommonData.Parameter = null;
+
+        //        SignalRData SendData = new SignalRData();
+        //        SendData.Method = enMethodName.SendGroupMessage;
+        //        SendData.Parameter = "Name :" + Data;
+        //        SendData.DataObj = Data;
+
+        //        await _mediator.Send(SendData);
+        //        ReciveMethod = CommonData.ReturnMethod;
+        //        return Ok(new { ReciveMethod = ReciveMethod });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+
+        //        return Ok();
+        //    }
+        //}
         //[HttpGet("CreateTranTest")]
         ////[Authorize]
         //public async Task<IActionResult> CreateTranTest(long ID)
@@ -681,31 +714,31 @@ namespace CleanArchitecture.Web.API
         //        //model.IsDefaultWallet = 1;
         //        //model.PublicAddress = "";
         //        //_signalRService.OnWalletBalChange(model, model.CoinName, accessToken);
-        //        VolumeDataRespose model = new VolumeDataRespose();
-        //        model.ChangePer = 20;
-        //        model.Currentrate = 1;
-        //        model.High24Hr = 1814;
-        //        model.High52Week = 1744;
-        //        model.HighWeek = 1800;
-        //        model.Low24Hr = 1812;
-        //        model.Low52Week = 1725;
-        //        model.LowWeek = 1700;
-        //        model.PairId = 10021001;
-        //        model.PairName = "INR_BTC";
-        //        model.UpDownBit = 0;
-        //        model.Volume24 = 1406;
+        //        //VolumeDataRespose model = new VolumeDataRespose();
+        //        //model.ChangePer = 20;
+        //        //model.Currentrate = 1;
+        //        //model.High24Hr = 1814;
+        //        //model.High52Week = 1744;
+        //        //model.HighWeek = 1800;
+        //        //model.Low24Hr = 1812;
+        //        //model.Low52Week = 1725;
+        //        //model.LowWeek = 1700;
+        //        //model.PairId = 10021001;
+        //        //model.PairName = "INR_BTC";
+        //        //model.UpDownBit = 0;
+        //        //model.Volume24 = 1406;
 
-        //        MarketCapData model2 = new MarketCapData();
-        //        model2.Change24 = 1;
-        //        model2.ChangePer = 3;
-        //        model2.High24 = 1153;
-        //        model2.Low24 = 1125;
-        //        model2.LastPrice = 1137;
-        //        model2.Volume24 = 253;
-        //        Task.Factory.StartNew (()=> _signalRService.OnVolumeChange(model, model2));
-        //        Task.Factory.StartNew (()=> _signalRService.OnVolumeChange(model, model2));
-        //        Task.Factory.StartNew (()=> _signalRService.OnVolumeChange(model, model2));
-                
+        //        //MarketCapData model2 = new MarketCapData();
+        //        //model2.Change24 = 1;
+        //        //model2.ChangePer = 3;
+        //        //model2.High24 = 1153;
+        //        //model2.Low24 = 1125;
+        //        //model2.LastPrice = 1137;
+        //        //model2.Volume24 = 253;
+        //        //Task.Factory.StartNew(() => _signalRService.OnVolumeChange(model, model2));
+        //        //Task.Factory.StartNew(() => _signalRService.OnVolumeChange(model, model2));
+        //        //Task.Factory.StartNew(() => _signalRService.OnVolumeChange(model, model2));
+        //        _signalRService.OnWalletBalChangeByUserID(new WalletMasterResponse(), "", 1);
         //        return Ok(new { ReciveMethod = ReciveMethod });
         //    }
         //    catch (Exception ex)

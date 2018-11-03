@@ -842,6 +842,34 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        //vsoalnki 2018-11-3
+        [HttpGet("{FromDate}/{ToDate}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConvertFundHistory(DateTime FromDate, DateTime ToDate,string Coin)
+        {
+            ApplicationUser user = new ApplicationUser(); user.Id = 35;
+            // ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+            ListTokenConvertHistoryRes Response = new ListTokenConvertHistoryRes();
+            try
+            {
+                if (user == null)
+                {
+                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.BizResponseObj.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    Response = _walletService.ConvertFundHistory(user.Id, FromDate, ToDate, Coin);
+                }
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {             
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
 
         /// <summary>
         /// vsolanki 8-10-2018 Get the coin list 

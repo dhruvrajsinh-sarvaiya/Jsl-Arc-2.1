@@ -33,10 +33,14 @@ namespace CleanArchitecture.Core.Interfaces
         void MarketTicker(VolumeDataRespose Data, string Base);
 
         //Event Call
-        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token,short IsPartial);
+        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial = 0);
         void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData);
-        void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token);
+        void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token, short TokenType = 1);
+        //void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName,long UserID);
         void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
         GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
+        void GetAndSendRecentOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
+        void SendActivityNotification(string Msg, string Token, short TokenType = 1);
+        string GetTokenByUserID(string ID);
     }
 }

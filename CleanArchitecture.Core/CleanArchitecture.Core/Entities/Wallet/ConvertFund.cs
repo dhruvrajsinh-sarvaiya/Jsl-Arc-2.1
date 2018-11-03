@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Wallet
 {
-    public class ConvertFund : BizBase
+    public class ConvertFundHistory : BizBase
     {
         [Required]
         public long FromWalletId { get; set; }
@@ -28,6 +28,10 @@ namespace CleanArchitecture.Core.Entities.Wallet
         [Required]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal SourcePrice { get; set; }
+
+        [Required]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal Price { get; set; }
 
         [Required]
         public DateTime TrnDate { get; set; }

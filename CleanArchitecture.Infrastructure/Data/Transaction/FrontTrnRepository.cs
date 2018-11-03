@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -90,19 +91,19 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 string Qry = "Select TTQ.TrnNo,TSL.ordertype,TTQ.PairName,TTQ.PairId,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type, " +
                         "CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price, "+
                         "CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END as Qty, "+
-                        "TTQ.SettledDate as DateTime,TTQ.Status from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id = TTQ.TrnNo INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id " +
+                        "TTQ.TrnDate as DateTime,TTQ.Status from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id = TTQ.TrnNo INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id " +
                         "WHERE TTQ.MemberID ={0} AND TTQ.Status in ({1},{2}) AND TQ.TrnDate > DATEADD(HOUR, -24, getdate()) "+ sCondition +
                         "UNION ALL Select TTQ.TrnNo,TSL.ordertype,TTQ.PairName,TTQ.PairId,CASE WHEN TTQ.TrnType = 4 THEN 'BUY' WHEN TTQ.TrnType = 5 THEN 'SELL' END as Type, " +
                         "CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price, "+
                         "CASE WHEN TTQ.TrnType = 4 THEN TCQ.PendingBuyQty else TCQ.DeliverQty END as Qty, "+
-                        "TTQ.SettledDate as DateTime,TTQ.Status from TradeCancelQueue TCQ INNER JOIN TradeTransactionQueue TTQ ON TTQ.TrnNo = TCQ.TrnNo  " +
+                        "TTQ.TrnDate as DateTime,TTQ.Status from TradeCancelQueue TCQ INNER JOIN TradeTransactionQueue TTQ ON TTQ.TrnNo = TCQ.TrnNo  " +
                         "INNER JOIN TransactionQueue TQ ON TQ.Id = TTQ.TrnNo INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id WHERE  TTQ.MemberID ={0} " +
                         "AND TCQ.Status in ({2}) AND TQ.TrnDate > DATEADD(HOUR, -24, getdate()) "+ sCondition +
                         "UNION ALL Select TTQ.TrnNo,TSL.ordertype,TTQ.PairName,TTQ.PairId,CASE WHEN TTQ.TrnType = 4 THEN 'BUY' WHEN TTQ.TrnType = 5 THEN 'SELL' END as Type, " +
                         "CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price,  "+
                         "CASE WHEN TTQ.TrnType = 4  THEN TTQ.BuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SellQty END as Qty, "+
-                        "TTQ.SettledDate as DateTime,TTQ.Status from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id = TTQ.TrnNo INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id " +
-                        "WHERE TTQ.MemberID ={0} AND TTQ.Status in ({3}) AND TQ.TrnDate > DATEADD(HOUR, -24, getdate()) "+ sCondition + " Order By TTQ.SettledDate Desc";
+                        "TTQ.TrnDate as DateTime,TTQ.Status from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id = TTQ.TrnNo INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id " +
+                        "WHERE TTQ.MemberID ={0} AND TTQ.Status in ({3}) AND TQ.TrnDate > DATEADD(HOUR, -24, getdate()) "+ sCondition + " Order By TTQ.TrnDate Desc";
 
                 if(PairId == 999)
                     Result = _dbContext.RecentOrderRespose.FromSql(Qry, MemberID, Convert.ToInt16(enTransactionStatus.Success), Convert.ToInt16(enTransactionStatus.Hold), Convert.ToInt16(enTransactionStatus.SystemFail));
@@ -286,20 +287,38 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
         }
 
-        public List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData)
+        public List<GetGraphResponse> GetGraphData(long id, int IntervalTime, string IntervalData,DateTime Minute,int socket = 0)
         {
             try
-            { 
-                string Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
-                               "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
-                               "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
-                               "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +
-                               " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
-                               " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
+            {
+                string Query = "";
+                IQueryable<GetGraphResponse> Result;
+                if (socket == 0)
+                {
+                    Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
+                                   "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
+                                   "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
+                                   "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +
+                                   " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
+                                   " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
 
-                Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
-                IQueryable<GetGraphResponse> Result = _dbContext.GetGraphResponse.FromSql(Query,id);
+                    Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
+                    Result = _dbContext.GetGraphResponse.FromSql(Query, id);
+                }
+                else
+                {
+                    Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
+                                   "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
+                                   "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
+                                   "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +
+                                   " Where PairId = {0} And DataDate = {1} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
+                                   " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
 
+                    Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
+                    string MinuteData =  Minute.ToString("yyyy-MM-dd HH:mm:00:000");
+
+                    Result = _dbContext.GetGraphResponse.FromSql(Query,id,MinuteData);
+                }
                 return Result.ToList();
             }
             catch (Exception ex)
@@ -386,6 +405,31 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             catch (Exception ex)
             {
                 //_logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        public List<TradePairTableResponse> GetTradePairAsset()
+        {
+            try
+            {
+                IQueryable<TradePairTableResponse> Result;
+               
+                Result = _dbContext.TradePairTableResponse.FromSql(
+                            @"Select SM1.Id As BaseId,SM1.Name As BaseName,SM1.SMSCode As BaseCode,TPM.ID As PairId,TPM.PairName As Pairname,TPS.CurrentRate As Currentrate,TPD.BuyFees As BuyFees,TPD.SellFees As SellFees,
+                                SM2.Name As ChildCurrency,SM2.SMSCode As Abbrevation,TPS.ChangePer24 As ChangePer,TPS.ChangeVol24 As Volume,TPS.High24Hr AS High24Hr,TPS.Low24Hr As Low24Hr,
+                                TPS.HighWeek As HighWeek,TPS.LowWeek As LowWeek,TPS.High52Week AS High52Week,TPS.Low52Week As Low52Week,TPS.UpDownBit As UpDownBit from Market M 
+                                Inner Join TradePairMaster TPM ON TPM.BaseCurrencyId = M.ServiceID
+                                Inner Join TradePairDetail TPD ON TPD.PairId = TPM.Id
+                                Inner Join TradePairStastics TPS ON TPS.PairId = TPM.Id
+                                Inner Join ServiceMaster SM1 ON SM1.Id = TPM.BaseCurrencyId
+                                Inner Join ServiceMaster SM2 ON SM2.Id = TPM.SecondaryCurrencyId Order By M.ID");
+                
+                return Result.ToList();
+            }
+            catch (Exception ex)
+            {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }

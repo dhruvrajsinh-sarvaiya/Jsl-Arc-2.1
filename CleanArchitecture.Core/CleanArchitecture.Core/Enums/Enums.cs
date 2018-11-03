@@ -191,6 +191,14 @@ namespace CleanArchitecture.Core.Enums
         InValidCreditAccountID = 4625,
         Graph_InvalidIntervalTime = 4626,
         CreateTrn_WithdrawAmountBetweenMinAndMax = 4627,
+        Settlement_AlreadySettled = 1,
+        Settlement_PartialSettlementDone = 1,
+        Settlement_FullSettlementDone = 1,
+        Settlement_SettlementInternalError = 1,
+        Settlement_NoSettlementRecordFound = 1,
+        CancelOrder_NoRecordFound = 1,
+        CancelOrder_InternalError = 1,
+        CancelOrder_TrnNotHold = 1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -433,9 +441,14 @@ namespace CleanArchitecture.Core.Enums
         Chat = 15,
         News = 16,
         Announcement = 17,
-        Time = 18
+        Time = 18,
+        SendGroupMessage = 19,
     }
-    
+    public enum enTokenType
+    {
+        ByAccessToken = 1,
+        ByUserID = 2
+    }
     public enum enValidateWalletLimit
     {
         Success = 1,

@@ -391,8 +391,8 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 ReturnCode = enResponseCode.Success,
                 ReturnMsg = EnResponseMessage.FindRecored,
-              ErrorCode = enErrorCode.Success,
-            Histories = items
+                ErrorCode = enErrorCode.Success,
+                Histories = items
             };
         }
 
@@ -440,8 +440,8 @@ namespace CleanArchitecture.Infrastructure.Data
             {
                 ReturnCode = enResponseCode.Success,
                 ReturnMsg = EnResponseMessage.FindRecored,
-               ErrorCode = enErrorCode.Success,
-            Histories = items
+                ErrorCode = enErrorCode.Success,
+                Histories = items
             };
         }
         public bool WalletCreditwithTQ(WalletLedger wl1, TransactionAccount ta1, WalletMaster wm2, WalletTransactionQueue wtq, CreditWalletDrArryTrnID[] arryTrnID)
@@ -521,7 +521,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                                                LimitPerTransaction = u.LimitPerTransaction,
                                                                AccWalletID = c.AccWalletID,
                                                                EndTime = u.EndTimeUnix,
-                                                               LifeTime = u.LifeTime != null ? u.LifeTime:0,
+                                                               LifeTime = u.LifeTime != null ? u.LifeTime : 0,
                                                                StartTime = u.StartTimeUnix
                                                            }).AsEnumerable().ToList();
 
@@ -1455,47 +1455,47 @@ namespace CleanArchitecture.Infrastructure.Data
             List<TransfersRes> trns = new List<TransfersRes>();
             if (FromDate != null && ToDate != null)
             {
-                 trns = (from trn in _dbContext.DepositHistory
-                            join wt in _dbContext.WalletTypeMasters
-                           on trn.SMSCode equals wt.WalletTypeName
-                            join u in _dbContext.Users
-                            on trn.UserId equals u.Id
-                            where trn.Status == Status && trn.Confirmations < 3 && (Coin == null || (trn.SMSCode == Coin && Coin != null))
-                             && (trn.CreatedDate == null || (trn.CreatedDate >= FromDate && trn.CreatedDate != null)) && (trn.CreatedDate == null || (trn.CreatedDate <= ToDate && trn.CreatedDate != null))
-                            select new TransfersRes
-                            {
-                                AutoNo = trn.Id,
-                                TrnID = trn.TrnID,
-                                WalletType = trn.SMSCode,
-                                Confirmations = trn.Confirmations,
-                                Amount = trn.Amount,
-                                Address = trn.Address,
-                                ConfirmationCount = wt.ConfirmationCount,
-                                ConfirmedTime=trn.ConfirmedTime,
-                                User = u.UserName
-                            }).ToList();              
+                trns = (from trn in _dbContext.DepositHistory
+                        join wt in _dbContext.WalletTypeMasters
+                       on trn.SMSCode equals wt.WalletTypeName
+                        join u in _dbContext.Users
+                        on trn.UserId equals u.Id
+                        where trn.Status == Status && trn.Confirmations < 3 && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                         && (trn.CreatedDate == null || (trn.CreatedDate >= FromDate && trn.CreatedDate != null)) && (trn.CreatedDate == null || (trn.CreatedDate <= ToDate && trn.CreatedDate != null))
+                        select new TransfersRes
+                        {
+                            AutoNo = trn.Id,
+                            TrnID = trn.TrnID,
+                            WalletType = trn.SMSCode,
+                            Confirmations = trn.Confirmations,
+                            Amount = trn.Amount,
+                            Address = trn.Address,
+                            ConfirmationCount = wt.ConfirmationCount,
+                            ConfirmedTime = trn.ConfirmedTime,
+                            User = u.UserName
+                        }).ToList();
             }
             else
             {
-                 trns = (from trn in _dbContext.DepositHistory
-                            join wt in _dbContext.WalletTypeMasters
-                           on trn.SMSCode equals wt.WalletTypeName
-                            join u in _dbContext.Users
-                            on trn.UserId equals u.Id
-                            where trn.Status == Status && trn.Confirmations < 3 && (Coin == null || (trn.SMSCode == Coin && Coin != null))
-                            select new TransfersRes
-                            {
-                                AutoNo = trn.Id,
-                                TrnID = trn.TrnID,
-                                WalletType = trn.SMSCode,
-                                Confirmations = trn.Confirmations,
-                                Amount = trn.Amount,
-                                Address = trn.Address,
-                                ConfirmationCount = wt.ConfirmationCount,
-                                ConfirmedTime = trn.ConfirmedTime,
-                                User = u.UserName
-                            }).ToList();
-               
+                trns = (from trn in _dbContext.DepositHistory
+                        join wt in _dbContext.WalletTypeMasters
+                       on trn.SMSCode equals wt.WalletTypeName
+                        join u in _dbContext.Users
+                        on trn.UserId equals u.Id
+                        where trn.Status == Status && trn.Confirmations < 3 && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                        select new TransfersRes
+                        {
+                            AutoNo = trn.Id,
+                            TrnID = trn.TrnID,
+                            WalletType = trn.SMSCode,
+                            Confirmations = trn.Confirmations,
+                            Amount = trn.Amount,
+                            Address = trn.Address,
+                            ConfirmationCount = wt.ConfirmationCount,
+                            ConfirmedTime = trn.ConfirmedTime,
+                            User = u.UserName
+                        }).ToList();
+
             }
             var test = trns.Select((r, i) => new TransfersRes
             {
@@ -1519,24 +1519,24 @@ namespace CleanArchitecture.Infrastructure.Data
             if (FromDate != null && ToDate != null)
             {
                 History = (from Wh in _dbContext.WithdrawHistory
-                        join WT in _dbContext.WalletTypeMasters
-                        on Wh.SMSCode equals WT.WalletTypeName
-                        join u in _dbContext.Users
-                        on Wh.UserId equals u.Id
-                        where Wh.Status == Status && Wh.Confirmations < 3 && (CoinName == null || (Wh.SMSCode == CoinName && CoinName != null))
-                        && (Wh.CreatedDate == null || (Wh.CreatedDate >= FromDate && Wh.CreatedDate != null)) && (Wh.CreatedDate == null || (Wh.CreatedDate <= ToDate && Wh.CreatedDate != null))
-                        select new TransfersRes
-                        {
-                            AutoNo = Wh.Id,
-                            TrnID = Wh.TrnID,
-                            WalletType = Wh.SMSCode,
-                            Confirmations = Wh.Confirmations,
-                            Amount = Wh.Amount,
-                            Address = Wh.Address,
-                            ConfirmationCount = WT.ConfirmationCount,
-                            ConfirmedTime = Wh.confirmedTime,
-                            User = u.UserName
-                        }).ToList();
+                           join WT in _dbContext.WalletTypeMasters
+                           on Wh.SMSCode equals WT.WalletTypeName
+                           join u in _dbContext.Users
+                           on Wh.UserId equals u.Id
+                           where Wh.Status == Status && Wh.Confirmations < 3 && (CoinName == null || (Wh.SMSCode == CoinName && CoinName != null))
+                           && (Wh.CreatedDate == null || (Wh.CreatedDate >= FromDate && Wh.CreatedDate != null)) && (Wh.CreatedDate == null || (Wh.CreatedDate <= ToDate && Wh.CreatedDate != null))
+                           select new TransfersRes
+                           {
+                               AutoNo = Wh.Id,
+                               TrnID = Wh.TrnID,
+                               WalletType = Wh.SMSCode,
+                               Confirmations = Wh.Confirmations,
+                               Amount = Wh.Amount,
+                               Address = Wh.Address,
+                               ConfirmationCount = WT.ConfirmationCount,
+                               ConfirmedTime = Wh.confirmedTime,
+                               User = u.UserName
+                           }).ToList();
             }
             else
             {
@@ -1548,15 +1548,15 @@ namespace CleanArchitecture.Infrastructure.Data
                            where Wh.Status == Status && Wh.Confirmations < 3 && (CoinName == null || (Wh.SMSCode == CoinName && CoinName != null))
                            select new TransfersRes
                            {
-                                AutoNo = Wh.Id,
-                                TrnID = Wh.TrnID,
-                                WalletType = Wh.SMSCode,
-                                Confirmations = Wh.Confirmations,
-                                Amount = Wh.Amount,
-                                Address = Wh.Address,
-                                ConfirmationCount = WT.ConfirmationCount,
-                                ConfirmedTime = Wh.ConfirmedTime,
-                                User = u.UserName
+                               AutoNo = Wh.Id,
+                               TrnID = Wh.TrnID,
+                               WalletType = Wh.SMSCode,
+                               Confirmations = Wh.Confirmations,
+                               Amount = Wh.Amount,
+                               Address = Wh.Address,
+                               ConfirmationCount = WT.ConfirmationCount,
+                               ConfirmedTime = Wh.ConfirmedTime,
+                               User = u.UserName
                            }).ToList();
 
             }
@@ -1573,6 +1573,25 @@ namespace CleanArchitecture.Infrastructure.Data
                 User = rec.User
             }).ToList();
             return dump;
+        }
+
+        public List<TokenConvertHistoryRes> ConvertFundHistory(long Userid, DateTime FromDate, DateTime ToDate, string Coin)
+        {
+            var h = (from c in _dbContext.ConvertFundHistory
+                     join w in _dbContext.WalletMasters
+                     on c.FromWalletId equals w.Id
+                     join wt in _dbContext.WalletTypeMasters
+                     on w.WalletTypeID equals wt.Id
+                     where w.UserID == Userid && (Coin == null || (wt.WalletTypeName == Coin && Coin != null)) && c.TrnDate >= FromDate && c.TrnDate <= ToDate
+                     select new TokenConvertHistoryRes
+                     {
+                         CoinName = wt.WalletTypeName,
+                         Amount =c.SourcePrice,
+                         Price =c.Price,
+                         Total =c.DestinationPrice,
+                         Date = c.TrnDate
+                     }).ToList();
+            return h;
         }
     }
 

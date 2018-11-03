@@ -50,6 +50,7 @@ namespace CleanArchitecture.Core.SignalR
                 Redis.SaveTagsToSetMember("Pairs:" + Pair, Context.ConnectionId, Pair); 
                 Redis.SaveTagsToSetMember("Markets:" + BaseCurrency, Context.ConnectionId, BaseCurrency);
                 Groups.AddToGroupAsync(Context.ConnectionId, "BroadCast").Wait();
+                Groups.AddToGroupAsync(Context.ConnectionId, "GroupMessage").Wait();               
                 Groups.AddToGroupAsync(Context.ConnectionId, "BuyerBook:" + Pair).Wait();
                 Groups.AddToGroupAsync(Context.ConnectionId, "SellerBook:" + Pair).Wait();
                 Groups.AddToGroupAsync(Context.ConnectionId, "TradingHistory:" + Pair).Wait();
