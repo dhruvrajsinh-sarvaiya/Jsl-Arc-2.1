@@ -693,6 +693,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 _TransactionRepository.Update(Newtransaction);
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
+                    NewTradetransaction.MakeTransactionHold();
+                    NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
+                    NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                    _TradeTransactionRepository.Update(NewTradetransaction);
                     try
                     {
                         _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);
