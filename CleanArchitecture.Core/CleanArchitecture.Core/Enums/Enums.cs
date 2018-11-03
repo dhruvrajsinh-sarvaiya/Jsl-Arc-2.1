@@ -438,9 +438,14 @@ namespace CleanArchitecture.Core.Enums
         Chat = 15,
         News = 16,
         Announcement = 17,
-        Time = 18
+        Time = 18,
+        SendGroupMessage = 19,
     }
-    
+    public enum enTokenType
+    {
+        ByAccessToken = 1,
+        ByUserID = 2
+    }
     public enum enValidateWalletLimit
     {
         Success = 1,
