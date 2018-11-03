@@ -16,7 +16,7 @@ namespace CleanArchitecture.Core.Interfaces
         void BuyerBook(GetBuySellBook Data,string Pair);
         void SellerBook(GetBuySellBook Data, string Pair);
         void OrderHistory(GetTradeHistoryInfo Data, string Pair);
-        void ChartData(List<GetGraphResponse> Data, string Pair);
+        void ChartData(GetGraphDetailInfo Data, string Pair);
         void MarketData(MarketCapData Data, string Pair);
         void LastPrice(LastPriceViewModel Data,string Pair);
 
@@ -33,7 +33,10 @@ namespace CleanArchitecture.Core.Interfaces
         void MarketTicker(VolumeDataRespose Data, string Base);
 
         //Event Call
-        void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial = 0);
+        void OnStatusPartialSuccess(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType);
+        void OnStatusSuccess(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType);
+        void OnStatusHold(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType);
+        void OnStatusCancel(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType);
         void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData);
         void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token, short TokenType = 1);
         //void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName,long UserID);

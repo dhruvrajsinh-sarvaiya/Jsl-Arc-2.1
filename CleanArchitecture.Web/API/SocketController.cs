@@ -155,7 +155,7 @@ namespace CleanArchitecture.Web.API
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 await _mediator.Send(SendData);
-                ReciveMethod = "RecieveTradingHistory";
+                ReciveMethod = CommonData.ReturnMethod;
                 return Ok(new { ReciveMethod = ReciveMethod });
             }
             catch (Exception ex)
