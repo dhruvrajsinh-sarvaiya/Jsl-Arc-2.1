@@ -474,7 +474,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0)
+        public void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPop = 0)
         {
             try
             {
@@ -535,7 +535,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public void GetAndSendRecentOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0)
+        public void GetAndSendRecentOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPop = 0)
         {
             try
             {
@@ -603,7 +603,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //pop OpenOrder
                 //add tradehistory
                 //add orderhistory
-                
+                //Token = Token;
                 if(string.IsNullOrEmpty(Token))
                 {
                     Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
@@ -612,8 +612,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     List<GetBuySellBook> list = new List<GetBuySellBook>();
 
-                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType,1);//update OpenOrder
+                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType,1);//update OpenOrder
 
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     OrderHistory(historyInfo, historyInfo.PairName);//Order
@@ -713,8 +713,8 @@ namespace CleanArchitecture.Infrastructure.Services
                     msg = msg.Replace("#Price#", historyInfo.Price.ToString());
                     msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
                     ActivityNotification(msg, Token);
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);
-                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
+                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
                 }
             }
             catch (Exception ex)
@@ -738,8 +738,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 if (!string.IsNullOrEmpty(Token))
                 {
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType, 1);//with amount 0, remove from OpenOrder
-                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
+                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType, 1);//with amount 0, remove from OpenOrder
+                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     TradeHistory(historyInfo, Token);//TradeHistory
                 } 

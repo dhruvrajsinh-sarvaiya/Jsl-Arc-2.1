@@ -512,7 +512,7 @@ namespace CleanArchitecture.Core.SignalR
             }            
         }
         
-        public Task BuyerSideWalletBal(string Key, string Data)
+        public Task BuyerSideWalletBal(string Token, string WalletName, string Data)
         {
             try
             {
@@ -523,22 +523,22 @@ namespace CleanArchitecture.Core.SignalR
                 //ConnetedClientList User = new ConnetedClientList();
                 //User = Redis.GetConnectionID(Token);
                 //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveBuyerSideWalletBal", Data);
-                //var Redis = new RadisServices<ConnetedClientToken>(this._fact);
-                //IEnumerable<string> ClientList = Redis.GetKey(Token);
-                //foreach (string s in ClientList.ToList())
-                //{
-                //    var Key = s;
-                //    Key = Key.Split(":")[1].ToString();
-                //    string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
-                //    if (Pair.ToUpper().Contains(WalletName.ToUpper()))
-                //    {
+                var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+                IEnumerable<string> ClientList = Redis.GetKey(Token);
+                foreach (string s in ClientList.ToList())
+                {
+                    var Key = s;
+                    Key = Key.Split(":")[1].ToString();
+                    string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
+                    if (Pair.Split("_")[1].ToString() == WalletName)
+                    {
                         _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerSideWalletBal), Data);
-                //    }
-                //    else
-                //    {
-                //        // ignore Data
-                //    }                   
-                //}
+                    }
+                    else
+                    {
+                        // ignore Data
+                    }                   
+                }
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -548,7 +548,7 @@ namespace CleanArchitecture.Core.SignalR
             }            
         }
 
-        public Task SellerSideWalletBal(string Key, string Data)
+        public Task SellerSideWalletBal(string Token, string WalletName, string Data)
         {
             try
             {
@@ -558,22 +558,22 @@ namespace CleanArchitecture.Core.SignalR
                 //ConnetedClientList User = new ConnetedClientList();
                 //User = Redis.GetConnectionID(Token);
                 //_chatHubContext.Clients.Client(User.ConnectionId).SendAsync("RecieveSellerSideWalletBal", Data);
-                //var Redis = new RadisServices<ConnetedClientToken>(this._fact);
-                //IEnumerable<string> ClientList = Redis.GetKey(Token);
-                //foreach (string s in ClientList.ToList())
-                //{
-                //    var Key = s;
-                //    Key = Key.Split(":")[1].ToString();
-                //    string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
-                //    if (Pair.ToUpper().Contains(WalletName.ToUpper()))
-                //    {
+                var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+                IEnumerable<string> ClientList = Redis.GetKey(Token);
+                foreach (string s in ClientList.ToList())
+                {
+                    var Key = s;
+                    Key = Key.Split(":")[1].ToString();
+                    string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
+                    if (Pair.Split("_")[0].ToString() == WalletName)
+                    {
                         _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerSideWalletBal), Data);
-                //    }
-                //    else
-                //    {
-                //        // ignore Data
-                //    }                   
-                //}
+                    }
+                    else
+                    {
+                        // ignore Data
+                    }                   
+                }
                 return Task.FromResult(0);
             }
             catch (Exception ex)
@@ -584,34 +584,36 @@ namespace CleanArchitecture.Core.SignalR
             
         }
 
-        public Task WalletBalChange(string Token, string WalletName, string Data)
-        {
-            try
-            { 
-                var Redis = new RadisServices<ConnetedClientToken>(this._fact);
-                IEnumerable<string> ClientList = Redis.GetKey(Token);
-                foreach (string s in ClientList.ToList())
-                {
-                    var Key = s;
-                    Key = Key.Split(":")[1].ToString();
-                    string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
-                    if (Pair.Split("_")[0].ToString() == WalletName)
-                    {
-                        SellerSideWalletBal(Key, Data);
-                    }
-                    else if(Pair.Split("_")[1].ToString() == WalletName)
-                    {
-                        BuyerSideWalletBal(Key, Data);
-                    }
-                }
-                return Task.FromResult(0);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                return Task.FromResult(0);
-            }
-        }
+        //public Task WalletBalChange(string Token, string WalletName, string Data)
+        //{
+        //    try
+        //    { 
+        //        var Redis = new RadisServices<ConnetedClientToken>(this._fact);
+        //        IEnumerable<string> ClientList = Redis.GetKey(Token);
+        //        foreach (string s in ClientList.ToList())
+        //        {
+        //            var Key = s;
+        //            Key = Key.Split(":")[1].ToString();
+        //            string Pair = Redis.GetPairOrMarketData(Key, ":", "Pairs");
+        //            if (Pair.Split("_")[0].ToString() == WalletName)
+        //            {
+        //                SellerSideWalletBal(Token,WalletName,Data);
+        //            }
+        //            else if(Key.Split("_")[1].ToString() == WalletName)
+        //            {
+        //                BuyerSideWalletBal(Token, WalletName, Data);
+        //            }
+
+
+        //        }
+        //        return Task.FromResult(0);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+        //        return Task.FromResult(0);
+        //    }
+        //}
         public Task ActivityNotification(string Token, string Message)
         {
             try

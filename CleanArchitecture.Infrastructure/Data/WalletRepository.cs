@@ -1125,7 +1125,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                      TrnType = Convert.ToByte(type),
                                  };
                 _dbContext.WalletAllowTrns.AddRange(trntypeObj);
-                _dbContext.SaveChanges();
+                _dbContext.SaveChanges();               
                 return 1;
             }
             catch (Exception ex)

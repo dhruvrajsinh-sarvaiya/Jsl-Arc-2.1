@@ -110,6 +110,12 @@ namespace CleanArchitecture.Core.Entities
             UpdatedDate = Helpers.Helpers.UTC_To_IST();
             AddValueChangeEvent();
         }
+        public void MakeTransactionHold()
+        {
+            Status = Convert.ToInt16(enTransactionStatus.Hold);
+            UpdatedDate = Helpers.Helpers.UTC_To_IST();
+            AddValueChangeEvent();
+        }
         public void SetTransactionCode(long statuscode)
         {
             StatusCode = statuscode;

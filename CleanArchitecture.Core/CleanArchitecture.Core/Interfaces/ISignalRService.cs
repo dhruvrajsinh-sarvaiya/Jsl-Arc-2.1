@@ -40,9 +40,9 @@ namespace CleanArchitecture.Core.Interfaces
         void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData);
         void OnWalletBalChange(WalletMasterResponse Data, string WalletTypeName, string Token, short TokenType = 1);
         //void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName,long UserID);
-        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
+        void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPop = 0);
         GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
-        void GetAndSendRecentOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
+        void GetAndSendRecentOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPop = 0);
         void SendActivityNotification(string Msg, string Token, short TokenType = 1);
         string GetTokenByUserID(string ID);
     }
