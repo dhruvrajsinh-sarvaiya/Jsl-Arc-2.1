@@ -2530,6 +2530,17 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 ListIncomingTrnRes Response = new ListIncomingTrnRes();
                 Response.BizResponseObj = new BizResponseClass();
+                var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
+                if (Coin != null)
+                {
+                    if (type == null)
+                    {
+                        Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                        Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
+                        Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                        return Response;
+                    }
+                }
                 var depositHistories = _walletRepository1.GetIncomingTransaction(Userid, Coin);
                 if (depositHistories.Count() == 0)
                 {
@@ -2718,12 +2729,15 @@ namespace CleanArchitecture.Infrastructure.Services
                 ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
                 Response.BizResponseObj = new BizResponseClass();
                 var type = _WalletTypeMasterRepository.GetSingle(i => i.WalletTypeName == Coin);
-                if (type == null)
+                if (Coin != null)
                 {
-                    Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
-                    Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
-                    Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
-                    return Response;
+                    if (type == null)
+                    {
+                        Response.BizResponseObj.ReturnCode = enResponseCode.Fail;
+                        Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidCoin;
+                        Response.BizResponseObj.ErrorCode = enErrorCode.InvalidCoinName;
+                        return Response;
+                    }
                 }
                 var Histories = _walletRepository1.GetOutGoingTransaction(Userid, Coin);
                 if (Histories.Count() == 0 || Histories == null)

@@ -812,9 +812,9 @@ namespace CleanArchitecture.Web.API
         }
 
         //vsolanki 2018-11-02
-        // [AllowAnonymous]
-        [HttpGet("{Coin}")]
-        // [AllowAnonymous]
+       // [AllowAnonymous]
+        [HttpGet]
+       // [AllowAnonymous]
         public async Task<IActionResult> GetOutGoingTransaction(string Coin)
         {
             // ApplicationUser user = new ApplicationUser(); user.Id = 35;

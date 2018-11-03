@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -34,5 +35,7 @@ namespace CleanArchitecture.Core.ViewModels
         public long UserID { get; set; }
 
         public string DeviceID { get; set; }
-    }
+
+        public EnDeviceSubsscrptionType SubsscrptionType { get; set; }
+}
 }
