@@ -652,7 +652,10 @@ namespace CleanArchitecture.Infrastructure.Services
                             BuySellmodel = model;
                             break;
                         }
-                        BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
+                        {
+                            BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
                     }
                     else//Sell
                     {
@@ -662,7 +665,10 @@ namespace CleanArchitecture.Infrastructure.Services
                             BuySellmodel = model;
                             break;
                         }
-                        SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
+                        {
+                            SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
                     }
                 }   
             }
@@ -697,7 +703,11 @@ namespace CleanArchitecture.Infrastructure.Services
                             BuySellmodel = model;
                             break;
                         }
-                        BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        if(BuySellmodel.OrderId .ToString()!= "00000000-0000-0000-0000-000000000000")
+                        {
+                            BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
+                        
                     }
                     else//Sell
                     {
@@ -707,12 +717,16 @@ namespace CleanArchitecture.Infrastructure.Services
                             BuySellmodel = model;
                             break;
                         }
-                        SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        if(BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
+                        {
+                            SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
+                        
                     }
-                    var msg = EnResponseMessage.SignalRTrnSuccessfullyCreated;
-                    msg = msg.Replace("#Price#", historyInfo.Price.ToString());
-                    msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
-                    ActivityNotification(msg, Token);
+                    //var msg = EnResponseMessage.SignalRTrnSuccessfullyCreated;
+                    //msg = msg.Replace("#Price#", historyInfo.Price.ToString());
+                    //msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
+                    //ActivityNotification(msg, Token);
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
                 }
