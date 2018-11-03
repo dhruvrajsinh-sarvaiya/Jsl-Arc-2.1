@@ -755,7 +755,8 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 2018-10-29
         //[AllowAnonymous]
-        [HttpGet]
+        //[AllowAnonymous]
+        [HttpGet("{Coin}")]
         public async Task<IActionResult> GetIncomingTransaction(string Coin)
         {
            //ApplicationUser user = new ApplicationUser(); user.Id = 35;
@@ -812,10 +813,11 @@ namespace CleanArchitecture.Web.API
 
         //vsolanki 2018-11-02
        // [AllowAnonymous]
-        [HttpGet]
+        [HttpGet("{Coin}")]
+       // [AllowAnonymous]
         public async Task<IActionResult> GetOutGoingTransaction(string Coin)
         {
-            //ApplicationUser user = new ApplicationUser(); user.Id = 35;
+           // ApplicationUser user = new ApplicationUser(); user.Id = 35;
             ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
             ListOutgoingTrnRes Response = new ListOutgoingTrnRes();
             try
