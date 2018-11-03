@@ -64,8 +64,6 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = CommonData.Parameter;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 _mediator.Send(SendData);
-
-
             }
             catch (Exception ex)
             {
@@ -224,7 +222,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //SignalRDataOpenOrder SendData = new SignalRDataOpenOrder();
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.OpenOrder;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = Token;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 _mediator.Send(SendData);
@@ -251,7 +249,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.TradeHistory;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = Token;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 _mediator.Send(SendData);
@@ -278,7 +276,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.RecentOrder;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = Token;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
 
                 _mediator.Send(SendData);
@@ -305,7 +303,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.BuyerSideWallet;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = Token;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = Wallet;
 
@@ -333,7 +331,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.SellerSideWallet;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = Token;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 SendData.WalletName = Wallet;
 
@@ -357,12 +355,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 CommonData.Subscription = Enum.GetName(typeof(enSubscriptionType), enSubscriptionType.OneToOne);
                 CommonData.ParamType = Enum.GetName(typeof(enSignalRParmType), enSignalRParmType.AccessToken);
                 CommonData.Data = Msg;
-                CommonData.Parameter = Token;
+                CommonData.Parameter = null;
 
                 //SignalRDataNotify SendData = new SignalRDataNotify();
                 SignalRData SendData = new SignalRData();
                 SendData.Method = enMethodName.ActivityNotification;
-                SendData.Parameter = CommonData.Parameter;
+                SendData.Parameter = Token;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 //SendData.WalletName = Wallet;
 
@@ -625,8 +623,6 @@ namespace CleanArchitecture.Infrastructure.Services
                     msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
                     msg = msg.Replace("#Total#", historyInfo.Total.ToString());
                     ActivityNotification(msg, Token);
-                    
-
                 }
             }
             catch (Exception ex)
@@ -753,11 +749,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
                 throw ex;
             }
-        }
-
-
-
-        //public void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName, long UserID)
+               //public void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName, long UserID)
         //{
         //    try
         //    {
@@ -778,7 +770,7 @@ namespace CleanArchitecture.Infrastructure.Services
         //        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
         //        throw ex;
         //    }
-        //}
+        }
     }
     
 }

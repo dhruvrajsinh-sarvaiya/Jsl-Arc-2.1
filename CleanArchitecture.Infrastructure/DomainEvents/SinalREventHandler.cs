@@ -48,7 +48,7 @@ namespace CleanArchitecture.Infrastructure.DomainEvents
                 else if (request.Method == enMethodName.RecentOrder)
                     _chat.RecentOrder(request.Parameter, request.DataObj);
                 else if (request.Method == enMethodName.BuyerSideWallet)
-                    _chat.BuyerSideWalletBal(request.Parameter,request.WalletName, request.DataObj);
+                    _chat.BuyerSideWalletBal(request.Parameter, request.WalletName, request.DataObj);
                 else if (request.Method == enMethodName.SellerSideWallet)
                     _chat.SellerSideWalletBal(request.Parameter, request.WalletName, request.DataObj);
                 else if (request.Method == enMethodName.Price)

@@ -11,7 +11,7 @@ using System.Text;
 
 namespace CleanArchitecture.Infrastructure.Interfaces
 {
-    
+
     public interface IWalletService
     {
         decimal GetUserBalance(long walletId);
@@ -20,7 +20,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         bool IsValidWallet(long walletId);
 
-        CreateWalletAddressRes GenerateAddress(string walletid,string coin, int GenaratePendingbit = 0);
+        CreateWalletAddressRes GenerateAddress(string walletid,string coin, string Token, int GenaratePendingbit = 0);
 
         //vsolanki 8-10-2018
         IEnumerable<WalletTypeMaster> GetWalletTypeMaster();
@@ -35,9 +35,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         ListWalletResponse GetWalletByCoin(long userid, string coin);
 
-        ListWalletResponse GetWalletById(long userid, string coin,string walletId);
+        ListWalletResponse GetWalletById(long userid, string coin, string walletId);
 
-        WalletDrCrResponse GetWalletDeductionNew(string coinName, string timestamp, enWalletTranxOrderType orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, string Token = "");
+        WalletDrCrResponse GetWalletDeductionNew(string coinName, string timestamp, enWalletTranxOrderType orderType, decimal amount, long userID, string accWalletID, long TrnRefNo, enServiceType serviceType, enWalletTrnType trnType, enTrnType routeTrnType, string Token = "");
 
         ListWalletAddressResponse ListAddress(string AccWalletID);
 
@@ -48,7 +48,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         DepositHistoryResponse WithdrawalHistoy(DateTime FromDate, DateTime ToDate, string Coin, decimal? Amount, byte? Status, long Userid);
 
         //ntrivedi 16-10-2018
-        WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, string Token = "" );
+        WalletDrCrResponse GetWalletCreditNew(string coinName, string timestamp, enWalletTrnType trnType, decimal TotalAmount, long userID, string crAccWalletID, CreditWalletDrArryTrnID[] arryTrnID, long TrnRefNo, short isFullSettled, enWalletTranxOrderType orderType, enServiceType serviceType, string Token = "");
 
         //Rushabh 16-10-2018
         LimitResponse SetWalletLimitConfig(string accWalletID, WalletLimitConfigurationReq request, long userID);
@@ -81,13 +81,13 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         // vsolanki 25-10-2018
         BalanceResponseWithLimit GetAvailbleBalTypeWise(long userid);
 
-        BeneficiaryResponse AddBeneficiary(string CoinName,short WhitelistingBit,string Name ,string BeneficiaryAddress, long UserId);
+        BeneficiaryResponse AddBeneficiary(string CoinName, short WhitelistingBit, string Name, string BeneficiaryAddress, long UserId);
         BeneficiaryResponse ListWhitelistedBeneficiary(string accWalletID, long id);
         BeneficiaryResponse ListBeneficiary(long id);
         UserPreferencesRes SetPreferences(long Userid, int GlobalBit);
         UserPreferencesRes GetPreferences(long Userid);
         BeneficiaryResponse UpdateBulkBeneficiary(BulkBeneUpdateReq request, long id);
-        BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request,string AccWalletID, long id);
+        BeneficiaryResponse UpdateBeneficiaryDetails(BeneficiaryUpdateReq request, string AccWalletID, long id);
         //vsolanki 25-10-2018
         ListAllBalanceTypeWiseRes GetAllBalancesTypeWise(long userId, string WalletType);
 

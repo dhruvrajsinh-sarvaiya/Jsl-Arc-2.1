@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Infrastructure.Data;
@@ -79,6 +80,7 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             try
             {
+                entity.CreatedDate = Helpers.UTC_To_IST();//Rita 3-11-2018 no need to set at all type
                 _dbContext.Set<T>().Add(entity);
                 _dbContext.SaveChanges();
 
@@ -109,6 +111,7 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             try
             {
+                entity.UpdatedDate = Helpers.UTC_To_IST();//Rita 3-11-2018 no need to set at all type
                 _dbContext.Entry(entity).State = EntityState.Modified;
                 _dbContext.SaveChanges();
             }
