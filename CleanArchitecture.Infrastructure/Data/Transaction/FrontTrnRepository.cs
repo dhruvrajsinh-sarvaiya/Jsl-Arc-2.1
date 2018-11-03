@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -386,6 +387,31 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             catch (Exception ex)
             {
                 //_logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        public List<TradePairTableResponse> GetTradePairAsset()
+        {
+            try
+            {
+                IQueryable<TradePairTableResponse> Result;
+               
+                Result = _dbContext.TradePairTableResponse.FromSql(
+                            @"Select SM1.Id As BaseId,SM1.Name As BaseName,SM1.SMSCode As BaseCode,TPM.ID As PairId,TPM.PairName As Pairname,TPS.CurrentRate As Currentrate,TPD.BuyFees As BuyFees,TPD.SellFees As SellFees,
+                                SM2.Name As ChildCurrency,SM2.SMSCode As Abbrevation,TPS.ChangePer24 As ChangePer,TPS.ChangeVol24 As Volume,TPS.High24Hr AS High24Hr,TPS.Low24Hr As Low24Hr,
+                                TPS.HighWeek As HighWeek,TPS.LowWeek As LowWeek,TPS.High52Week AS High52Week,TPS.Low52Week As Low52Week,TPS.UpDownBit As UpDownBit from Market M 
+                                Inner Join TradePairMaster TPM ON TPM.BaseCurrencyId = M.ServiceID
+                                Inner Join TradePairDetail TPD ON TPD.PairId = TPM.Id
+                                Inner Join TradePairStastics TPS ON TPS.PairId = TPM.Id
+                                Inner Join ServiceMaster SM1 ON SM1.Id = TPM.BaseCurrencyId
+                                Inner Join ServiceMaster SM2 ON SM2.Id = TPM.SecondaryCurrencyId Order By M.ID");
+                
+                return Result.ToList();
+            }
+            catch (Exception ex)
+            {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
                 throw ex;
             }

@@ -23,6 +23,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.UserChangeLog;
 using Microsoft.EntityFrameworkCore.Metadata;
+using CleanArchitecture.Core.ViewModels;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -117,6 +118,7 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<ActiveOrderDataResponse> ActiveOrderDataResponse { get; set; } //komal 12-10-2018
         public DbQuery<GetBuySellBook> BuyerSellerInfo { get; set; } //uday 12-10-2018
         public DbQuery<GetGraphResponse> GetGraphResponse { get; set; } //uday 22-10-2018
+        public DbQuery<TradePairTableResponse> TradePairTableResponse { get; set; } //uday 03-11-2018
         //Add Tables for Service Master (Not Commited)
 
         public DbSet<ServiceMaster> ServiceMaster { get; set; }
