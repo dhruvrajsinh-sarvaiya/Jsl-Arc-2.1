@@ -251,7 +251,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         //Continuew as record Partially settled
                         try
                         {
-                            _ISignalRService.OnStatusChange(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj,accesstocken,1);
+                            _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj,accesstocken,1);//komal 
                                 //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
                         }
                         catch (Exception ex)
@@ -324,7 +324,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _Resp.ReturnMsg = "Full Settlement Done of TrnNo " + TradeBuyRequestObj.TrnNo + " Settled: " + TradeBuyRequestObj.DeliveredQty + " Remain:" + TradeBuyRequestObj.PendingQty;
                         try
                         {
-                            _ISignalRService.OnStatusChange(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accesstocken, 0);                            
+                            _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accesstocken, 0);//komal
                         }
                         catch (Exception ex)
                         {
