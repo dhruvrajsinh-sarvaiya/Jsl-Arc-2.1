@@ -32,10 +32,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (Request.SubsscrptionType == EnDeviceSubsscrptionType.Subsscribe)
                 {
                     Response = await SubscibePushNotification(Request);
+                    return Response;
                 }
                 else if (Request.SubsscrptionType == EnDeviceSubsscrptionType.UnSubsscribe)
                 {
                     Response = await SubscibePushNotification(Request);
+                    return Response;
                 }
                 return await Task.FromResult(new CommunicationResponse
                 {
@@ -61,7 +63,7 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 var DeviceStore = new DeviceStore();
                 DeviceStore = _MessageRepository.GetById(Request.UserID);
-                if (DeviceStore.UserID > 0)
+                if (DeviceStore != null && DeviceStore.UserID > 0)
                 {
                     DeviceStore.Active();
                     _MessageRepository.Update(DeviceStore);
