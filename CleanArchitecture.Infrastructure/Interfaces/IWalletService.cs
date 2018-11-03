@@ -138,5 +138,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 2018-11-03
         ListTokenConvertHistoryRes ConvertFundHistory(long Userid, DateTime FromDate, DateTime ToDate, string Coin);
+
+        //vsolanki 2018-11-03
+        decimal ConvertFund(decimal SourcePrice);
+        BizResponseClass AddIntoConvertFund(ConvertTockenReq Request, long userid);
     }
 }

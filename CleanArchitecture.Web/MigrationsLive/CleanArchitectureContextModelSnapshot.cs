@@ -445,7 +445,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("SMSCode")
                         .IsRequired()
-                        .HasMaxLength(5);
+                        .HasMaxLength(6);
 
                     b.Property<short>("ServiceType");
 
@@ -790,6 +790,35 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasAlternateKey("Address", "TrnID");
 
                     b.ToTable("DepositHistory");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.DeviceStore", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("UserID");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("DeviceID")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("Id", "UserID");
+
+                    b.HasAlternateKey("UserID");
+
+                    b.ToTable("DeviceStore");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.EmailQueue", b =>
@@ -3665,7 +3694,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("WalletTypeName")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasMaxLength(7);
 
                     b.HasKey("Id");
 

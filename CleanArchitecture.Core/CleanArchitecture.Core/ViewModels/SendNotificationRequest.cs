@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using CleanArchitecture.Core.ApiModels;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,5 +27,12 @@ namespace CleanArchitecture.Core.ViewModels
         [Required]
         [StringLength(200)]
         public string ContentTitle { get; set; }
+    }
+
+    public class DeviceRegistrationRequest : IRequest<CommunicationResponse>
+    {
+        public long UserID { get; set; }
+
+        public string DeviceID { get; set; }
     }
 }

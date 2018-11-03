@@ -15,7 +15,7 @@ namespace CleanArchitecture.Infrastructure.Data
             _dbContext = dbContext;
         }
 
-        public T GetById(int id)
+        public T GetById(long id)
         {
             return _dbContext.Set<T>().SingleOrDefault(e => e.Id == id);
         }

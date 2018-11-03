@@ -584,6 +584,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         }).ToList();
 
                         var GraphData = responseData.FirstOrDefault();
+                        _signalRService.ChartData(GraphData, VolumeData.PairName);
                     }
 
                     _signalRService.OnVolumeChange(VolumeData, MarketData);
