@@ -7,6 +7,6 @@ namespace CleanArchitecture.Core.Interfaces.Log
     public interface IipHistory
     {
         long AddIpHistory(IpHistoryViewModel model);
-        List<IpHistoryViewModel> GetIpHistoryListByUserId(long UserId, int pageIndex, int pageSize);
+        List<IpHistoryDataViewModel> GetIpHistoryListByUserId(long UserId, int pageIndex, int pageSize);
     }
 }
