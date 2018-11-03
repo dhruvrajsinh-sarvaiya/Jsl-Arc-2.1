@@ -13,7 +13,7 @@ namespace CleanArchitecture.Core.Entities.Configuration
         [StringLength(30)]
         [Required]
         public string Name { get; set; }
-        [StringLength(5)]
+        [StringLength(6)]
         [Required]
         public string SMSCode { get; set; }
         public short ServiceType { get; set; }
