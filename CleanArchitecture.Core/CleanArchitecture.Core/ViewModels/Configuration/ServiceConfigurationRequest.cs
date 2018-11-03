@@ -11,7 +11,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
         [StringLength(30, ErrorMessage = "1,Please enter a valid  parameters,4519")]
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4520")]
         public string Name { get; set; }
-        [StringLength(5, ErrorMessage = "1,Please enter a valid  parameters,4521")]
+        [StringLength(6, ErrorMessage = "1,Please enter a valid  parameters,4521")]
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4522")]
         public string SMSCode { get; set; }
         public short Type { get; set; }
