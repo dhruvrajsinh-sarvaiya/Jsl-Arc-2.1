@@ -1577,7 +1577,7 @@ namespace CleanArchitecture.Infrastructure.Data
 
         public List<TokenConvertHistoryRes> ConvertFundHistory(long Userid, DateTime FromDate, DateTime ToDate, string Coin)
         {
-            var h = (from c in _dbContext.ConvertFund
+            var h = (from c in _dbContext.ConvertFundHistory
                      join w in _dbContext.WalletMasters
                      on c.FromWalletId equals w.Id
                      join wt in _dbContext.WalletTypeMasters

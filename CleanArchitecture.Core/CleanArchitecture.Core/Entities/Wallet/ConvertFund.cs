@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Wallet
 {
-    public class ConvertFund : BizBase
+    public class ConvertFundHistory : BizBase
     {
         [Required]
         public long FromWalletId { get; set; }
