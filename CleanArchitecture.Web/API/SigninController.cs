@@ -26,8 +26,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
 using TwoFactorAuthNet;
-using CleanArchitecture.Core.Interfaces.Log;
-using CleanArchitecture.Core.ViewModels.AccountViewModels.Log;
 
 namespace CleanArchitecture.Web.API
 {
@@ -50,15 +48,14 @@ namespace CleanArchitecture.Web.API
             new Dictionary<string, IUserTwoFactorTokenProvider<ApplicationUser>>();
         private readonly ITempUserRegisterService _tempUserRegisterService;
         private readonly IUserKeyMasterService _userKeyMasterService;
-        private readonly IipHistory _iipHistory;
+
         private ApplicationUser _ApplicationUser;
-        private readonly ILoginHistory _loginHistory;
 
         #endregion
 
         #region Ctore
         public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage,
-            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService, IUserKeyMasterService userKeyMasterService, IipHistory iipHistory,ILoginHistory loginHistory)
+            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService, IUserKeyMasterService userKeyMasterService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -72,8 +69,6 @@ namespace CleanArchitecture.Web.API
             _custompassword = custompassword;
             _tempUserRegisterService = tempUserRegisterService;
             _userKeyMasterService = userKeyMasterService;
-            _iipHistory = iipHistory;
-            _loginHistory = loginHistory;
         }
         #endregion
 
@@ -353,42 +348,15 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
-
                 //var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: false);
                 // var checkmail = await _userManager.FindByEmailAsync(model.Username);
-                string Location = await _userService.GetLocationByIP(model.IPAddress);
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
                     _ApplicationUser = user;
                     var roles = await _userManager.GetRolesAsync(user);
-
-                    
-                    //// added by nirav savariya for ip history user wise on 11-03-2018
-                    var IpHistory = new IpHistoryViewModel()
-                    {
-                        IpAddress = model.IPAddress,
-                        Location = Location,
-                        UserId = user.Id,
-                    };
-                    _iipHistory.AddIpHistory(IpHistory);
-
-                    var LoginhistoryViewModel = new LoginhistoryViewModel()
-                    {
-                        UserId = user.Id,
-                        IpAddress = model.IPAddress,
-                        Device = model.DeviceId,
-                        Location = Location
-                    };
-                    _loginHistory.AddLoginHistory(LoginhistoryViewModel);
-
+                    //_logger.LogInformation(1, "User logged in.");
                     return Ok(new StandardLoginResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
                 }
                 if (result.RequiresTwoFactor)
@@ -396,25 +364,6 @@ namespace CleanArchitecture.Web.API
 
                     //// Start 2FA in Custome token Create 
                     var user = await _userManager.FindByNameAsync(model.Username);
-
-                    //// added by nirav savariya for ip history user wise on 11-03-2018
-                    var IpHistory = new IpHistoryViewModel()
-                    {
-                        IpAddress = model.IPAddress,
-                        Location = Location,
-                        UserId = user.Id,
-                    };
-                    _iipHistory.AddIpHistory(IpHistory);
-
-                    var LoginhistoryViewModel = new LoginhistoryViewModel()
-                    {
-                        UserId = user.Id,
-                        IpAddress = model.IPAddress,
-                        Device = model.DeviceId,
-                        Location = Location
-                    };
-                    _loginHistory.AddLoginHistory(LoginhistoryViewModel);
-
                     string TwoFAToken = _userKeyMasterService.Get2FACustomToken(user.Id);
                     //// End 2FA in Custome token Create 
                     return Ok(new StandardLogin2FAResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.FactorRequired, ErrorCode = enErrorCode.Status4060VerifyMethod, TwoFAToken = TwoFAToken });
@@ -473,13 +422,6 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
-
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user != null)
                 {
@@ -492,6 +434,9 @@ namespace CleanArchitecture.Web.API
                         data.EnableStatus = false;
                         await _custompassword.AddPassword(data);
 
+
+
+                        _logger.LogWarning(1, "User Login with Email Send Success.");
                         return Ok(new LoginWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.LoginWithEmailSuccessSend, Appkey = otpData.appkey });
                     }
                     else
@@ -533,16 +478,8 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
-
                 //var logindata = await _userService.FindByEmail(model.Email);
                 var checkmail = await _userManager.FindByEmailAsync(model.Email);
-                string Location = await _userService.GetLocationByIP(model.IPAddress);
                 if (!string.IsNullOrEmpty(checkmail?.Email) && (checkmail.LockoutEnd <= DateTime.UtcNow || checkmail.LockoutEnd == null))
                 {
                     if (checkmail?.Id > 0)
@@ -560,24 +497,6 @@ namespace CleanArchitecture.Web.API
                                         //var result = await _signInManager.PasswordSignInAsync(checkmail.UserName, currenttime, false, lockoutOnFailure: false);
                                         //// Start 2FA in Custome token Create 
                                         var user = await _userManager.FindByEmailAsync(model.Email);
-                                        //// added by nirav savariya for ip history user wise on 11-03-2018
-                                        var IpHistory = new IpHistoryViewModel()
-                                        {
-                                            IpAddress = model.IPAddress,
-                                            Location = Location,
-                                            UserId = user.Id,
-                                        };
-                                        _iipHistory.AddIpHistory(IpHistory);
-
-                                        var LoginhistoryViewModel = new LoginhistoryViewModel()
-                                        {
-                                            UserId = user.Id,
-                                            IpAddress = model.IPAddress,
-                                            Device = model.DeviceId,
-                                            Location = Location
-                                        };
-                                        _loginHistory.AddLoginHistory(LoginhistoryViewModel);
-
                                         string TwoFAToken = _userKeyMasterService.Get2FACustomToken(user.Id);
                                         //// End 2FA in Custome token Create 
 
@@ -611,24 +530,6 @@ namespace CleanArchitecture.Web.API
                                     _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(checkmail);
-
-                                    //// added by nirav savariya for ip history user wise on 11-03-2018
-                                    var IpHistorydet = new IpHistoryViewModel()
-                                    {
-                                        IpAddress = model.IPAddress,
-                                        Location = Location,
-                                        UserId = checkmail.Id,
-                                    };
-                                    _iipHistory.AddIpHistory(IpHistorydet);
-
-                                    var LoginhistoryViewModel = new LoginhistoryViewModel()
-                                    {
-                                        UserId = checkmail.Id,
-                                        IpAddress = model.IPAddress,
-                                        Device = model.DeviceId,
-                                        Location = Location
-                                    };
-                                    _loginHistory.AddLoginHistory(LoginhistoryViewModel);
                                     //  return AppUtils.SignIn(checkmail, roles);
                                     return Ok(new OTPWithEmailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
                                 }
@@ -710,13 +611,6 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
-
                 var userdt = await _userManager.FindByEmailAsync(model.Email);
                 if (!string.IsNullOrEmpty(userdt?.Email))
                 {
@@ -785,13 +679,6 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
-
                 var userdt = await _userService.FindByMobileNumber(model.Mobile);
                 if (userdt != null)
                 {
@@ -844,16 +731,8 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-                ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
-
                 var logindata = await _userService.FindByMobileNumber(model.Mobile);
                 var result = await _userManager.FindByIdAsync(logindata?.Id.ToString());
-                string Location = await _userService.GetLocationByIP(model.IPAddress);
                 if (!string.IsNullOrEmpty(result?.Mobile) && (result.LockoutEnd <= DateTime.UtcNow || result.LockoutEnd == null))
                 {
                     if (logindata?.Id > 0)
@@ -868,23 +747,6 @@ namespace CleanArchitecture.Web.API
                                     _otpMasterService.UpdateOtp(tempotp.Id);  /// Added by pankaj for update the opt enable status
                                     if (result.TwoFactorEnabled)   /// Addede By Pankaj For TwoFactor Authentication Purporse
                                     {
-                                        //// added by nirav savariya for ip history user wise on 11-03-2018
-                                        var IpHistory = new IpHistoryViewModel()
-                                        {
-                                            IpAddress = model.IPAddress,
-                                            Location = Location,
-                                            UserId = result.Id,
-                                        };
-                                        _iipHistory.AddIpHistory(IpHistory);
-
-                                        var LoginhistoryViewModel = new LoginhistoryViewModel()
-                                        {
-                                            UserId = result.Id,
-                                            IpAddress = model.IPAddress,
-                                            Device = model.DeviceId,
-                                            Location = Location
-                                        };
-                                        _loginHistory.AddLoginHistory(LoginhistoryViewModel);
 
                                         ////// Start 2FA in Custome token Create                                    
                                         string TwoFAToken = _userKeyMasterService.Get2FACustomToken(logindata.Id);
@@ -914,24 +776,7 @@ namespace CleanArchitecture.Web.API
                                         //else
                                         //    return BadRequest(new OTPWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.Userpasswordnotupdated, ErrorCode = enErrorCode.Status4061Userpasswordnotupdated });
                                     }
-
-                                    //// added by nirav savariya for ip history user wise on 11-03-2018
-                                    var IpHistorydet = new IpHistoryViewModel()
-                                    {
-                                        IpAddress = model.IPAddress,
-                                        Location = "",
-                                        UserId = result.Id,
-                                    };
-                                    _iipHistory.AddIpHistory(IpHistorydet);
-
-                                    var LoginhistoryViewModel = new LoginhistoryViewModel()
-                                    {
-                                        UserId = result.Id,
-                                        IpAddress = model.IPAddress,
-                                        Device = model.DeviceId,
-                                        Location = Location
-                                    };
-                                    _loginHistory.AddLoginHistory(LoginhistoryViewModel);
+                                    _logger.LogWarning(1, "You are successfully login.");
                                     _otpMasterService.UpdateOtp(tempotp.Id);
                                     var roles = await _userManager.GetRolesAsync(result);
                                     return Ok(new OTPWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.StandardLoginSuccess });
@@ -1005,14 +850,6 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-
-                ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(model.IPAddress);
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
-
                 var userdt = await _userService.FindByMobileNumber(model.Mobile);
                 if (!string.IsNullOrEmpty(userdt?.Mobile))
                 {

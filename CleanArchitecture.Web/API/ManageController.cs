@@ -52,8 +52,6 @@ namespace CleanArchitecture.Web.API
         private readonly IDeviceIdService _iDeviceIdService;
         private readonly IBasePage _basePage;
         private readonly IUserChangeLog _iuserChangeLog;
-        private readonly IipHistory _iipHistory;
-        private readonly ILoginHistory _loginHistory;
         #endregion
 
         #region Ctore
@@ -69,9 +67,7 @@ namespace CleanArchitecture.Web.API
         IUserService userdata,
         IipAddressService ipAddressService,
          IBasePage basePage,
-         IDeviceIdService iDeviceIdService, IUserChangeLog userChangeLog,
-         IipHistory iipHistory,
-         ILoginHistory loginHistory)
+         IDeviceIdService iDeviceIdService, IUserChangeLog userChangeLog)
         {
             _context = context;
             _userManager = userManager;
@@ -86,8 +82,6 @@ namespace CleanArchitecture.Web.API
             _basePage = basePage;
             _iDeviceIdService = iDeviceIdService;
             _iuserChangeLog = userChangeLog;
-            _iipHistory = iipHistory;
-            _loginHistory = loginHistory;
         }
         #endregion
 
@@ -764,76 +758,6 @@ namespace CleanArchitecture.Web.API
 
         }
 
-        #endregion
-
-        #region IpHistory
-        [HttpGet("GetIpHistory/{PageIndex}/{Page_Size}")]
-        public async Task<IActionResult> GetIpHistory(int PageIndex = 0, int Page_Size = 0)
-        {
-            try
-            {
-                var user = await GetCurrentUserAsync();
-
-                if (user != null)
-                {
-                    var IpHistoryList = (dynamic)null;
-                    IpHistoryList = _iipHistory.GetIpHistoryListByUserId(user.Id, PageIndex, Page_Size);
-                    int TotalRowCount = 0;
-                    if (IpHistoryList != null)
-                    {
-                        if (IpHistoryList.Count > 0)
-                        {
-                            TotalRowCount = IpHistoryList.Count;
-                        }
-                    }
-                    return Ok(new IpHistoryResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetIpHistory, IpHistoryList = IpHistoryList, TotalRow = TotalRowCount });
-                }
-                else
-                {
-                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-
-        }
-        #endregion
-
-        #region LoginHistory
-        [HttpGet("GetLoginHistory/{PageIndex}/{Page_Size}")]
-        public async Task<IActionResult> GetLoginHistory(int PageIndex = 0, int Page_Size = 0)
-        {
-            try
-            {
-                var user = await GetCurrentUserAsync();
-
-                if (user != null)
-                {
-                    var LoginHistoryList = (dynamic)null;
-                    LoginHistoryList = _loginHistory.GetLoginHistoryByUserId(user.Id, PageIndex, Page_Size);
-                    int TotalRowCount = 0;
-                    if (LoginHistoryList != null)
-                    {
-                        if (LoginHistoryList.Count > 0)
-                        {
-                            TotalRowCount = LoginHistoryList.Count;
-                        }
-                    }
-                    return Ok(new LoginHistoryResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetLoginHistory, LoginHistoryList = LoginHistoryList, TotalRow = TotalRowCount });
-                }
-                else
-                {
-                    return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4033NotFoundRecored });
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new IpAddressResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-            }
-
-        }
         #endregion
 
         [HttpPost("changepassword")]

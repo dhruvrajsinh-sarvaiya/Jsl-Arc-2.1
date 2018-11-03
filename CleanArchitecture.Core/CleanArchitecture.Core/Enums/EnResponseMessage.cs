@@ -245,8 +245,6 @@ namespace CleanArchitecture.Core.Enums
         public static string TwoFactorActiveRequest = "User two factor authentication reguest successfully send.";
         public static string TwoFAalreadyDisable = "Two factor authentication already disable.";
         public static string FactorKeyFail = "Invalid two factor key.";
-        public static string SuccessGetIpHistory = "Success full Get Ip History.";
-        public static string SuccessGetLoginHistory = "Success full Get Ip History.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";

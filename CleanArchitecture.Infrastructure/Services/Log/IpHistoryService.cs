@@ -42,7 +42,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
             }
         }
 
-        public List<IpHistoryDataViewModel> GetIpHistoryListByUserId(long UserId, int pageIndex, int pageSize)
+        public List<IpHistoryViewModel> GetIpHistoryListByUserId(long UserId, int pageIndex, int pageSize)
         {
             try
             {
@@ -52,13 +52,13 @@ namespace CleanArchitecture.Infrastructure.Services.Log
                     return null;
                 }
 
-                var IpList = new List<IpHistoryDataViewModel>();
+                var IpList = new List<IpHistoryViewModel>();
                 foreach (var item in IpHistoryList)
                 {
-                    IpHistoryDataViewModel model = new IpHistoryDataViewModel();
+                    IpHistoryViewModel model = new IpHistoryViewModel();
                     model.IpAddress = item.IpAddress;
                     model.Location = item.Location;
-                    model.Date = item.CreatedDate;
+                    model.CreatedDate = item.CreatedDate;
                     IpList.Add(model);
                 }
                 //return IpList;
