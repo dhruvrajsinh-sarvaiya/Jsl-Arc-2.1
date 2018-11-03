@@ -431,7 +431,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
         #endregion
 
-        public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Tokene, short OrderType, short IsPartial=0)
+        public void OnStatusChange(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
         {
             try
             {
@@ -477,18 +477,21 @@ namespace CleanArchitecture.Infrastructure.Services
                     //add OrderHistory
                     //add TradeHistory
 
-                    
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType,1);//with amount 0, remove from OpenOrder
-                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
-                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
-                    OrderHistory(historyInfo,historyInfo.PairName);//Order
-                    TradeHistory(historyInfo, Token);//TradeHistory
+                    if (!string.IsNullOrEmpty(Token))
+                    {
+                        GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType, 1);//with amount 0, remove from OpenOrder
+                        GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
+                        historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
+                        OrderHistory(historyInfo, historyInfo.PairName);//Order
+                        TradeHistory(historyInfo, Token);//TradeHistory
 
-                    var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
-                    msg = msg.Replace("#Price#",historyInfo.Price .ToString());
-                    msg = msg.Replace("#Qty#", historyInfo.Amount .ToString());
-                    msg = msg.Replace("#Total#", historyInfo.Total .ToString());
-                    ActivityNotification(msg,Token);
+                        var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
+                        msg = msg.Replace("#Price#", historyInfo.Price.ToString());
+                        msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
+                        msg = msg.Replace("#Total#", historyInfo.Total.ToString());
+                        ActivityNotification(msg, Token);
+                    }
+                        
                 }
                 else if (Status == Convert.ToInt16(enTransactionStatus.Success) && IsPartial==1)//Partial settled
                 {
@@ -497,50 +500,57 @@ namespace CleanArchitecture.Infrastructure.Services
                     //add tradehistory
                     //add orderhistory
                     //update Buyer/seller book
+                    if (!string.IsNullOrEmpty(Token))
+                    {
+                        List<GetBuySellBook> list = new List<GetBuySellBook>();
 
-                    List<GetBuySellBook> list = new List<GetBuySellBook>();
+                        GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
+                        GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);//update OpenOrder
+
+                        historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
+                        OrderHistory(historyInfo, historyInfo.PairName);//Order
+                        TradeHistory(historyInfo, Token);//TradeHistory
+                        var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
+                        msg = msg.Replace("#Price#", historyInfo.Price.ToString());
+                        msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
+                        msg = msg.Replace("#Total#", historyInfo.Total.ToString());
+                        ActivityNotification(msg, Token);
+                        if (NewTradeTransaction.TrnType == 4)//Buy
+                        {
+                            list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
+                            foreach (var model in list)
+                            {
+                                BuySellmodel = model;
+                                break;
+                            }
+                            BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
+                        else//Sell
+                        {
+                            list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
+                            foreach (var model in list)
+                            {
+                                BuySellmodel = model;
+                                break;
+                            }
+                            SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        }
+                    }
                     
-                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType);//update OpenOrder
-
-                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
-                    OrderHistory(historyInfo, historyInfo.PairName);//Order
-                    TradeHistory(historyInfo, Token);//TradeHistory
-                    var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
-                    msg = msg.Replace("#Price#", historyInfo.Price.ToString());
-                    msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
-                    msg = msg.Replace("#Total#", historyInfo.Total.ToString());
-                    ActivityNotification(msg, Token);
-                    if (NewTradeTransaction.TrnType == 4)//Buy
-                    {
-                        list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
-                        foreach (var model in list)
-                        {
-                            BuySellmodel = model;
-                            break;
-                        }
-                        BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                    }
-                    else//Sell
-                    {
-                        list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
-                        foreach (var model in list)
-                        {
-                            BuySellmodel = model;
-                            break;
-                        }
-                        SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                    }
                 }
                 else if (Status == Convert.ToInt16(enTransactionStatus.SystemFail))
                 {
                     //pop from OpenOrder
                     //update Recent order
                     //add Trade history
-                    GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType, 1);//with amount 0, remove from OpenOrder
-                    GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
-                    historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
-                    TradeHistory(historyInfo, Token);//TradeHistory
+                    if (!string.IsNullOrEmpty(Token))
+                    {
+                        GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction, OrderType, 1);//with amount 0, remove from OpenOrder
+                        GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction, OrderType);//Update Recent
+                        historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
+                        TradeHistory(historyInfo, Token);//TradeHistory
+                    }
+                       
                 }
 
 
@@ -581,8 +591,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     Token = GetTokenByUserID(Token);
                 }
-                BuyerSideWalletBal(Data, WalletTypeName, Token);
-                SellerSideWalletBal(Data, WalletTypeName, Token);
+                if (!string.IsNullOrEmpty(Token))
+                {
+                    BuyerSideWalletBal(Data, WalletTypeName, Token);
+                    SellerSideWalletBal(Data, WalletTypeName, Token);
+                }
+                    
             }
             catch (Exception ex)
             {
