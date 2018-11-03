@@ -689,7 +689,26 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        
+        public void SendActivityNotification(string Msg, string Token, short TokenType = 1)
+        {
+            try
+            {
+                if (TokenType == Convert.ToInt16(enTokenType.ByUserID))
+                {
+                    Token = GetTokenByUserID(Token);
+                }
+                if (!string.IsNullOrEmpty(Token))
+                {
+                    ActivityNotification(Msg, Token);
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
         public string GetTokenByUserID(string ID)
         {
             try
@@ -704,6 +723,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 throw ex;
             }
         }
+
+        
 
         //public void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName, long UserID)
         //{
