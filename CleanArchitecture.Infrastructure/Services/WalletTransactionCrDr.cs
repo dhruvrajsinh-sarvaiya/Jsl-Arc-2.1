@@ -229,7 +229,12 @@ namespace CleanArchitecture.Infrastructure.Services
                     //tqObj = InsertIntoWalletTransactionQueue(Guid.NewGuid().ToString(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, 2, EnResponseMessage.InvalidWallet);
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidWallet, ErrorCode = enErrorCode.InvalidWallet };
                 }
-
+                //ntrivedi 03-11-2018
+                var charge = _commonWalletFunction.GetServiceLimitChargeValue(enTrnType.Deposit, coinName);
+                if (charge.MaxAmount > amount && charge.MinAmount < amount)
+                {
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
+                }
                 resp = InsertWalletTQDebit(timestamp, dWalletobj.Id, coinName, amount, TrnRefNo, serviceType, enWalletTrnType.Dr_Debit, enWalletTranx, enWalletLimit);
                 if (resp.ReturnCode !=0 || resp.Status != enTransactionStatus.Initialize)
                 {
@@ -270,19 +275,20 @@ namespace CleanArchitecture.Infrastructure.Services
                 _walletRepository1.WalletCreditDebitwithTQ(walletLedgerDr, walletLedgerCr, tranxAccountCr, tranxAccounDrt, dWalletobj, cWalletObj, objTQCr, objTQDr, woObj);
 
                 //vsolanki 2018-11-1---------------socket method   --------------------------
-                //WalletMasterResponse walletMasterObj = new WalletMasterResponse();
-                //walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
-                //walletMasterObj.Balance = dWalletobj.Balance;
-                //walletMasterObj.WalletName = dWalletobj.Walletname;
-                //walletMasterObj.PublicAddress = dWalletobj.PublicAddress;
-                //walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
-                //walletMasterObj.CoinName = coinName;
-                //_signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
-                //// OnWalletBalChange(walletMasterObj, coinName,  Token);
-                ////-------------------------------
+                WalletMasterResponse walletMasterObj = new WalletMasterResponse();
+                walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
+                walletMasterObj.Balance = dWalletobj.Balance;
+                walletMasterObj.WalletName = dWalletobj.Walletname;
+                walletMasterObj.PublicAddress = dWalletobj.PublicAddress;
+                walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
+                walletMasterObj.CoinName = coinName;
+                _signalRService.OnWalletBalChange(walletMasterObj, coinName, dWalletobj.UserID.ToString(), 2);
+                _signalRService.SendActivityNotification("Deposition found for Address @Address for @Coin", dWalletobj.UserID.ToString(), 2);
+                // OnWalletBalChange(walletMasterObj, coinName,  Token);
+                //-------------------------------
 
 
-                ////vsolanki 2018-11-1---------------socket method   --------------------------
+                //vsolanki 2018-11-1---------------socket method   --------------------------
                 //WalletMasterResponse walletMasterObj1 = new WalletMasterResponse();
                 //walletMasterObj.AccWalletID = cWalletObj.AccWalletID;
                 //walletMasterObj.Balance = cWalletObj.Balance;
@@ -292,7 +298,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //walletMasterObj.CoinName = coinName;
                 //_signalRService.OnWalletBalChange(walletMasterObj1, coinName, Token);
 
-                // OnWalletBalChange(walletMasterObj, coinName,  Token);
+                //OnWalletBalChange(walletMasterObj, coinName, Token);
                 //-------------------------------
 
 
