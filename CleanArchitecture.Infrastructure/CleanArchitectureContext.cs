@@ -92,7 +92,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<BeneficiaryMaster> BeneficiaryMaster { get; set; }
         public DbSet<WalletLimitConfigurationMaster> WalletLimitConfigurationMaster { get; set; }
         public DbSet<WithdrawHistory> WithdrawHistory { get; set; }
-        public DbSet<ConvertFund> ConvertFund { get; set; }
+        public DbSet<ConvertFundHistory> ConvertFundHistory { get; set; }
         
         //========Transaction Tables
         public DbSet<TradeTransactionQueue> TradeTransactionQueue { get; set; }
