@@ -130,3 +130,6 @@ CleanArchitecture.Web/obj/Debug/netcoreapp2.1/CleanArchitecture.Web.csproj.FileL
 CleanArchitecture.Web/obj/Debug/netcoreapp2.1/CleanArchitecture.Web.csprojAssemblyReference.cache
 CleanArchitecture.Web/obj/Debug/netcoreapp2.1/CleanArchitecture.Web.Views.dll
 CleanArchitecture.Web/obj/project.assets.json
+CleanArchitecture.Core/CleanArchitecture.Core/Enums/EnResponseMessage.cs
+CleanArchitecture.Core/CleanArchitecture.Core/Enums/EnResponseMessage.cs
+CleanArchitecture.Core/CleanArchitecture.Core/Enums/Enums.cs

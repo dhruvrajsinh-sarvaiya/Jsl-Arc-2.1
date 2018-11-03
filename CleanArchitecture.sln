@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.Web", "CleanArchitecture.Web\CleanArchitecture.Web.csproj", "{0A1B38E0-7E4B-48B3-AA51-768603035C40}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepositStatusCheckApp", "DepositStatusCheckApp\DepositStatusCheckApp.csproj", "{727E3B12-397A-4C6A-941F-D30E85A2AF66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WithdrawConsoleApplication", "WithdrawConsoleApplication\WithdrawConsoleApplication.csproj", "{AB274A8D-2335-4BF2-AB81-138ABE0174BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{0A1B38E0-7E4B-48B3-AA51-768603035C40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A1B38E0-7E4B-48B3-AA51-768603035C40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A1B38E0-7E4B-48B3-AA51-768603035C40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{727E3B12-397A-4C6A-941F-D30E85A2AF66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{727E3B12-397A-4C6A-941F-D30E85A2AF66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{727E3B12-397A-4C6A-941F-D30E85A2AF66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{727E3B12-397A-4C6A-941F-D30E85A2AF66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB274A8D-2335-4BF2-AB81-138ABE0174BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB274A8D-2335-4BF2-AB81-138ABE0174BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB274A8D-2335-4BF2-AB81-138ABE0174BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB274A8D-2335-4BF2-AB81-138ABE0174BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

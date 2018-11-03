@@ -7,8 +7,57 @@
     <UserSecretsId>aspnetcorespa-c23d27a4-eb88-4b18-9b77-2a93f3b15119</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="MigrationsLive\**" />
+    <Compile Remove="Migrations\**" />
+    <Content Remove="MigrationsLive\**" />
+    <Content Remove="Migrations\**" />
+    <EmbeddedResource Remove="MigrationsLive\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="MigrationsLive\**" />
+    <None Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Web.deps.json" />
+    <Content Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Web.runtimeconfig.dev.json" />
+    <Content Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Web.runtimeconfig.json" />
+    <Content Include="bin\Debug\netcoreapp2.1\LogFiles\Logfile_2018-11-02.txt" />
+    <Content Include="bin\Release\netcoreapp2.1\CleanArchitecture.Web.deps.json" />
+    <Content Include="bin\Release\netcoreapp2.1\CleanArchitecture.Web.runtimeconfig.dev.json" />
+    <Content Include="bin\Release\netcoreapp2.1\CleanArchitecture.Web.runtimeconfig.json" />
+  </ItemGroup>
+
   <ItemGroup>
     <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Core.dll" />
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Core.pdb" />
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.dll" />
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Infrastructure.pdb" />
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Web.dll" />
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Web.pdb" />
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Web.Views.dll" />
+    <None Include="bin\Debug\netcoreapp2.1\CleanArchitecture.Web.Views.pdb" />
+    <None Include="bin\Debug\netcoreapp2.1\NLog.config" />
+    <None Include="bin\Debug\netcoreapp2.1\TwoFactorAuth.Net.dll" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Core.dll" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Core.pdb" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Infrastructure.dll" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Infrastructure.pdb" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Web.dll" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Web.pdb" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Web.Views.dll" />
+    <None Include="bin\Release\netcoreapp2.1\CleanArchitecture.Web.Views.pdb" />
+    <None Include="bin\Release\netcoreapp2.1\NLog.config" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,8 +66,10 @@
     <PackageReference Include="libphonenumber-csharp" Version="8.9.14" />
     <!--<PackageReference Include="Microsoft.AspNetCore.All" />-->
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Connections.Abstractions" Version="2.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" />
+    <PackageReference Include="NLog.Config" Version="4.5.10" />
     <PackageReference Include="OpenIddict" Version="2.0.0-rc2-final" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="2.0.0-rc2-final" />
     <PackageReference Include="OpenIddict.Mvc" Version="2.0.0-rc2-final" />
@@ -34,6 +85,12 @@
   <ItemGroup>
     <ProjectReference Include="..\CleanArchitecture.core\CleanArchitecture.core\CleanArchitecture.Core.csproj" />
     <ProjectReference Include="..\CleanArchitecture.Infrastructure\CleanArchitecture.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="TwoFactorAuth.Net">
+      <HintPath>C:\Users\JBSL-0073\Downloads\TwoFactorAuth.Net.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

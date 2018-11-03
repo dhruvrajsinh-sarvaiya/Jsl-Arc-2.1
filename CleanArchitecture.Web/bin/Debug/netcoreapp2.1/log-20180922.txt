@@ -1,2 +1,0 @@
-2018-09-22T11:31:21.8945828+05:30 0HLH0A31H4E6S:00000003 [WRN] Failed to determine the https port for redirect. (ca76cc21)
-2018-09-22T11:47:01.7393558+05:30 0HLH0ABSAUGFG:00000003 [WRN] Failed to determine the https port for redirect. (ca76cc21)
