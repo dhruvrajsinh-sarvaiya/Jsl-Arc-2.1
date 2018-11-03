@@ -136,5 +136,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         ListOutgoingTrnRes GetOutGoingTransaction(long Userid, string Coin);
 
+        //vsolanki 2018-11-03
+        ListTokenConvertHistoryRes ConvertFundHistory(long Userid, DateTime FromDate, DateTime ToDate, string Coin);
     }
 }

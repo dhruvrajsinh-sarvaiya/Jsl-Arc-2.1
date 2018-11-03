@@ -111,5 +111,8 @@ namespace CleanArchitecture.Core.Interfaces
         List<TransfersRes> GetTransferIn(string Coin, DateTime? FromDate, DateTime? ToDate, short Status);
 
         List<TransfersRes> TransferOutHistory(string CoinName, DateTime? FromDate, DateTime? ToDate, short Status);
+
+        //vsolanki 2018-11-3
+        List<TokenConvertHistoryRes> ConvertFundHistory(long Userid, DateTime FromDate, DateTime ToDate, string Coin);
     }
 }

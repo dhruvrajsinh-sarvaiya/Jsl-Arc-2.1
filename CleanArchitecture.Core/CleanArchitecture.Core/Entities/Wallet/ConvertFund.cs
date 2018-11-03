@@ -30,6 +30,10 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal SourcePrice { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18, 8)")]
+        public decimal Price { get; set; }
+
+        [Required]
         public DateTime TrnDate { get; set; }
     }
 }
