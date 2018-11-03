@@ -40,7 +40,7 @@ namespace CleanArchitecture.Core.Interfaces
         void GetAndSendOpenOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
         GetTradeHistoryInfo GetAndSendTradeHistoryInfoData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
         void GetAndSendRecentOrderData(TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, short OrderType, short IsPop = 0);
-
+        void SendActivityNotification(string Msg, string Token, short TokenType = 1);
         string GetTokenByUserID(string ID);
     }
 }
