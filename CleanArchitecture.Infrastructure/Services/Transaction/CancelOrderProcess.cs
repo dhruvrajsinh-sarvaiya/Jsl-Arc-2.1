@@ -26,35 +26,47 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TradeTransactionRepository = TradeTransactionRepository;
             _SettlementRepository = SettlementRepository;
         }
-        public async Task<BizResponse> ProcessCancelOrderAsync(CancelOrderRequest Req)
+        public async Task<BizResponse> ProcessCancelOrderAsync(CancelOrderRequest Req,string accessToken)
         {
+            BizResponse _Resp = new BizResponse();
             try
             {
-                BizResponse _Resp = new BizResponse();
-
-                var TradeTranQueueObj = _TradeTransactionRepository.GetById(Req.TranNo);
+                var TradeTranQueueObj = _TradeTransactionRepository.GetSingle(item=>item.TrnNo==Req.TranNo);
                 if(TradeTranQueueObj != null)
                 {
-                    TradeTranQueueObj.IsCancelled = 1;
-                    _TradeTransactionRepository.Update(TradeTranQueueObj);
+                    _Resp.ErrorCode = enErrorCode.CancelOrder_NoRecordFound;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ReturnMsg ="No Record Found";
+                    return _Resp;
                 }
-                
+                if (TradeTranQueueObj.Status != Convert.ToInt16(enTransactionStatus.Hold))
+                {
+                    _Resp.ErrorCode = enErrorCode.CancelOrder_TrnNotHold;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ReturnMsg = "Order is not in pending State";
+                    return _Resp;
+                }
+                TradeTranQueueObj.IsCancelled = 1;
+                _TradeTransactionRepository.Update(TradeTranQueueObj);
+
                 var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == Req.TranNo && item.IsProcessing == 0 &&
-                                                                           (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
-                                                                           item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
+                                                                    (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
+                                                                    item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
                 if (NewBuyRequestObj != null)
                 {
                     var HoldTrnNosNotExec = new List<long> { };
                     _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, NewBuyRequestObj, ref HoldTrnNosNotExec);
                 }
-
-                return _Resp;
+                
             }
             catch(Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                _Resp.ErrorCode = enErrorCode.CancelOrder_InternalError;
+                _Resp.ReturnCode = enResponseCodeService.Fail;
+                _Resp.ReturnMsg = "Internal Error";
             }
+            return _Resp;
         }
     }
 }
