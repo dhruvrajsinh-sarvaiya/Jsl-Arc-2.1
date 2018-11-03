@@ -132,7 +132,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         ServiceLimitChargeValue GetServiceLimitChargeValue(enTrnType TrnType, string CoinName);
 
         //vsoalnki 2018-10-31
-        CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId);
+        CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId,string accessToken);
 
         ListOutgoingTrnRes GetOutGoingTransaction(long Userid, string Coin);
 

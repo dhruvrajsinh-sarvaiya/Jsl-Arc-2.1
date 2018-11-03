@@ -832,7 +832,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //genrate address and update in walletmaster
                 if (isBaseService == 0)    //uday 25-10-2018 When Service is add create default wallet of org not generate the address
                 {
-                    var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName);
+                    var addressClass = GenerateAddress(walletMaster.AccWalletID, CoinName,accessToken);
                     if (addressClass.address != null)
                     {
                         walletMaster.WalletPublicAddress(addressClass.address);
@@ -2706,7 +2706,7 @@ namespace CleanArchitecture.Infrastructure.Services
         }
 
         //vsoalnki 2018-10-31
-        public CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId)
+        public CreateWalletAddressRes CreateETHAddress(string Coin, int AddressCount, long UserId,string token)
         {
             try
             {
@@ -2728,7 +2728,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 for (int i = 1; i <= AddressCount; i++)
                 {
-                    addr = GenerateAddress(walletObj.AccWalletID, Coin,1);
+                    addr = GenerateAddress(walletObj.AccWalletID, Coin, token,1);
                     if (addr.address == null)
                     {
                         return addr;
@@ -2847,7 +2847,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
-        public BizResponseClass AddIntoConvertFund(ConvertTockenReq Request,long userid)
+        public BizResponseClass AddIntoConvertFund(ConvertTockenReq Request, long userid, string accessToken = null)
         {
             try
             {
@@ -2864,6 +2864,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 h.Price = 10;
                 h.TrnDate = UTC_To_IST();
                 _ConvertFundHistory.Add(h);
+                if(accessToken!=null)
+                {
+                    var msg = EnResponseMessage.ConvertFund;
+                    msg = msg.Replace("#SourcePrice#", h.SourcePrice.ToString());
+                    msg = msg.Replace("#DestinationPrice#", h.DestinationPrice.ToString());
+                    _signalRService.SendActivityNotification(msg, accessToken);
+                }
                 return new BizResponseClass { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.RecordAdded, ErrorCode = enErrorCode.Success }; 
             }
             catch (Exception ex)

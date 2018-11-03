@@ -406,7 +406,8 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    responseClass = _walletService.CreateETHAddress(Coin, AddressCount,user.Id);
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    responseClass = _walletService.CreateETHAddress(Coin, AddressCount,user.Id, accessToken);
                 }
              
                 //var respObj = JsonConvert.SerializeObject(Response);
