@@ -8,6 +8,7 @@ using AspNet.Security.OpenIdConnect.Primitives;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces.Profile_Management;
 using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.Services;
 using CleanArchitecture.Core.ViewModels;
@@ -15,6 +16,7 @@ using CleanArchitecture.Core.ViewModels.AccountViewModels;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.Login;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.OTP;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.SignUp;
+using CleanArchitecture.Core.ViewModels.Profile_Management;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Infrastructure.Services;
@@ -46,11 +48,12 @@ namespace CleanArchitecture.Web.API
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private readonly IBasePage _basePage;
         private readonly IWalletService _IwalletService;
+        private readonly ISubscriptionMaster _IsubscriptionMaster;
         #endregion
 
         #region Ctore
         public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService, Microsoft.Extensions.Configuration.IConfiguration configuration, 
-            IBasePage basePage, IWalletService walletService)
+            IBasePage basePage, IWalletService walletService, ISubscriptionMaster IsubscriptionMaster)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
@@ -63,8 +66,7 @@ namespace CleanArchitecture.Web.API
             _configuration = configuration;
             _basePage = basePage;
             _IwalletService = walletService;
-
-
+            _IsubscriptionMaster = IsubscriptionMaster;
         }
         #endregion
 
@@ -256,7 +258,6 @@ namespace CleanArchitecture.Web.API
         {
             try
             {
-
                 if (!string.IsNullOrEmpty(emailConfirmCode))
                 {
                     byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
@@ -307,6 +308,13 @@ namespace CleanArchitecture.Web.API
                                         var resultupdate = await _userManager.UpdateAsync(currentUser);
                                         _tempUserRegisterService.Update(user.Id);
 
+                                        //// added by nirav savariya for create profile subscription plan on 11-04-2018
+                                        SubscriptionViewModel subscriptionmodel = new SubscriptionViewModel()
+                                        {
+                                            UserId = currentUser.Id
+                                        };
+                                        _IsubscriptionMaster.AddSubscription(subscriptionmodel);
+
                                         ///   define the wallet services..
 
                                         _IwalletService.CreateDefaulWallet(currentUser.Id);
@@ -317,7 +325,6 @@ namespace CleanArchitecture.Web.API
 
                                         };
                                         _IwalletService.AddBizUserTypeMapping(addBizUserTypeMappingReq);
-
                                         //return Ok("Your account has been activated, you can now login.");
                                         //return AppUtils.StanderdSignUp("Your account has been activated, you can now login.");
                                         return Ok(new RegisterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpEmailConfirm });
@@ -582,6 +589,12 @@ namespace CleanArchitecture.Web.API
                                             };
                                             _IwalletService.AddBizUserTypeMapping(addBizUserTypeMappingReq);
 
+                                            //// added by nirav savariya for create profile subscription plan on 11-04-2018
+                                            SubscriptionViewModel subscriptionmodel = new SubscriptionViewModel()
+                                            {
+                                                UserId = currentUser.Id
+                                            };
+                                            _IsubscriptionMaster.AddSubscription(subscriptionmodel);
 
                                             //return Ok("Your account has been activated, you can now login.");
                                             //return AppUtils.StanderdSignUp("You have successfully verified.");
@@ -626,8 +639,7 @@ namespace CleanArchitecture.Web.API
                 }
             }
             catch (Exception ex)
-            {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
+            {                
                 return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
@@ -855,6 +867,14 @@ namespace CleanArchitecture.Web.API
 
                                             };
                                             _IwalletService.AddBizUserTypeMapping(addBizUserTypeMappingReq);
+
+                                            //// added by nirav savariya for create profile subscription plan on 11-04-2018
+                                            SubscriptionViewModel subscriptionmodel = new SubscriptionViewModel()
+                                            {
+                                                UserId = currentUser.Id
+                                            };
+                                            _IsubscriptionMaster.AddSubscription(subscriptionmodel);
+
                                             return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUPVerification });
                                         }
                                         else
@@ -894,7 +914,6 @@ namespace CleanArchitecture.Web.API
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Date: " + _basePage.UTC_To_IST() + ",\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nControllername=" + this.GetType().Name, LogLevel.Error);
                 return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
