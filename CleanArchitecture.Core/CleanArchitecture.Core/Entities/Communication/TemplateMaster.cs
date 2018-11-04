@@ -19,7 +19,6 @@ namespace CleanArchitecture.Core.Entities
         public string TemplateName { get; set; }
 
         [Required]
-        [StringLength(1024)]
         public string Content { get; set; }
 
         [Required]
