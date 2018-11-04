@@ -34,7 +34,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             {
                 Qry = @"Select TQ.Id,TSL.ordertype,TTQ.PairName,TTQ.PairId,TQ.TrnDate,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type,TTQ.Order_Currency,TTQ.Delivery_Currency, " +
                    "CASE WHEN TTQ.BuyQty = 0 THEN TTQ.SellQty WHEN TTQ.SellQty = 0 THEN TTQ.BuyQty END as Amount, "+
-                   "CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END as Price, "+
+                   "CASE WHEN TTQ.BidPrice = 0 THEN ISNULL(TTQ.AskPrice,0)as AskPrice WHEN TTQ.AskPrice = 0 THEN ISNULL(TTQ.BidPrice,0)as BidPrice END as Price, " +
                    "TTQ.IsCancelled from TransactionQueue TQ INNER JOIN TradeTransactionQueue TTQ ON TQ.Id = TTQ.TrnNo INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id " +
                    "Where "+ sCondition  +" AND TQ.Status ={1} And TQ.MemberID ={0} ";
                 
