@@ -68,7 +68,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -95,7 +95,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -121,7 +121,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -147,7 +147,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -173,7 +173,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -199,7 +199,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -230,7 +230,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -257,7 +257,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -284,7 +284,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -312,7 +312,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -340,7 +340,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -369,7 +369,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -398,7 +398,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -424,7 +424,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
         #endregion
@@ -453,7 +453,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -476,7 +476,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -501,7 +501,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 OpenOrderModel.PairId = NewTradeTransaction.PairID;
                 OpenOrderModel.PairName = NewTradeTransaction.PairName;
                 OpenOrder(OpenOrderModel, Token);
-                HelperForLog.WriteLogIntoFile("GetAndSendOpenOrderData", ControllerName, " After OpenOrder call TRNNO:" + Newtransaction.Id + " " + JsonConvert.SerializeObject(OpenOrderModel) + " TradeTransactionQueue " + JsonConvert.SerializeObject(NewTradeTransaction));
+                HelperForLog.WriteLogIntoFile("GetAndSendOpenOrderData", ControllerName, " After OpenOrder call TRNNO:" + Newtransaction.Id);
                 if (IsPop != 1)//send notification
                 {
                     var msg = EnResponseMessage.SignalRTrnSuccessfullyCreated;
@@ -513,7 +513,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -540,7 +540,8 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                //throw ex;
+                return null;
             }
         }
 
@@ -559,12 +560,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 model.PairName = NewTradeTransaction.PairName;
                 model.OrderType = Enum.GetName(typeof(enTransactionMarketType), OrderType);
                 RecentOrder(model, Token);
-                HelperForLog.WriteLogIntoFile("GetAndSendRecentOrderData", ControllerName, "After Socket call RecentOrder TRNNO:" + Newtransaction.Id + " " + JsonConvert.SerializeObject(model) + " TradeTransactionQueue " + JsonConvert.SerializeObject(NewTradeTransaction));
+                HelperForLog.WriteLogIntoFile("GetAndSendRecentOrderData", ControllerName, "After Socket call RecentOrder TRNNO:" + Newtransaction.Id);
             }
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -584,7 +585,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                //throw ex;
             }
         }
 
@@ -599,7 +600,8 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                //throw ex;
+                return "";
             }
         }
 
@@ -629,9 +631,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Open Order Socket call ");
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     OrderHistory(historyInfo, historyInfo.PairName);//Order
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  :" + JsonConvert.SerializeObject(historyInfo));
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  :" );
                     TradeHistory(historyInfo, Token);//TradeHistory
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  :" + JsonConvert.SerializeObject(historyInfo));
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  :");
                     var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
                     msg = msg.Replace("#Price#", historyInfo.Price.ToString());
                     msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
@@ -642,7 +644,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                //throw ex;
             }
         }
         public void OnStatusPartialSuccess(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType)
@@ -692,7 +694,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
         }
         public void OnStatusHold(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType)
@@ -723,7 +725,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         if (BuySellmodel.OrderId .ToString()!= "00000000-0000-0000-0000-000000000000")
                         {
                             BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "BuyerBook call TRNNO:" + Newtransaction.Id + " " + JsonConvert.SerializeObject(BuySellmodel));
+                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "BuyerBook call TRNNO:" + Newtransaction.Id );
                         }
                         
                     }
@@ -738,7 +740,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         if(BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
                         {
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "SellerBook call TRNNO:" + Newtransaction.Id + " " + JsonConvert.SerializeObject(BuySellmodel));
+                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "SellerBook call TRNNO:" + Newtransaction.Id );
                         }
                         
                     }
@@ -756,7 +758,7 @@ namespace CleanArchitecture.Infrastructure.Services
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-                throw ex;
+                ////throw ex;
             }
         }
         public void OnStatusCancel(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType)
@@ -781,13 +783,13 @@ namespace CleanArchitecture.Infrastructure.Services
                     HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Recent Order Socket call ");
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     TradeHistory(historyInfo, Token);//TradeHistory
-                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Trade History Socket call  :" + JsonConvert.SerializeObject(historyInfo));
+                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Trade History Socket call  :");
                 } 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
-                throw ex;
+                //throw ex;
             }
                //public void OnWalletBalChangeByUserID(WalletMasterResponse Data, string WalletTypeName, long UserID)
         //{
@@ -808,7 +810,7 @@ namespace CleanArchitecture.Infrastructure.Services
         //    catch (Exception ex)
         //    {
         //        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
-        //        throw ex;
+        //        //throw ex;
         //    }
         }
     }
