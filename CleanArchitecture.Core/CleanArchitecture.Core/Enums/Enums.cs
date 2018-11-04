@@ -542,4 +542,9 @@ namespace CleanArchitecture.Core.Enums
         Subsscribe = 1,
         UnSubsscribe = 2
     }
+
+    public enum EnTemplateType
+    {
+        Registration = 1
+    }
 }

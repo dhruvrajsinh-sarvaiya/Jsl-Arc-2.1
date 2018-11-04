@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Web.ApiModels;
@@ -21,12 +22,16 @@ namespace CleanArchitecture.Web.Api
         private readonly IMediator _mediator;
         ILogger<ToDoItemsController> _loggerFactory;
         private readonly string sKey;
-        public ToDoItemsController(ILogger<ToDoItemsController> loggerFactory, IRepository<ToDoItem> todoRepository, IMediator mediator)
+        private readonly IMessageConfiguration _messageConfiguration;
+
+        public ToDoItemsController(ILogger<ToDoItemsController> loggerFactory, IRepository<ToDoItem> todoRepository, IMediator mediator, IMessageConfiguration messageConfiguration)
         {
             _loggerFactory = loggerFactory/*.CreateLogger<ToDoItemsController>()*/;
             _todoRepository = todoRepository;
             _mediator = mediator;
-           
+            _messageConfiguration = messageConfiguration;
+
+
         }
 
         // GET: api/ToDoItems
@@ -119,7 +124,33 @@ namespace CleanArchitecture.Web.Api
             }
         }
 
-     
+        [HttpPost("EmailWithTemplate")]
+        public async Task<IActionResult> EmailWithTemplateForSample([FromBody] SendEmailRequest Request)
+        {
+            try
+            {
+                string GeneratedLink = "https://cleandevtest.azurewebsites.net/SSO_Account/api/SignUp/ConfirmEmail?emailConfirmCode=mLjgF4N8iwzW2z4fs7dUSmEgAO1M3GziSngzVkS2UV9JAk1SUnCUoinNXm3SjGmcFlA6Tqp7wJTShohQ89Snbx3aastoWzItNncfTqf9dGqUNPPaCWAyumi%2B3FbcG1Jrh%2F8eRPznAZ%2BXKrwNDWz3JSniADZ4eDRE4e9mKbTk9rmc3OieMKv7nsco43TFOdkqsEqis%2Bxj5dKoPGx%2Bsk%2FWQnuhTl3j7u%2FtByvBIGT3c3EwgbyIlTdO6hR5ZIMG1JwZwRQ7Tl6UjlJBFc3AGMTAI7aRWN0LZNTjqcSJ6UzpKZhHt5%2FKhF8qdtP13S0HnNnt%2B2rpBVpve9Aw4t1R9Wez0aQn38axHNQhBwBSgqnDg0I%3D";
+                IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email),Convert.ToInt16(EnTemplateType.Registration),0);
+                foreach (TemplateMasterData Provider in Result)
+                {
+                    //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                    //foreach (string s in splitedarray)
+                    //{
+                    Provider.Content = Provider.Content.Replace("#Link#", GeneratedLink);
+                    //}
+                    Request.Body = Provider.Content;
+                }
+               
+                CommunicationResponse Response = await _mediator.Send(Request);
+                return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(Response);
+            }
+        }
+
+
         // POST api/values
         [HttpGet("GetQrCode")]
         [ProducesResponseType(200)]
