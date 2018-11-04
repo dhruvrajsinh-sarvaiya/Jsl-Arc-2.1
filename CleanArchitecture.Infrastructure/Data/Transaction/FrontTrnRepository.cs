@@ -252,7 +252,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch(Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name + " #PairId# : " + id + " #Price# : " + Price, this.GetType().Name, ex);
                 throw ex;
             }
         }
@@ -282,7 +282,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch(Exception ex)
             {
-                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name + " #PairId# : " + id + " #Price# : " + Price, this.GetType().Name, ex);
                 throw ex;
             }
         }
