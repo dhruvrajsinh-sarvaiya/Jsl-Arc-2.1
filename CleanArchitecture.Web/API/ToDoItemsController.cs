@@ -137,6 +137,16 @@ namespace CleanArchitecture.Web.Api
                     //foreach (string s in splitedarray)
                     //{
                     Provider.Content = Provider.Content.Replace("#Link#", GeneratedLink);
+                    Provider.Content = Provider.Content.Replace("###USERNAME###", "Khushali");
+                    Provider.Content = Provider.Content.Replace("###TYPE###", "LTCBTC");
+                    Provider.Content = Provider.Content.Replace("###REQAMOUNT###", "100000");
+                    Provider.Content = Provider.Content.Replace("###STATUS###", "Success");
+                    Provider.Content = Provider.Content.Replace("###USER###", "Khushali");
+                    Provider.Content = Provider.Content.Replace("###CURRENCY###", "BTC");
+                    Provider.Content = Provider.Content.Replace("###DATETIME###", "4 Nov 2018 12:39 PM");
+                    Provider.Content = Provider.Content.Replace("###AMOUNT###", "100000");
+                    Provider.Content = Provider.Content.Replace("###FEES###", "1000");
+                    Provider.Content = Provider.Content.Replace("###FINAL###", "101000");
                     //}
                     Request.Body = Provider.Content;
                 }

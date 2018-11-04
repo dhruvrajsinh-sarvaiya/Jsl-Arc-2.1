@@ -65,6 +65,8 @@ namespace CleanArchitecture.Infrastructure.DomainEvents
                     _chat.BroadCastAnnouncement(request.DataObj);
                 else if (request.Method == enMethodName.SendGroupMessage)
                     _chat.SendGroupMessage(request.Parameter,request.DataObj);
+                else if (request.Method == enMethodName.Time)
+                    _chat.GetTime(request.DataObj);
 
                 //_chat.OpenOrder("CfDJ8MB8DXV9k79JrEe_PIsRHuriLlB4BgdnHH8a68GFLRS8lKmDBmEroQPEr7Ut3SdC4N3B6LKb826fWnx5CCHwGA28z0Qj2_mU9jp3L2HgggdUTI38vyxTUNrDKAo_ajk7Mn8D9-PdbcXYqGIVNSUZ58Vj0XqbW9nAkKcfIx6ZfSy9JY_w5aBtVL8mLB3gqKuX-SWyMsEGKzW70_cU49ALKLEUo1p6Pap4S4d3QCbnbiBV5dw4sshE5DhXdPflobrF6G1kDBzCyL8nLr3GFnJZIQPQfKl8v80MuLtBDmDttfAkNP_vbL0dg-muZipMLFCvkz1Sg3pPGbcCTaU-u1EsrRw3CB8LKR3yfpDGOUkr0mj3mU7rNE15hePJnUZPSeAiniKnouXmvkg5bTp4LjVUWY_uRKk2SJNYjBDfw68UtpyhTD_FjgVNL7pqW0GNoGCFUXwYz9JkxtR00aFo8xuH4pIOSmVqWIM-UXHMRQwbwML_HL0rZ79Ol11w-HuIwz5NPJ40vb5sFPlD54FkH5F522a3YmT8GBkYltGJfnpfz_BqHKw1JFO2RuVhpTqONfibcp8hyhP8alB0Eaok12xuSI0km8PAd8ZKqCu3O-gqOsn6e8pu9ZRxSZgsL-VB2kTMmtKsc2TB74m8Cus15T6yB0-vTBju1Vl6sptcoRo-bS8tgZ858aw9MJOZcU0FlFMMICfJAwpQNdpSBQWQ8eAF49Z8cc7_KUGBen93ZYrKsIhdZ0tvTl_5MKkbbTDYOFWri9VzyarzpTPlh7l8uYXN1peJOdARroPSF3MF7kPyiEXjnERRtzD02GfwjPujDLtlw8wqNL9aONYwBwertKVUYOs", "xyz");
                 return Task.FromResult(new Unit());
