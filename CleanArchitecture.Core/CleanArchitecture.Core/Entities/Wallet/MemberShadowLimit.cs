@@ -18,6 +18,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public long MemberTypeId { get; set; }//organization Id = 0
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal ShadowLimitAmount { get; set; }
 

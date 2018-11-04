@@ -18,12 +18,18 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public int TrnType { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal LimitPerHour { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal LimitPerDay { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal LimitPerTransaction { get; set; }
 
         public decimal? LifeTime { get; set; }

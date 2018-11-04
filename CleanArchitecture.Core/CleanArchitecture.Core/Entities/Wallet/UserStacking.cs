@@ -17,6 +17,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public long WalletId { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal StackingAmount { get; set; }
 

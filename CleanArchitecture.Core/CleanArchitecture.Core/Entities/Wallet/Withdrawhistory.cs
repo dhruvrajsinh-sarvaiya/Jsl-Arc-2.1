@@ -37,6 +37,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public decimal Value { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal Amount { get; set; }
 
