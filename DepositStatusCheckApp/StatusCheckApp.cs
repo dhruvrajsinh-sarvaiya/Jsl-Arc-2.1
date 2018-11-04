@@ -39,24 +39,75 @@ namespace DepositStatusCheckApp
         static bool IsProcessing = false;
         //private readonly IWalletService _walletService;
         //private readonly IProcessStatusCheck _processStatusCheck;
-
+        ServiceProvider ServiceProviderObj ;
+        //IWalletTransactionCrDr bar;
         static void Main(string[] args)
         {
-            Console.Write("start");
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
+            try
+            {
+                Console.Write("start");
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json");
 
-            Configuration = builder.Build();
+                Configuration = builder.Build();
 
-          
-            //Console.WriteLine("Hello World!");
-            TransactionTick.Interval = Convert.ToInt32(Configuration["Interval"]); // 1000;
-            TransactionTick.Elapsed += new ElapsedEventHandler(transaction_tick);
-            TransactionTick.Start();
-            //SetConsoleCtrlHandler(new HandlerRoutine(ConsoleCtrlCheck), true); //komal 10/9/20108 process rudely exits, 
-            Console.WriteLine("Press \'q\' to quit");
-            while (Console.Read() != 'q') ;
+                var conStr = Configuration["SqlServerConnectionString"];
+                 var serviceProvider = new ServiceCollection()
+                 .AddLogging()
+                 .AddSingleton<IWalletTransactionCrDr, WalletTransactionCrDr>()
+                 //.AddSingleton<IWalletService, WalletService>()
+                 //.AddSingleton<ICommonRepository<WalletMaster>, EFCommonRepository<WalletMaster>>()
+                 //.AddSingleton<ICommonRepository<WalletLimitConfiguration>, EFCommonRepository<WalletLimitConfiguration>>()
+                 .AddSingleton(typeof(ICommonRepository<>), typeof(EFCommonRepository<>))
+                 //.AddSingleton<ICommonRepository<ThirdPartyAPIConfiguration>, EFCommonRepository<ThirdPartyAPIConfiguration>>()
+                 //.AddSingleton<ICommonRepository<WalletOrder>, EFCommonRepository<WalletOrder>>()
+                 //.AddSingleton<ICommonRepository<AddressMaster>, EFCommonRepository<AddressMaster>>()
+                 //.AddSingleton<ICommonRepository<TrnAcBatch>, EFCommonRepository<TrnAcBatch>>()
+                 //.AddSingleton<ICommonRepository<WalletOrder>, EFCommonRepository<WalletOrder>>()
+                 //.AddSingleton<ICommonRepository<TradeBitGoDelayAddresses>, EFCommonRepository<TradeBitGoDelayAddresses>>()
+                 //.AddSingleton<ICommonRepository<WalletAllowTrn>, EFCommonRepository<WalletAllowTrn>>()
+                 //.AddSingleton<ICommonRepository<BeneficiaryMaster>, EFCommonRepository<BeneficiaryMaster>>()
+                 //.AddSingleton<ICommonRepository<UserPreferencesMaster>, EFCommonRepository<UserPreferencesMaster>>()
+                 //.AddSingleton<ICommonRepository<WalletTypeMaster>, EFCommonRepository<WalletTypeMaster>>()
+                 //.AddSingleton<ICommonRepository<WalletAllowTrn>, EFCommonRepository<WalletAllowTrn>>()
+                 .AddSingleton<IWalletRepository, WalletRepository>()
+                 .AddSingleton<ICommonWalletFunction, CommonWalletFunction>()
+                 .AddSingleton<IWebApiRepository, WebApiDataRepository>()
+                 .AddTransient<IFrontTrnRepository, FrontTrnRepository>()
+                 .AddSingleton<RedisConnectionFactory>()
+                 //.AddSingleton<IWebApiParseResponse, WebApiParseResponse>()
+                 .AddSingleton<IWebApiSendRequest, WebAPISendRequest>()
+                 .AddSingleton<IGetWebRequest, GetWebRequest>()
+                 .AddTransient<ISignalRService, SignalRService>()
+                 .AddSingleton<IMediator, Mediator>()
+                 .AddDbContext<CleanArchitectureContext>(options => options.UseSqlServer(conStr))
+                 .AddTransient<UserResolveService>()
+                 .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+                 .AddScoped<ServiceFactory>(p => type => p.GetService(type))
+                 .AddScoped<IMediator, Mediator>()
+                 .AddScoped<ICommonRepository<TransactionQueue>, EFCommonRepository<TransactionQueue>>()
+                 .AddScoped<ICommonRepository<TradeTransactionQueue>, EFCommonRepository<TradeTransactionQueue>>()
+                 .AddTransient<ICommonRepository<TransactionQueue>, EFCommonRepository<TransactionQueue>>()
+                 .AddScoped<ICommonRepository<TradeTransactionQueue>, EFCommonRepository<TradeTransactionQueue>>()
+                 //.AddSingleton<RedisConnectionFactory>() 
+                 .BuildServiceProvider();
+
+                IWalletTransactionCrDr bar = serviceProvider.GetService<IWalletTransactionCrDr>();
+                //Console.WriteLine("Hello World!");
+                TransactionTick.Interval = Convert.ToInt32(Configuration["Interval"]); // 1000;
+                TransactionTick.Elapsed += new ElapsedEventHandler(transaction_tick);
+                TransactionTick.Start();
+                //SetConsoleCtrlHandler(new HandlerRoutine(ConsoleCtrlCheck), true); //komal 10/9/20108 process rudely exits, 
+                Console.WriteLine("Press \'q\' to quit");
+                while (Console.Read() != 'q') ;
+            }
+            catch (Exception ex)
+            {
+                // new ProcessStatusCheck().WriteErrorLog(ex, "transaction_tick", ex.Source.ToString());
+                WriteErrorLog(ex, "Program", "Main");
+                ex = null;
+            }
         }
 
       
@@ -76,7 +127,7 @@ namespace DepositStatusCheckApp
             catch (Exception ex)
             {
                // new ProcessStatusCheck().WriteErrorLog(ex, "transaction_tick", ex.Source.ToString());
-                ex = null;
+                 WriteErrorLog(ex, "Program", "transaction_tick");
             }
             
         }
@@ -265,7 +316,7 @@ namespace DepositStatusCheckApp
             }
             finally
             {
-                //TransactionTick.Start(); //ntrivedi temperory 28-06-2018
+                TransactionTick.Start(); //ntrivedi temperory 28-06-2018
             }
         }
         #endregion
@@ -410,7 +461,7 @@ namespace DepositStatusCheckApp
                 //  dayDiff = walletServiceDataObj.ValidDays; //komal 10/9/2018 get valid days from table
                 //dayDiff = (Configuration["DayDiff"] != string.Empty? Convert.ToInt16(Configuration["DayDiff"]):1);
                 // ntrivedi 28-05-2018 temperory top 1
-               SqlStr = "SELECT top " + walletServiceDataObj.RecordCount.ToString() + " ID, TrnID , Address, SMSCode, Amount, Confirmations,OrderID,isNull(FromAddress,'') as FromAddress From DepositHistory WHERE SMSCode = '" + CommonMethod.SMSCode + "' AND Status = 0 AND IsProcessing = 0  order by CreatedDate desc"; // ntrivedi temperory order by updateddate
+               SqlStr = "SELECT top " + walletServiceDataObj.RecordCount.ToString() + " ID, TrnID , Address, SMSCode, Amount, Confirmations,OrderID,isNull(FromAddress,'') as FromAddress From DepositHistory WHERE SMSCode = '" + CommonMethod.SMSCode + "' AND Status = 0 AND IsProcessing = 0  order by updateddate"; // ntrivedi temperory order by updateddate
                 dSet = (new DataCommon()).OpenDataSet("DepositHistory", SqlStr, dSet, 30);
                 if (dSet.Tables[0].Rows.Count > 0)
                 {
@@ -647,56 +698,67 @@ namespace DepositStatusCheckApp
                             //    SqlStr = "UPDATE DepositHistory SET OrderID=" + walletDrCrResponse.TrnNo  + ",StatusMsg='" + walletDrCrResponse.StatusMsg +"',Status=1,IsProcessing = 9 WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
                             //    (new DataCommon()).ExecuteQuery(SqlStr);
                             //}                  
-                            var conStr = Configuration["SqlServerConnectionString"];
-                            var serviceProvider = new ServiceCollection()
-                             .AddLogging()
-                             .AddSingleton<IWalletTransactionCrDr, WalletTransactionCrDr>()
-                             //.AddSingleton<IWalletService, WalletService>()
-                             //.AddSingleton<ICommonRepository<WalletMaster>, EFCommonRepository<WalletMaster>>()
-                             //.AddSingleton<ICommonRepository<WalletLimitConfiguration>, EFCommonRepository<WalletLimitConfiguration>>()
-                             .AddSingleton(typeof(ICommonRepository<>), typeof(EFCommonRepository<>))
-                             //.AddSingleton<ICommonRepository<ThirdPartyAPIConfiguration>, EFCommonRepository<ThirdPartyAPIConfiguration>>()
-                             //.AddSingleton<ICommonRepository<WalletOrder>, EFCommonRepository<WalletOrder>>()
-                             //.AddSingleton<ICommonRepository<AddressMaster>, EFCommonRepository<AddressMaster>>()
-                             //.AddSingleton<ICommonRepository<TrnAcBatch>, EFCommonRepository<TrnAcBatch>>()
-                             //.AddSingleton<ICommonRepository<WalletOrder>, EFCommonRepository<WalletOrder>>()
-                             //.AddSingleton<ICommonRepository<TradeBitGoDelayAddresses>, EFCommonRepository<TradeBitGoDelayAddresses>>()
-                             //.AddSingleton<ICommonRepository<WalletAllowTrn>, EFCommonRepository<WalletAllowTrn>>()
-                             //.AddSingleton<ICommonRepository<BeneficiaryMaster>, EFCommonRepository<BeneficiaryMaster>>()
-                             //.AddSingleton<ICommonRepository<UserPreferencesMaster>, EFCommonRepository<UserPreferencesMaster>>()
-                             //.AddSingleton<ICommonRepository<WalletTypeMaster>, EFCommonRepository<WalletTypeMaster>>()
-                             //.AddSingleton<ICommonRepository<WalletAllowTrn>, EFCommonRepository<WalletAllowTrn>>()
-                             .AddSingleton<IWalletRepository, WalletRepository>()
-                             .AddSingleton<ICommonWalletFunction, CommonWalletFunction>()
-                             .AddSingleton<IWebApiRepository, WebApiDataRepository>()
-                             .AddTransient<IFrontTrnRepository, FrontTrnRepository>()
-                             .AddSingleton<RedisConnectionFactory>()
-                             //.AddSingleton<IWebApiParseResponse, WebApiParseResponse>()
-                             .AddSingleton<IWebApiSendRequest, WebAPISendRequest>()
-                             .AddSingleton<IGetWebRequest, GetWebRequest>()
-                             .AddTransient<ISignalRService, SignalRService>()
-                             //.AddSingleton<IMediator, Mediator>()                             
-                             .AddDbContext<CleanArchitectureContext>(options => options.UseSqlServer(conStr))
-                             .AddTransient<UserResolveService>()
-                             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()                             
-                             //.AddSingleton<RedisConnectionFactory>() 
-                             .BuildServiceProvider();
-                            
+
+
                             //                        .AddDbContext<BloggingContext>(options =>
                             //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-                            var bar = serviceProvider.GetService<IWalletTransactionCrDr>();
-                           //long id= bar.getOrgID();
-                           WalletDrCrResponse walletDrCrResponse =  bar.DepositionWalletOperation(UTC_To_IST().ToString("ddMMyyyyHHmmss"), item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit,enTrnType.Deposit,"");
+
+                            //long id= bar.getOrgID();
+                            // intentionally added code 04-11-2018 for checking the exception from dependency side 
+                            var conStr = Configuration["SqlServerConnectionString"];
+                            var serviceProvider = new ServiceCollection()
+                            .AddLogging()
+                            .AddSingleton<IWalletTransactionCrDr, WalletTransactionCrDr>()
+                            //.AddSingleton<IWalletService, WalletService>()
+                            //.AddSingleton<ICommonRepository<WalletMaster>, EFCommonRepository<WalletMaster>>()
+                            //.AddSingleton<ICommonRepository<WalletLimitConfiguration>, EFCommonRepository<WalletLimitConfiguration>>()
+                            .AddSingleton(typeof(ICommonRepository<>), typeof(EFCommonRepository<>))
+                            //.AddSingleton<ICommonRepository<ThirdPartyAPIConfiguration>, EFCommonRepository<ThirdPartyAPIConfiguration>>()
+                            //.AddSingleton<ICommonRepository<WalletOrder>, EFCommonRepository<WalletOrder>>()
+                            //.AddSingleton<ICommonRepository<AddressMaster>, EFCommonRepository<AddressMaster>>()
+                            //.AddSingleton<ICommonRepository<TrnAcBatch>, EFCommonRepository<TrnAcBatch>>()
+                            //.AddSingleton<ICommonRepository<WalletOrder>, EFCommonRepository<WalletOrder>>()
+                            //.AddSingleton<ICommonRepository<TradeBitGoDelayAddresses>, EFCommonRepository<TradeBitGoDelayAddresses>>()
+                            //.AddSingleton<ICommonRepository<WalletAllowTrn>, EFCommonRepository<WalletAllowTrn>>()
+                            //.AddSingleton<ICommonRepository<BeneficiaryMaster>, EFCommonRepository<BeneficiaryMaster>>()
+                            //.AddSingleton<ICommonRepository<UserPreferencesMaster>, EFCommonRepository<UserPreferencesMaster>>()
+                            //.AddSingleton<ICommonRepository<WalletTypeMaster>, EFCommonRepository<WalletTypeMaster>>()
+                            //.AddSingleton<ICommonRepository<WalletAllowTrn>, EFCommonRepository<WalletAllowTrn>>()
+                            .AddSingleton<IWalletRepository, WalletRepository>()
+                            .AddSingleton<ICommonWalletFunction, CommonWalletFunction>()
+                            .AddSingleton<IWebApiRepository, WebApiDataRepository>()
+                            .AddTransient<IFrontTrnRepository, FrontTrnRepository>()
+                            .AddSingleton<RedisConnectionFactory>()
+                            //.AddSingleton<IWebApiParseResponse, WebApiParseResponse>()
+                            .AddSingleton<IWebApiSendRequest, WebAPISendRequest>()
+                            .AddSingleton<IGetWebRequest, GetWebRequest>()
+                            .AddTransient<ISignalRService, SignalRService>()
+                            .AddSingleton<IMediator, Mediator>()
+                            .AddDbContext<CleanArchitectureContext>(options => options.UseSqlServer(conStr))
+                            .AddTransient<UserResolveService>()
+                            .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+                            .AddScoped<ServiceFactory>(p => type => p.GetService(type))
+                            .AddScoped<IMediator, Mediator>()
+                            .AddScoped<ICommonRepository<TransactionQueue>, EFCommonRepository<TransactionQueue>>()
+                            .AddScoped<ICommonRepository<TradeTransactionQueue>, EFCommonRepository<TradeTransactionQueue>>()
+                            .AddTransient<ICommonRepository<TransactionQueue>, EFCommonRepository<TransactionQueue>>()
+                            .AddScoped<ICommonRepository<TradeTransactionQueue>, EFCommonRepository<TradeTransactionQueue>>()
+                            //.AddSingleton<RedisConnectionFactory>() 
+                            .BuildServiceProvider();
+
+                            IWalletTransactionCrDr bar = serviceProvider.GetService<IWalletTransactionCrDr>();
+
+                            WalletDrCrResponse walletDrCrResponse = bar.DepositionWalletOperation(UTC_To_IST().ToString("ddMMyyyyHHmmss"), item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit, enTrnType.Deposit, "");
 
                             if (walletDrCrResponse.ReturnCode == 0)
                             {
-                                    SqlStr = "UPDATE DepositHistory SET status = 1,StatusMsg='Success',OrderID='" + walletDrCrResponse.TrnNo + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
-                                    (new DataCommon()).ExecuteQuery(SqlStr);
+                                SqlStr = "UPDATE DepositHistory SET status = 1,StatusMsg='Success',OrderID='" + walletDrCrResponse.TrnNo + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
+                                (new DataCommon()).ExecuteQuery(SqlStr);
                             }
                             else
                             {
-                                SqlStr = "UPDATE DepositHistory SET status = 9,StatusMsg='"+ walletDrCrResponse.ReturnMsg +"',OrderID='" + walletDrCrResponse.TrnNo + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
+                                SqlStr = "UPDATE DepositHistory SET status = 9,StatusMsg='" + walletDrCrResponse.ReturnMsg + "',OrderID='" + walletDrCrResponse.TrnNo + "' WHERE ID=" + item.id; //TrnID = '" + item.txid + "'";
                                 (new DataCommon()).ExecuteQuery(SqlStr);
                             }
                         }

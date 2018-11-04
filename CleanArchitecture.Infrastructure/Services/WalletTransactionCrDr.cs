@@ -280,19 +280,27 @@ namespace CleanArchitecture.Infrastructure.Services
                 _walletRepository1.WalletCreditDebitwithTQ(walletLedgerDr, walletLedgerCr, tranxAccountCr, tranxAccounDrt, dWalletobj, cWalletObj, objTQCr, objTQDr, woObj);
                 //ntrivedi temperory
                 //vsolanki 2018-11-1---------------socket method   --------------------------
-                //WalletMasterResponse walletMasterObj = new WalletMasterResponse();
-                //walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
-                //walletMasterObj.Balance = dWalletobj.Balance;
-                //walletMasterObj.WalletName = dWalletobj.Walletname;
-                //walletMasterObj.PublicAddress = dWalletobj.PublicAddress;
-                //walletMasterObj.AccWalletID = dWalletobj.AccWalletID;
-                //walletMasterObj.CoinName = coinName;
-                //_signalRService.OnWalletBalChange(walletMasterObj, coinName, dWalletobj.UserID.ToString(), 2);
-                //var msg = EnResponseMessage.CreditWalletMsg;
-                //msg = msg.Replace("#Coin#", coinName);
-                //msg = msg.Replace("#TrnType#", routeTrnType.ToString());
-                //msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
-                //_signalRService.SendActivityNotification(msg, dWalletobj.UserID.ToString(), 2);
+                WalletMasterResponse walletMasterObj = new WalletMasterResponse();
+                walletMasterObj.AccWalletID = cWalletObj.AccWalletID;
+                walletMasterObj.Balance = cWalletObj.Balance;
+                walletMasterObj.WalletName = cWalletObj.Walletname;
+                walletMasterObj.PublicAddress = cWalletObj.PublicAddress;
+                walletMasterObj.AccWalletID = cWalletObj.AccWalletID;
+                walletMasterObj.CoinName = coinName;
+                var msg = EnResponseMessage.CreditWalletMsg;
+                msg = msg.Replace("#Coin#", coinName);
+                msg = msg.Replace("#TrnType#", routeTrnType.ToString());
+                msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
+                try
+                {
+                    _signalRService.OnWalletBalChange(walletMasterObj, coinName, cWalletObj.UserID.ToString(), 2);
+                    _signalRService.SendActivityNotification(msg, cWalletObj.UserID.ToString(), 2);
+                }
+                catch (Exception ex2)
+                {
+                    HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex2);
+
+                }
                 // OnWalletBalChange(walletMasterObj, coinName,  Token);
                 //-------------------------------
 
