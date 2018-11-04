@@ -10,7 +10,7 @@ namespace CleanArchitecture.Core.Entities.Profile_Management
     {
         public int UserId { get; set; }
 
-        public int ProfileId { get; set; }
+        public long ProfileId { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime StartDate { get; set; }
