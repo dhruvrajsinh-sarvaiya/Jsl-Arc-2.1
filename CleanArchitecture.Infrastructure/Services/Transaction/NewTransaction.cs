@@ -697,16 +697,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
                     NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
                     _TradeTransactionRepository.Update(NewTradetransaction);
-                    try
-                    {
-                        _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);
-                        //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
-                    }
-                    catch (Exception ex)
-                    {
-                        HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
-                    }
-
                 }
                 
             }
@@ -736,6 +726,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
                 _WalletService.GetWalletCreditNew(Req.SMSCode, Helpers.GetTimeStamp(), enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
                 Req.DebitAccountID, CreditWalletDrArryTrnIDList.ToArray(), Req.TrnNo,1, enWalletTranxOrderType.Credit, Req.ServiceType, (enTrnType)Newtransaction.TrnType);
+
                 try
                 {
                     _ISignalRService.SendActivityNotification("Transaction Failed TrnNo:" + Req.TrnNo, Req.accessToken);
@@ -1155,7 +1146,17 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     InsertBuyerList();
 
                     _Resp.ReturnCode = enResponseCodeService.Success;
-                    _Resp.ReturnMsg = "Pool Order Updated Inserted";                    
+                    _Resp.ReturnMsg = "Pool Order Updated Inserted";
+                    try
+                    {
+                        var CopyNewtransaction = new TransactionQueue();
+                        //CopyNewtransaction = CopyClass(Newtransaction);
+                        _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);                        
+                    }
+                    catch (Exception ex)
+                    {
+                        HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Trading Hold Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                    }
                     break;
                 }              
             }
