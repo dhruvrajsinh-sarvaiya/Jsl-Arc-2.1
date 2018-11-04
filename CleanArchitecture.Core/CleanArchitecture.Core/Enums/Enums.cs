@@ -486,7 +486,8 @@ namespace CleanArchitecture.Core.Enums
         //Base Market
         RecievePairData = 12,
         RecieveMarketTicker = 13,
-        BroadcastMessage = 14
+        BroadcastMessage = 14,
+        SetTime = 15
     }
     public enum enCheckWithdrawalBene
     {
