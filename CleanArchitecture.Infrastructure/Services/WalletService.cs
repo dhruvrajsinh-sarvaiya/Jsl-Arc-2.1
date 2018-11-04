@@ -2350,7 +2350,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 Response.BizResponse.ReturnCode = enResponseCode.Success;
                 var msg = EnResponseMessage.UserPreferencesNotification;
-                //msg = msg.Replace("#WalletName#", walletMasters.WalletTypeName);
+                if (GlobalBit==1)
+                {
+                    msg = msg.Replace("#ONOFF#","ON");
+                }
+                else
+                {
+                    msg = msg.Replace("#ONOFF#", "OFF");
+                }        
                 _signalRService.SendActivityNotification(msg, Token);
                 return Response;
             }
