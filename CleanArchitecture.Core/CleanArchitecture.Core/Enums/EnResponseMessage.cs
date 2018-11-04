@@ -261,6 +261,8 @@ namespace CleanArchitecture.Core.Enums
         public static string Typemasterrequired = "Provider type not available";
 
         public static string SuccessAddComplain = "Success full add raise complaint.";
+        public static string ProfilePlan = "Profile plan not available.";
+        public static string SuccessGetProfilePlan = "Success full get raise profile plan.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
