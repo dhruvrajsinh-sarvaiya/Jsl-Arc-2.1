@@ -277,6 +277,7 @@ namespace CleanArchitecture.Core.Enums
         Status4106LoginFailMobileNotAvailable = 4106,
         Status4107TwoFAKeyinvalid = 4107,
         Status4108TwoFAalreadydisable = 4108,
+        Typemasterrequired4109 = 4109,
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

@@ -21,10 +21,10 @@ namespace CleanArchitecture.Core.Entities.Complaint
         [Required]
         [StringLength(100)]
         public string Complainstatus { get; set; }
-        public long? UpdatedBy { get; set; }
+        public long? CreatedBy { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime? UpdatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
 
     }
 }
