@@ -1150,8 +1150,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     try
                     {
                         var CopyNewtransaction = new TransactionQueue();
-                        //CopyNewtransaction = CopyClass(Newtransaction);
-                        _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);                        
+                        CopyNewtransaction = (TransactionQueue)Newtransaction.Clone();
+
+                        var CopyNewTradetransaction = new TradeTransactionQueue();                      
+                        CopyNewTradetransaction = (TradeTransactionQueue)NewTradetransaction.Clone();
+
+                        _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), CopyNewtransaction, CopyNewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);                        
                     }
                     catch (Exception ex)
                     {

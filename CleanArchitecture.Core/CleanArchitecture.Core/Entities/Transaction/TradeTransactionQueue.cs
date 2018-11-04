@@ -103,6 +103,11 @@ namespace CleanArchitecture.Core.Entities
         [Column(TypeName = "decimal(18, 8)")]
         public decimal TakerPer { get; set; }
 
+        public object Clone()//for copy object
+        {
+            return MemberwiseClone();
+        }
+
         public void MakeTransactionSuccess()
         {
             Status = Convert.ToInt16(enTransactionStatus.Success);
