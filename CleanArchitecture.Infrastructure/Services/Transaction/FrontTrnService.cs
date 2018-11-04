@@ -447,7 +447,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 finally
                 {
                     //Calculate High Low Data For 24Hr
-                    var tradegraphdetail = _graphDetailRepository.FindBy(x => x.DataDate >= _basePage.UTC_To_IST().AddDays(-1) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.Id).ToList();
+                    var tradegraphdetail = _graphDetailRepository.FindBy(x => x.PairId == PairId && x.DataDate >= _basePage.UTC_To_IST().AddDays(-1) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.Id).ToList();
                     High24Hr = CurrentRate;
                     Low24Hr = CurrentRate;
                     if (tradegraphdetail.Count > 0)

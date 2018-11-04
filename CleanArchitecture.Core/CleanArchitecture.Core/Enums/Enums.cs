@@ -278,6 +278,7 @@ namespace CleanArchitecture.Core.Enums
         Status4107TwoFAKeyinvalid = 4107,
         Status4108TwoFAalreadydisable = 4108,
         Typemasterrequired4109 = 4109,
+        Status4112ProfilePlan =4112,
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

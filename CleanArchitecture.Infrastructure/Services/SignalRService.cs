@@ -440,6 +440,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     LastPriceViewModel lastPriceData = new LastPriceViewModel();
                     lastPriceData.LastPrice = capData.LastPrice;
+                    capData.Volume24 = capData.High24 - capData.Low24;
                     string Base = volumeData.PairName.Split("_")[1];
                     PairData(volumeData, Base);
                     HelperForLog.WriteLogIntoFile("OnVolumeChange", ControllerName, "After Pair Data Call Base :"+ Base+ "  DATA :" + JsonConvert.SerializeObject(volumeData));
@@ -613,7 +614,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //add tradehistory
                 //add orderhistory
                 //Token = Token;
-                HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "Call ---- TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                //HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "Call ---- TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
                 if (string.IsNullOrEmpty(Token))
                 {
                     Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
@@ -623,14 +624,14 @@ namespace CleanArchitecture.Infrastructure.Services
                     List<GetBuySellBook> list = new List<GetBuySellBook>();
 
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Recent Order Socket call TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Recent Order Socket call ");
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType,1);//update OpenOrder
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Open Order Socket call TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Open Order Socket call ");
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     OrderHistory(historyInfo, historyInfo.PairName);//Order
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  :" + JsonConvert.SerializeObject(historyInfo) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  :" + JsonConvert.SerializeObject(historyInfo));
                     TradeHistory(historyInfo, Token);//TradeHistory
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  :" + JsonConvert.SerializeObject(historyInfo) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  :" + JsonConvert.SerializeObject(historyInfo));
                     var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
                     msg = msg.Replace("#Price#", historyInfo.Price.ToString());
                     msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
@@ -650,7 +651,7 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 GetBuySellBook BuySellmodel = new GetBuySellBook();
                 //update Buyer/seller book
-                HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, " TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                //HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, " TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
                 if (string.IsNullOrEmpty(Token))
                 {
                     Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
@@ -669,7 +670,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
                         {
                             BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "BuyerBook call TRNNO:" + Newtransaction.Id + " " + JsonConvert.SerializeObject(BuySellmodel));
+                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "BuyerBook call TRNNO:");
                         }
                     }
                     else//Sell
@@ -683,7 +684,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
                         {
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "SellerBook call TRNNO:" + Newtransaction.Id + " " + JsonConvert.SerializeObject(BuySellmodel));
+                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "SellerBook call TRNNO:");
                         }
                     }
                 }   
@@ -703,7 +704,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //add buyer/seller book
                 //add OpenOrder
                 //add recent order
-                HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+               // HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " TransactionQueue :" );
                 if (string.IsNullOrEmpty(Token))
                 {
                     Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
@@ -747,9 +748,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     //ActivityNotification(msg, Token);
                    
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
-                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Open Order Socket call TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Open Order Socket call  :");
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
-                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Recent Order Socket call TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Recent Order Socket call  :" );
                 }
             }
             catch (Exception ex)
@@ -767,7 +768,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //pop from OpenOrder
                 //update Recent order
                 //add Trade history
-                HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                //HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
                 if (string.IsNullOrEmpty(Token))
                 {
                     Token = GetTokenByUserID(NewTradeTransaction.MemberID.ToString());
@@ -775,12 +776,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (!string.IsNullOrEmpty(Token))
                 {
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType, 1);//with amount 0, remove from OpenOrder
-                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Open Order Socket call TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Open Order Socket call ");
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
-                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Recent Order Socket call TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Recent Order Socket call ");
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     TradeHistory(historyInfo, Token);//TradeHistory
-                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Trade History Socket call  :" + JsonConvert.SerializeObject(historyInfo) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
+                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Trade History Socket call  :" + JsonConvert.SerializeObject(historyInfo));
                 } 
             }
             catch (Exception ex)

@@ -41,6 +41,8 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.Interfaces.UserChangeLog;
 using CleanArchitecture.Infrastructure.Services.UserChangeLog;
 using CleanArchitecture.Infrastructure.Interfaces;
+using CleanArchitecture.Core.Interfaces.Profile_Management;
+using CleanArchitecture.Infrastructure.Services.Profile_Management;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -409,6 +411,9 @@ namespace CleanArchitecture.Web.Extensions
             //Login History and Ip History added by nirav savariya on 02-11-2018
             services.AddScoped<IipHistory, IpHistoryService>();
             services.AddScoped<ILoginHistory, LoginHistoryService>();
+            // Profile Master added by nirav savariya on 04-11-2018
+            services.AddScoped<IProfileMaster, ProfileManagementService>();
+            services.AddScoped<ISubscriptionMaster, SubscriptionMasterService>();
             return services;
         }
     }

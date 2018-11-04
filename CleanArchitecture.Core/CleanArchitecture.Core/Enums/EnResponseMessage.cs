@@ -112,7 +112,7 @@ namespace CleanArchitecture.Core.Enums
         public static string UWalletLimitNotification = "New Limit Updated Successfully For Wallet:#WalletName#";
         public static string AddBeneNotification = "New Beneficiary Added Successfully For Wallet Type:#WalletName#";
         public static string UpBeneNotification = "Beneficiary Details Updated Successfully For Wallet Type:#WalletName#";
-        public static string UserPreferencesNotification = "Your Whitelisting Switched Successfully";
+        public static string UserPreferencesNotification = "Your Whitelisting Is Switched #ONOFF# Successfully";
         //public static string AddBeneNotification = "New Beneficiary Added Successfully For Wallet Type:#WalletName#";
 
         //========================My Account===============================//
@@ -261,6 +261,8 @@ namespace CleanArchitecture.Core.Enums
         public static string Typemasterrequired = "Provider type not available";
 
         public static string SuccessAddComplain = "Success full add raise complaint.";
+        public static string ProfilePlan = "Profile plan not available.";
+        public static string SuccessGetProfilePlan = "Success full get raise profile plan.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
