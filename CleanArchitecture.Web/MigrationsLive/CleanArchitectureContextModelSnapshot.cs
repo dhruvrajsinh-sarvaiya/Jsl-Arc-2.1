@@ -959,6 +959,57 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("EmailQueue");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.KYC.PersonalVerification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BackImage")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<bool>("EnableStatus");
+
+                    b.Property<string>("FrontImage")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<string>("GivenName")
+                        .IsRequired()
+                        .HasMaxLength(150);
+
+                    b.Property<string>("SelfieImage")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasMaxLength(150);
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<int>("UserID");
+
+                    b.Property<string>("ValidIdentityCard")
+                        .IsRequired()
+                        .HasMaxLength(150);
+
+                    b.Property<bool>("VerifyStatus");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PersonalVerification");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Log.DeviceMaster", b =>
                 {
                     b.Property<long>("Id")
@@ -1289,6 +1340,37 @@ namespace CleanArchitecture.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProfileMaster");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Profile_Management.SubscriptionMaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("ActiveStatus");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<DateTime>("EndDate");
+
+                    b.Property<long>("ProfileId");
+
+                    b.Property<DateTime>("StartDate");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionMaster");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.RequestFormatMaster", b =>
@@ -3473,11 +3555,14 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal?>("LifeTime");
 
-                    b.Property<decimal>("LimitPerDay");
+                    b.Property<decimal>("LimitPerDay")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("LimitPerHour");
+                    b.Property<decimal>("LimitPerHour")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("LimitPerTransaction");
+                    b.Property<decimal>("LimitPerTransaction")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<double?>("StartTimeUnix");
 
@@ -3509,11 +3594,14 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal?>("LifeTime");
 
-                    b.Property<decimal>("LimitPerDay");
+                    b.Property<decimal>("LimitPerDay")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("LimitPerHour");
+                    b.Property<decimal>("LimitPerHour")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("LimitPerTransaction");
+                    b.Property<decimal>("LimitPerTransaction")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<double>("StartTimeUnix")
                         .HasColumnType("float");
