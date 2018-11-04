@@ -451,7 +451,7 @@ namespace CleanArchitecture.Web.API
                         return BadRequest(Response);
                     }
                     //sCondition += " AND TTQ.TrnDate Between '" + fDate  + " AND '" + tDate  + "' ";
-                    sCondition += "AND TTQ.TrnDate Between {2} AND {3} ";
+                    sCondition += " AND TTQ.TrnDate Between {2} AND {3} ";
                 }
                 long MemberID =user.Id;
                 Response.response = _frontTrnService.GetActiveOrder(MemberID, sCondition,request .FromDate,request .ToDate, PairId, request.Page);
