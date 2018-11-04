@@ -260,7 +260,7 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessGetLoginHistory = "Success full Get Login History.";
         public static string Typemasterrequired = "Provider type not available";
 
-        public static string SuccessAddComplain = "Success full add device id.";
+        public static string SuccessAddComplain = "Success full add raise complaint.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
