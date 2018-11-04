@@ -546,7 +546,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 TradeStopLossObj = new TradeStopLoss()
                 {
                     TrnNo = Req.TrnNo,
-                    ordertype = Convert.ToInt16(Req.ordertype)                   
+                    ordertype = Convert.ToInt16(Req.ordertype),
+                    StopPrice = Req.StopPrice,
+                    Status = Convert.ToInt16(enTransactionStatus.Success)
                 };
                 TradeStopLossObj =_TradeStopLoss.Add(TradeStopLossObj);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
