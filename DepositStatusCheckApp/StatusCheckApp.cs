@@ -28,6 +28,7 @@ using Microsoft.EntityFrameworkCore;
 using CleanArchitecture.Core.Services;
 using Microsoft.AspNetCore.Http;
 using CleanArchitecture.Core.Services.RadisDatabase;
+using MediatR;
 
 namespace DepositStatusCheckApp
 {
@@ -668,20 +669,25 @@ namespace DepositStatusCheckApp
                              .AddSingleton<IWalletRepository, WalletRepository>()
                              .AddSingleton<ICommonWalletFunction, CommonWalletFunction>()
                              .AddSingleton<IWebApiRepository, WebApiDataRepository>()
+                             .AddTransient<IFrontTrnRepository, FrontTrnRepository>()
+                             .AddSingleton<RedisConnectionFactory>()
                              //.AddSingleton<IWebApiParseResponse, WebApiParseResponse>()
                              .AddSingleton<IWebApiSendRequest, WebAPISendRequest>()
                              .AddSingleton<IGetWebRequest, GetWebRequest>()
+                             .AddTransient<ISignalRService, SignalRService>()
+                             //.AddSingleton<IMediator, Mediator>()                             
                              .AddDbContext<CleanArchitectureContext>(options => options.UseSqlServer(conStr))
                              .AddTransient<UserResolveService>()
-                             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                             .AddSingleton<RedisConnectionFactory>() 
+                             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()                             
+                             //.AddSingleton<RedisConnectionFactory>() 
                              .BuildServiceProvider();
+                            
                             //                        .AddDbContext<BloggingContext>(options =>
                             //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-                                                        
+
                             var bar = serviceProvider.GetService<IWalletTransactionCrDr>();
                            //long id= bar.getOrgID();
-                           WalletDrCrResponse walletDrCrResponse =  bar.DepositionWalletOperation(UTC_To_IST().ToString("ddMMyyyyHHmmss"), item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit,"");
+                           WalletDrCrResponse walletDrCrResponse =  bar.DepositionWalletOperation(UTC_To_IST().ToString("ddMMyyyyHHmmss"), item.address, item.coin, item.Amount, item.id, enServiceType.WalletService, enWalletTrnType.cr_Deposit, enWalletTranxOrderType.Credit, enWalletLimitType.DepositLimit,enTrnType.Deposit,"");
 
                             if (walletDrCrResponse.ReturnCode == 0)
                             {

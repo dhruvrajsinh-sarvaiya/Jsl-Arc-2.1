@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Transaction
@@ -11,23 +12,29 @@ namespace CleanArchitecture.Core.Entities.Transaction
         public long TrnNo { get; set; }
 
         [Required ]
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SettledQty { get; set; }
 
         [Required]
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal TotalQty { get; set; }
         [Required]
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal DeliveredQty { get; set; }
         [Required]
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal PendingQty { get; set; }
         [Required]
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SoldPrice { get; set; }
         [Required]
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal BidPrice { get; set; }
 
         [Required]

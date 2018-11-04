@@ -11,6 +11,7 @@ using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -586,9 +587,12 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         }).ToList();
 
                         var GraphData = responseData.FirstOrDefault();
+                        HelperForLog.WriteLogIntoFile("#GraphDataToSocket# #TrnNo# : " + TrnNo, "FrontService", "Object Data : " + JsonConvert.SerializeObject(GraphData), "");
                         _signalRService.ChartData(GraphData, VolumeData.PairName);
                     }
 
+                    HelperForLog.WriteLogIntoFile("#VolumeDataToSocket# #PairId# : " + PairId, "FrontService", "Object Data : " + JsonConvert.SerializeObject(VolumeData), "");
+                    HelperForLog.WriteLogIntoFile("#MarketDataToSocket# #PairId# : " + PairId, "FrontService", "Object Data : " + JsonConvert.SerializeObject(MarketData), "");
                     _signalRService.OnVolumeChange(VolumeData, MarketData);
                 }
             }

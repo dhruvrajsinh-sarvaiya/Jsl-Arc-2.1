@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Transaction
@@ -35,25 +36,32 @@ namespace CleanArchitecture.Core.Entities.Transaction
 
         public long DeliveryWalletID { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal BuyQty { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal BidPrice { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SellQty { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal AskPrice { get; set; }
 
         public string Order_Currency { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal OrderTotalQty { get; set; }
 
         public string Delivery_Currency { get; set; }
 
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal DeliveryTotalQty { get; set; }
 
         public long StatusCode { get; set; }
@@ -72,10 +80,12 @@ namespace CleanArchitecture.Core.Entities.Transaction
 
         public short IsCancelled { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SettledBuyQty { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SettledSellQty { get; set; }
 
         public DateTime? SettledDate { get; set; }

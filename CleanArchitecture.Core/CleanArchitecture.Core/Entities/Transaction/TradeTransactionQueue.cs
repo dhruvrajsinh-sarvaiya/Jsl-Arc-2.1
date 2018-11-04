@@ -43,25 +43,32 @@ namespace CleanArchitecture.Core.Entities
 
         public long DeliveryWalletID { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal BuyQty { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal BidPrice { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SellQty { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]        
         public decimal AskPrice { get; set; }
 
         public string Order_Currency { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal OrderTotalQty { get; set; }
 
         public string Delivery_Currency { get; set; }
 
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal DeliveryTotalQty { get; set; }
 
         //public short Status { get; set; }
@@ -82,15 +89,24 @@ namespace CleanArchitecture.Core.Entities
 
         public short IsCancelled { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SettledBuyQty { get; set; }
 
-        [Range(0, 9999999999.99999999)]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal SettledSellQty { get; set; }
 
         public DateTime? SettledDate { get; set; }
 
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal TakerPer { get; set; }
+
+        public object Clone()//for copy object
+        {
+            return MemberwiseClone();
+        }
 
         public void MakeTransactionSuccess()
         {

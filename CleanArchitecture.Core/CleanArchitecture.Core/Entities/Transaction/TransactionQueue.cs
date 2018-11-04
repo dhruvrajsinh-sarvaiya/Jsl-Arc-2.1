@@ -112,6 +112,10 @@ namespace CleanArchitecture.Core.Entities
 
         public short? ChargeType { get; set; }
 
+        public object Clone()//for copy object
+        {
+            return MemberwiseClone();
+        }
         //public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
         public void MakeTransactionInProcess()
         {

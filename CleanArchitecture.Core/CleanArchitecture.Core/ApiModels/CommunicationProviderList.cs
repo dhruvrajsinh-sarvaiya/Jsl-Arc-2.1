@@ -31,4 +31,10 @@ namespace CleanArchitecture.Core.ApiModels
         public string Param2Regex { get; set; } = "";
         public string Param3Regex { get; set; } = "";
     }
+
+    public class TemplateMasterData
+    {
+        public string Content { get; set; }
+        public string AdditionalInfo { get; set; }
+    }
 }

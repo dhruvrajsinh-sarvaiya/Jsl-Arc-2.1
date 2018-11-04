@@ -258,6 +258,7 @@ namespace CleanArchitecture.Core.Enums
         public static string FactorKeyFail = "Invalid two factor key.";
         public static string SuccessGetIpHistory = "Success full Get Ip History.";
         public static string SuccessGetLoginHistory = "Success full Get Login History.";
+        public static string Typemasterrequired = "Provider type not available";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
