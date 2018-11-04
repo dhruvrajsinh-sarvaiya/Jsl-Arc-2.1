@@ -4,8 +4,10 @@ using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,6 +33,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         private readonly ICommonRepository<TradeStopLoss> _TradeStopLoss;
         private readonly ISignalRService _ISignalRService;
         private readonly IFrontTrnService _IFrontTrnService;
+        private readonly IMediator _mediator;
 
         private readonly IWalletService _WalletService;
 
@@ -47,7 +50,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             ICommonRepository<TradeSellerList> TradeSellerList, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<PoolOrder> PoolOrder, EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, 
-            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss)
+            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss, IMediator mediator)
         {
             _dbContext = dbContext;
             //_logger = logger;
@@ -63,6 +66,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _ISignalRService = ISignalRService;
             _IFrontTrnService = IFrontTrnService;
             _TradeStopLoss = TradeStopLoss;
+            _mediator = mediator;
         }
 
         #region ==============================PROCESS SETLLEMENT========================
@@ -380,6 +384,19 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 _Resp.ErrorCode = enErrorCode.Settlement_SettlementInternalError;
             }
             return Task.FromResult(_Resp);
+        }
+        public async Task EmailSendAsync()
+        {
+            try
+            {
+                SendEmailRequest Request = new SendEmailRequest();
+                CommunicationResponse Response = await _mediator.Send(Request);
+
+            }
+            catch(Exception ex)
+            {
+                //HelperForLog.WriteErrorLog("EmailSendAsync Error:##TrnNo " + TradeBuyRequestObj.TrnNo, ControllerName, ex);
+            }
         }
         #endregion
 
