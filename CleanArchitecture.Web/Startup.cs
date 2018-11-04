@@ -188,7 +188,8 @@ namespace CleanArchitecture.Web
                 config.For(typeof(IWebApiSendRequest)).Add(typeof(WebAPISendRequest));
                 config.For(typeof(IGetWebRequest)).Add(typeof(GetWebRequest));
                 config.For(typeof(IWalletConfigurationService)).Add(typeof(WalletConfigurationService));
-
+                config.For(typeof(IMessageConfiguration)).Add(typeof(MessageConfiguration));
+                
                 //  config.For(typeof(ILogger));
 
                 // added by nirav savariya for common repository on 10-04-2018
