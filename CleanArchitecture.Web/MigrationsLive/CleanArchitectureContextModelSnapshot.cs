@@ -1524,8 +1524,7 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long>("CommServiceTypeID");
 
                     b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1024);
+                        .IsRequired();
 
                     b.Property<long>("CreatedBy");
 
