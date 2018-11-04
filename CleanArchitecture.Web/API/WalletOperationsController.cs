@@ -137,7 +137,8 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.SetWalletLimitConfig(AccWalletID, Request, user.Id);                    
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    response = _walletService.SetWalletLimitConfig(AccWalletID, Request, user.Id, accessToken);                    
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -200,7 +201,8 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.AddBeneficiary(CoinName, WhitelistingBit, BeneficiaryName,BeneficiaryAddress, user.Id);
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    response = _walletService.AddBeneficiary(CoinName, WhitelistingBit, BeneficiaryName,BeneficiaryAddress, user.Id,accessToken);
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -229,7 +231,8 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.UpdateBulkBeneficiary(Request, user.Id);
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    response = _walletService.UpdateBulkBeneficiary(Request, user.Id,accessToken);
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -258,7 +261,8 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.UpdateBeneficiaryDetails(Request,AccWalletID ,user.Id);
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    response = _walletService.UpdateBeneficiaryDetails(Request,AccWalletID ,user.Id,accessToken);
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -346,7 +350,8 @@ namespace CleanArchitecture.Web.API
                 }
                 else
                 {
-                    response = _walletService.SetPreferences(user.Id,Convert.ToInt16(GlobalBit));
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    response = _walletService.SetPreferences(user.Id,Convert.ToInt16(GlobalBit),accessToken);
                 }
                 var respObj = JsonConvert.SerializeObject(response);
                 dynamic respObjJson = JObject.Parse(respObj);

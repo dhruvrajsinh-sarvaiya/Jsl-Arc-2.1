@@ -24,6 +24,8 @@ using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Entities.UserChangeLog;
 using Microsoft.EntityFrameworkCore.Metadata;
 using CleanArchitecture.Core.ViewModels;
+using CleanArchitecture.Core.Entities.Profile_Management;
+using CleanArchitecture.Core.Entities.Complaint;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -63,6 +65,11 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<ServiceTypeMaster> ServiceTypeMaster { get; set; }
         public DbSet<TemplateMaster> TemplateMaster { get; set; }
         public DbSet<UserKeyMaster> UserKeyMaster { get; set; }
+        public DbSet<ProfileMaster> ProfileMaster { get; set; } // nirav savariya 11-03-2018
+        ///Complaint
+        public DbSet<Typemaster> Typemaster { get; set; }
+        public DbSet<Complainmaster> Complainmaster { get; set; }
+        public DbSet<CompainTrail> CompainTrail { get; set; }
         // wallet tables
         public DbSet<WalletTypeMaster> WalletTypeMasters { get; set; }
         public DbSet<WalletMaster> WalletMasters { get; set; }

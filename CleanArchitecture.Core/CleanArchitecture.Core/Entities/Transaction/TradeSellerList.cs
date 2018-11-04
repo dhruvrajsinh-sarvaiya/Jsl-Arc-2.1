@@ -19,11 +19,14 @@ namespace CleanArchitecture.Core.Entities.Transaction
         public long TrnNo { get; set; }
         public long SellServiceID { get; set; }
         public long BuyServiceID { get; set; }
-        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Price { get; set; }
-        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal Qty { get; set; }
-        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal RemainQty { get; set; }
 
         public short IsProcessing { get; set; }

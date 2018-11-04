@@ -180,8 +180,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     Req.WalletTrnType = enWalletTrnType.Dr_Sell_Trade;
                 }
 
-                var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode,Helpers.GetTimeStamp(), enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
-                    Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType,Req.TrnType,Req.accessToken);
+                var DebitResult = _WalletService.GetWalletDeductionNew(Req.SMSCode, Helpers.GetTimeStamp(), enWalletTranxOrderType.Debit, Req.Amount, Req.MemberID,
+                    Req.DebitAccountID, Req.TrnNo, Req.ServiceType, Req.WalletTrnType, Req.TrnType, Req.accessToken);
 
                 if (DebitResult.ReturnCode == enResponseCode.Fail)
                 {
@@ -697,16 +697,6 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
                     NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
                     _TradeTransactionRepository.Update(NewTradetransaction);
-                    try
-                    {
-                        _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), Newtransaction, NewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);
-                        //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
-                    }
-                    catch (Exception ex)
-                    {
-                        HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
-                    }
-
                 }
                 
             }
@@ -735,7 +725,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
 
                 _WalletService.GetWalletCreditNew(Req.SMSCode, Helpers.GetTimeStamp(), enWalletTrnType.Cr_Refund, Req.Amount, Req.MemberID,
-                Req.DebitAccountID, CreditWalletDrArryTrnIDList.ToArray(), Req.TrnNo,1, enWalletTranxOrderType.Credit, Req.ServiceType);
+                Req.DebitAccountID, CreditWalletDrArryTrnIDList.ToArray(), Req.TrnNo,1, enWalletTranxOrderType.Credit, Req.ServiceType, (enTrnType)Newtransaction.TrnType);
+
                 try
                 {
                     _ISignalRService.SendActivityNotification("Transaction Failed TrnNo:" + Req.TrnNo, Req.accessToken);
@@ -1155,7 +1146,21 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     InsertBuyerList();
 
                     _Resp.ReturnCode = enResponseCodeService.Success;
-                    _Resp.ReturnMsg = "Pool Order Updated Inserted";                    
+                    _Resp.ReturnMsg = "Pool Order Updated Inserted";
+                    try
+                    {
+                        var CopyNewtransaction = new TransactionQueue();
+                        CopyNewtransaction = (TransactionQueue)Newtransaction.Clone();
+
+                        var CopyNewTradetransaction = new TradeTransactionQueue();                      
+                        CopyNewTradetransaction = (TradeTransactionQueue)NewTradetransaction.Clone();
+
+                        _ISignalRService.OnStatusHold(Convert.ToInt16(enTransactionStatus.Success), CopyNewtransaction, CopyNewTradetransaction, Req.accessToken, TradeStopLossObj.ordertype);                        
+                    }
+                    catch (Exception ex)
+                    {
+                        HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Trading Hold Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                    }
                     break;
                 }              
             }
