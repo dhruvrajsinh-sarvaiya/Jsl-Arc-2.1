@@ -1242,7 +1242,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 //vsolanki 208-11-1
                 var charge = GetServiceLimitChargeValue(routeTrnType, coinName);
-                if (charge.MaxAmount > amount && charge.MinAmount < amount && charge.MaxAmount != 0 && charge.MinAmount != 0)
+                if (charge.MaxAmount < amount && charge.MinAmount > amount && charge.MaxAmount != 0 && charge.MinAmount != 0)
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 }
