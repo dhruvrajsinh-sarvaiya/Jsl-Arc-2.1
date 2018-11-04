@@ -1278,7 +1278,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.CoinName = coinName;
 
                 _signalRService.OnWalletBalChange(walletMasterObj, coinName,  Token);
-                var msg = EnResponseMessage.CreditWalletMsg;
+                var msg = EnResponseMessage.DebitWalletMsg;
                 msg = msg.Replace("#Coin#", coinName);
                 msg = msg.Replace("#TrnType#", routeTrnType.ToString());
                 msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
