@@ -440,6 +440,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     LastPriceViewModel lastPriceData = new LastPriceViewModel();
                     lastPriceData.LastPrice = capData.LastPrice;
+                    capData.Volume24 = capData.High24 - capData.Low24;
                     string Base = volumeData.PairName.Split("_")[1];
                     PairData(volumeData, Base);
                     HelperForLog.WriteLogIntoFile("OnVolumeChange", ControllerName, "After Pair Data Call Base :"+ Base+ "  DATA :" + JsonConvert.SerializeObject(volumeData));
