@@ -27,7 +27,7 @@ namespace CleanArchitecture.Infrastructure.Services
     public class WalletTransactionCrDr : BasePage, IWalletTransactionCrDr
     {
         // private readonly ILogger<WalletService> _log;
-       // private readonly ISignalRService _signalRService;
+        private readonly ISignalRService _signalRService;
         private readonly ICommonRepository<WalletMaster> _commonRepository;
         //private readonly ICommonRepository<WalletLimitConfiguration> _LimitcommonRepository;
         // private readonly ICommonRepository<ThirdPartyAPIConfiguration> _thirdPartyCommonRepository;
@@ -59,7 +59,7 @@ namespace CleanArchitecture.Infrastructure.Services
            IGetWebRequest getWebRequest, ICommonRepository<TradeBitGoDelayAddresses> bitgoDelayRepository, ICommonRepository<AddressMaster> addressMaster,
            ILogger<BasePage> logger, ICommonRepository<WalletTypeMaster> WalletTypeMasterRepository,
            ICommonRepository<WalletAllowTrn> WalletAllowTrnRepo, ICommonRepository<WalletLimitConfiguration> WalletLimitConfig, ICommonRepository<TransactionAccount> TransactionAccountsRepository, ICommonWalletFunction commonWalletFunction,
-           ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster) : base(logger)
+           ICommonRepository<ChargeRuleMaster> chargeRuleMaster, ICommonRepository<LimitRuleMaster> limitRuleMaster, ISignalRService signalRService) : base(logger)
         {
             //_walletService = walletService;
             // _log = log;
@@ -84,7 +84,7 @@ namespace CleanArchitecture.Infrastructure.Services
             //_BeneficiarycommonRepository = BeneficiaryMasterRepo;
             //_UserPreferencescommonRepository = UserPreferenceRepo;
             _TransactionAccountsRepository = TransactionAccountsRepository;
-           // _signalRService = signalRService;
+            _signalRService = signalRService;
             _commonWalletFunction = commonWalletFunction;
             _chargeRuleMaster = chargeRuleMaster;
             _limitRuleMaster = limitRuleMaster;
@@ -161,13 +161,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 // ntrivedi 03-11-2018
                 if (_commonWalletFunction.CheckShadowLimit(Walletobj.Id, amount) != enErrorCode.Success)
                 {
-                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), enWalletTranxOrderType.Debit, amount, TrnRefNo, UTC_To_IST(), null, Walletobj.Id, coinName, Walletobj.UserID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.InsufficantBal, trnType);
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), enWalletTranxOrderType.Debit, amount, TrnRefNo, UTC_To_IST(), null, Walletobj.Id, coinName, Walletobj.UserID, timestamp, enTransactionStatus.SystemFail, EnResponseMessage.ShadowLimitExceed, trnType);
                     objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ShadowLimitExceed, ErrorCode = enErrorCode.ShadowBalanceExceed, TrnNo = objTQ.TrnNo, Status = objTQ.Status, StatusMsg = objTQ.StatusMsg };
                 }
                 //vsolanki 208-11-1
                 var charge = GetServiceLimitChargeValue(enTrnType.Deposit, coinName);//for deposit
-                if (charge.MaxAmount >= amount && charge.MinAmount <= amount)
+                if (charge.MaxAmount < amount && charge.MinAmount > amount)
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 }
@@ -236,7 +236,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 //ntrivedi 03-11-2018
                 var charge = _commonWalletFunction.GetServiceLimitChargeValue(enTrnType.Deposit, coinName);
-                if (charge.MaxAmount > amount && charge.MinAmount < amount)
+                if (charge.MaxAmount < amount && charge.MinAmount > amount)
                 {
                     return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 }

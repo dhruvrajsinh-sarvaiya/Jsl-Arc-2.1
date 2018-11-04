@@ -33,7 +33,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly ICommonRepository<TradePoolMaster> _TradePoolMaster; 
         private readonly ICommonRepository<TradeBuyRequest> _TradeBuyRequest; 
         private readonly ICommonRepository<TradeSellerList> _TradeSellerList; 
-        private readonly ICommonRepository<TradeBuyerList> _TradeBuyerList; 
+        private readonly ICommonRepository<TradeBuyerList> _TradeBuyerList;
+        private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
         //private readonly ICommonRepository<TradePoolQueue> _TradePoolQueue; 
         private readonly ILogger<NewTransaction> _log;
         private readonly IWalletService _WalletService;
@@ -82,7 +83,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             IWebApiSendRequest WebApiSendRequest, WebApiParseResponse WebApiParseResponseObj, IWebApiData IWebApiData,
             ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeSellerList> TradeSellerList,
-            ICommonRepository<TradeBuyerList> TradeBuyerList, ISettlementRepository<BizResponse> SettlementRepository, ISignalRService ISignalRService)
+            ICommonRepository<TradeBuyerList> TradeBuyerList, ISettlementRepository<BizResponse> SettlementRepository, 
+            ISignalRService ISignalRService, ICommonRepository<TradePairStastics> tradePairStastics)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -106,6 +108,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _TradeBuyerList = TradeBuyerList;
             _SettlementRepository = SettlementRepository;
             _ISignalRService = ISignalRService;
+            _tradePairStastics = tradePairStastics;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -278,6 +281,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 //IF @PairID <> 0 ntrivedi 18-04-2018  check inside @TrnType (4,5) @TradeWalletMasterID will be 0 or null
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
+                    if(Req.ordertype==enTransactionMarketType.MARKET)
+                    {
+                        var pairStastics = _tradePairStastics.GetSingle(pair => pair.PairId == Req.PairID);
+                        Req.Price = pairStastics.LTP;
+                    }
                     Req.CreditWalletID = _WalletService.GetWalletID(Req.CreditAccountID);
                     if (Req.CreditWalletID == 0)
                     {
@@ -538,7 +546,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 TradeStopLossObj = new TradeStopLoss()
                 {
                     TrnNo = Req.TrnNo,
-                    ordertype = Convert.ToInt16(Req.ordertype)                   
+                    ordertype = Convert.ToInt16(Req.ordertype),
+                    StopPrice = Req.StopPrice,
+                    Status = Convert.ToInt16(enTransactionStatus.Success)
                 };
                 TradeStopLossObj =_TradeStopLoss.Add(TradeStopLossObj);
                 return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });

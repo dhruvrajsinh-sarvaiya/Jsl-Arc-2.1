@@ -1151,7 +1151,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 else if (Type.ToUpper().Equals("MARKET"))
                     return Convert.ToInt16(enTransactionMarketType.MARKET);
                 else if (Type.ToUpper().Equals("STOP_LOSS"))
-                    return Convert.ToInt16(enTransactionMarketType.STOP_LOSS);
+                    return Convert.ToInt16(enTransactionMarketType.STOP_Limit);
                 else if (Type.ToUpper().Equals("SPOT"))
                     return Convert.ToInt16(enTransactionMarketType.SPOT);
                 else

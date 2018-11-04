@@ -227,6 +227,99 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("Market");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Complaint.CompainTrail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("ComplainId");
+
+                    b.Property<string>("Complainstatus")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<long?>("CreatedBy");
+
+                    b.Property<DateTime?>("CreatedDate");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000);
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasMaxLength(2000);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompainTrail");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Complaint.Complainmaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000);
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<long>("TypeId");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<int>("UserID");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Complainmaster");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Complaint.Typemaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<bool>("EnableStatus");
+
+                    b.Property<short>("Status");
+
+                    b.Property<string>("SubType")
+                        .IsRequired()
+                        .HasMaxLength(150);
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Typemaster");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Configuration.AppType", b =>
                 {
                     b.Property<long>("Id")
@@ -1148,6 +1241,56 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("ProductConfiguration");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Profile_Management.ProfileMaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<decimal>("DepositFee")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000);
+
+                    b.Property<bool>("EnableStatus");
+
+                    b.Property<int>("Level");
+
+                    b.Property<string>("LevelName")
+                        .IsRequired()
+                        .HasMaxLength(150);
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<short>("Status");
+
+                    b.Property<decimal>("Tradingfee")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<long>("TypeId");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.Property<decimal>("WithdrawalLimit")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.Property<decimal>("Withdrawalfee")
+                        .HasColumnType("decimal(18, 8)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProfileMaster");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.RequestFormatMaster", b =>
                 {
                     b.Property<long>("Id")
@@ -1495,17 +1638,21 @@ namespace CleanArchitecture.Web.Migrations
                 {
                     b.Property<long>("TrnNo");
 
-                    b.Property<decimal>("AskPrice");
+                    b.Property<decimal>("AskPrice")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("BidPrice");
+                    b.Property<decimal>("BidPrice")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("BuyQty");
+                    b.Property<decimal>("BuyQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<decimal>("DeliveryTotalQty");
+                    b.Property<decimal>("DeliveryTotalQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("DeliveryWalletID");
 
@@ -1519,7 +1666,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long>("MemberID");
 
-                    b.Property<decimal>("OrderTotalQty");
+                    b.Property<decimal>("OrderTotalQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("OrderWalletID");
 
@@ -1530,13 +1678,16 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("PairName")
                         .IsRequired();
 
-                    b.Property<decimal>("SellQty");
+                    b.Property<decimal>("SellQty")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("SettledBuyQty");
+                    b.Property<decimal>("SettledBuyQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<DateTime?>("SettledDate");
 
-                    b.Property<decimal>("SettledSellQty");
+                    b.Property<decimal>("SettledSellQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<short>("Status");
 
@@ -1544,7 +1695,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<string>("StatusMsg");
 
-                    b.Property<decimal>("TakerPer");
+                    b.Property<decimal>("TakerPer")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<DateTime>("TrnDate");
 
@@ -1651,17 +1803,21 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("AskPrice");
+                    b.Property<decimal>("AskPrice")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("BidPrice");
+                    b.Property<decimal>("BidPrice")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("BuyQty");
+                    b.Property<decimal>("BuyQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<decimal>("DeliveryTotalQty");
+                    b.Property<decimal>("DeliveryTotalQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("DeliveryWalletID");
 
@@ -1671,7 +1827,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<long>("MemberID");
 
-                    b.Property<decimal>("OrderTotalQty");
+                    b.Property<decimal>("OrderTotalQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("OrderWalletID");
 
@@ -1686,17 +1843,20 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<int>("RoutID");
 
-                    b.Property<decimal>("SellQty");
+                    b.Property<decimal>("SellQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("SerProID");
 
                     b.Property<long>("ServiceID");
 
-                    b.Property<decimal>("SettledBuyQty");
+                    b.Property<decimal>("SettledBuyQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<DateTime?>("SettledDate");
 
-                    b.Property<decimal>("SettledSellQty");
+                    b.Property<decimal>("SettledSellQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<short>("Status");
 
@@ -1835,9 +1995,11 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<decimal?>("DeliverBidPrice");
+                    b.Property<decimal?>("DeliverBidPrice")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("DeliverQty");
+                    b.Property<decimal>("DeliverQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("DeliverServiceID");
 
@@ -1845,7 +2007,8 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short?>("OrderType");
 
-                    b.Property<decimal>("PendingBuyQty");
+                    b.Property<decimal>("PendingBuyQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<DateTime?>("SettledDate");
 
@@ -2261,6 +2424,9 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<short>("Status");
 
+                    b.Property<decimal>("StopPrice")
+                        .HasColumnType("decimal(18, 8)");
+
                     b.Property<long>("TrnNo");
 
                     b.Property<long?>("UpdatedBy");
@@ -2280,29 +2446,35 @@ namespace CleanArchitecture.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("BidPrice");
+                    b.Property<decimal>("BidPrice")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.Property<decimal>("DeliveredQty");
+                    b.Property<decimal>("DeliveredQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("OrderID");
 
-                    b.Property<decimal>("PendingQty");
+                    b.Property<decimal>("PendingQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long?>("SellStockID");
 
-                    b.Property<decimal>("SettledQty");
+                    b.Property<decimal>("SettledQty")
+                        .HasColumnType("decimal(18, 8)");
 
-                    b.Property<decimal>("SoldPrice");
+                    b.Property<decimal>("SoldPrice")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<short>("Status");
 
                     b.Property<long>("StockID");
 
-                    b.Property<decimal>("TotalQty");
+                    b.Property<decimal>("TotalQty")
+                        .HasColumnType("decimal(18, 8)");
 
                     b.Property<long>("TrnNo");
 

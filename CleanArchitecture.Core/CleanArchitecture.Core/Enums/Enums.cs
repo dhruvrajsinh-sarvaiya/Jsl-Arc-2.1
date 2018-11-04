@@ -393,9 +393,9 @@ namespace CleanArchitecture.Core.Enums
     public enum enTransactionMarketType
     {
         LIMIT = 1,
-        MARKET = 2,
-        STOP_LOSS = 3,
-        SPOT = 4
+        MARKET = 2,//No price , take from statestic table
+        STOP_Limit = 3,//take extra para
+        SPOT = 4 //same as LIMIT
     }
     public enum enWalletTranxOrderType
     {

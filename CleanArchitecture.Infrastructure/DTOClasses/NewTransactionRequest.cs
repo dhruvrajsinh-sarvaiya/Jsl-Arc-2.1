@@ -66,6 +66,8 @@ namespace CleanArchitecture.Infrastructure.DTOClasses
 
         public string AddressLabel { get; set; }
         public string accessToken { get; set; }
+        [Range(0, 9999999999.99999999)]
+        public decimal StopPrice { get; set; }
 
     }
 

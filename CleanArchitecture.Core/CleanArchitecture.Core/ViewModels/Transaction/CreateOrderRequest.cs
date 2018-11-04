@@ -49,6 +49,9 @@ namespace CleanArchitecture.Core.ViewModels.Transaction
 
         [Required(ErrorMessage = "1,Please Enter Required Parameters,4613")]
         public long Nonce { get; set; }//Timestamp
+        
+        [Range(0, 9999999999.99999999)]
+        public decimal StopPrice { get; set; }
     }
     public class WithdrawalRequest
     {
