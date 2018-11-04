@@ -14,10 +14,12 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public new long Id { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal MaxLimitAmount { get; set; }
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal MinLimitAmount { get; set; }
 

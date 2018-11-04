@@ -15,9 +15,11 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public string Name { get; set; }
         [Key]
         public enTrnType TrnType { get; set; }
-        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal MinAmount { get; set; }
-        [Range(0, 9999999999.99999999), Column(TypeName = "decimal(18, 8)")]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 8)")]
         public decimal MaxAmount { get; set; }
         [Key]
         public long WalletType { get; set; }

@@ -17,6 +17,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public long WalletID { get; set; }//User Id 
 
         [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal ShadowAmount { get; set; }
 

@@ -26,8 +26,8 @@ namespace CleanArchitecture.Core.Entities
         [Required]
         public long DWalletMasterID { get; set; }
 
-        [Required]       
-        [Range(1, 99999), DataType(DataType.Currency)]
+        [Required]
+        [Range(0, 9999999999.99999999), DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 8)")]
         public decimal OrderAmt { get; set; }
 
