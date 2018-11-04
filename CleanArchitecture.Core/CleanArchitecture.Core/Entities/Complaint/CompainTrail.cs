@@ -22,7 +22,7 @@ namespace CleanArchitecture.Core.Entities.Complaint
         [StringLength(100)]
         public string Complainstatus { get; set; }
         public long? CreatedBy { get; set; }
-
+         
         [DataType(DataType.DateTime)]
         public DateTime? CreatedDate { get; set; }
 
