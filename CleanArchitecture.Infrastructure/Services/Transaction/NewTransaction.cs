@@ -451,7 +451,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 InsertTransactionInQueue();              
                 if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
                 {
-                    InsertTradeTransactionInQueue();
+                    try//as some para null in starting so error occured here ,only in case of system fail
+                    {
+                        InsertTradeTransactionInQueue();                        
+                    }
+                    catch(Exception ex)
+                    {
+                        HelperForLog.WriteErrorLog("MarkSystemFailTransaction Trade TQ Error:##TrnNo " + Req.TrnNo, ControllerName, ex);
+                    }
                     InsertTradeStopLoss();
                 }
                 //DI of SMS here
