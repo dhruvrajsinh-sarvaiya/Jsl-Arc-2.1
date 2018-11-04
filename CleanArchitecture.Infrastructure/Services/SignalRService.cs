@@ -27,21 +27,21 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         private readonly ILogger<SignalRService> _logger;
         private readonly IMediator _mediator;
-        private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
-        private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
+        //private readonly EFCommonRepository<TransactionQueue> _TransactionRepository;
+        //private readonly EFCommonRepository<TradeTransactionQueue> _TradeTransactionRepository;
         private readonly IFrontTrnRepository _frontTrnRepository;
         private RedisConnectionFactory _fact;
         public String Token=null;
         public string ControllerName = "SignalRService";
-        public SignalRService(ILogger<SignalRService> logger, IMediator mediator, EFCommonRepository<TransactionQueue> TransactionRepository, IFrontTrnRepository frontTrnRepository,
-            EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, RedisConnectionFactory Factory)
+        public SignalRService(ILogger<SignalRService> logger, IMediator mediator, IFrontTrnRepository frontTrnRepository,
+             RedisConnectionFactory Factory)
         {
             _fact = Factory;
             _logger = logger;
             _mediator = mediator;
-            _TransactionRepository = TransactionRepository;
+            // _TransactionRepository = TransactionRepository;
             _frontTrnRepository = frontTrnRepository;
-            _TradeTransactionRepository = TradeTransactionRepository;
+            //_TradeTransactionRepository = TradeTransactionRepository;
            
         }
         #region Pairwise

@@ -1378,7 +1378,7 @@ namespace CleanArchitecture.Infrastructure.Data
                 var UserTypeObj = _dbContext.BizUserTypeMapping.Where(u => u.UserID == userid).SingleOrDefault();
                 if (UserTypeObj == null)
                 {
-                    return 0;
+                    return -1; //ntrivedi usertype can be 0
                 }
                 else
                 {

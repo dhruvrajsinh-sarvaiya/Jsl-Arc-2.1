@@ -67,7 +67,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     else
                     {
                         var typeobj = _walletRepository1.GetTypeMappingObj(Walletobj.UserID);
-                        if (typeobj != 0)
+                        if (typeobj != -1) //ntrivedi 04-11-2018 
                         {
                             var Limitobj = _ShadowLimitRepo.GetSingle(item => item.MemberTypeId == typeobj);
                             if (Limitobj != null)
@@ -78,7 +78,7 @@ namespace CleanArchitecture.Infrastructure.Services
                                 }
                                 return enErrorCode.InsufficientBalance;
                             }
-                            return enErrorCode.NotFoundLimit;
+                            return enErrorCode.Success; // IF ENTRY NOT FOUND THEN SUCCESS NTRIVEDI
                         }
                         return enErrorCode.MemberTypeNotFound;
                     }
