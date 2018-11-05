@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
@@ -8,6 +9,7 @@ using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -34,6 +36,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         private readonly ISignalRService _ISignalRService;
         private readonly IFrontTrnService _IFrontTrnService;
         private readonly IMediator _mediator;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly IWalletService _WalletService;
 
@@ -44,13 +47,14 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         TransactionQueue TransactionQueueObj;
         TradeTransactionQueue TradeTransactionQueueObj;
         TradeStopLoss _TradeStopLossObj;
+        private readonly IMessageConfiguration _messageConfiguration;
 
         public SettlementRepository(CleanArchitectureContext dbContext, ICommonRepository<TradePoolQueue> TradePoolQueue,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeBuyerList> TradeBuyerList,
             ICommonRepository<TradeSellerList> TradeSellerList, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<PoolOrder> PoolOrder, EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, 
-            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss, IMediator mediator)
+            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss, IMediator mediator, IMessageConfiguration messageConfiguration, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             //_logger = logger;
@@ -67,6 +71,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _IFrontTrnService = IFrontTrnService;
             _TradeStopLoss = TradeStopLoss;
             _mediator = mediator;
+            _messageConfiguration = messageConfiguration;
+            _userManager = userManager;
         }
 
         #region ==============================PROCESS SETLLEMENT========================
@@ -387,17 +393,44 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             return Task.FromResult(_Resp);
         }
-        public async Task EmailSendAsync()
+        public async Task EmailSendAsync(string UserID,int Status,string PairName, string BaseMarket 
+            ,string TrnDate,decimal ReqAmount=0,decimal Amount=0, decimal Fees = 0)
         {
             try
             {
-                SendEmailRequest Request = new SendEmailRequest();
-                CommunicationResponse Response = await _mediator.Send(Request);
-
+                if (!string.IsNullOrEmpty(UserID) && !string.IsNullOrEmpty(PairName) && !string.IsNullOrEmpty(BaseMarket) &&
+                    ReqAmount != 0 && !string.IsNullOrEmpty(TrnDate) && Amount != 0 && Status == 1)
+                {
+                    SendEmailRequest Request = new SendEmailRequest();
+                    ApplicationUser User = new ApplicationUser();
+                    User = await _userManager.FindByIdAsync(UserID);
+                    if (!string.IsNullOrEmpty(User.Email))
+                    {
+                        IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.Registration), 0);
+                        foreach (TemplateMasterData Provider in Result)
+                        {
+                            Provider.Content = Provider.Content.Replace("###USERNAME###", User.Name);
+                            Provider.Content = Provider.Content.Replace("###TYPE###", PairName);
+                            Provider.Content = Provider.Content.Replace("###REQAMOUNT###", ReqAmount.ToString());
+                            Provider.Content = Provider.Content.Replace("###STATUS###", Status.ToString());
+                            Provider.Content = Provider.Content.Replace("###USER###", User.Name);
+                            Provider.Content = Provider.Content.Replace("###CURRENCY###", BaseMarket);
+                            Provider.Content = Provider.Content.Replace("###DATETIME###", TrnDate);
+                            Provider.Content = Provider.Content.Replace("###AMOUNT###", Amount.ToString());
+                            Provider.Content = Provider.Content.Replace("###FEES###", Fees.ToString());
+                            Provider.Content = Provider.Content.Replace("###FINAL###", (Amount + Fees).ToString());
+                            Request.Body = Provider.Content;
+                        }
+                        Request.Recepient = User.Email;
+                        Request.Subject = "";
+                        Request.EmailType = 0;
+                        await _mediator.Send(Request);
+                    }                    
+                }
             }
             catch(Exception ex)
             {
-                //HelperForLog.WriteErrorLog("EmailSendAsync Error:##TrnNo " + TradeBuyRequestObj.TrnNo, ControllerName, ex);
+                HelperForLog.WriteErrorLog("Settlement - EmailSendAsync Error ", ControllerName, ex);
             }
         }
         #endregion
