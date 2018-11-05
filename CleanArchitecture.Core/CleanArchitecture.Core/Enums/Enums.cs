@@ -285,7 +285,7 @@ namespace CleanArchitecture.Core.Enums
         Typemasterrequired4109 = 4109,
         Status4112ProfilePlan =4112,
         Status4122NotAddedProfile = 4122,
-
+        Status4129InvalidProfileId =4129,
         Status4110TypemasterInsertError = 4110,
         Status4111AddCompainrequired = 4111,
         Status4113AddCompainTrail = 4113,
