@@ -787,6 +787,7 @@ namespace CleanArchitecture.Web.API
 
         //Uday 30-10-2018
         [HttpGet("{TrnType}/{CoinName}")]
+        //[AllowAnonymous]
         public ActionResult GetServiceLimitChargeValue(enTrnType TrnType, string CoinName)
         {
             ServiceLimitChargeValueResponse Response = new ServiceLimitChargeValueResponse();
@@ -799,6 +800,8 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responseData;
                     Response.ReturnCode = enResponseCode.Success;
+                    Response.ReturnMsg = EnResponseMessage.FindRecored;
+                    Response.ErrorCode = enErrorCode.Success;
                     subObj.ChargeType = Response.response.ChargeType;
                     subObj.ChargeValue = Response.response.ChargeValue;
                     subObj.CoinName = Response.response.CoinName;
@@ -809,7 +812,7 @@ namespace CleanArchitecture.Web.API
                     ResponseStr.ReturnCode = Response.ReturnCode;
                     ResponseStr.ErrorCode = Response.ErrorCode;
                     ResponseStr.ReturnMsg = Response.ReturnMsg;
-
+                    ResponseStr.response = subObj;
 
                 }
                 else
