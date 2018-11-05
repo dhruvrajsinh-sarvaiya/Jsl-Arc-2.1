@@ -46,7 +46,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
         {
             try
             {
-                var IpHistoryList = _ipHistoryRepository.Table.Where(i => i.UserId == UserId).ToList();
+                var IpHistoryList = _ipHistoryRepository.Table.Where(i => i.UserId == UserId).OrderByDescending(i => i.CreatedDate).ToList();
                 if (IpHistoryList == null)
                 {
                     return null;

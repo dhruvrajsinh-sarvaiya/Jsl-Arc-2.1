@@ -27,26 +27,30 @@ namespace CleanArchitecture.Infrastructure.Services.Profile_Management
         {
             try
             {
-                var IpHistoryList = _profileRepository.Table.ToList();
+                var ProfileDataList = _profileRepository.Table.OrderBy(i => i.Level).ToList();
                 List<ProfileMasterViewModel> listmodel = new List<ProfileMasterViewModel>();
-                foreach (var item in IpHistoryList)
+                if (ProfileDataList != null)
                 {
-                    ProfileMasterViewModel model = new ProfileMasterViewModel();
-                    model.Description = item.Description;
-                    model.LevelName = item.LevelName;
-                    model.Price = item.Price;
-                    model.TypeId = _typemasterRepository.Table.Where(i => i.Id == item.TypeId).FirstOrDefault().SubType;
-                    model.DepositFee = item.DepositFee;
-                    model.Withdrawalfee = item.Withdrawalfee;
-                    model.Tradingfee = item.Tradingfee;
-                    model.WithdrawalLimit = item.WithdrawalLimit;
-                    long profileid = _subscriptionRepository.Table.Where(s => s.UserId == userid && s.ActiveStatus == true).FirstOrDefault().ProfileId;
-                    if (item.Id == profileid)
-                        model.ActiveStatus = true;
-                    else
-                        model.ActiveStatus = false;
-
-                    listmodel.Add(model);
+                    foreach (var item in ProfileDataList)
+                    {
+                        ProfileMasterViewModel model = new ProfileMasterViewModel();
+                        model.Description = item.Description;
+                        model.LevelName = item.LevelName;
+                        model.Price = item.Price;
+                        model.TypeId = _typemasterRepository.Table.Where(i => i.Id == item.TypeId).FirstOrDefault().SubType;
+                        model.DepositFee = item.DepositFee;
+                        model.Withdrawalfee = item.Withdrawalfee;
+                        model.Tradingfee = item.Tradingfee;
+                        model.WithdrawalLimit = item.WithdrawalLimit;
+                        long profileid = 0;
+                        profileid = _subscriptionRepository.Table.Where(s => s.UserId == userid && s.ActiveStatus == true).FirstOrDefault().ProfileId;
+                        if (item.Id == profileid)
+                            model.ActiveStatus = true;
+                        else
+                            model.ActiveStatus = false;
+                        model.ProfileId = item.Id;
+                        listmodel.Add(model);
+                    }
                 }
 
                 return listmodel;

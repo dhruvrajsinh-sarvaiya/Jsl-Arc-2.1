@@ -21,7 +21,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
         {
             try
             {
-                var LoginHistoryList = _CustomLoginRepository.Table.Where(i => i.UserId == UserId).ToList();
+                var LoginHistoryList = _CustomLoginRepository.Table.Where(i => i.UserId == UserId).OrderByDescending(i =>i.CreatedDate).ToList();
                 if (LoginHistoryList == null)
                 {
                     return null;
