@@ -531,7 +531,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 model.Total = model.Type == "BUY" ? ((model.Price * model.Amount) - model.ChargeRs) : ((model.Price * model.Amount));
                 model.DateTime = Convert.ToDateTime(NewTradeTransaction.SettledDate);
                 model.Status = NewTradeTransaction.Status;
-                model.StatusText = NewTradeTransaction.StatusMsg;
+                model.StatusText = Enum.GetName(typeof(enTransactionStatus),model.Status);
                 model.PairName = NewTradeTransaction.PairName;
                 model.ChargeRs = Convert.ToDecimal(Newtransaction.ChargeRs);
                 model.IsCancel = NewTradeTransaction.IsCancelled;
@@ -624,36 +624,20 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 if (!string.IsNullOrEmpty(Token))
                 {
-                    List<GetBuySellBook> list = new List<GetBuySellBook>();
+                    BuySellmodel.Amount = 0;
+                    BuySellmodel.OrderId = new Guid();
+                    BuySellmodel.RecordCount = 0;
                     if (NewTradeTransaction.TrnType == 4)//Buy
                     {
-                        list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
-                        foreach (var model in list)
-                        {
-                            BuySellmodel = model;
-                            break;
-                        }
-                        if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
-                        {
-                            BuySellmodel.Amount = 0;
-                            BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "BuyerBook call TRNNO:");
-                        }
+                        BuySellmodel.Price = NewTradeTransaction.BidPrice;
+                        BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "BuyerBook call TRNNO:");
                     }
                     else//Sell
                     {
-                        list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
-                        foreach (var model in list)
-                        {
-                            BuySellmodel = model;
-                            break;
-                        }
-                        if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
-                        {
-                            BuySellmodel.Amount = 0;
-                            SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "SellerBook call TRNNO:");
-                        }
+                        BuySellmodel.Price = NewTradeTransaction.AskPrice;
+                        SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                        HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "SellerBook call TRNNO:");
                     }
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
                     HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Recent Order Socket call ");

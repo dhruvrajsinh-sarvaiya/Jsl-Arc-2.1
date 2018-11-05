@@ -222,7 +222,29 @@ namespace CleanArchitecture.Infrastructure.Services
                             }
                         }
                     }
-                    return enErrorCode.GlobalBitNotFound;
+                    //return enErrorCode.GlobalBitNotFound;
+                    else
+                    {
+                        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                        if (Beneobj != null)
+                        {
+                            return enErrorCode.Success;
+                        }
+                        else
+                        {
+                            BeneficiaryMaster AddNew = new BeneficiaryMaster();
+                            AddNew.IsWhiteListed = Convert.ToInt16(enWhiteListingBit.OFF);
+                            AddNew.Status = Convert.ToInt16(ServiceStatus.Active);
+                            AddNew.CreatedBy = Walletobj.UserID;
+                            AddNew.CreatedDate = UTC_To_IST();
+                            AddNew.UserID = Walletobj.UserID;
+                            AddNew.Address = DestinationAddress;
+                            AddNew.Name = Name;
+                            AddNew.WalletTypeID = Walletobj.WalletTypeID;
+                            AddNew = _BeneficiarycommonRepository.Add(AddNew);
+                            return enErrorCode.Success;                            
+                        }
+                    }
                 }
                 return enErrorCode.WalletNotFound;
             }
