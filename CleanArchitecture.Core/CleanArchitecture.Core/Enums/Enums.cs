@@ -293,6 +293,15 @@ namespace CleanArchitecture.Core.Enums
         status4116Complaintdatanotavailable = 4116,
         status4121complaintTypeNotavailable = 4121,
 
+        Status4115ImageNotUpload = 4115,
+        Status4123FrontImageLarger = 4123,
+        Status4124BackImageLarger = 4124,
+        Status4125SelfiImageLarger = 4125,
+        Status4126SuranName = 4126,
+        Status4127GivenName = 4127,
+        Status4128ValidIdentityCard = 4128,
+        Status4129PersonalIdentityNotInserted = 4129,
+
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

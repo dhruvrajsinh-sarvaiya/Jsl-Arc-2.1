@@ -277,6 +277,16 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessGetCompainDetail = "Success full get complaint data.";
 
         public static string Complaintdatanotavailable = "Complaint not available.";
+
+        public static string ImageNotAvailable = "Image not availalbe.";
+        public static string FrontImageSizeLarger = "Front image size lager.";
+        public static string BackImageSizeLarger = "Back image size lager.";
+        public static string SelfieImageSizeLarger = "Selfie image size lager.";
+        public static string Surname = "Please enter surname.";
+        public static string GivenName = "Please enter given name.";
+        public static string ValidIdentityCard = "Please enter valid identity card.";
+        public static string PersonalIdentityInsertSuccessfull = "Personal identity KYC request success full insert.";
+        public static string PersonalIdentityNotInserted = "Personal identity KYC request success full not inserted.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
