@@ -20,10 +20,14 @@
   <ItemGroup>
 	  <PackageReference Include="Ardalis.GuardClauses" Version="1.2.3" />
 	  <PackageReference Include="AutoMapper" Version="7.0.1" />
+	  <PackageReference Include="CachingFramework.Redis" Version="10.0.2" />
 	  <PackageReference Include="MediatR" Version="5.1.0" />
 	  <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.2" />
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
 	  <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="NLog.Config" Version="4.5.10" />
+    <PackageReference Include="StackExchange.Redis" Version="2.0.513" />
   </ItemGroup>
 
   <ItemGroup>

@@ -503,10 +503,10 @@ namespace DepositStatusCheckApp
                             {
                                 if (TPGenerateResponse.entries != null)
                                 {
-                                    string trnid = dSet.Tables[0].Rows[0]["TrnID"].ToString();
-                                    trnid = dSet.Tables[0].Rows[0]["SMSCode"].ToString();
+                                    string trnid = dRow["TrnID"].ToString();
+                                    trnid = dRow["SMSCode"].ToString();
 
-                                    if (TPGenerateResponse.txid == (dSet.Tables[0].Rows[0]["TrnID"]).ToString() && TPGenerateResponse.coin.ToLower() == (dSet.Tables[0].Rows[0]["SMSCode"]).ToString().ToLower())
+                                    if (TPGenerateResponse.txid == (dRow["TrnID"]).ToString() && TPGenerateResponse.coin.ToLower() == (dRow["SMSCode"]).ToString().ToLower())
                                     {
                                         if (TPGenerateResponse.entries != null)
                                         {
@@ -520,7 +520,7 @@ namespace DepositStatusCheckApp
                                                         (new DataCommon()).ExecuteQuery(SqlStr);
                                                         continue;
                                                     }
-                                                    if (iv.address.ToString() == dSet.Tables[0].Rows[0]["address"].ToString() && iv.wallet == CommonMethod.ProviderWalletID)
+                                                    if (iv.address.ToString() == dRow["address"].ToString() && iv.wallet == CommonMethod.ProviderWalletID)
                                                     {
                                                         // iv["address"] = iv["address"].ToString();
                                                         //iv["Amount"] = Convert.ToDecimal(iv["value"]) / Convert.ToDecimal(Configuration[Convert.ToString(iv["btc"])]);
@@ -550,7 +550,7 @@ namespace DepositStatusCheckApp
                                                     }
                                                     else
                                                     {
-                                                        //SqlStr = dSet.Tables[0].Rows[0]["address"].ToString(); //temperory
+                                                        //SqlStr = dRow["address"].ToString(); //temperory
                                                         SqlStr = "UPDATE DepositHistory SET IsProcessing = 1,Status=9,StatusMsg='mismatch walletid or address' WHERE Address='" + iv.address.ToString() + "' and ID = " + dRow["ID"].ToString() + "";
                                                         (new DataCommon()).ExecuteQuery(SqlStr);
                                                     }

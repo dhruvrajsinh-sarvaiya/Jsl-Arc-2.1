@@ -1427,7 +1427,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.IsDefaultWallet = cWalletobj.IsDefaultWallet;
                 walletMasterObj.CoinName = coinName;
 
-                _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
+                //_signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
                 // ntrivedi 03-11-2018
                 var msg = EnResponseMessage.CreditWalletMsg;
                 msg = msg.Replace("#Coin#", coinName);
@@ -1436,10 +1436,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (!string.IsNullOrEmpty(Token))
                 {
                     _signalRService.SendActivityNotification(msg, Token);
+                    _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
                 }
                 else
                 {
                     _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);
+                    _signalRService.OnWalletBalChange(walletMasterObj, coinName, cWalletobj.UserID.ToString(),2);
                 }
 
                 //-------------------------------

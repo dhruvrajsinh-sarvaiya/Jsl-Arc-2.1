@@ -55,7 +55,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
 
         public List<DeviceMasterViewModel> GetDeviceListByUserId(long UserId, int pageIndex, int pageSize)
         {
-            var DeviceIdList = _deviceMasterRepository.Table.Where(i => i.UserId == UserId && !i.IsDeleted).ToList();
+            var DeviceIdList = _deviceMasterRepository.Table.Where(i => i.UserId == UserId && !i.IsDeleted).OrderByDescending(i => i.CreatedDate).ToList();
             if (DeviceIdList == null)
             {
                 return null;

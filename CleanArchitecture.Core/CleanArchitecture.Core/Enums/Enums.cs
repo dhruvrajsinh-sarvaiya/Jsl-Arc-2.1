@@ -284,6 +284,15 @@ namespace CleanArchitecture.Core.Enums
         Status4108TwoFAalreadydisable = 4108,
         Typemasterrequired4109 = 4109,
         Status4112ProfilePlan =4112,
+        Status4122NotAddedProfile = 4122,
+
+        Status4110TypemasterInsertError = 4110,
+        Status4111AddCompainrequired = 4111,
+        Status4113AddCompainTrail = 4113,
+        Status4114CompainTrailInsertError = 4114,
+        status4116Complaintdatanotavailable = 4116,
+        status4121complaintTypeNotavailable = 4121,
+
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -492,7 +501,7 @@ namespace CleanArchitecture.Core.Enums
         //Base Market
         RecievePairData = 12,
         RecieveMarketTicker = 13,
-        BroadcastMessage = 14,
+        BroadcastMessage = 16,
         SetTime = 15
     }
     public enum enCheckWithdrawalBene

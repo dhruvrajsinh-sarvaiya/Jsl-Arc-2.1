@@ -88,7 +88,7 @@ namespace CleanArchitecture.Infrastructure.Services.Log
         {
             
 
-            var IpAddressList = _ipMasterRepository.Table.Where(i => i.UserId == UserId && !i.IsDeleted).ToList();
+            var IpAddressList = _ipMasterRepository.Table.Where(i => i.UserId == UserId && !i.IsDeleted).OrderByDescending(i => i.CreatedDate).ToList();
             if (IpAddressList == null)
             {
                 return null;
