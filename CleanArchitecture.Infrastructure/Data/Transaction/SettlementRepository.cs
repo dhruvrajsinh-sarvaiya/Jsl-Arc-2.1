@@ -230,6 +230,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         PoolMst.TotalQty = PoolMst.TotalQty - SettlementQty;                        
                         PoolOrderObj.MakeTransactionSuccess();
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
+                        TransactionQueueObj.SetTransactionCode(Convert.ToInt64(enErrorCode.Settlement_PartialSettlementDone));
+                        TransactionQueueObj.SetTransactionStatusMsg("Partial Settlement Done");
 
                         CreditWalletDrArryTrnIDList.Add(new CreditWalletDrArryTrnID { DrTrnRefNo = SellerList.TrnNo, Amount = SettlementQty });
 
@@ -302,6 +304,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         TradeBuyRequestObj.MakeTransactionSuccess();
                         TradeBuyerListObj.MakeTransactionSuccess();                        
                         TransactionQueueObj.MakeTransactionSuccess();
+                        TransactionQueueObj.SetTransactionCode(Convert.ToInt64(enErrorCode.Settlement_FullSettlementDone));
+                        TransactionQueueObj.SetTransactionStatusMsg("Full Settlement Done");
                         TradeTransactionQueueObj.MakeTransactionSuccess();
 
                         TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + SettlementQty;
