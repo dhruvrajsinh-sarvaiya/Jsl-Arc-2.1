@@ -457,6 +457,8 @@ namespace CleanArchitecture.Infrastructure.Data
                                 select p).ToList();
                 arrayObj.ForEach(e => e.Status = enTransactionStatus.Success);
                 arrayObj.ForEach(e => e.StatusMsg = "Success");
+                arrayObj.ForEach(e => e.UpdatedDate = UTC_To_IST()); // ntrivedi update updateddate
+
 
                 // update debit transaction(current tranx against which tranx) status if it is fully settled
                 var arrayObjTQ = (from p in _dbContext.WalletTransactionQueues
@@ -465,6 +467,8 @@ namespace CleanArchitecture.Infrastructure.Data
                 arrayObjTQ.ForEach(e => e.p.SettedAmt = e.p.SettedAmt + e.q.Amount);
                 arrayObjTQ.ForEach(e => e.p.UpdatedDate = UTC_To_IST());
                 arrayObjTQ.Where(d => d.p.SettedAmt >= d.p.Amount).ToList().ForEach(e => e.p.Status = enTransactionStatus.Success);
+                arrayObjTQ.Where(d => d.p.SettedAmt >= d.p.Amount).ToList().ForEach(e => e.p.StatusMsg = "Success"); // ntrivedi update statusmsg
+                arrayObjTQ.Where(d => d.p.SettedAmt >= d.p.Amount).ToList().ForEach(e => e.p.UpdatedDate = UTC_To_IST()); // ntrivedi update updateddate
 
 
                 _dbContext.Set<WalletLedger>().Add(wl1);
