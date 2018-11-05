@@ -31,7 +31,7 @@ namespace CleanArchitecture.Core.Entities.KYC
         public bool EnableStatus { get; set; }
         public bool VerifyStatus { get; set; }
 
-        public int KYCLevelId{ get; set; }
+        public long KYCLevelId{ get; set; }
 
 
     }

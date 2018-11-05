@@ -31,6 +31,7 @@ namespace CleanArchitecture.Core.ViewModels.KYC
         public string SelfieImage { get; set; }
         public bool EnableStatus { get; set; }
         public bool VerifyStatus { get; set; }
+        public long KYCLevelId { get; set; }
 
     }
 

@@ -8,11 +8,11 @@ namespace CleanArchitecture.Web.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
+            migrationBuilder.AddColumn<long>(
                 name: "KYCLevelId",
                 table: "PersonalVerification",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0L);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Remark",
