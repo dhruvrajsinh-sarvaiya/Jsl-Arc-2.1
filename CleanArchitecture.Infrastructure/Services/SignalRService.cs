@@ -440,7 +440,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     LastPriceViewModel lastPriceData = new LastPriceViewModel();
                     lastPriceData.LastPrice = capData.LastPrice;
-                    capData.Volume24 = capData.High24 - capData.Low24;
+                    lastPriceData.UpDownBit = volumeData.UpDownBit;
+
                     string Base = volumeData.PairName.Split("_")[1];
                     PairData(volumeData, Base);
                     HelperForLog.WriteLogIntoFile("OnVolumeChange", ControllerName, "After Pair Data Call Base :"+ Base+ "  DATA :" + JsonConvert.SerializeObject(volumeData));
@@ -615,7 +616,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 //pop OpenOrder
                 //add tradehistory
                 //add orderhistory
-                //Token = Token;
+                //pop buyer/seller book;
                 //HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "Call ---- TransactionQueue :" + JsonConvert.SerializeObject(Newtransaction) + " TradeTransactionQueue :" + JsonConvert.SerializeObject(NewTradeTransaction));
                 if (string.IsNullOrEmpty(Token))
                 {
@@ -624,16 +625,45 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (!string.IsNullOrEmpty(Token))
                 {
                     List<GetBuySellBook> list = new List<GetBuySellBook>();
-
+                    if (NewTradeTransaction.TrnType == 4)//Buy
+                    {
+                        list = _frontTrnRepository.GetBuyerBook(NewTradeTransaction.PairID, NewTradeTransaction.BidPrice);
+                        foreach (var model in list)
+                        {
+                            BuySellmodel = model;
+                            break;
+                        }
+                        if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
+                        {
+                            BuySellmodel.Amount = 0;
+                            BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
+                            HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "BuyerBook call TRNNO:");
+                        }
+                    }
+                    else//Sell
+                    {
+                        list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
+                        foreach (var model in list)
+                        {
+                            BuySellmodel = model;
+                            break;
+                        }
+                        if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
+                        {
+                            BuySellmodel.Amount = 0;
+                            SellerBook(BuySellmodel, NewTradeTransaction.PairName);
+                            HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "SellerBook call TRNNO:");
+                        }
+                    }
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
                     HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Recent Order Socket call ");
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType,1);//update OpenOrder
                     HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Open Order Socket call ");
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     OrderHistory(historyInfo, historyInfo.PairName);//Order
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  :" );
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  : TrnType :" +Newtransaction .TrnType +" : Amount :"+ Newtransaction.Amount.ToString());
                     TradeHistory(historyInfo, Token);//TradeHistory
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  :");
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  : STATUS " + Newtransaction.Status.ToString());
                     var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
                     msg = msg.Replace("#Price#", historyInfo.Price.ToString());
                     msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
@@ -671,6 +701,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         }
                         if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
                         {
+                            
                             BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
                             HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "BuyerBook call TRNNO:");
                         }
@@ -680,6 +711,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         list = _frontTrnRepository.GetSellerBook(NewTradeTransaction.PairID, NewTradeTransaction.AskPrice);
                         foreach (var model in list)
                         {
+                           
                             BuySellmodel = model;
                             break;
                         }
