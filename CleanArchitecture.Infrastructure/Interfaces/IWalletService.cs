@@ -142,5 +142,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         //vsolanki 2018-11-03
         decimal ConvertFund(decimal SourcePrice);
         BizResponseClass AddIntoConvertFund(ConvertTockenReq Request, long userid, string accessToken = null);
+
+        bool InsertIntoWithdrawHistory(WithdrawHistory req);
     }
 }
