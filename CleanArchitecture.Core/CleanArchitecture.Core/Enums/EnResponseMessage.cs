@@ -258,11 +258,25 @@ namespace CleanArchitecture.Core.Enums
         public static string FactorKeyFail = "Invalid two factor key.";
         public static string SuccessGetIpHistory = "Success full Get Ip History.";
         public static string SuccessGetLoginHistory = "Success full Get Login History.";
-        public static string Typemasterrequired = "Provider type not available";
+       
 
-        public static string SuccessAddComplain = "Success full add raise complaint.";
         public static string ProfilePlan = "Profile plan not available.";
         public static string SuccessGetProfilePlan = "Success full get raise profile plan.";
+
+
+        public static string Typemasterrequired = "Please Enter complaint type";
+        public static string TypemasterInsertError = "raise complaint not added.";
+        public static string complaintTypeNotavailable = "Complaint type not available";
+        public static string SuccessAddComplain = "Success full add raise complaint.";
+        public static string AddCompainrequired = "Please Provice Compaint raise Detail.";
+        public static string AddCompainTrail = "Please Provice CompainTrail Detail.";
+        public static string CompainTrailInsertError = "CompainTrail not added.";
+        public static string SuccessCompainTrail = "Success full add CompainTrail.";
+
+        public static string SuccessGetCompainDetail = "Success full get complaint data.";
+
+        public static string Complaintdatanotavailable = "Complaint not available.";
+
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
