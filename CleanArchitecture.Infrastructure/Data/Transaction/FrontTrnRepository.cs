@@ -334,7 +334,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 IQueryable<GetGraphResponse> Result;
                 if (socket == 0)
                 {
-                    Query = "Select Top 500 DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
+                    Query = "Select DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) As DataDate," +
                                    "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
                                    "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
                                    "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +

@@ -612,7 +612,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                         if (delayGeneratedAddressesObj == null)
                         {
-                            return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.AddressGenerationFailed, ReturnCode = enResponseCode.Fail, ReturnMsg = "please try after some time" };
+                            return new CreateWalletAddressRes { address = Respaddress, ErrorCode = enErrorCode.UnAssignedAddressFetchFail, ReturnCode = enResponseCode.Fail, ReturnMsg = "please try after some time" };
                         }
                         address = delayGeneratedAddressesObj.Address;
                         Respaddress = delayGeneratedAddressesObj.Address;
