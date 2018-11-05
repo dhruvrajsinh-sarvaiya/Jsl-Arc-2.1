@@ -678,11 +678,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 Newtransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
                 _TransactionRepository.Update(Newtransaction);
 
-                //var TradeTxn = _TradeTransactionRepository.GetById(Req.TrnNo);
-                NewTradetransaction.MakeTransactionSystemFail();
-                NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
-                NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
-                _TradeTransactionRepository.Update(NewTradetransaction);
+                if (Req.TrnType == enTrnType.Buy_Trade || Req.TrnType == enTrnType.Sell_Trade)
+                {
+                    //var TradeTxn = _TradeTransactionRepository.GetById(Req.TrnNo);
+                    NewTradetransaction.MakeTransactionSystemFail();
+                    NewTradetransaction.SetTransactionStatusMsg(StatusMsg);
+                    NewTradetransaction.SetTransactionCode(Convert.ToInt64(ErrorCode));
+                    _TradeTransactionRepository.Update(NewTradetransaction);
+                }              
                 try
                 {
                     _ISignalRService.SendActivityNotification("Transaction Validation Fail TrnNo:" + Req.TrnNo, Req.accessToken);
@@ -695,7 +698,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             catch(Exception ex)
             {
                 HelperForLog.WriteErrorLog("MarkTransactionSystemFail:##TrnNo " + Req.TrnNo, ControllerName, ex);
-                throw ex;
+               // throw ex;
             } 
         }
         public void MarkTransactionHold(string StatusMsg, enErrorCode ErrorCode)
