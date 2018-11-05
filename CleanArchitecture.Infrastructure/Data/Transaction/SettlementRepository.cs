@@ -232,6 +232,12 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         PoolOrderObj.DRemarks = "Delivery Success with " + SellerList.Price;
                         TransactionQueueObj.SetTransactionCode(Convert.ToInt64(enErrorCode.Settlement_PartialSettlementDone));
                         TransactionQueueObj.SetTransactionStatusMsg("Partial Settlement Done");
+                        decimal SellRelQty = Helpers.DoRoundForTrading(SettlementQty * TradeBuyRequestObj.PaidQty / TradeBuyRequestObj.Qty, 8);
+
+                        TradeTransactionQueueObj.SetTransactionCode(Convert.ToInt64(enErrorCode.Settlement_PartialSettlementDone));
+                        TradeTransactionQueueObj.SetTransactionStatusMsg("Partial Settlement Done");
+                        TradeTransactionQueueObj.SettledBuyQty = TradeTransactionQueueObj.SettledBuyQty + SettlementQty;
+                        TradeTransactionQueueObj.SettledSellQty = TradeTransactionQueueObj.SettledSellQty + SellRelQty;
 
                         CreditWalletDrArryTrnIDList.Add(new CreditWalletDrArryTrnID { DrTrnRefNo = SellerList.TrnNo, Amount = SettlementQty });
 
@@ -242,7 +248,9 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         _dbContext.Entry(SellerList).State = EntityState.Modified;
                         _dbContext.Entry(PoolMst).State = EntityState.Modified;
                         _dbContext.Entry(TradeBuyerListObj).State = EntityState.Modified;
-                       var CreditWalletResult =_WalletService.GetWalletCreditNew(TradeTransactionQueueObj.Delivery_Currency, Helpers.GetTimeStamp(), 
+                        _dbContext.Entry(TransactionQueueObj).State = EntityState.Modified;
+                        _dbContext.Entry(TradeTransactionQueueObj).State = EntityState.Modified;
+                        var CreditWalletResult =_WalletService.GetWalletCreditNew(TradeTransactionQueueObj.Delivery_Currency, Helpers.GetTimeStamp(), 
                                                         enWalletTrnType.Cr_Buy_Trade, SettlementQty, TradeBuyRequestObj.UserID,
                                                         CreditAccountID, CreditWalletDrArryTrnIDList.ToArray(), TradeBuyRequestObj.TrnNo, 0, 
                                                         enWalletTranxOrderType.Credit, enServiceType.Trading, (enTrnType)TransactionQueueObj.TrnType);
@@ -306,7 +314,13 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         TransactionQueueObj.MakeTransactionSuccess();
                         TransactionQueueObj.SetTransactionCode(Convert.ToInt64(enErrorCode.Settlement_FullSettlementDone));
                         TransactionQueueObj.SetTransactionStatusMsg("Full Settlement Done");
+
                         TradeTransactionQueueObj.MakeTransactionSuccess();
+                        TradeTransactionQueueObj.SetTransactionCode(Convert.ToInt64(enErrorCode.Settlement_FullSettlementDone));
+                        TradeTransactionQueueObj.SetTransactionStatusMsg("Full Settlement Done");
+                        decimal SellRelQty = Helpers.DoRoundForTrading(SettlementQty * TradeBuyRequestObj.PaidQty / TradeBuyRequestObj.Qty, 8);
+                        TradeTransactionQueueObj.SettledBuyQty = TradeTransactionQueueObj.SettledBuyQty + SettlementQty;
+                        TradeTransactionQueueObj.SettledSellQty = TradeTransactionQueueObj.SettledSellQty + SellRelQty;
 
                         TradeBuyerListObj.DeliveredQty = TradeBuyerListObj.DeliveredQty + SettlementQty;
 
@@ -401,8 +415,22 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             return Task.FromResult(_Resp);
         }
-        //#region REpository Functions       
-        //#endregion
+        #region Cancellation Process
+        public async Task<BizResponse> CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj)
+        {
+            decimal DeliverQty = 0;
+            try
+            {
+
+
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return _Resp;
+        }
+        #endregion
 
         public async Task EmailSendAsync()
         {
