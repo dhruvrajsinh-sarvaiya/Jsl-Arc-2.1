@@ -1,15 +1,16 @@
-﻿using CleanArchitecture.Core.SharedKernel;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace CleanArchitecture.Core.Entities.KYC
+namespace CleanArchitecture.Core.ViewModels.KYC
 {
-    public class PersonalVerification : BizBase
+    public class PersonalVerificationViewModel : TrackerViewModel
     {
-
-        public int UserID { get; set; }
+        public long Id { get; set; }
+        public int UserId { get; set; }
         [Required]
         [StringLength(150)]
         public string Surname { get; set; }
@@ -30,9 +31,21 @@ namespace CleanArchitecture.Core.Entities.KYC
         public string SelfieImage { get; set; }
         public bool EnableStatus { get; set; }
         public bool VerifyStatus { get; set; }
-
-        public long KYCLevelId{ get; set; }
-
+        public long KYCLevelId { get; set; }
 
     }
+
+    public class PersonalVerificationRequest
+    {
+
+        //public  MyProperty { get; set; }
+    }
+
+    public class PersonalVerificationResponse : BizResponseClass
+    {
+
+        //public  MyProperty { get; set; }
+    }
+
+
 }

@@ -15,7 +15,7 @@ namespace CleanArchitecture.Web.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -248,7 +248,6 @@ namespace CleanArchitecture.Web.Migrations
                         .HasMaxLength(4000);
 
                     b.Property<string>("Remark")
-                        .IsRequired()
                         .HasMaxLength(2000);
 
                     b.HasKey("Id");
@@ -959,6 +958,37 @@ namespace CleanArchitecture.Web.Migrations
                     b.ToTable("EmailQueue");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.KYC.KYCLevelMaster", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<bool>("EnableStatus");
+
+                    b.Property<bool>("IsDelete");
+
+                    b.Property<string>("KYCName")
+                        .IsRequired()
+                        .HasMaxLength(150);
+
+                    b.Property<int>("Level");
+
+                    b.Property<short>("Status");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("kYCLevelMaster");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.KYC.PersonalVerification", b =>
                 {
                     b.Property<long>("Id")
@@ -982,6 +1012,8 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<string>("GivenName")
                         .IsRequired()
                         .HasMaxLength(150);
+
+                    b.Property<long>("KYCLevelId");
 
                     b.Property<string>("SelfieImage")
                         .IsRequired()

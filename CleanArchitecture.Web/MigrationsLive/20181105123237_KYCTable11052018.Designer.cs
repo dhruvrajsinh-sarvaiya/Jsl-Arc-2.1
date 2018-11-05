@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanArchitecture.Web.Migrations
 {
     [DbContext(typeof(CleanArchitectureContext))]
-    [Migration("20181105120742_KYCTable11052018")]
+    [Migration("20181105123237_KYCTable11052018")]
     partial class KYCTable11052018
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1015,7 +1015,7 @@ namespace CleanArchitecture.Web.Migrations
                         .IsRequired()
                         .HasMaxLength(150);
 
-                    b.Property<int>("KYCLevelId");
+                    b.Property<long>("KYCLevelId");
 
                     b.Property<string>("SelfieImage")
                         .IsRequired()
