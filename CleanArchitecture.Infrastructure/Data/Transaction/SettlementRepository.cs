@@ -4,8 +4,10 @@ using CleanArchitecture.Core.Entities.Transaction;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,6 +33,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         private readonly ICommonRepository<TradeStopLoss> _TradeStopLoss;
         private readonly ISignalRService _ISignalRService;
         private readonly IFrontTrnService _IFrontTrnService;
+        private readonly IMediator _mediator;
 
         private readonly IWalletService _WalletService;
 
@@ -47,7 +50,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             ICommonRepository<TradeSellerList> TradeSellerList, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<PoolOrder> PoolOrder, EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, 
-            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss)
+            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss, IMediator mediator)
         {
             _dbContext = dbContext;
             //_logger = logger;
@@ -63,6 +66,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _ISignalRService = ISignalRService;
             _IFrontTrnService = IFrontTrnService;
             _TradeStopLoss = TradeStopLoss;
+            _mediator = mediator;
         }
 
         #region ==============================PROCESS SETLLEMENT========================
@@ -273,10 +277,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         SettlementQty = TradeBuyRequestObj.PendingQty;
                         //Topup Order create
                         PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, SettlementQty, CreditWalletID, CreditAccountID);
-
-                        SellerList.RemainQty = SellerList.RemainQty - SettlementQty;//Update first as updated value in below line
-                        SellerList.MakeTransactionHold();                    
-                        PoolMst.TotalQty = PoolMst.TotalQty - SettlementQty;
+                                              
 
                         //Here Bid Price of pool always low then user given in Order , base on above Query
                         decimal TakeDisc = 0;
@@ -285,6 +286,11 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                             TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * SettlementQty;
                         }
                         InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SettlementQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0, SellerList.Id);
+
+
+                        SellerList.RemainQty = SellerList.RemainQty - SettlementQty;//Update first as updated value in below line
+                        SellerList.MakeTransactionHold();
+                        PoolMst.TotalQty = PoolMst.TotalQty - SettlementQty;
 
                         TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SettlementQty;//Fully settled Here
                         TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SettlementQty;//this will 0
@@ -380,6 +386,19 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 _Resp.ErrorCode = enErrorCode.Settlement_SettlementInternalError;
             }
             return Task.FromResult(_Resp);
+        }
+        public async Task EmailSendAsync()
+        {
+            try
+            {
+                SendEmailRequest Request = new SendEmailRequest();
+                CommunicationResponse Response = await _mediator.Send(Request);
+
+            }
+            catch(Exception ex)
+            {
+                //HelperForLog.WriteErrorLog("EmailSendAsync Error:##TrnNo " + TradeBuyRequestObj.TrnNo, ControllerName, ex);
+            }
         }
         #endregion
 

@@ -46,16 +46,45 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     _Resp.ReturnMsg = "Order is not in pending State";
                     return _Resp;
                 }
-                TradeTranQueueObj.IsCancelled = 1;
-                _TradeTransactionRepository.Update(TradeTranQueueObj);
+                if (TradeTranQueueObj.IsCancelled==1)
+                {
+                    _Resp.ErrorCode = enErrorCode.CancelOrder_OrderalreadyCancelled;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ReturnMsg = "Transaction Cancellation request is already in processing";
+                    return _Resp;
+                }               
 
-                var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == Req.TranNo && item.IsProcessing == 0 &&
+                var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == Req.TranNo &&
                                                                     (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
                                                                     item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
                 if (NewBuyRequestObj != null)
                 {
+                    if(NewBuyRequestObj.IsProcessing==0)
+                    {
+                        _Resp.ErrorCode = enErrorCode.CancelOrder_YourOrderInProcessMode;
+                        _Resp.ReturnCode = enResponseCodeService.Fail;
+                        _Resp.ReturnMsg = "Your Order is in process mode,please try again";
+                        return _Resp;
+                    }
+                    if (NewBuyRequestObj.PendingQty == 0)
+                    {
+                        _Resp.ErrorCode = enErrorCode.CancelOrder_Yourorderfullyexecuted;
+                        _Resp.ReturnCode = enResponseCodeService.Fail;
+                        _Resp.ReturnMsg = "Can not initiate Cancellation Request.Your order is fully executed";
+                        return _Resp;
+                    }
+                    TradeTranQueueObj.IsCancelled = 1;
+                    _TradeTransactionRepository.Update(TradeTranQueueObj);
+
                     var HoldTrnNosNotExec = new List<long> { };
                     _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, NewBuyRequestObj, ref HoldTrnNosNotExec);
+                }
+                else
+                {
+                    _Resp.ErrorCode = enErrorCode.CancelOrder_NoRecordFound;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ReturnMsg = "No Record Found";
+                    return _Resp;
                 }
                 
             }

@@ -199,6 +199,9 @@ namespace CleanArchitecture.Core.Enums
         CancelOrder_NoRecordFound = 4633,
         CancelOrder_InternalError = 4634,
         CancelOrder_TrnNotHold = 4635,
+        CancelOrder_OrderalreadyCancelled=1,
+        CancelOrder_YourOrderInProcessMode = 1,
+        CancelOrder_Yourorderfullyexecuted=1,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
