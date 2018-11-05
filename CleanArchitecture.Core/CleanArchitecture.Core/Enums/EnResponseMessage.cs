@@ -263,6 +263,8 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessAddComplain = "Success full add raise complaint.";
         public static string ProfilePlan = "Profile plan not available.";
         public static string SuccessGetProfilePlan = "Success full get raise profile plan.";
+        public static string SuccessAddProfile = "Success full add profile plan.";
+        public static string NotAddedProfile = "This profile plan already exists or selected plan not allow lower level.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";

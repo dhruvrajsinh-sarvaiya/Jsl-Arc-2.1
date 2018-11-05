@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.ViewModels.Configuration;
+﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,5 +20,19 @@ namespace CleanArchitecture.Core.ViewModels.Profile_Management
         public DateTime EndDate { get; set; }
 
         public bool ActiveStatus { get; set; }
+    }
+
+    public class MultipalSubscriptionReqViewModel : TrackerViewModel
+    {
+        [Required]
+        public int ProfileId { get; set; }
+    }
+
+
+
+
+    public class SubscriptionResponse : BizResponseClass
+    {
+        //public List<ProfileMasterViewModel> ProfileList { get; set; }
     }
 }
