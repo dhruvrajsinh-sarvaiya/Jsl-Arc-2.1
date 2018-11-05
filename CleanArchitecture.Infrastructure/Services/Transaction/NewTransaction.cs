@@ -643,7 +643,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     }
                 }
                 TxnProviderList = _WebApiRepository.GetProviderDataList(new TransactionApiConfigurationRequest { amount = Req.Amount, SMSCode = Req.SMSCode, APIType = enWebAPIRouteType.TransactionAPI, trnType = Req.TrnType ==enTrnType.Sell_Trade?Convert.ToInt32(enTrnType.Buy_Trade):Convert.ToInt32(Req.TrnType)});
-                if (TxnProviderList == null)
+                if (TxnProviderList.Count == 0) //Uday 05-11-2018 check condition for no record
                 {
                     _Resp.ReturnMsg = EnResponseMessage.ProcessTrn_ServiceProductNotAvailableMsg;
                     _Resp.ErrorCode = enErrorCode.ProcessTrn_ServiceProductNotAvailable;
