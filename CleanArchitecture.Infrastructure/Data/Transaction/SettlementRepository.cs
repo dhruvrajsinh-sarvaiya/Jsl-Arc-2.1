@@ -156,7 +156,20 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 CreditWalletID = TradeTransactionQueueObj.DeliveryWalletID;
                 CreditAccountID = _WalletService.GetAccWalletID(CreditWalletID);
 
-                                
+                if (TradeTransactionQueueObj.IsCancelled == 1)
+                {
+
+                    //Code for settlement
+                    return Task.FromResult(_Resp);
+                }
+                if (TradeBuyRequestObj.PendingQty == 0)
+                {
+                    _Resp.ErrorCode = enErrorCode.Settlement_AlreadySettled;
+                    _Resp.ReturnCode = enResponseCodeService.Success;
+                    _Resp.ReturnMsg = "ALready Settled";
+                    return Task.FromResult(_Resp);
+                }
+
                 TradeBuyRequestObj.MakeTransactionHold();
                 TradeBuyRequestObj.UpdatedDate = Helpers.UTC_To_IST();
                 TradeBuyRequestObj.IsProcessing = 1;
@@ -167,19 +180,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 TradeBuyerListObj.IsProcessing = 1;
                 _TradeBuyerList.Update(TradeBuyerListObj);
 
-                if(TradeTransactionQueueObj.IsCancelled==1)
-                {
-
-                    //Code for settlement
-                    return Task.FromResult(_Resp);
-                }
-                if(TradeBuyRequestObj.PendingQty==0)
-                {
-                    _Resp.ErrorCode = enErrorCode.Settlement_AlreadySettled;
-                    _Resp.ReturnCode = enResponseCodeService.Success;
-                    _Resp.ReturnMsg = "ALready Settled";
-                    return Task.FromResult(_Resp);
-                }
+               
                 //SortedList<TradeSellerList, TradeSellerList>
                 var MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
                                                         && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
@@ -416,12 +417,26 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             return Task.FromResult(_Resp);
         }
         #region Cancellation Process
-        public async Task<BizResponse> CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj)
+        public async Task<BizResponse> CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj,TransactionQueue TransactionQueueObj)
         {
             decimal DeliverQty = 0;
             try
             {
+               //finding the return sell quantity of cancallation order depending on pendingqty of tradebuyquantity 
+               //ALSO DIND THE SELL BID PRICE
+               DeliverQty = Helpers.DoRoundForTrading(TransactionQueueObj.Amount * TradeBuyRequestObj.PendingQty / TradeBuyRequestObj.Qty, 8);//@TotalSellQty
 
+                if(DeliverQty==0 || DeliverQty < 0)
+                {
+
+                }
+                if (DeliverQty > TransactionQueueObj.Amount)
+                {
+
+                }
+
+                TradeTransactionQueueObj.IsCancelled = 1;
+                _TradeTransactionRepository.Update(TradeTransactionQueueObj);
 
             }
             catch(Exception ex)
