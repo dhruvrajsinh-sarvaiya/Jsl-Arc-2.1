@@ -790,6 +790,8 @@ namespace CleanArchitecture.Web.API
         public ActionResult GetServiceLimitChargeValue(enTrnType TrnType, string CoinName)
         {
             ServiceLimitChargeValueResponse Response = new ServiceLimitChargeValueResponse();
+            ServiceLimitChargeValueResponseStr ResponseStr = new ServiceLimitChargeValueResponseStr();
+            ServiceLimitChargeValueStr subObj = new ServiceLimitChargeValueStr();
             try
             {
                 var responseData = _walletService.GetServiceLimitChargeValue(TrnType, CoinName);
@@ -797,14 +799,29 @@ namespace CleanArchitecture.Web.API
                 {
                     Response.response = responseData;
                     Response.ReturnCode = enResponseCode.Success;
+                    subObj.ChargeType = Response.response.ChargeType;
+                    subObj.ChargeValue = Response.response.ChargeValue;
+                    subObj.CoinName = Response.response.CoinName;
+                    subObj.MaxAmount = Response.response.MaxAmount.ToString();
+                    subObj.MinAmount = Response.response.MinAmount.ToString();
+                    subObj.ChargeType = Response.response.ChargeType;
+
+                    ResponseStr.ReturnCode = Response.ReturnCode;
+                    ResponseStr.ErrorCode = Response.ErrorCode;
+                    ResponseStr.ReturnMsg = Response.ReturnMsg;
+
+
                 }
                 else
                 {
                     Response.ReturnCode = enResponseCode.Fail;
                     Response.ReturnMsg = EnResponseMessage.NotFound;
                     Response.ErrorCode = enErrorCode.NotFound;
+                    ResponseStr.ReturnCode = enResponseCode.Fail;
+                    ResponseStr.ReturnMsg = EnResponseMessage.NotFound;
+                    ResponseStr.ErrorCode = enErrorCode.NotFound;
                 }
-                return Ok(Response);
+                return Ok(ResponseStr);
             }
             catch (Exception ex)
             {
