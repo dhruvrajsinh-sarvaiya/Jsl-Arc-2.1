@@ -169,7 +169,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 var charge = GetServiceLimitChargeValue(enTrnType.Deposit, coinName);//for deposit
                 if (charge.MaxAmount < amount && charge.MinAmount > amount)
                 {
-                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
+                    var msg1 = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg;
+                    msg1 = msg1.Replace("@MIN", charge.MinAmount.ToString());
+                    msg1 = msg1.Replace("@MAX", charge.MaxAmount.ToString());
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), enWalletTranxOrderType.Debit, amount, TrnRefNo, UTC_To_IST(), null, Walletobj.Id, coinName, Walletobj.UserID, timestamp, enTransactionStatus.SystemFail, msg1, trnType);
+                    objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = msg1, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 }
 
                 int count = CheckTrnRefNo(TrnRefNo, enWalletTranx, trnType);

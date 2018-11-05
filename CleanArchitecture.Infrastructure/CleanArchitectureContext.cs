@@ -27,6 +27,7 @@ using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.Entities.Profile_Management;
 using CleanArchitecture.Core.Entities.Complaint;
 using CleanArchitecture.Core.Entities.KYC;
+using CleanArchitecture.Core.ViewModels.Complaint;
 
 namespace CleanArchitecture.Infrastructure
 {
@@ -131,6 +132,10 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<GetGraphResponse> GetGraphResponse { get; set; } //uday 22-10-2018
         public DbQuery<TradePairTableResponse> TradePairTableResponse { get; set; } //uday 03-11-2018
         public DbQuery<ServiceMasterResponse> ServiceMasterResponse { get; set; } //uday 05-11-2018
+
+
+        public DbQuery<CompainDetailResponse> compainDetailResponse { get; set; }  //Add by pankaj For Get Detail 
+        public DbQuery<UserWiseCompaintDetailResponce> userWiseCompaintDetailResponce { get; set; }
         //Add Tables for Service Master (Not Commited)
 
         public DbSet<ServiceMaster> ServiceMaster { get; set; }

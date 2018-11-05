@@ -222,7 +222,29 @@ namespace CleanArchitecture.Infrastructure.Services
                             }
                         }
                     }
-                    return enErrorCode.GlobalBitNotFound;
+                    //return enErrorCode.GlobalBitNotFound;
+                    else
+                    {
+                        var Beneobj = _BeneficiarycommonRepository.GetSingle(item => item.WalletTypeID == Walletobj.WalletTypeID && item.Address == DestinationAddress && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                        if (Beneobj != null)
+                        {
+                            return enErrorCode.Success;
+                        }
+                        else
+                        {
+                            BeneficiaryMaster AddNew = new BeneficiaryMaster();
+                            AddNew.IsWhiteListed = Convert.ToInt16(enWhiteListingBit.OFF);
+                            AddNew.Status = Convert.ToInt16(ServiceStatus.Active);
+                            AddNew.CreatedBy = Walletobj.UserID;
+                            AddNew.CreatedDate = UTC_To_IST();
+                            AddNew.UserID = Walletobj.UserID;
+                            AddNew.Address = DestinationAddress;
+                            AddNew.Name = Name;
+                            AddNew.WalletTypeID = Walletobj.WalletTypeID;
+                            AddNew = _BeneficiarycommonRepository.Add(AddNew);
+                            return enErrorCode.Success;                            
+                        }
+                    }
                 }
                 return enErrorCode.WalletNotFound;
             }
@@ -1244,7 +1266,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 var charge = GetServiceLimitChargeValue(routeTrnType, coinName);
                 if (charge.MaxAmount < amount && charge.MinAmount > amount && charge.MaxAmount != 0 && charge.MinAmount != 0)
                 {
-                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
+                    var msg1 = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg;
+                    msg1 = msg1.Replace("@MIN", charge.MinAmount.ToString());
+                    msg1 = msg1.Replace("@MAX", charge.MaxAmount.ToString());                   
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, msg1, trnType);
+                    objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = msg1, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 }
 
                 int count = CheckTrnRefNo(TrnRefNo, orderType, trnType);
@@ -1400,13 +1427,22 @@ namespace CleanArchitecture.Infrastructure.Services
                 walletMasterObj.IsDefaultWallet = cWalletobj.IsDefaultWallet;
                 walletMasterObj.CoinName = coinName;
 
-                _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
+                //_signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
                 // ntrivedi 03-11-2018
                 var msg = EnResponseMessage.CreditWalletMsg;
                 msg = msg.Replace("#Coin#", coinName);
                 msg = msg.Replace("#TrnType#", routeTrnType.ToString());
                 msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
-                _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);               
+                if (!string.IsNullOrEmpty(Token))
+                {
+                    _signalRService.SendActivityNotification(msg, Token);
+                    _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
+                }
+                else
+                {
+                    _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);
+                    _signalRService.OnWalletBalChange(walletMasterObj, coinName, cWalletobj.UserID.ToString(),2);
+                }
 
                 //-------------------------------
 

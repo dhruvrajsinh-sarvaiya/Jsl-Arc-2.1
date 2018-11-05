@@ -21,13 +21,15 @@ namespace CleanArchitecture.Web.API
         #region Field
         private readonly IProfileMaster _IprofileMaster;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ISubscriptionMaster _IsubscriptionMaster;
         #endregion
 
         #region Ctore
-        public ProfileController(IProfileMaster IprofileMaster, UserManager<ApplicationUser> userManager)
+        public ProfileController(IProfileMaster IprofileMaster, UserManager<ApplicationUser> userManager, ISubscriptionMaster IsubscriptionMaster)
         {
             _IprofileMaster = IprofileMaster;
             _userManager = userManager;
+            _IsubscriptionMaster = IsubscriptionMaster;
         }
         #endregion
 
@@ -52,6 +54,37 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 return BadRequest(new ProfileMasterResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        [HttpPost("AddProfile")]
+        public async Task<ActionResult> AddProfile(MultipalSubscriptionReqViewModel model)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    if (model.ProfileId > 0)
+                    {
+                        bool Status = _IsubscriptionMaster.GetSubscriptionData(user.Id, model.ProfileId);
+                        if (Status)
+                        {
+                            _IsubscriptionMaster.AddMultiSubscription(user.Id, model.ProfileId);
+                            return Ok(new SubscriptionResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddProfile });
+                        }
+                        else
+                            return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotAddedProfile, ErrorCode = enErrorCode.Status4122NotAddedProfile });
+                    }
+                    else
+                        return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidProfileId, ErrorCode = enErrorCode.Status4129InvalidProfileId });
+                }
+                else
+                    return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4063UserNotRegister });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
 

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CleanArchitecture.Core.Entities.Complaint
 {
-  public  class CompainTrail
+    public class CompainTrail
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,14 +15,14 @@ namespace CleanArchitecture.Core.Entities.Complaint
         [Required]
         [StringLength(4000)]
         public string Description { get; set; }
-        [Required]
+
         [StringLength(2000)]
         public string Remark { get; set; }
         [Required]
         [StringLength(100)]
         public string Complainstatus { get; set; }
         public long? CreatedBy { get; set; }
-         
+
         [DataType(DataType.DateTime)]
         public DateTime? CreatedDate { get; set; }
 

@@ -41,6 +41,7 @@ namespace CleanArchitecture.Core.ViewModels.Profile_Management
 
         public bool ActiveStatus { get; set; }
 
+        public long ProfileId { get; set; }
     }
 
     public class ProfileMasterResponse : BizResponseClass

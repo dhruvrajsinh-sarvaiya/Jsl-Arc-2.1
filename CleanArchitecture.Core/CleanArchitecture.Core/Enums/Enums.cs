@@ -196,12 +196,14 @@ namespace CleanArchitecture.Core.Enums
         Settlement_FullSettlementDone = 4630,
         Settlement_SettlementInternalError = 4631,
         Settlement_NoSettlementRecordFound = 4632,
+        Settlement_PartialSettlementRollback = 4636,
+        Settlement_FullSettlementRollback = 4637,
         CancelOrder_NoRecordFound = 4633,
         CancelOrder_InternalError = 4634,
         CancelOrder_TrnNotHold = 4635,
-        CancelOrder_OrderalreadyCancelled=1,
-        CancelOrder_YourOrderInProcessMode = 1,
-        CancelOrder_Yourorderfullyexecuted=1,
+        CancelOrder_OrderalreadyCancelled= 4638,
+        CancelOrder_YourOrderInProcessMode = 4639,
+        CancelOrder_Yourorderfullyexecuted= 4640,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -282,6 +284,15 @@ namespace CleanArchitecture.Core.Enums
         Status4108TwoFAalreadydisable = 4108,
         Typemasterrequired4109 = 4109,
         Status4112ProfilePlan =4112,
+        Status4122NotAddedProfile = 4122,
+        Status4129InvalidProfileId =4129,
+        Status4110TypemasterInsertError = 4110,
+        Status4111AddCompainrequired = 4111,
+        Status4113AddCompainTrail = 4113,
+        Status4114CompainTrailInsertError = 4114,
+        status4116Complaintdatanotavailable = 4116,
+        status4121complaintTypeNotavailable = 4121,
+
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
@@ -490,7 +501,7 @@ namespace CleanArchitecture.Core.Enums
         //Base Market
         RecievePairData = 12,
         RecieveMarketTicker = 13,
-        BroadcastMessage = 14,
+        BroadcastMessage = 16,
         SetTime = 15
     }
     public enum enCheckWithdrawalBene
