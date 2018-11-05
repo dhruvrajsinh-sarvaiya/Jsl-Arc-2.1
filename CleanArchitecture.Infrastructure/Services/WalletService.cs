@@ -1244,7 +1244,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 var charge = GetServiceLimitChargeValue(routeTrnType, coinName);
                 if (charge.MaxAmount < amount && charge.MinAmount > amount && charge.MaxAmount != 0 && charge.MinAmount != 0)
                 {
-                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
+                    var msg1 = EnResponseMessage.ProcessTrn_AmountBetweenMinMaxMsg;
+                    msg1 = msg1.Replace("@MIN", charge.MinAmount.ToString());
+                    msg1 = msg1.Replace("@MAX", charge.MaxAmount.ToString());                   
+                    objTQ = InsertIntoWalletTransactionQueue(Guid.NewGuid(), orderType, amount, TrnRefNo, UTC_To_IST(), null, dWalletobj.Id, coinName, userID, timestamp, enTransactionStatus.SystemFail, msg1, trnType);
+                    objTQ = _walletRepository1.AddIntoWalletTransactionQueue(objTQ, 1);
+                    return new WalletDrCrResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = msg1, ErrorCode = enErrorCode.ProcessTrn_AmountBetweenMinMax };
                 }
 
                 int count = CheckTrnRefNo(TrnRefNo, orderType, trnType);
@@ -1406,7 +1411,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 msg = msg.Replace("#Coin#", coinName);
                 msg = msg.Replace("#TrnType#", routeTrnType.ToString());
                 msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
-                _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);               
+                if (!string.IsNullOrEmpty(Token))
+                {
+                    _signalRService.SendActivityNotification(msg, Token);
+                }
+                else
+                {
+                    _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);
+                }
 
                 //-------------------------------
 
