@@ -45,6 +45,8 @@ using CleanArchitecture.Core.Interfaces.Profile_Management;
 using CleanArchitecture.Infrastructure.Services.Profile_Management;
 using CleanArchitecture.Core.Interfaces.Complaint;
 using CleanArchitecture.Infrastructure.Services.Complaint;
+using CleanArchitecture.Core.Interfaces.KYC;
+using CleanArchitecture.Infrastructure.Services.KYC;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -422,6 +424,7 @@ namespace CleanArchitecture.Web.Extensions
             services.AddScoped<IComplainmaster, ComplainmasterServices>();
             
             services.AddScoped<ICompainTrail, CompainTrailServices>();
+            services.AddScoped<IPersonalVerificationService, PersonalVerificationService>(); 
 
             return services;
         }

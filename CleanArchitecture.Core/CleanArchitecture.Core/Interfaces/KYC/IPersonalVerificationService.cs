@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CleanArchitecture.Core.Interfaces.KYC
 {
    public interface IPersonalVerificationService
     {
-        long AddPersonalVerification(PersonalVerificationViewModel model);
+        Task<long> AddPersonalVerification(PersonalVerificationViewModel model);
+        Task<long> UpdatePersonalVerification(PersonalVerificationViewModel model);
+        PersonalVerificationViewModel GetPersonalVerification(int Userid);
     }
 }

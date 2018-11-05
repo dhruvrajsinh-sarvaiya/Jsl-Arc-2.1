@@ -287,6 +287,8 @@ namespace CleanArchitecture.Core.Enums
         public static string ValidIdentityCard = "Please enter valid identity card.";
         public static string PersonalIdentityInsertSuccessfull = "Personal identity KYC request success full insert.";
         public static string PersonalIdentityNotInserted = "Personal identity KYC request success full not inserted.";
+        public static string GetPersonalIdentity = "Success full get user personal identity data.";
+        public static string PersonalIdentityNotavailable = "Personal Identity not available.";
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";

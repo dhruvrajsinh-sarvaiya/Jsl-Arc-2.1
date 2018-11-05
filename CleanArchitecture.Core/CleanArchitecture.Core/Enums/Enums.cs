@@ -301,7 +301,7 @@ namespace CleanArchitecture.Core.Enums
         Status4127GivenName = 4127,
         Status4128ValidIdentityCard = 4128,
         Status4129PersonalIdentityNotInserted = 4129,
-
+        Status4130PersonalIdentityNotavailable =4130,
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,

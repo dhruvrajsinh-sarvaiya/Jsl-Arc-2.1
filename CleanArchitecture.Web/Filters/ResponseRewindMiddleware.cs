@@ -94,7 +94,8 @@ namespace CleanArchitecture.Web.Filters
                     responseLog += $", Response : {responseBody}";
                     //if (ResponseDetails?[1] == "api")
                     //{
-                    if (context.Request.Path.Value.Split("/")[1] != "swagger")
+                    //Uday 05-11-2018 don't write log for graph method
+                    if (context.Request.Path.Value.Split("/")[1] != "swagger" && !context.Request.Path.Value.Contains("GetGraphDetail"))
                     {
                         if (erParams?.ReturnCode != 9)
                         {
