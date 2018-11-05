@@ -280,7 +280,7 @@ namespace CleanArchitecture.Core.Enums
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
-        public static string SignalRTrnSuccessPartialSettled = "Your Transacton Patial settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
+        public static string SignalRTrnSuccessPartialSettled = "Your Transacton Partial settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";
 
 
         public static string PushNotificationSubscriptionSuccess = "Notification Subscribed Successfully.";

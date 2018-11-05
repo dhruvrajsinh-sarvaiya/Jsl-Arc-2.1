@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
@@ -8,6 +9,7 @@ using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -34,6 +36,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         private readonly ISignalRService _ISignalRService;
         private readonly IFrontTrnService _IFrontTrnService;
         private readonly IMediator _mediator;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly IWalletService _WalletService;
 
@@ -44,13 +47,14 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         TransactionQueue TransactionQueueObj;
         TradeTransactionQueue TradeTransactionQueueObj;
         TradeStopLoss _TradeStopLossObj;
+        private readonly IMessageConfiguration _messageConfiguration;
 
         public SettlementRepository(CleanArchitectureContext dbContext, ICommonRepository<TradePoolQueue> TradePoolQueue,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeBuyerList> TradeBuyerList,
             ICommonRepository<TradeSellerList> TradeSellerList, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<PoolOrder> PoolOrder, EFCommonRepository<TransactionQueue> TransactionRepository,
             EFCommonRepository<TradeTransactionQueue> TradeTransactionRepository, IWalletService WalletService, 
-            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss, IMediator mediator)
+            ISignalRService ISignalRService, IFrontTrnService IFrontTrnService, ICommonRepository<TradeStopLoss> TradeStopLoss, IMediator mediator, IMessageConfiguration messageConfiguration, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             //_logger = logger;
@@ -67,6 +71,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             _IFrontTrnService = IFrontTrnService;
             _TradeStopLoss = TradeStopLoss;
             _mediator = mediator;
+            _messageConfiguration = messageConfiguration;
+            _userManager = userManager;
         }
 
         #region ==============================PROCESS SETLLEMENT========================
@@ -442,7 +448,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             catch(Exception ex)
             {
-                //HelperForLog.WriteErrorLog("EmailSendAsync Error:##TrnNo " + TradeBuyRequestObj.TrnNo, ControllerName, ex);
+                HelperForLog.WriteErrorLog("Settlement - EmailSendAsync Error ", ControllerName, ex);
             }
         }
         #endregion
