@@ -62,7 +62,7 @@ namespace CleanArchitecture.Web.API
                 model.ValidIdentityCard = httpRequest["ValidIdentityCard"].ToString();
                 model.EnableStatus = false;
                 model.VerifyStatus = false;
-
+                
 
                 foreach (var file in httpRequest.Files)
                 {
@@ -130,7 +130,7 @@ namespace CleanArchitecture.Web.API
 
                 }
 
-                long verifyId = _personalVerificationService.AddPersonalVerification(model);
+                long verifyId = await  _personalVerificationService.AddPersonalVerification(model);
                 if (verifyId > 0)
                 {
                     return Ok(new PersonalVerificationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.PersonalIdentityInsertSuccessfull });
