@@ -69,6 +69,7 @@ namespace CleanArchitecture.Infrastructure
         public DbSet<UserKeyMaster> UserKeyMaster { get; set; }
         public DbSet<ProfileMaster> ProfileMaster { get; set; } // nirav savariya 11-03-2018
         public DbSet<PersonalVerification> PersonalVerification { get; set; }
+        public DbSet<KYCLevelMaster> kYCLevelMaster { get; set; }
         public DbSet<SubscriptionMaster> SubscriptionMaster { get; set; }
         ///Complaint
         public DbSet<Typemaster> Typemaster { get; set; }
