@@ -105,8 +105,8 @@ namespace CleanArchitecture.Core.Enums
         public static string InternalError = "Internal Error";
         public static string BalMismatch = "Settled Balance Mismatch";
         public static string ShadowLimitExceed = "Exceed Shadow Limit";
-        public static string CreditWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
-        public static string DebitWalletMsg = "Your #Coin# wallet is credit for #TrnType# Transaction TrnNo:#TrnNo#";
+        public static string CreditWalletMsg = "Your #Coin# wallet is Credited for #TrnType# Transaction TrnNo:#TrnNo#";
+        public static string DebitWalletMsg = "Your #Coin# wallet is Debited for #TrnType# Transaction TrnNo:#TrnNo#";
         public static string GenerateAddressNotification = "New Address Created Successfully For Wallet:#WalletName#";
         public static string CWalletLimitNotification = "New Limit Created Successfully For Wallet:#WalletName#";
         public static string UWalletLimitNotification = "New Limit Updated Successfully For Wallet:#WalletName#";

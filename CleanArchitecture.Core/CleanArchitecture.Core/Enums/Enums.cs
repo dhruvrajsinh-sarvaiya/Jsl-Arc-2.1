@@ -327,10 +327,12 @@ namespace CleanArchitecture.Core.Enums
         MemberTypeNotFound = 4242,
         SettedBalanceMismatch  = 4243,
         ShadowBalanceExceed = 4244,
+        UnAssignedAddressFetchFail = 4245,
         PushNotificationSubscriptionSuccess = 5001,
         PushNotificationunsubscriptionSuccess = 5002,
         PushNotificationSubscriptionFail = 5003,
-        PushNotificationUnsubscriptionFail = 5004
+        PushNotificationUnsubscriptionFail = 5004,
+
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

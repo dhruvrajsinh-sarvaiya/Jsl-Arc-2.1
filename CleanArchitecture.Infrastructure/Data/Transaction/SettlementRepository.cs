@@ -162,7 +162,20 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 CreditWalletID = TradeTransactionQueueObj.DeliveryWalletID;
                 CreditAccountID = _WalletService.GetAccWalletID(CreditWalletID);
 
-                                
+                if (TradeTransactionQueueObj.IsCancelled == 1)
+                {
+
+                    //Code for settlement
+                    return Task.FromResult(_Resp);
+                }
+                if (TradeBuyRequestObj.PendingQty == 0)
+                {
+                    _Resp.ErrorCode = enErrorCode.Settlement_AlreadySettled;
+                    _Resp.ReturnCode = enResponseCodeService.Success;
+                    _Resp.ReturnMsg = "ALready Settled";
+                    return Task.FromResult(_Resp);
+                }
+
                 TradeBuyRequestObj.MakeTransactionHold();
                 TradeBuyRequestObj.UpdatedDate = Helpers.UTC_To_IST();
                 TradeBuyRequestObj.IsProcessing = 1;
@@ -173,19 +186,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 TradeBuyerListObj.IsProcessing = 1;
                 _TradeBuyerList.Update(TradeBuyerListObj);
 
-                if(TradeTransactionQueueObj.IsCancelled==1)
-                {
-
-                    //Code for settlement
-                    return Task.FromResult(_Resp);
-                }
-                if(TradeBuyRequestObj.PendingQty==0)
-                {
-                    _Resp.ErrorCode = enErrorCode.Settlement_AlreadySettled;
-                    _Resp.ReturnCode = enResponseCodeService.Success;
-                    _Resp.ReturnMsg = "ALready Settled";
-                    return Task.FromResult(_Resp);
-                }
+               
                 //SortedList<TradeSellerList, TradeSellerList>
                 var MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
                                                         && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
@@ -422,12 +423,26 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             return Task.FromResult(_Resp);
         }
         #region Cancellation Process
-        public async Task<BizResponse> CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj)
+        public async Task<BizResponse> CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj,TransactionQueue TransactionQueueObj)
         {
             decimal DeliverQty = 0;
             try
             {
+               //finding the return sell quantity of cancallation order depending on pendingqty of tradebuyquantity 
+               //ALSO DIND THE SELL BID PRICE
+               DeliverQty = Helpers.DoRoundForTrading(TransactionQueueObj.Amount * TradeBuyRequestObj.PendingQty / TradeBuyRequestObj.Qty, 8);//@TotalSellQty
 
+                if(DeliverQty==0 || DeliverQty < 0)
+                {
+
+                }
+                if (DeliverQty > TransactionQueueObj.Amount)
+                {
+
+                }
+
+                TradeTransactionQueueObj.IsCancelled = 1;
+                _TradeTransactionRepository.Update(TradeTransactionQueueObj);
 
             }
             catch(Exception ex)
@@ -438,15 +453,42 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         }
         #endregion
 
-        public async Task EmailSendAsync()
+        public async Task EmailSendAsync(string UserID, int Status, string PairName, string BaseMarket
+            , string TrnDate, decimal ReqAmount = 0, decimal Amount = 0, decimal Fees = 0)
         {
             try
             {
-                SendEmailRequest Request = new SendEmailRequest();
-                CommunicationResponse Response = await _mediator.Send(Request);
-
+                if (!string.IsNullOrEmpty(UserID) && !string.IsNullOrEmpty(PairName) && !string.IsNullOrEmpty(BaseMarket) &&
+                    ReqAmount != 0 && !string.IsNullOrEmpty(TrnDate) && Amount != 0 && Status == 1)
+                {
+                    SendEmailRequest Request = new SendEmailRequest();
+                    ApplicationUser User = new ApplicationUser();
+                    User = await _userManager.FindByIdAsync(UserID);
+                    if (!string.IsNullOrEmpty(User.Email))
+                    {
+                        IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.Registration), 0);
+                        foreach (TemplateMasterData Provider in Result)
+                        {
+                            Provider.Content = Provider.Content.Replace("###USERNAME###", User.Name);
+                            Provider.Content = Provider.Content.Replace("###TYPE###", PairName);
+                            Provider.Content = Provider.Content.Replace("###REQAMOUNT###", ReqAmount.ToString());
+                            Provider.Content = Provider.Content.Replace("###STATUS###", Status.ToString());
+                            Provider.Content = Provider.Content.Replace("###USER###", User.Name);
+                            Provider.Content = Provider.Content.Replace("###CURRENCY###", BaseMarket);
+                            Provider.Content = Provider.Content.Replace("###DATETIME###", TrnDate);
+                            Provider.Content = Provider.Content.Replace("###AMOUNT###", Amount.ToString());
+                            Provider.Content = Provider.Content.Replace("###FEES###", Fees.ToString());
+                            Provider.Content = Provider.Content.Replace("###FINAL###", (Amount + Fees).ToString());
+                            Request.Body = Provider.Content;
+                            Request.Subject = Provider.AdditionalInfo;
+                        }
+                        Request.Recepient = User.Email;                       
+                        Request.EmailType = 0;
+                        await _mediator.Send(Request);
+                    }
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog("Settlement - EmailSendAsync Error ", ControllerName, ex);
             }
