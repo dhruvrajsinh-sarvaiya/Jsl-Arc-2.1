@@ -8,7 +8,7 @@ namespace CleanArchitecture.Core.Interfaces.Complaint
 {
      public interface IComplainmaster
     {
-        long AddComplainmaster(ComplainmasterViewModel model);
+        long AddComplainmaster(ComplainmasterReqViewModel model);
         List<CompainDetailResponse> GetComplain(int UserId);
         List<UserWiseCompaintDetailResponce> GetComplainByUserWise(int UserId); 
 

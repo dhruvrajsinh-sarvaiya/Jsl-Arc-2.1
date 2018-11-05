@@ -21,7 +21,7 @@ namespace CleanArchitecture.Infrastructure.Services.Complaint
             _ComplainmasterRepository = customRepository;
             _dbContext = context;
         }
-        public long AddComplainmaster(ComplainmasterViewModel model)
+        public long AddComplainmaster(ComplainmasterReqViewModel model)
         {
             try
             {

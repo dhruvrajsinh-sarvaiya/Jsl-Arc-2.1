@@ -16,7 +16,7 @@ namespace CleanArchitecture.Infrastructure.Services.Complaint
         {
             _dbContext = dbContext;
         }
-        public long AddCompainTrail(CompainTrailVirewModel compainTrail)
+        public long AddCompainTrail(CompainTrailReqVirewModel compainTrail)
         {
             try
             {

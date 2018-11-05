@@ -14,7 +14,19 @@ namespace CleanArchitecture.Core.ViewModels.Complaint
         [Required(ErrorMessage = "2,Please Enter complaint Description,4117")]
         public string Description { get; set; }
         public int TypeId { get; set; } 
-        public int UserID { get; set; }
+       // public int UserID { get; set; }
+    }
+
+
+    public class ComplainmasterReqViewModel
+    {
+
+        [Required(ErrorMessage = "1,Please Enter complaint Subject,4118")]
+        public string Subject { get; set; }
+        [Required(ErrorMessage = "2,Please Enter complaint Description,4117")]
+        public string Description { get; set; }
+        public int TypeId { get; set; }
+         public int UserID { get; set; }
     }
 
     public class ComplainmasterResonse  :  BizResponseClass

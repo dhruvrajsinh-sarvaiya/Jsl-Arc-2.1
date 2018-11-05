@@ -2,28 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces.Complaint;
 using CleanArchitecture.Core.ViewModels.Complaint;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]")]
     [ApiController]
-
+    [Authorize]
     public class ComplaintController : ControllerBase
     {
         private readonly ITypemaster _typemaster;
         private readonly IComplainmaster _Icomplainmaster;
         private readonly ICompainTrail _IcompainTrail;
-        public ComplaintController(ITypemaster typemaster, IComplainmaster complainmaster, ICompainTrail compainTrail)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public ComplaintController(ITypemaster typemaster, IComplainmaster complainmaster, ICompainTrail compainTrail,
+                 UserManager<ApplicationUser> userManager)
         {
             _typemaster = typemaster;
             _Icomplainmaster = complainmaster;
             _IcompainTrail = compainTrail;
+            _userManager = userManager;
         }
         [HttpGet("GetTypeMaster")]
         public async Task<IActionResult> GetTypeMaster(string Type)
@@ -60,15 +65,25 @@ namespace CleanArchitecture.Web.API
             {
                 if (model != null)
                 {
-                    long id = _Icomplainmaster.AddComplainmaster(model);
+                    var user = await GetCurrentUserAsync();
+                    var ComplainmasterReqViewModel = new ComplainmasterReqViewModel()
+                    {
+                        Description=model.Description,
+                        Subject=model.Subject,
+                        TypeId=model.TypeId,
+                        UserID=user.Id
+                    };
 
+
+                    long id = _Icomplainmaster.AddComplainmaster(ComplainmasterReqViewModel);
+                    
                     if (id > 0)
                     {
-                        var compainTrail = new CompainTrailVirewModel()
+                        var compainTrail = new CompainTrailReqVirewModel()
                         {
                             ComplainId = id,
                             Description = model.Description,
-                            UserID = model.UserID
+                            UserID = user.Id
                         };
                         long idcompainTrail = _IcompainTrail.AddCompainTrail(compainTrail);
 
@@ -97,7 +112,20 @@ namespace CleanArchitecture.Web.API
             {
                 if (model != null)
                 {
-                    long id = _IcompainTrail.AddCompainTrail(model);
+                    var user = await GetCurrentUserAsync();
+
+                    var compainTrail = new CompainTrailReqVirewModel()
+                    {
+                        ComplainId = model.ComplainId,
+                        Description = model.Description,
+                        UserID = user.Id,
+                        Complainstatus=model.Complainstatus,
+                        Remark=model.Remark
+                    };
+
+
+
+                    long id = _IcompainTrail.AddCompainTrail(compainTrail);
                     if (id > 0)
                     {
                         return Ok(new CompainTrailResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessCompainTrail });
@@ -167,6 +195,10 @@ namespace CleanArchitecture.Web.API
                 ex.ToString();
                 throw;
             }
+        }
+        private Task<ApplicationUser> GetCurrentUserAsync()
+        {
+            return _userManager.GetUserAsync(HttpContext.User);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace CleanArchitecture.Core.Interfaces.Complaint
 {
    public interface ICompainTrail
     {
-        long AddCompainTrail(CompainTrailVirewModel compainTrail);
+        long AddCompainTrail(CompainTrailReqVirewModel compainTrail);
     }
 }
