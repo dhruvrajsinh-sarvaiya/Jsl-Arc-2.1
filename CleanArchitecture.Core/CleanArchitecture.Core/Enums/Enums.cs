@@ -196,6 +196,8 @@ namespace CleanArchitecture.Core.Enums
         Settlement_FullSettlementDone = 4630,
         Settlement_SettlementInternalError = 4631,
         Settlement_NoSettlementRecordFound = 4632,
+        Settlement_PartialSettlementRollback = 1,
+        Settlement_FullSettlementRollback = 1,
         CancelOrder_NoRecordFound = 4633,
         CancelOrder_InternalError = 4634,
         CancelOrder_TrnNotHold = 4635,

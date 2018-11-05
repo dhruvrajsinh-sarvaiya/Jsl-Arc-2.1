@@ -248,28 +248,32 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         {
                             HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
                             _dbContext.Database.RollbackTransaction();
+
+                            _Resp.ErrorCode = enErrorCode.Settlement_PartialSettlementRollback;
+                            _Resp.ReturnCode = enResponseCodeService.Success;
+                            _Resp.ReturnMsg = "Partial Settlement RollBack TrnNo " + TradeBuyRequestObj.TrnNo + " With: TrnNo " + SellerList.TrnNo + "  Reason: " + CreditWalletResult.ReturnMsg;
                         }
                         else
                         {
                             _dbContext.SaveChanges();
                             _dbContext.Database.CommitTransaction();
 
+                            HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT", ControllerName, "Partial Settlement Done with " + SellerList.TrnNo + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                            _Resp.ErrorCode = enErrorCode.Settlement_PartialSettlementDone;
+                            _Resp.ReturnCode = enResponseCodeService.Success;
+                            _Resp.ReturnMsg = "Partial Settlement Done of TrnNo " + TradeBuyRequestObj.TrnNo + " Settled: " + TradeBuyRequestObj.DeliveredQty + " Remain:" + TradeBuyRequestObj.PendingQty;
+                            //Continuew as record Partially settled
+                            try
+                            {
+                                _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal                                                                                                                                                                                                                //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
+                            }
+                            catch (Exception ex)
+                            {
+                                HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                            }
                         }
                         HoldTrnNos.Add(SellerList.TrnNo);
-                        HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT", ControllerName, "Partial Settlement Done with " + SellerList.TrnNo + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
-                        _Resp.ErrorCode = enErrorCode.Settlement_PartialSettlementDone;
-                        _Resp.ReturnCode = enResponseCodeService.Success;
-                        _Resp.ReturnMsg = "Partial Settlement Done of TrnNo "+ TradeBuyRequestObj.TrnNo + " Settled: "+ TradeBuyRequestObj.DeliveredQty + " Remain:"+ TradeBuyRequestObj.PendingQty;                        
-                        //Continuew as record Partially settled
-                        try
-                        {
-                            _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal 
-                                //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
-                        }
-                        catch (Exception ex)
-                        {
-                            HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Partial Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
-                        }
+                        
                     }
                     //====================================FULL SETTLEMENT TO MEMBER
                     else if (SellerList.RemainQty >= TradeBuyRequestObj.PendingQty && TradeBuyRequestObj.PendingQty!=0)
@@ -324,32 +328,38 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         {
                             HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
                             _dbContext.Database.RollbackTransaction();
+                            _Resp.ErrorCode = enErrorCode.Settlement_FullSettlementRollback;
+                            _Resp.ReturnCode = enResponseCodeService.Success;
+                            _Resp.ReturnMsg = "Full Settlement Rollback TrnNo:" + TradeBuyRequestObj.TrnNo + " With: TrnNo " + SellerList.TrnNo + "  Reason:" + CreditWalletResult.ReturnMsg;
                         }
                         else
                         {
                             _dbContext.SaveChanges();
                             _dbContext.Database.CommitTransaction();
+
+                            HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT", ControllerName, "Full Settlement Done with " + SellerList.TrnNo + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+
+                            _Resp.ErrorCode = enErrorCode.Settlement_FullSettlementDone;
+                            _Resp.ReturnCode = enResponseCodeService.Success;
+                            _Resp.ReturnMsg = "Full Settlement Done of TrnNo " + TradeBuyRequestObj.TrnNo + " Settled: " + TradeBuyRequestObj.DeliveredQty + " Remain:" + TradeBuyRequestObj.PendingQty;
+                            try
+                            {
+                                _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal
+                                                                                                                                                                                                        //==============Volume update only after success
+                                if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
+                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.BidPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.BuyQty);
+                                else
+                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty);
+
+                            }
+                            catch (Exception ex)
+                            {
+                                HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Full Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
+                            }
                         }
 
-                        HoldTrnNos.Add(SellerList.TrnNo);
-                        HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT", ControllerName, "Full Settlement Done with " + SellerList.TrnNo + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
-                        _Resp.ErrorCode = enErrorCode.Settlement_FullSettlementDone;
-                        _Resp.ReturnCode = enResponseCodeService.Success;
-                        _Resp.ReturnMsg = "Full Settlement Done of TrnNo " + TradeBuyRequestObj.TrnNo + " Settled: " + TradeBuyRequestObj.DeliveredQty + " Remain:" + TradeBuyRequestObj.PendingQty;
-                        try
-                        {
-                            _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal
-                            //==============Volume update only after success
-                            if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
-                                _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.BidPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.BuyQty);
-                            else
-                                _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty);
-
-                        }
-                        catch (Exception ex)
-                        {
-                            HelperForLog.WriteLogIntoFile("ISignalRService", ControllerName, "Full Settlement Error " + ex.Message + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
-                        }
+                        HoldTrnNos.Add(SellerList.TrnNo);                        
+                        
                         break;//record settled
                     }
                     var newSellerList = _TradeSellerList.GetById(SellerList.Id);
@@ -387,6 +397,9 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             }
             return Task.FromResult(_Resp);
         }
+        //#region REpository Functions       
+        //#endregion
+
         public async Task EmailSendAsync()
         {
             try
