@@ -277,10 +277,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         SettlementQty = TradeBuyRequestObj.PendingQty;
                         //Topup Order create
                         PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.UserID, SellerList.PoolID, TradeBuyRequestObj.TrnNo, SettlementQty, CreditWalletID, CreditAccountID);
-
-                        SellerList.RemainQty = SellerList.RemainQty - SettlementQty;//Update first as updated value in below line
-                        SellerList.MakeTransactionHold();                    
-                        PoolMst.TotalQty = PoolMst.TotalQty - SettlementQty;
+                                              
 
                         //Here Bid Price of pool always low then user given in Order , base on above Query
                         decimal TakeDisc = 0;
@@ -289,6 +286,11 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                             TakeDisc = (TradeBuyRequestObj.BidPrice - SellerList.Price) * SettlementQty;
                         }
                         InsertTradePoolQueue(TradeBuyRequestObj.UserID,SellerList.TrnNo, SellerList.PoolID, SellerList.RemainQty, SellerList.Price, TradeBuyRequestObj.TrnNo, SettlementQty, TradeBuyRequestObj.BidPrice, TakeDisc, 0, SellerList.Id);
+
+
+                        SellerList.RemainQty = SellerList.RemainQty - SettlementQty;//Update first as updated value in below line
+                        SellerList.MakeTransactionHold();
+                        PoolMst.TotalQty = PoolMst.TotalQty - SettlementQty;
 
                         TradeBuyRequestObj.DeliveredQty = TradeBuyRequestObj.DeliveredQty + SettlementQty;//Fully settled Here
                         TradeBuyRequestObj.PendingQty = TradeBuyRequestObj.PendingQty - SettlementQty;//this will 0
