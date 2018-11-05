@@ -25,7 +25,7 @@ namespace CleanArchitecture.Web.API
         #endregion
 
         #region Ctore
-        public ProfileController(IProfileMaster IprofileMaster, UserManager<ApplicationUser> userManager,ISubscriptionMaster IsubscriptionMaster)
+        public ProfileController(IProfileMaster IprofileMaster, UserManager<ApplicationUser> userManager, ISubscriptionMaster IsubscriptionMaster)
         {
             _IprofileMaster = IprofileMaster;
             _userManager = userManager;
@@ -65,14 +65,19 @@ namespace CleanArchitecture.Web.API
                 var user = await GetCurrentUserAsync();
                 if (user != null)
                 {
-                    bool Status = _IsubscriptionMaster.GetSubscriptionData(user.Id, model.ProfileId);
-                    if (Status)
+                    if (model.ProfileId > 0)
                     {
-                        _IsubscriptionMaster.AddMultiSubscription(user.Id, model.ProfileId);
-                        return Ok(new SubscriptionResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddProfile });
+                        bool Status = _IsubscriptionMaster.GetSubscriptionData(user.Id, model.ProfileId);
+                        if (Status)
+                        {
+                            _IsubscriptionMaster.AddMultiSubscription(user.Id, model.ProfileId);
+                            return Ok(new SubscriptionResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessAddProfile });
+                        }
+                        else
+                            return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotAddedProfile, ErrorCode = enErrorCode.Status4122NotAddedProfile });
                     }
                     else
-                        return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.NotAddedProfile, ErrorCode = enErrorCode.Status4122NotAddedProfile });
+                        return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidProfileId, ErrorCode = enErrorCode.Status4129InvalidProfileId });
                 }
                 else
                     return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4063UserNotRegister });

@@ -264,6 +264,7 @@ namespace CleanArchitecture.Core.Enums
         public static string SuccessGetProfilePlan = "Success full get raise profile plan.";
         public static string SuccessAddProfile = "Success full add profile plan.";
         public static string NotAddedProfile = "This profile plan already exists or selected plan not allow lower level.";
+        public static string InvalidProfileId = "Invalid profileId.";
         public static string Typemasterrequired = "Please Enter complaint type";
         public static string TypemasterInsertError = "raise complaint not added.";
         public static string complaintTypeNotavailable = "Complaint type not available";
