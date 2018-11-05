@@ -12,14 +12,14 @@ namespace CleanArchitecture.Infrastructure.Services.KYC
 {
     public class PersonalVerificationService : IPersonalVerificationService
     {
-        private readonly CleanArchitectureContext _dbContext;
+        //private readonly CleanArchitectureContext _dbContext;
         private readonly ICustomRepository<PersonalVerification> _personalVerificationRepository;
         private readonly ICustomRepository<KYCLevelMaster> _KYCLevelRepository;
-        public PersonalVerificationService(ICustomRepository<PersonalVerification> personalVerificationRepository, ICustomRepository<KYCLevelMaster> KYCLevelRepository, CleanArchitectureContext dbContext)
+        public PersonalVerificationService(ICustomRepository<PersonalVerification> personalVerificationRepository, ICustomRepository<KYCLevelMaster> KYCLevelRepository)
         {
             _personalVerificationRepository = personalVerificationRepository;
             _KYCLevelRepository = KYCLevelRepository;
-            _dbContext = dbContext;
+            //_dbContext = dbContext;
         }
 
         public async Task<long> AddPersonalVerification(PersonalVerificationViewModel model)
@@ -64,6 +64,37 @@ namespace CleanArchitecture.Infrastructure.Services.KYC
                 throw ex;
             }
             
+        }
+
+        public PersonalVerificationViewModel GetPersonalVerification(int Userid)
+        {
+            try
+            {
+                var KYCUserData = _personalVerificationRepository.Table.Where(i => i.UserID == Userid).FirstOrDefault();
+                PersonalVerificationViewModel modeldata = new PersonalVerificationViewModel();
+                if (KYCUserData != null)
+                {
+                    modeldata.UserId = KYCUserData.UserID;
+                    modeldata.Surname = KYCUserData.Surname;
+                    modeldata.GivenName = KYCUserData.GivenName;
+                    modeldata.ValidIdentityCard = KYCUserData.ValidIdentityCard;
+                    modeldata.FrontImage = KYCUserData.FrontImage;
+                    modeldata.BackImage = KYCUserData.BackImage;
+                    modeldata.SelfieImage = KYCUserData.SelfieImage;
+                    modeldata.EnableStatus = KYCUserData.EnableStatus;
+                    modeldata.VerifyStatus = KYCUserData.VerifyStatus;
+                    modeldata.KYCLevelId = KYCUserData.KYCLevelId;
+
+                    return modeldata;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                ex.ToString();
+                throw;
+            }
         }
 
         public async Task<long> UpdatePersonalVerification(PersonalVerificationViewModel model)

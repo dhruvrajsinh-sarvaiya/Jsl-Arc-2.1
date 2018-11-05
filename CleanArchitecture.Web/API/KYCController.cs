@@ -28,13 +28,13 @@ namespace CleanArchitecture.Web.API
         }
 
         /// <summary>
-        /// Thid method are used standard login 
+        /// Thid method are used KYC 
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("PersonalVerification")]
         //[AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> PersonalVerification() //(PersonalVerificationViewModel model)
         {
             try
@@ -142,6 +142,20 @@ namespace CleanArchitecture.Web.API
             {
                 return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
 
+            }
+        }
+
+        [HttpGet("GetKYCData")]
+        public async Task<IActionResult> GetKYCData()
+        {
+            try
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                ex.ToString();
+                throw;
             }
         }
     }

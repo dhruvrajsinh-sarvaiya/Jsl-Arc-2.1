@@ -10,5 +10,6 @@ namespace CleanArchitecture.Core.Interfaces.KYC
     {
         Task<long> AddPersonalVerification(PersonalVerificationViewModel model);
         Task<long> UpdatePersonalVerification(PersonalVerificationViewModel model);
+        PersonalVerificationViewModel GetPersonalVerification(int Userid);
     }
 }
