@@ -3,29 +3,50 @@ using System.IO;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AutoMapper.Configuration;
+using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces.KYC;
+using CleanArchitecture.Core.Interfaces.User;
 using CleanArchitecture.Core.ViewModels.KYC;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Web.API
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class KYCController : ControllerBase
     {
+        #region Field
         //private IHostingEnvironment _hostingEnvironment;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private readonly IPersonalVerificationService _personalVerificationService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserService _userService;
+        #endregion
+
+        #region Ctore
         public KYCController(//IHostingEnvironment hostingEnvironment,
             Microsoft.Extensions.Configuration.IConfiguration configuration,
-            IPersonalVerificationService personalVerificationService)
+            IPersonalVerificationService personalVerificationService, UserManager<ApplicationUser> userManager)
         {
             //_hostingEnvironment = hostingEnvironment;
             _configuration = configuration;
             _personalVerificationService = personalVerificationService;
+            _userManager = userManager;
         }
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Thid method are used KYC 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+
 
         /// <summary>
         /// Thid method are used KYC 
@@ -40,12 +61,25 @@ namespace CleanArchitecture.Web.API
             try
             {
                 var httpRequest = Request.Form;
+                var user = await GetCurrentUserAsync();
+                int userid = user.Id;
 
-                int userid = 1;
+
 
                 PersonalVerificationViewModel model = new PersonalVerificationViewModel();
                 //model.Id = ;
                 //model.UserID = 
+
+                if (String.IsNullOrEmpty(httpRequest["IPAddress"].ToString()))
+                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+                ////// Ip Address Validate or not
+                string CountryCode = await _userService.GetCountryByIP(httpRequest["IPAddress"].ToString());
+                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                {
+                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+                }
+
+
                 if (httpRequest.Files.Count == 0)
                     return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ImageNotAvailable, ErrorCode = enErrorCode.Status4115ImageNotUpload });
                 if (String.IsNullOrEmpty(httpRequest["Surname"].ToString()))
@@ -62,7 +96,7 @@ namespace CleanArchitecture.Web.API
                 model.ValidIdentityCard = httpRequest["ValidIdentityCard"].ToString();
                 model.EnableStatus = false;
                 model.VerifyStatus = false;
-                
+
 
                 foreach (var file in httpRequest.Files)
                 {
@@ -130,7 +164,7 @@ namespace CleanArchitecture.Web.API
 
                 }
 
-                long verifyId = await  _personalVerificationService.AddPersonalVerification(model);
+                long verifyId = await _personalVerificationService.AddPersonalVerification(model);
                 if (verifyId > 0)
                 {
                     return Ok(new PersonalVerificationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.PersonalIdentityInsertSuccessfull });
@@ -145,18 +179,56 @@ namespace CleanArchitecture.Web.API
             }
         }
 
+        /// <summary>
+        /// Thid method are used GET KYC details
+        /// </summary>
+        /// <param name="model"></param>
         [HttpGet("GetKYCData")]
         public async Task<IActionResult> GetKYCData()
         {
             try
             {
-                return null;
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var userkycdata = _personalVerificationService.GetPersonalVerification(user.Id);
+                    if (userkycdata != null)
+                    {
+                        PersonalVerificationRequest userdata = new PersonalVerificationRequest();
+
+                        userdata.Surname = userkycdata.Surname;
+                        userdata.GivenName = userkycdata.GivenName;
+                        userdata.ValidIdentityCard = userkycdata.ValidIdentityCard;
+                        userdata.FrontImage = userkycdata.FrontImage;
+                        userdata.BackImage = userkycdata.BackImage;
+                        userdata.SelfieImage = userkycdata.SelfieImage;
+                        userdata.EnableStatus = userkycdata.EnableStatus;
+                        userdata.VerifyStatus = userkycdata.VerifyStatus;
+                        userdata.KYCLevelId = userkycdata.KYCLevelId;
+
+                        return Ok(new PersonalVerificationResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.GetPersonalIdentity, UserKYC = userdata });
+                    }
+                    else
+                        return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.PersonalIdentityNotavailable, ErrorCode = enErrorCode.Status4130PersonalIdentityNotavailable });
+
+                }
+                else
+                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4063UserNotRegister });
             }
+
             catch (Exception ex)
             {
-                ex.ToString();
-                throw;
+                return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+
             }
         }
+        #endregion
+
+        #region Helpers
+        private Task<ApplicationUser> GetCurrentUserAsync()
+        {
+            return _userManager.GetUserAsync(HttpContext.User);
+        }
+        #endregion
     }
 }
