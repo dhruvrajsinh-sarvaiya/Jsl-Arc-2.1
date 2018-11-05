@@ -6,6 +6,7 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Configuration;
+using CleanArchitecture.Core.Interfaces.Repository;
 using CleanArchitecture.Core.ViewModels.Configuration;
 using CleanArchitecture.Core.ViewModels.WalletConfiguration;
 using CleanArchitecture.Infrastructure.Interfaces;
@@ -43,6 +44,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly IWalletService _walletService;
         private readonly ICommonRepository<TradePairStastics> _tradePairStastics;
         private readonly ICommonRepository<Market> _marketRepository;
+        private readonly IFrontTrnRepository _frontTrnRepository;
 
         public TransactionConfigService(
             ICommonRepository<ServiceMaster> serviceMasterRepository,
@@ -67,7 +69,8 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ICommonRepository<WalletTypeMaster> walletTypeService,
             IWalletService walletService,
             ICommonRepository<TradePairStastics> tradePairStastics,
-            ICommonRepository<Market> marketRepository)
+            ICommonRepository<Market> marketRepository,
+            IFrontTrnRepository frontTrnRepository)
           {
             _serviceMasterRepository = serviceMasterRepository;
             _serviceDetailRepository = serviceDetailRepository;
@@ -92,6 +95,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             _walletService = walletService;
             _tradePairStastics = tradePairStastics;
             _marketRepository = marketRepository;
+            _frontTrnRepository = frontTrnRepository;
         }
 
         #region Service
@@ -325,20 +329,20 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             try
             {
                 responsedata = new List<ServiceConfigurationRequest>();
-
-                var serviceMaster = _serviceMasterRepository.List();
-                if (serviceMaster != null)
+                var ServiceData = _frontTrnRepository.GetAllServiceConfiguration();
+                //var serviceMaster = _serviceMasterRepository.List();
+                if (ServiceData != null && ServiceData.Count > 0)
                 {
-                    foreach (var service in serviceMaster)
+                    foreach (var service in ServiceData)
                     {
                         ServiceConfigurationRequest response = new ServiceConfigurationRequest();
-                        response.ServiceId = service.Id;
-                        response.Name = service.Name;
+                        response.ServiceId = service.ServiceId;
+                        response.Name = service.ServiceName;
                         response.SMSCode = service.SMSCode;
                         response.Type = service.ServiceType;
 
-                        var serviceDetail = _serviceDetailRepository.GetSingle(ser => ser.ServiceId == service.Id);
-                        var serviceDetailJson = JsonConvert.DeserializeObject<ServiceDetailJsonData>(serviceDetail.ServiceDetailJson);
+                        //var serviceDetail = _serviceDetailRepository.GetSingle(ser => ser.ServiceId == service.Id);
+                        var serviceDetailJson = JsonConvert.DeserializeObject<ServiceDetailJsonData>(service.ServiceDetailJson);
 
                         response.ImageUrl = serviceDetailJson.ImageUrl;
                         response.TotalSupply = serviceDetailJson.TotalSupply;
@@ -351,28 +355,31 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                         response.WhitePaperPath = serviceDetailJson.WhitePaperPath;
                         response.Introduction = serviceDetailJson.Introduction;
 
-                        var serviceStastics = _serviceStasticsRepository.GetSingle(ser => ser.ServiceId == service.Id);
-                        response.CirculatingSupply = serviceStastics.CirculatingSupply;
-                        response.IssueDate = serviceStastics.IssueDate;
-                        response.IssuePrice = serviceStastics.IssuePrice;
+                        //var serviceStastics = _serviceStasticsRepository.GetSingle(ser => ser.ServiceId == service.Id);
+                        response.CirculatingSupply = service.CirculatingSupply;
+                        response.IssueDate = service.IssueDate;
+                        response.IssuePrice = service.IssuePrice;
 
-                        var depositSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Deposit));
-                        if (depositSerMapping != null)
-                        {
-                            response.IsDeposit = depositSerMapping.Status;
-                        }
+                        //var depositSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Deposit));
+                        //if (depositSerMapping != null)
+                        //{
+                        //    response.IsDeposit = depositSerMapping.Status;
+                        //}
 
-                        var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
-                        if (withdrawSerMapping != null)
-                        {
-                            response.IsWithdraw = withdrawSerMapping.Status;
-                        }
+                        //var withdrawSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Withdraw));
+                        //if (withdrawSerMapping != null)
+                        //{
+                        //    response.IsWithdraw = withdrawSerMapping.Status;
+                        //}
 
-                        var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
-                        if (tranSerMapping != null)
-                        {
-                            response.IsTransaction = tranSerMapping.Status;
-                        }
+                        //var tranSerMapping = _serviceTypeMapping.GetSingle(x => x.ServiceId == service.Id && x.TrnType == Convert.ToInt16(enTrnType.Transaction));
+                        //if (tranSerMapping != null)
+                        //{
+                        //    response.IsTransaction = tranSerMapping.Status;
+                        //}
+                        response.IsDeposit = service.DepositBit;
+                        response.IsWithdraw = service.WithdrawBit;
+                        response.IsTransaction = service.TransactionBit;
 
                         responsedata.Add(response);
                     }
