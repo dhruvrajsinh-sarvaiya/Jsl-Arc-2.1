@@ -43,6 +43,8 @@ using CleanArchitecture.Infrastructure.Services.UserChangeLog;
 using CleanArchitecture.Infrastructure.Interfaces;
 using CleanArchitecture.Core.Interfaces.Profile_Management;
 using CleanArchitecture.Infrastructure.Services.Profile_Management;
+using CleanArchitecture.Core.Interfaces.Complaint;
+using CleanArchitecture.Infrastructure.Services.Complaint;
 
 namespace CleanArchitecture.Web.Extensions
 {
@@ -110,7 +112,7 @@ namespace CleanArchitecture.Web.Extensions
                 // options.Password.RequiredLength = 4;
                 // options.Password.RequireNonAlphanumeric = false;
 
-                
+
                 // Start Pawword Related Setting
                 //.AddTokenProvider<ConfirmEmailDataProtectorTokenProvider<ApplicationUser>>(EmailConfirmationTokenProviderName);
 
@@ -133,7 +135,7 @@ namespace CleanArchitecture.Web.Extensions
                 options.User.RequireUniqueEmail = false;
 
                 // End Pawword Related Setting
-                
+
             })
             .AddEntityFrameworkStores<CleanArchitectureContext>()
             .AddDefaultTokenProviders();
@@ -307,7 +309,7 @@ namespace CleanArchitecture.Web.Extensions
                    options.ClientId = Startup.Configuration["Authentication:Microsoft:ClientId"];
                    options.ClientSecret = Startup.Configuration["Authentication:Microsoft:ClientSecret"];
                });
-               
+
             return services;
         }
 
@@ -331,9 +333,9 @@ namespace CleanArchitecture.Web.Extensions
                 }
                 else
                 {
-                    var connection = Startup.Configuration["Data:SqlServerConnectionString"]; 
+                    var connection = Startup.Configuration["Data:SqlServerConnectionString"];
                     options.UseSqlServer(connection);
-                    options.UseSqlServer(connection, b => b.MigrationsAssembly("CleanArchitecture.Web")); 
+                    options.UseSqlServer(connection, b => b.MigrationsAssembly("CleanArchitecture.Web"));
                 }
                 options.UseOpenIddict();
             });
@@ -361,7 +363,7 @@ namespace CleanArchitecture.Web.Extensions
 
             return services;
         }
-        
+
         public static IServiceCollection RegisterCustomServices(this IServiceCollection services)
         {
             // New instance every time, only configuration class needs so its ok
@@ -389,7 +391,7 @@ namespace CleanArchitecture.Web.Extensions
             //services.AddTransient<IMessageSender, MessageService>();
             // added by nirav savariya for Encypted Decrypted on 10-02-2018
             services.AddScoped<EncyptedDecrypted>();
-            services.AddTransient<IFrontTrnService, FrontTrnService>(); 
+            services.AddTransient<IFrontTrnService, FrontTrnService>();
             services.AddTransient<IFrontTrnRepository, FrontTrnRepository>();
             services.AddTransient<ITransactionConfigService, TransactionConfigService>();
             services.AddTransient<ISignalRService, SignalRService>();//komal 30-10-2018 
@@ -414,6 +416,13 @@ namespace CleanArchitecture.Web.Extensions
             // Profile Master added by nirav savariya on 04-11-2018
             services.AddScoped<IProfileMaster, ProfileManagementService>();
             services.AddScoped<ISubscriptionMaster, SubscriptionMasterService>();
+            ///   complaint Function added By pankaj kathiriya 05-11-2018
+            ///   
+            services.AddScoped<ITypemaster, TypemasterServices>();
+            services.AddScoped<IComplainmaster, ComplainmasterServices>();
+            
+            services.AddScoped<ICompainTrail, CompainTrailServices>();
+
             return services;
         }
     }
