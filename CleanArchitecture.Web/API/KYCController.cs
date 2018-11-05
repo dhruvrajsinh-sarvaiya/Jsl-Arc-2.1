@@ -73,11 +73,11 @@ namespace CleanArchitecture.Web.API
                 if (String.IsNullOrEmpty(httpRequest["IPAddress"].ToString()))
                     return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
                 ////// Ip Address Validate or not
-                string CountryCode = await _userService.GetCountryByIP(httpRequest["IPAddress"].ToString());
-                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                {
-                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                }
+                //string CountryCode = await _userService.GetCountryByIP(httpRequest["IPAddress"].ToString());
+                //if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                //{
+                //    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+                //}
 
 
                 if (httpRequest.Files.Count == 0)
