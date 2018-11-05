@@ -548,6 +548,11 @@ namespace CleanArchitecture.Core.Enums
 
     public enum EnTemplateType
     {
-        Registration = 1
+        Registration = 1,
+        TransactionSuccess = 2,
+        ConfirmationMail = 3,
+        ForgotPassword = 4,
+        LoginWithOTP = 5,
+        ResetPassword = 6
     }
 }
