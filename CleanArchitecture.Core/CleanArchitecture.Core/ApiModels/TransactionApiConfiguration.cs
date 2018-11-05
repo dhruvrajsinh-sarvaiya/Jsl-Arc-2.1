@@ -125,4 +125,20 @@ namespace CleanArchitecture.Core.ApiModels
         public Decimal PreBal { get; set; }
         public Decimal PostBal { get; set; }
     }
+
+    public class ServiceMasterResponse
+    {
+        public long ServiceId { get; set; }
+        public string ServiceName { get; set; }
+        public string SMSCode { get; set; }
+        public short ServiceType { get; set; }
+        public string ServiceDetailJson { get; set; }
+        public long CirculatingSupply { get; set; }
+        public DateTime IssueDate { get; set; }
+        public decimal IssuePrice { get; set; }
+        public short TransactionBit { get; set; }
+        public short WithdrawBit { get; set; }
+        public short DepositBit { get; set; }
+
+    }
 }

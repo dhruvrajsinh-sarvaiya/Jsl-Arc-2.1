@@ -19,5 +19,6 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         decimal LastPriceByPair(long PairId, ref short UpDownBit);
         PairRatesResponse GetPairRates(long PairId);
         List<TradePairTableResponse> GetTradePairAsset();
+        List<ServiceMasterResponse> GetAllServiceConfiguration();
     }
 }

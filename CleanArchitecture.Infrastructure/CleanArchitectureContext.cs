@@ -130,6 +130,7 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<GetBuySellBook> BuyerSellerInfo { get; set; } //uday 12-10-2018
         public DbQuery<GetGraphResponse> GetGraphResponse { get; set; } //uday 22-10-2018
         public DbQuery<TradePairTableResponse> TradePairTableResponse { get; set; } //uday 03-11-2018
+        public DbQuery<ServiceMasterResponse> ServiceMasterResponse { get; set; } //uday 05-11-2018
         //Add Tables for Service Master (Not Commited)
 
         public DbSet<ServiceMaster> ServiceMaster { get; set; }

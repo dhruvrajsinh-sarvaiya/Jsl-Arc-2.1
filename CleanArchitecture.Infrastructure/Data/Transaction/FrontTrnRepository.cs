@@ -230,11 +230,31 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             try
             {
                 IQueryable<GetBuySellBook> Result;
+
+                //Uday  05-11-2018 As Per Instruction by ritamam not get the OrderId From TradePoolMaster
+                
+                //if (Price != -0)
+                //{
+                //    Result = _dbContext.BuyerSellerInfo.FromSql(
+                //                  @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
+                //                Count(TTQ.BidPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.BidPrice And TPM.PairId = TTQ.PairID) As OrderId
+                //                From TradeTransactionQueue TTQ  Where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.PairID = {0}
+                //                AND TTQ.IsCancelled = 0 AND TTQ.BidPrice={1} Group By TTQ.BidPrice,PairID Order By TTQ.BidPrice desc", id, Price);
+                //}
+                //else
+                //{
+                //    Result = _dbContext.BuyerSellerInfo.FromSql(
+                //                  @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
+                //                Count(TTQ.BidPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.BidPrice And TPM.PairId = TTQ.PairID) As OrderId
+                //                From TradeTransactionQueue TTQ  Where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.PairID = {0}
+                //                AND TTQ.IsCancelled = 0 Group By TTQ.BidPrice,PairID Order By TTQ.BidPrice desc", id);
+                //}
+
                 if (Price != -0)
                 {
                     Result = _dbContext.BuyerSellerInfo.FromSql(
                                   @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
-                                Count(TTQ.BidPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.BidPrice And TPM.PairId = TTQ.PairID) As OrderId
+                                Count(TTQ.BidPrice) As RecordCount,NEWID() As OrderId
                                 From TradeTransactionQueue TTQ  Where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.PairID = {0}
                                 AND TTQ.IsCancelled = 0 AND TTQ.BidPrice={1} Group By TTQ.BidPrice,PairID Order By TTQ.BidPrice desc", id, Price);
                 }
@@ -242,7 +262,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 {
                     Result = _dbContext.BuyerSellerInfo.FromSql(
                                   @"Select Top 100 TTQ.BidPrice As Price, Sum(TTQ.DeliveryTotalQty) - Sum(TTQ.SettledBuyQty) As Amount,
-                                Count(TTQ.BidPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.BidPrice And TPM.PairId = TTQ.PairID) As OrderId
+                                Count(TTQ.BidPrice) As RecordCount,NEWID() As OrderId
                                 From TradeTransactionQueue TTQ  Where TTQ.Status = 4 and TTQ.TrnType = 4 AND TTQ.PairID = {0}
                                 AND TTQ.IsCancelled = 0 Group By TTQ.BidPrice,PairID Order By TTQ.BidPrice desc", id);
                 }
@@ -262,11 +282,30 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             try
             {
                 IQueryable<GetBuySellBook> Result;
+                //Uday  05-11-2018 As Per Instruction by ritamam not get the OrderId From TradePoolMaster
+                
+                //if (Price != -0)
+                //{
+                //    Result = _dbContext.BuyerSellerInfo.FromSql(
+                //                @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
+                //              Count(TTQ.AskPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.AskPrice And TPM.PairId = TTQ.PairID) As OrderId
+                //              from TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
+                //              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 AND TTQ.AskPrice={1} Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id, Price);
+                //}
+                //else
+                //{
+                //    Result = _dbContext.BuyerSellerInfo.FromSql(
+                //                @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
+                //              Count(TTQ.AskPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.AskPrice And TPM.PairId = TTQ.PairID) As OrderId
+                //              from TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
+                //              TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id);
+                //}
+
                 if (Price != -0)
                 {
                     Result = _dbContext.BuyerSellerInfo.FromSql(
                                 @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
-                              Count(TTQ.AskPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.AskPrice And TPM.PairId = TTQ.PairID) As OrderId
+                              Count(TTQ.AskPrice) As RecordCount,NEWID() As OrderId
                               from TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
                               TTQ.pairID = {0} AND TTQ.IsCancelled = 0 AND TTQ.AskPrice={1} Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id, Price);
                 }
@@ -274,7 +313,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 {
                     Result = _dbContext.BuyerSellerInfo.FromSql(
                                 @"Select Top 100 TTQ.AskPrice As Price,sum(TTQ.OrderTotalQty) - Sum(TTQ.SettledSellQty) as Amount,
-                              Count(TTQ.AskPrice) As RecordCount,(Select Top 1 GUID From TradePoolMaster TPM Where TPM.BidPrice = TTQ.AskPrice And TPM.PairId = TTQ.PairID) As OrderId
+                              Count(TTQ.AskPrice) As RecordCount,NEWID() As OrderId
                               from TradeTransactionQueue TTQ Where TTQ.Status = 4 and TTQ.TrnType = 5 AND 
                               TTQ.pairID = {0} AND TTQ.IsCancelled = 0 Group by TTQ.AskPrice,PairID order by TTQ.AskPrice", id);
                 }
@@ -426,6 +465,32 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                 Inner Join ServiceMaster SM1 ON SM1.Id = TPM.BaseCurrencyId
                                 Inner Join ServiceMaster SM2 ON SM2.Id = TPM.SecondaryCurrencyId Order By M.ID");
                 
+                return Result.ToList();
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        public List<ServiceMasterResponse> GetAllServiceConfiguration()
+        {
+
+            try
+            {
+                IQueryable<ServiceMasterResponse> Result;
+
+                Result = _dbContext.ServiceMasterResponse.FromSql(
+                            @"Select SM.Id As ServiceId,SM.Name As ServiceName,SM.SMSCode,SM.ServiceType,SD.ServiceDetailJson,
+                            SS.CirculatingSupply,SS.IssueDate,SS.IssuePrice,
+                            ISNULL((Select STM.Status From ServiceTypeMapping STM Where STM.ServiceId = SM.Id and TrnType = 1),0) TransactionBit,
+                            ISNULL((Select STM.Status From ServiceTypeMapping STM Where STM.ServiceId = SM.Id and TrnType = 6),0) WithdrawBit,
+                            ISNULL((Select STM.Status From ServiceTypeMapping STM Where STM.ServiceId = SM.Id and TrnType = 8),0) DepositBit
+                            From ServiceMaster SM
+                            Inner Join ServiceDetail SD On SD.ServiceId = SM.Id
+                            Inner Join ServiceStastics SS On SS.ServiceId = SM.Id");
+
                 return Result.ToList();
             }
             catch (Exception ex)
