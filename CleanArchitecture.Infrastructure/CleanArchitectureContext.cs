@@ -133,6 +133,7 @@ namespace CleanArchitecture.Infrastructure
         public DbQuery<GetGraphResponse> GetGraphResponse { get; set; } //uday 22-10-2018
         public DbQuery<TradePairTableResponse> TradePairTableResponse { get; set; } //uday 03-11-2018
         public DbQuery<ServiceMasterResponse> ServiceMasterResponse { get; set; } //uday 05-11-2018
+        public DbQuery<GetGraphResponsePairWise> GetGraphResponseByPair { get; set; } //khushali 06-11-2018
 
 
         public DbQuery<CompainDetailResponse> compainDetailResponse { get; set; }  //Add by pankaj For Get Detail 
