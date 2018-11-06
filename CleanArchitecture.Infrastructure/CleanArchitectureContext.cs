@@ -221,7 +221,7 @@ namespace CleanArchitecture.Infrastructure
             //modelBuilder.Entity<TradeTransactionQueue>().HasKey(e => new { e.Id, e.TrnNo }); // komal 04-10-2018 composite primary key
             modelBuilder.Entity<TradePoolMaster>().HasKey(e => new {e.Id ,e.SellServiceID ,e.BuyServiceID ,e.BidPrice }); // komal 11-10-2018 composite primary key
 
-            modelBuilder.Entity<WithdrawHistory>().HasKey(e => new {  e.TrnID, e.Address }); // vsolanki 2018-10-29 composite primary key
+            //modelBuilder.Entity<WithdrawHistory>().HasKey(e => new {  e.TrnID, e.Address }); // vsolanki 2018-10-29 composite primary key ntrivedi removing pk 06-11-2018
 
             modelBuilder.Entity<DepositCounterMaster>().HasKey(e => new {e.WalletTypeID, e.SerProId}); // Rita 22-10-2018 composite primary key
             modelBuilder.Entity<TradeGraphDetail>().HasKey(e => new { e.Id, e.TranNo }); // Uday 22-10-2018 composite primary key
