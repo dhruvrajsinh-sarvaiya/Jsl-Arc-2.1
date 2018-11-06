@@ -507,17 +507,17 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 string Query = "";
                 IQueryable<GetGraphResponsePairWise> Result;               
                 Query = "Select (Select Top 1 PairName From TradePairMaster TPM Where TPM.Id = T.PairId) As PairName,"+ 
-                            "DATEADD(MINUTE, DATEDIFF(MINUTE, 0, T.DataDate) / 1 * 1, 0) As DataDate,"+
-                            "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume,"+
-                            "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As OpenVal,"+
-                            "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As CloseVal From TradeData T"+
-                            "Where PairId In(10041001,10041002) And DataDate = {0}"+
-                            "GROUP BY DATEADD(MINUTE, DATEDIFF(MINUTE, 0, T.DataDate) / 1 * 1, 0),PairId"+
-                            "Order By DATEADD(MINUTE, DATEDIFF(MINUTE, 0, T.DataDate) / 1 * 1, 0) desc";
+                            " DATEADD(MINUTE, DATEDIFF(MINUTE, 0, T.DataDate) / 1 * 1, 0) As DataDate,"+
+                            " MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume,"+
+                            " (Select T1.OpenVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As OpenVal,"+
+                            " (Select T1.CloseVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As CloseVal From TradeData T"+
+                            " Where PairId In (Select TM.Id From TradePairMaster TM) And DataDate = {0}" +
+                            " GROUP BY DATEADD(MINUTE, DATEDIFF(MINUTE, 0, T.DataDate) / 1 * 1, 0),PairId"+
+                            " Order By DATEADD(MINUTE, DATEDIFF(MINUTE, 0, T.DataDate) / 1 * 1, 0) desc";
 
                 //Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
                 //string MinuteData = Minute.ToString("yyyy-MM-dd HH:mm:00:000");
-
+                Interval = "2018-10-11 23:06:00";
                 Result = _dbContext.GetGraphResponseByPair.FromSql(Query, Interval);
                 return Result.ToList();
             }

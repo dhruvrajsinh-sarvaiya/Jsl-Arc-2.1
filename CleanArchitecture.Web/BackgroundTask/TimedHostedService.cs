@@ -54,7 +54,8 @@ namespace CleanArchitecture.Web.BackgroundTask
             //SendData.DataObj = JsonConvert.SerializeObject(CommonData);
             //_mediator.Send(SendData).Wait();
             DateTime dt = Helpers.UTC_To_IST();
-            _signalRService.ChartDataEveryLastMin(Helpers.UTC_To_IST());
+            dt = dt.AddMinutes(-1);
+            _signalRService.ChartDataEveryLastMin(dt);
             _logger.LogInformation("Timed Background Service for ChartData is working.");
         }
 
