@@ -3734,14 +3734,16 @@ namespace CleanArchitecture.Web.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Wallet.WithdrawHistory", b =>
                 {
-                    b.Property<string>("TrnID");
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(100);
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("APITopUpRefNo")
                         .IsRequired()
                         .HasMaxLength(50);
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(100);
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18, 8)");
@@ -3753,10 +3755,6 @@ namespace CleanArchitecture.Web.Migrations
                     b.Property<long>("CreatedBy");
 
                     b.Property<DateTime>("CreatedDate");
-
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<short>("IsProcessing");
 
@@ -3783,6 +3781,9 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<DateTime>("TrnDate");
 
+                    b.Property<string>("TrnID")
+                        .HasMaxLength(1000);
+
                     b.Property<long>("TrnNo");
 
                     b.Property<long?>("UpdatedBy");
@@ -3807,9 +3808,7 @@ namespace CleanArchitecture.Web.Migrations
                         .IsRequired()
                         .HasMaxLength(50);
 
-                    b.HasKey("TrnID", "Address");
-
-                    b.HasAlternateKey("Address", "TrnID");
+                    b.HasKey("Id");
 
                     b.ToTable("WithdrawHistory");
                 });
