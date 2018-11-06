@@ -10,10 +10,13 @@ namespace CleanArchitecture.Core.Entities.Wallet
     public class WithdrawHistory :BizBase
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
         public new long Id { get; set; }
 
         //public long AutoNo { get; set; }
-        [Key]
+        //[Key] removing due to bit go id is very large not support pk 
+
+        [StringLength(1000)]
         public string TrnID { get; set; }
 
         [Required]
@@ -24,7 +27,7 @@ namespace CleanArchitecture.Core.Entities.Wallet
        // [StringLength(50)]
         public long Wallet { get; set; }
 
-        [Key]
+        //[Key]
         [StringLength(100)]
         public string Address { get; set; }
         //public short Status { get; set; }
