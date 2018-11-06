@@ -463,7 +463,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                 Inner Join TradePairDetail TPD ON TPD.PairId = TPM.Id
                                 Inner Join TradePairStastics TPS ON TPS.PairId = TPM.Id
                                 Inner Join ServiceMaster SM1 ON SM1.Id = TPM.BaseCurrencyId
-                                Inner Join ServiceMaster SM2 ON SM2.Id = TPM.SecondaryCurrencyId Order By M.ID");
+                                Inner Join ServiceMaster SM2 ON SM2.Id = TPM.SecondaryCurrencyId Where TPM.Status = 1  Order By M.ID");
                 
                 return Result.ToList();
             }
@@ -489,7 +489,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                             ISNULL((Select STM.Status From ServiceTypeMapping STM Where STM.ServiceId = SM.Id and TrnType = 8),0) DepositBit
                             From ServiceMaster SM
                             Inner Join ServiceDetail SD On SD.ServiceId = SM.Id
-                            Inner Join ServiceStastics SS On SS.ServiceId = SM.Id");
+                            Inner Join ServiceStastics SS On SS.ServiceId = SM.Id Where SM.Status = 1");
 
                 return Result.ToList();
             }
