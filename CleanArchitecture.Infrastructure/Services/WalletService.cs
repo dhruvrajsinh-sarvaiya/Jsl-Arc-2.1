@@ -1556,7 +1556,8 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                DepositHistoryResponse response = _walletRepository1.DepositHistoy(FromDate, ToDate, Coin, Amount, Status, Userid);
+                DateTime newTodate = ToDate.AddHours(23).AddMinutes(59).AddSeconds(59);
+                DepositHistoryResponse response = _walletRepository1.DepositHistoy(FromDate, newTodate, Coin, Amount, Status, Userid);
                 return response;
             }
             catch (Exception ex)
@@ -1571,7 +1572,10 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                DepositHistoryResponse response = _walletRepository1.WithdrawalHistoy(FromDate, ToDate, Coin, Amount, Status, Userid);
+                DateTime NewTodate = ToDate.AddHours(23);
+                NewTodate = NewTodate.AddMinutes(59);
+                NewTodate = NewTodate.AddSeconds(59);
+                DepositHistoryResponse response = _walletRepository1.WithdrawalHistoy(FromDate, NewTodate, Coin, Amount, Status, Userid);
                 return response;
             }
             catch (Exception ex)
@@ -2538,7 +2542,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 Response.BizResponseObj.ReturnMsg = EnResponseMessage.InvalidWallet;
                 return Response;
             }
-            var wl = _walletRepository1.GetWalletLedger(FromDate, ToDate, wallet.Id, page);
+            DateTime newToDate = ToDate.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var wl = _walletRepository1.GetWalletLedger(FromDate, newToDate, wallet.Id, page);
             if (wl.Count() == 0)
             {
                 Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;
@@ -2888,7 +2893,8 @@ namespace CleanArchitecture.Infrastructure.Services
                         return Response;
                     }
                 }
-                var Histories = _walletRepository1.ConvertFundHistory(Userid, FromDate, ToDate, Coin);
+                DateTime newTodate = ToDate.AddHours(23).AddMinutes(59).AddSeconds(59);
+                var Histories = _walletRepository1.ConvertFundHistory(Userid, FromDate, newTodate, Coin);
                 if (Histories.Count() == 0 || Histories == null)
                 {
                     Response.BizResponseObj.ErrorCode = enErrorCode.NotFound;

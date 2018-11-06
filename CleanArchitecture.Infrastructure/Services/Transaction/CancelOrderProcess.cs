@@ -73,11 +73,11 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _Resp.ReturnMsg = "Can not initiate Cancellation Request.Your order is fully executed";
                         return _Resp;
                     }
-                    TradeTranQueueObj.IsCancelled = 1;
-                    _TradeTransactionRepository.Update(TradeTranQueueObj);
+                    //TradeTranQueueObj.IsCancelled = 1;
+                    //_TradeTransactionRepository.Update(TradeTranQueueObj);
 
                     var HoldTrnNosNotExec = new List<long> { };
-                    _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, NewBuyRequestObj, ref HoldTrnNosNotExec);
+                    _Resp = await _SettlementRepository.PROCESSSETLLEMENT(_Resp, NewBuyRequestObj, ref HoldTrnNosNotExec, accessToken,1);
                 }
                 else
                 {

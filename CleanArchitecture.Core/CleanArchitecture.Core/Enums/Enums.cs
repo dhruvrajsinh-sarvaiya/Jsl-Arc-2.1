@@ -204,6 +204,8 @@ namespace CleanArchitecture.Core.Enums
         CancelOrder_OrderalreadyCancelled= 4638,
         CancelOrder_YourOrderInProcessMode = 4639,
         CancelOrder_Yourorderfullyexecuted= 4640,
+        CancelOrder_InvalidDeliveryamount = 4640,
+        CancelOrder_InsertSuccess = 4643,
         ProcessTrn_APICallInternalError = 4641,
         //=======================
         //=====================MyAccount
