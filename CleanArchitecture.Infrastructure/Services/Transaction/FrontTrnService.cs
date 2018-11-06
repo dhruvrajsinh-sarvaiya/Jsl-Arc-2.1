@@ -362,9 +362,16 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 decimal Volume24 = 0, ChangePer = 0, High24Hr = 0, Low24Hr = 0, WeekHigh = 0,WeekLow =0,Week52High=0,Week52Low=0;
                 short UpDownBit = 0;
                 decimal tradeprice = 0, todayopen, todayclose;
+                var tradedtatstatus = _tradeTransactionQueueRepository.GetSingle(x => x.TrnNo == TrnNo);
+                if( tradedtatstatus != null)
+                {
+                    HelperForLog.WriteLogIntoFile("#GetPairAdditionalVal# #TradeStatus# " + " #TrnNo# :" + TrnNo + " #BidPrice# : " + tradedtatstatus.BidPrice + " #AskPrice# : " + tradedtatstatus.AskPrice + " #Status# : " + tradedtatstatus.Status, "FrontService", "Object Data : ");
+                }
                 var tradedata = _tradeTransactionQueueRepository.GetSingle(x => x.TrnDate > _basePage.UTC_To_IST().AddDays(-1) && x.PairID == PairId && x.Status == 1);
+              
                 if (tradedata != null)
                 {
+                    HelperForLog.WriteLogIntoFile("#GetPairAdditionalVal# #CHANGEPER# #Count# : 1 " + " #TrnNo# :" + TrnNo + " #BidPrice# : " + tradedata.BidPrice + " #AskPrice# : " + tradedata.AskPrice, "FrontService", "Object Data : ");
                     if (tradedata.TrnType == 4)
                     {
                         tradeprice = tradedata.BidPrice;
@@ -390,11 +397,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 //Calculate Volume24
                 tradeprice = 0;
                 decimal tradeqty = 0, sum = 0;
-                var tradedata1 = _tradeTransactionQueueRepository.FindBy(x => x.TrnDate >= _basePage.UTC_To_IST().AddDays(-1) && x.TrnDate <= DateTime.Now && x.PairID == PairId && x.Status == 1 && (x.TrnType == 4 || x.TrnType == 5));
+                var tradedata1 = _tradeTransactionQueueRepository.FindBy(x => x.TrnDate >= _basePage.UTC_To_IST().AddDays(-1) && x.TrnDate <= _basePage.UTC_To_IST() && x.PairID == PairId && x.Status == 1 && (x.TrnType == 4 || x.TrnType == 5));
                 if (tradedata1 != null)
                 {
+
                     foreach (var trade in tradedata1)
                     {
+                        HelperForLog.WriteLogIntoFile("#GetPairAdditionalVal# #VolumeData#  " + " #TrnNo# :" + trade.TrnNo + " #BidPrice# : " + trade.BidPrice + " #AskPrice# : " + trade.AskPrice, "FrontService", "Object Data : ");
                         if (trade.TrnType == 4)
                         {
                             tradeprice = trade.BidPrice;
@@ -419,6 +428,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     Volume24 = 0;
                 }
 
+                HelperForLog.WriteLogIntoFile("#GetPairAdditionalVal# " + " #VolumeData :" + Volume24 + " #ChangePer# : " + ChangePer, "FrontService", "Object Data : ");
 
                 //Insert In GraphDetail Only BidPrice
                 var DataDate = _basePage.UTC_To_IST();
