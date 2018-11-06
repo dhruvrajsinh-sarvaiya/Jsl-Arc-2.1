@@ -1444,11 +1444,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (!string.IsNullOrEmpty(Token))
                 {
                     _signalRService.SendActivityNotification(msg, Token);
+                    HelperForLog.WriteLogIntoFile("GetWalletCreditNew:With Token", "WalletService", "Token=" + Token + "WalletID" + walletMasterObj.AccWalletID + ",Balance" + walletMasterObj.Balance.ToString());
                     _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
                 }
                 else
                 {
                     _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);
+                    HelperForLog.WriteLogIntoFile("GetWalletCreditNew:Without Token", "WalletService", "UserID=" + cWalletobj.UserID.ToString() + "WalletID" + walletMasterObj.AccWalletID + ",Balance" + walletMasterObj.Balance.ToString());
                     _signalRService.OnWalletBalChange(walletMasterObj, coinName, cWalletobj.UserID.ToString(), 2);
                 }
 
