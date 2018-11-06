@@ -628,23 +628,23 @@ namespace CleanArchitecture.Infrastructure.Services
                     {
                         BuySellmodel.Price = NewTradeTransaction.BidPrice;
                         BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                        HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "BuyerBook call TRNNO:");
+                        HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "BuyerBook call TRNNO:" + Newtransaction.Id);
                     }
                     else//Sell
                     {
                         BuySellmodel.Price = NewTradeTransaction.AskPrice;
                         SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                        HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "SellerBook call TRNNO:");
+                        HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, "SellerBook call TRNNO:" + Newtransaction.Id);
                     }
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Recent Order Socket call ");
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Recent Order Socket call TRNNO:" + Newtransaction.Id);
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType,1);//update OpenOrder
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Open Order Socket call ");
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Open Order Socket call TRNNO:" + Newtransaction.Id);
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     OrderHistory(historyInfo, historyInfo.PairName);//Order
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  : TrnType :" +Newtransaction .TrnType +" : Amount :"+ Newtransaction.Amount.ToString());
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Order History Socket call  : TRNNO:" + Newtransaction.Id);
                     TradeHistory(historyInfo, Token);//TradeHistory
-                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  : STATUS " + Newtransaction.Status.ToString());
+                    HelperForLog.WriteLogIntoFile("OnStatusSuccess", ControllerName, " Aftre Trade History Socket call  : TRNNO:" + Newtransaction.Id);
                     var msg = EnResponseMessage.SignalRTrnSuccessfullySettled;
                     msg = msg.Replace("#Price#", historyInfo.Price.ToString());
                     msg = msg.Replace("#Qty#", historyInfo.Amount.ToString());
@@ -684,7 +684,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         {
                             
                             BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "BuyerBook call TRNNO:");
+                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "BuyerBook call TRNNO:" + Newtransaction.Id);
                         }
                     }
                     else//Sell
@@ -699,7 +699,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         if (BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
                         {
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "SellerBook call TRNNO:");
+                            HelperForLog.WriteLogIntoFile("OnStatusPartialSuccess", ControllerName, "SellerBook call TRNNO:" + Newtransaction.Id);
                         }
                     }
                 }   
@@ -738,7 +738,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         if (BuySellmodel.OrderId .ToString()!= "00000000-0000-0000-0000-000000000000")
                         {
                             BuyerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "BuyerBook call TRNNO:" + Newtransaction.Id );
+                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "BuyerBook call TRNNO:" + Newtransaction.Id +" Pair :"+ NewTradeTransaction.PairName);
                         }
                         
                     }
@@ -753,7 +753,7 @@ namespace CleanArchitecture.Infrastructure.Services
                         if(BuySellmodel.OrderId.ToString() != "00000000-0000-0000-0000-000000000000")
                         {
                             SellerBook(BuySellmodel, NewTradeTransaction.PairName);
-                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "SellerBook call TRNNO:" + Newtransaction.Id );
+                            HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, "SellerBook call TRNNO:" + Newtransaction.Id + " Pair :" + NewTradeTransaction.PairName);
                         }
                         
                     }
@@ -763,9 +763,9 @@ namespace CleanArchitecture.Infrastructure.Services
                     //ActivityNotification(msg, Token);
                    
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
-                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Open Order Socket call  :");
+                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Open Order Socket call  TRNNO:" + Newtransaction.Id);
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);
-                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Recent Order Socket call  :" );
+                    HelperForLog.WriteLogIntoFile("OnStatusHold", ControllerName, " Aftre Recent Order Socket call  TRNNO:" + Newtransaction.Id);
                 }
             }
             catch (Exception ex)
@@ -791,12 +791,12 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (!string.IsNullOrEmpty(Token))
                 {
                     GetAndSendOpenOrderData(Newtransaction, NewTradeTransaction,Token, OrderType, 1);//with amount 0, remove from OpenOrder
-                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Open Order Socket call ");
+                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Open Order Socket call : TRNNO:" + Newtransaction.Id);
                     GetAndSendRecentOrderData(Newtransaction, NewTradeTransaction,Token, OrderType);//Update Recent
-                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Recent Order Socket call ");
+                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Recent Order Socket call : TRNNO:" + Newtransaction.Id);
                     historyInfo = GetAndSendTradeHistoryInfoData(Newtransaction, NewTradeTransaction, OrderType);
                     TradeHistory(historyInfo, Token);//TradeHistory
-                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Trade History Socket call  :");
+                    HelperForLog.WriteLogIntoFile("OnStatusCancel", ControllerName, " Aftre Trade History Socket call : TRNNO:" + Newtransaction.Id);
                 } 
             }
             catch (Exception ex)
