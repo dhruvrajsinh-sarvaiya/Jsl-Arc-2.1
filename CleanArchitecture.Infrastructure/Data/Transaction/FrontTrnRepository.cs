@@ -338,7 +338,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                    "MAX(T.High) As High, MIN(T.Low) As Low, SUM(T.Volume) As Volume," +
                                    "(Select T1.OpenVal From TradeData T1 Where T1.TranNo = MIN(T.TranNo)) As OpenVal," +
                                    "(Select T1.CloseVal From TradeData T1 Where T1.TranNo = MAX(T.TranNo)) As CloseVal From TradeData T" +
-                                   " Where PairId = {0} GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
+                                   " Where PairId = {0} And DATEADD(MINUTE, DATEDIFF(MINUTE, 0, T.DataDate) / 1 * 1, 0) > DATEADD(Day,-30,dbo.GetISTDate()) GROUP BY DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0)" +
                                    " Order By DATEADD(#IntervalData#, DATEDIFF(#IntervalData#, 0, T.DataDate) / #IntervalTime# * #IntervalTime#, 0) desc";
 
                     Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
