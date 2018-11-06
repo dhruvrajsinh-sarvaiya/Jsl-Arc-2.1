@@ -90,7 +90,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                 string Qry = "Select TTQ.TrnNo,TSL.ordertype,TTQ.PairName,TTQ.PairId,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type, " +
                         "ISNULL((CASE WHEN TTQ.BidPrice = 0 THEN TTQ.AskPrice WHEN TTQ.AskPrice = 0 THEN TTQ.BidPrice END),0) as Price, "+
-                        "ISNULL((CASE WHEN TTQ.TrnType = 4 THEN TTQ.SettledBuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SettledSellQty END),0) as Qty, "+
+                        "ISNULL((CASE WHEN TTQ.Status =1 AND TTQ.TrnType=4 THEN TTQ.SettledBuyQty WHEN TTQ.Status=1 AND TTQ.TrnType=5 THEN TTQ.SettledSellQty WHEN TTQ.Status =4 AND TTQ.TrnType=4 THEN TTQ.BuyQty WHEN TTQ.Status=4 AND TTQ.TrnType=5 THEN TTQ.SellQty END),0) as Qty, " +
                         "TTQ.TrnDate as DateTime,TTQ.Status from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id = TTQ.TrnNo INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id " +
                         "WHERE TTQ.MemberID ={0} AND TTQ.Status in ({1},{2}) AND TQ.TrnDate > DATEADD(HOUR, -24, getdate()) "+ sCondition +
                         "UNION ALL Select TTQ.TrnNo,TSL.ordertype,TTQ.PairName,TTQ.PairId,CASE WHEN TTQ.TrnType = 4 THEN 'BUY' WHEN TTQ.TrnType = 5 THEN 'SELL' END as Type, " +
@@ -180,7 +180,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     {
                         qry = @"Select TTQ.TrnNo,TSL.ordertype,CASE WHEN TTQ.TrnType=4 THEN 'BUY' WHEN TTQ.TrnType=5 THEN 'SELL' END as Type," +
                                " ISNULL((CASE WHEN TTQ.BidPrice=0 THEN TTQ.AskPrice WHEN TTQ.AskPrice=0 THEN TTQ.BidPrice END),0) as Price," +
-                                "ISNULL((CASE WHEN TTQ.TrnType = 4  THEN TTQ.BuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SellQty END),0) as Amount,TTQ.TrnDate as DateTime," +
+                                "ISNULL((CASE WHEN TTQ.TrnType = 4 THEN TTQ.BuyQty WHEN TTQ.TrnType = 5 THEN TTQ.SellQty END),0) as Amount,TTQ.TrnDate as DateTime," +
                                 "TTQ.Status,TTQ.StatusMsg as StatusText,TP.PairName,ISNULL(TQ.ChargeRs,0)as ChargeRs,TTQ.IsCancelled " +
                                 "from TradeTransactionQueue TTQ INNER JOIN TransactionQueue TQ ON TQ.Id=TTQ.TrnNo INNER JOIN TradePairMaster TP ON TP.Id =TTQ.PairID  INNER JOIN TradeStopLoss TSL ON TSL.TrnNo =TQ.Id " +
                                 "WHERE " + sCondition + "AND TTQ.Status in(" + Convert.ToInt16(enTransactionStatus.Success) + "," + Convert.ToInt16(enTransactionStatus.OperatorFail) +
