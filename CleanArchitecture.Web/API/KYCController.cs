@@ -134,7 +134,8 @@ namespace CleanArchitecture.Web.API
                     string folderDirctory = model.UserId.ToString();
                     //string webRootPath = _hostingEnvironment.WebRootPath;
                     string webRootPath = _configuration["KYCImagePath"].ToString();
-                    string newPath = Path.Combine(webRootPath, folderDirctory);
+                    //string newPath = Path.Combine(webRootPath, folderDirctory);
+                    string newPath = webRootPath+"/"+folderDirctory;
                     if (!Directory.Exists(newPath))
                     {
                         Directory.CreateDirectory(newPath);
@@ -145,7 +146,7 @@ namespace CleanArchitecture.Web.API
                     string fileName = ContentDispositionHeaderValue.Parse(postedFile.ContentDisposition).FileName.Trim('"');
                     //fileName = postedFile.FileName;
                     //string fullPath = Path.Combine(newPath, fileName);
-                    string fullPath = newPath + "//" + fileName;
+                    string fullPath = newPath + "/" + fileName;
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
                         // postedFile.CopyTo(stream);
@@ -161,15 +162,15 @@ namespace CleanArchitecture.Web.API
 
                     if (file.Name == "Front")
                     {
-                        model.FrontImage = fileName;
+                        model.FrontImage = fullPath;
                     }
                     if (file.Name == "Back")
                     {
-                        model.BackImage = fileName;
+                        model.BackImage = fullPath;
                     }
                     if (file.Name == "Selfie")
                     {
-                        model.SelfieImage = fileName;
+                        model.SelfieImage = fullPath;
                     }
 
                 }
