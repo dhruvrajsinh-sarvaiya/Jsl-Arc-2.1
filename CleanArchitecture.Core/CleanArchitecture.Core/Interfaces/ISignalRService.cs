@@ -17,6 +17,7 @@ namespace CleanArchitecture.Core.Interfaces
         void SellerBook(GetBuySellBook Data, string Pair);
         void OrderHistory(GetTradeHistoryInfo Data, string Pair);
         void ChartData(GetGraphDetailInfo Data, string Pair);
+        Task ChartDataEveryLastMin(DateTime DateTime);
         void MarketData(MarketCapData Data, string Pair);
         void LastPrice(LastPriceViewModel Data,string Pair);
 

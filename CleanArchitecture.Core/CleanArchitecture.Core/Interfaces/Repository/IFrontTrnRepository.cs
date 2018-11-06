@@ -20,5 +20,6 @@ namespace CleanArchitecture.Core.Interfaces.Repository
         PairRatesResponse GetPairRates(long PairId);
         List<TradePairTableResponse> GetTradePairAsset();
         List<ServiceMasterResponse> GetAllServiceConfiguration();
+        List<GetGraphResponsePairWise> GetGraphDataEveryLastMin(string Interval);
     }
 }

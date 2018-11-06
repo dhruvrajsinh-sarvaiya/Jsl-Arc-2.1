@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities.Communication;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
+using CleanArchitecture.Core.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -17,11 +18,13 @@ namespace CleanArchitecture.Web.BackgroundTask
         private Timer _timer;
         private Timer _timerForChart;
         private readonly IMediator _mediator;
+        private readonly ISignalRService _signalRService;
 
-        public TimedHostedService(ILogger<TimedHostedService> logger, IMediator mediator)
+        public TimedHostedService(ILogger<TimedHostedService> logger, IMediator mediator, ISignalRService signalRService)
         {
             _logger = logger;
             _mediator = mediator;
+            _signalRService = signalRService;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -50,6 +53,8 @@ namespace CleanArchitecture.Web.BackgroundTask
             //SendData.Method = enMethodName.ChartData;
             //SendData.DataObj = JsonConvert.SerializeObject(CommonData);
             //_mediator.Send(SendData).Wait();
+            DateTime dt = Helpers.UTC_To_IST();
+            _signalRService.ChartDataEveryLastMin(Helpers.UTC_To_IST());
             _logger.LogInformation("Timed Background Service for ChartData is working.");
         }
 

@@ -141,4 +141,14 @@ namespace CleanArchitecture.Core.ApiModels
         public short DepositBit { get; set; }
 
     }
+    public class GetGraphResponsePairWise
+    {
+        public DateTime DataDate { get; set; }
+        public decimal High { get; set; }
+        public decimal Low { get; set; }
+        public decimal OpenVal { get; set; }
+        public decimal CloseVal { get; set; }
+        public decimal Volume { get; set; }
+        public string PairName { get; set; }
+    }
 }

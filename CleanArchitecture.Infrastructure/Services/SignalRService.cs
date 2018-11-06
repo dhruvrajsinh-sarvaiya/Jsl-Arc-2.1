@@ -151,6 +151,33 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
 
+        public async Task ChartDataEveryLastMin(DateTime DateTime)
+        {
+            try
+            {
+                List<GetGraphResponsePairWise> GraphResponsesList = new List<GetGraphResponsePairWise>();
+                GraphResponsesList = _frontTrnRepository.GetGraphDataEveryLastMin(DateTime.ToString("yyyy-MM-dd HH:mm:00:000"));
+                foreach(GetGraphResponsePairWise GraphData in GraphResponsesList)
+                {
+                    GetGraphDetailInfo GraphDetailInfo = new GetGraphDetailInfo();
+                    GraphDetailInfo.Close = GraphData.CloseVal;
+                    GraphDetailInfo.High = GraphData.High;
+                    GraphDetailInfo.Open = GraphData.OpenVal;
+                    GraphDetailInfo.Low = GraphData.Low;
+                    DateTime dt2 = new DateTime(1970, 1, 1);
+                    GraphDetailInfo.DataDate = Convert.ToInt64(GraphData.DataDate.Subtract(dt2).TotalMilliseconds);
+                    GraphDetailInfo.Volume = GraphData.Volume;
+                    GraphDetailInfo.Close = GraphData.CloseVal;
+                    ChartData(GraphDetailInfo, GraphData.PairName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                //throw ex;
+            }
+        }
+
         public void MarketData(MarketCapData Data, string Pair)
         {
             try
