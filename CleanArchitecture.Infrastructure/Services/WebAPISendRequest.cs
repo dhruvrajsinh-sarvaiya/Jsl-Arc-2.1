@@ -203,13 +203,20 @@ namespace CleanArchitecture.Infrastructure.Services
                 }
                 catch(WebException webex)
                 {
-                    WebResponse errResp = webex.Response;
-                    Stream respStream = errResp.GetResponseStream();
-                    StreamReader reader = new StreamReader(respStream);
-                    string Text = reader.ReadToEnd();                   
-                    if (Text.ToLower().Contains("code"))
+                    if(webex.Response!=null)
                     {
-                        WSResponse = Text;
+                        WebResponse errResp = webex.Response;
+                        Stream respStream = errResp.GetResponseStream();
+                        StreamReader reader = new StreamReader(respStream);
+                        string Text = reader.ReadToEnd();
+                        if (Text.ToLower().Contains("code"))
+                        {
+                            WSResponse = Text;
+                        }
+                    }
+                    else
+                    {
+                        WSResponse = webex.Message;
                     }
                     webex = null;
 
