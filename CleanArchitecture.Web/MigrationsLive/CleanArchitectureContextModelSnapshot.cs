@@ -15,7 +15,7 @@ namespace CleanArchitecture.Web.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -3793,9 +3793,7 @@ namespace CleanArchitecture.Web.Migrations
 
                     b.Property<decimal>("Value");
 
-                    b.Property<string>("Wallet")
-                        .IsRequired()
-                        .HasMaxLength(50);
+                    b.Property<long>("Wallet");
 
                     b.Property<string>("confirmedTime")
                         .IsRequired()
