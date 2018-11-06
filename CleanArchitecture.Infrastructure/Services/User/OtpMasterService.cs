@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
@@ -22,11 +23,12 @@ namespace CleanArchitecture.Infrastructure.Services.User
         private readonly IMessageRepository<OtpMaster> _customRepository;
         private readonly IRegisterTypeService _registerTypeService;
         private readonly IMediator _mediator;
+        private readonly IMessageConfiguration _messageConfiguration;
         public OtpMasterService(
             CleanArchitectureContext dbContext, IUserService userService,
             //ICustomRepository<OtpMaster> customRepository,
             IMessageRepository<OtpMaster> customRepository,
-        IRegisterTypeService registerTypeService, IMediator mediator)
+        IRegisterTypeService registerTypeService, IMediator mediator, IMessageConfiguration messageConfiguration)
         {
             _dbContext = dbContext;
             _userService = userService;
@@ -34,6 +36,7 @@ namespace CleanArchitecture.Infrastructure.Services.User
             //_customRepository = customRepository;
             _registerTypeService = registerTypeService;
             _mediator = mediator;
+            _messageConfiguration = messageConfiguration;
         }
 
         public async Task<OtpMasterViewModel> AddOtp(int UserId, string Email = null, string Mobile = null)
@@ -84,9 +87,28 @@ namespace CleanArchitecture.Infrastructure.Services.User
             {
                 SendEmailRequest request = new SendEmailRequest();
                 request.Recepient = Email;
-                request.Subject = EnResponseMessage.LoginEmailSubject;
-                request.Body = EnResponseMessage.SendMailBody + numeric;
+               // request.Subject = EnResponseMessage.LoginEmailSubject;
+               // request.Body = EnResponseMessage.SendMailBody + numeric;
+               
+
+
+                IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.LoginWithOTP), 0);
+                foreach (TemplateMasterData Provider in Result)
+                {
+                    Provider.Content = Provider.Content.Replace("###USERNAME###", string.Empty);
+                    Provider.Content = Provider.Content.Replace("###Password###", numeric);
+                    //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                    //foreach (string s in splitedarray)
+                    //{
+
+                    //}
+                    request.Body = Provider.Content;
+                    request.Subject = Provider.AdditionalInfo;
+                }
+
                 await _mediator.Send(request);
+
+
             }
             if (!String.IsNullOrEmpty(Mobile))
             {

@@ -207,13 +207,6 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     SellerList.IsProcessing = 1;
                     _TradeSellerList.Update(SellerList);
                     var PoolMst = _TradePoolMaster.GetById(SellerList.PoolID);
-
-                    //====================take always latest object from DB 
-                    //==========as if txn not commit so dbnot change and object value changes , so take object value from DB
-                    TradeBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
-                    TransactionQueueObj = _TransactionRepository.GetById(TradeBuyRequestObj.TrnNo);
-                    TradeTransactionQueueObj = _TradeTransactionRepository.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
-                    TradeBuyerListObj = _TradeBuyerList.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
                     //====================================Partial SETTLEMENT TO MEMBER
                     if (SellerList.RemainQty < TradeBuyRequestObj.PendingQty)
                     {
@@ -283,7 +276,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                             //Continuew as record Partially settled
                             try
                             {
-                                _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal                                                                                                                                                                                                                //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)
+                                _ISignalRService.OnStatusPartialSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal                                                                                                                                                                                                                //(short Status, TransactionQueue Newtransaction, TradeTransactionQueue NewTradeTransaction, string Token, short OrderType, short IsPartial=0)                                
                             }
                             catch (Exception ex)
                             {
@@ -379,6 +372,9 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                 else
                                     _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty);
 
+                                EmailSendAsync(TradeBuyRequestObj.UserID.ToString(), Convert.ToInt16(enTransactionStatus.Success), TradeTransactionQueueObj.PairName,
+                                       TradeTransactionQueueObj.PairName.Split("_")[1], TradeTransactionQueueObj.TrnDate.ToString(),
+                                       TradeTransactionQueueObj.DeliveryTotalQty, TradeTransactionQueueObj.OrderTotalQty, 0);
                             }
                             catch (Exception ex)
                             {
@@ -390,24 +386,22 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                         
                         break;//record settled
                     }
-                    var newSellerList = _TradeSellerList.GetById(SellerList.Id);
-                    //SellerList.IsProcessing = 0;//Release Seller List
-                    newSellerList.IsProcessing = 0;//Release Seller List
-                    _TradeSellerList.Update(newSellerList);
+                    //====================take always latest object from DB 
+                    //==========as if txn not commit so dbnot change and object value changes , so take object value from DB
+                    _dbContext.Entry(TradeBuyRequestObj).Reload();
+                    _dbContext.Entry(TransactionQueueObj).Reload();
+                    _dbContext.Entry(TradeTransactionQueueObj).Reload();
+                    _dbContext.Entry(TradeBuyerListObj).Reload();                   
+                    _dbContext.Entry(SellerList).Reload();
 
+                    SellerList.IsProcessing = 0;//Release Seller List                    
+                    _TradeSellerList.Update(SellerList);
                 }
-                //as object may rollback so object value has wrong value
-                var NewTradeBuyRequestObj = _TradeBuyRequest.GetSingle(item=>item.TrnNo==TradeBuyRequestObj.TrnNo);
-                //TradeBuyRequestObj.IsProcessing = 0;//Release Buy Order
-                NewTradeBuyRequestObj.IsProcessing = 0;//Release Buy Order
-                //_TradeBuyRequest.Update(TradeBuyRequestObj);
-                _TradeBuyRequest.Update(NewTradeBuyRequestObj);
+                TradeBuyRequestObj.IsProcessing = 0;//Release Buy Order             
+                _TradeBuyRequest.Update(TradeBuyRequestObj);
 
-                var NewTradeBuyerListObj = _TradeBuyerList.GetSingle(item => item.TrnNo == TradeBuyRequestObj.TrnNo);
-                NewTradeBuyerListObj.IsProcessing = 0;
-                _TradeBuyerList.Update(NewTradeBuyerListObj);
-                //TradeBuyerListObj.IsProcessing = 0;
-                //_TradeBuyerList.Update(TradeBuyerListObj);
+                TradeBuyerListObj.IsProcessing = 0;
+                _TradeBuyerList.Update(TradeBuyerListObj);
                 if (TrackBit==0)//No any record Process
                 {
                     _Resp.ErrorCode = enErrorCode.Settlement_NoSettlementRecordFound;
@@ -469,7 +463,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     User = await _userManager.FindByIdAsync(UserID);
                     if (!string.IsNullOrEmpty(User.Email))
                     {
-                        IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.Registration), 0);
+                        IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.TransactionSuccess), 0);
                         foreach (TemplateMasterData Provider in Result)
                         {
                             Provider.Content = Provider.Content.Replace("###USERNAME###", User.Name);

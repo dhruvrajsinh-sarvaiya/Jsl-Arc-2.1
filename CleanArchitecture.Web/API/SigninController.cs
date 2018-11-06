@@ -28,6 +28,8 @@ using System.Text;
 using TwoFactorAuthNet;
 using CleanArchitecture.Core.Interfaces.Log;
 using CleanArchitecture.Core.ViewModels.AccountViewModels.Log;
+using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.ApiModels;
 
 namespace CleanArchitecture.Web.API
 {
@@ -53,12 +55,14 @@ namespace CleanArchitecture.Web.API
         private readonly IipHistory _iipHistory;
         private ApplicationUser _ApplicationUser;
         private readonly ILoginHistory _loginHistory;
+        private readonly IMessageConfiguration _messageConfiguration;
 
         #endregion
 
         #region Ctore
         public SigninController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IMediator mediator, IUserService userService, IOtpMasterService otpMasterService, Microsoft.Extensions.Configuration.IConfiguration configuration, IBasePage basePage,
-            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService, IUserKeyMasterService userKeyMasterService, IipHistory iipHistory, ILoginHistory loginHistory)
+            EncyptedDecrypted encypted, ICustomPassword custompassword, ITempUserRegisterService tempUserRegisterService, IUserKeyMasterService userKeyMasterService, IipHistory iipHistory, ILoginHistory loginHistory,
+            IMessageConfiguration messageConfiguration)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -74,6 +78,7 @@ namespace CleanArchitecture.Web.API
             _userKeyMasterService = userKeyMasterService;
             _iipHistory = iipHistory;
             _loginHistory = loginHistory;
+            _messageConfiguration = messageConfiguration;
         }
         #endregion
 
@@ -481,6 +486,7 @@ namespace CleanArchitecture.Web.API
                 }
 
                 var user = await _userManager.FindByEmailAsync(model.Email);
+              
                 if (user != null)
                 {
                     var otpData = await _otpMasterService.AddOtp(user.Id, user.Email, "");
@@ -1384,6 +1390,7 @@ namespace CleanArchitecture.Web.API
                 string UserDetails = JsonConvert.SerializeObject(ResetPassword);
                 string SubScriptionKey = EncyptedDecrypted.Encrypt(UserDetails, passwordBytes);
 
+                string name = currentUser.FirstName;
 
 
                 //string ctokenlink = Url.Action("resetpassword", "Signin", new
@@ -1395,12 +1402,37 @@ namespace CleanArchitecture.Web.API
                 byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);
                 string ctokenlink = _configuration["ResetPaswword"].ToString() + Convert.ToBase64String(plainTextBytes);
 
-                var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">" + EnResponseMessage.ResetEmailMessage + "</a>";
+
+
+
+
+
+
+
+                //   var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">" + EnResponseMessage.ResetEmailMessage + "</a>";
 
                 SendEmailRequest request = new SendEmailRequest();
                 request.Recepient = model.Email;
-                request.Subject = EnResponseMessage.ForgotPasswordMail;
-                request.Body = confirmationLink;
+               // request.Subject = EnResponseMessage.ForgotPasswordMail;
+                //  request.Body = confirmationLink;
+
+
+
+                IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.Registration), 0);
+                foreach (TemplateMasterData Provider in Result)
+                {
+
+                    //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                    //foreach (string s in splitedarray)
+                    //{
+                    Provider.Content = Provider.Content.Replace("###Link###", ctokenlink);
+                    Provider.Content = Provider.Content.Replace("###USERNAME###", name);
+                    //}
+                    request.Body = Provider.Content;
+                    request.Subject = Provider.AdditionalInfo;
+                }
+
+                //CommunicationResponse Response = await _mediator.Send(request);
 
                 await _mediator.Send(request);
 
@@ -1529,8 +1561,26 @@ namespace CleanArchitecture.Web.API
                         {
                             SendEmailRequest request = new SendEmailRequest();
                             request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.ResetPasswordMail;
-                            request.Body = EnResponseMessage.EmailNewPassword + " : " + model.Password;
+                           // request.Subject = EnResponseMessage.ResetPasswordMail;
+                            //request.Body = EnResponseMessage.EmailNewPassword + " : " + model.Password;
+
+
+                            IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.ResetPassword), 0);
+                            foreach (TemplateMasterData Provider in Result)
+                            {
+
+                                //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                                //foreach (string s in splitedarray)
+                                //{
+                                Provider.Content = Provider.Content.Replace("###USERNAME###", user.FirstName);
+                                Provider.Content = Provider.Content.Replace("###Password###", model.Password);
+                                //}
+                                request.Body = Provider.Content;
+                                request.Subject = Provider.AdditionalInfo;
+                            }
+
+
+
 
                             await _mediator.Send(request);
                             return Ok(new ResetPassWordResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.ResetResendEmail });

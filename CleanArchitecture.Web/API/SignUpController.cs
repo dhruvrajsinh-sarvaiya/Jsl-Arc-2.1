@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Primitives;
+using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
@@ -49,11 +50,12 @@ namespace CleanArchitecture.Web.API
         private readonly IBasePage _basePage;
         private readonly IWalletService _IwalletService;
         private readonly ISubscriptionMaster _IsubscriptionMaster;
+        private readonly IMessageConfiguration _messageConfiguration;
         #endregion
 
         #region Ctore
-        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService, Microsoft.Extensions.Configuration.IConfiguration configuration, 
-            IBasePage basePage, IWalletService walletService, ISubscriptionMaster IsubscriptionMaster)
+        public SignUpController(UserManager<ApplicationUser> userManager, ILoggerFactory loggerFactory, IUserService userdata, ITempUserRegisterService tempUserRegisterService, IMediator mediator, EncyptedDecrypted encdecAEC, IRegisterTypeService registerTypeService, ITempOtpService tempOtpService, Microsoft.Extensions.Configuration.IConfiguration configuration,
+            IBasePage basePage, IWalletService walletService, ISubscriptionMaster IsubscriptionMaster, IMessageConfiguration messageConfiguration)
         {
             _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SignUpController>();
@@ -67,6 +69,7 @@ namespace CleanArchitecture.Web.API
             _basePage = basePage;
             _IwalletService = walletService;
             _IsubscriptionMaster = IsubscriptionMaster;
+            _messageConfiguration = messageConfiguration;
         }
         #endregion
 
@@ -181,7 +184,7 @@ namespace CleanArchitecture.Web.API
                     return BadRequest(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpTempUserMobileExist, ErrorCode = enErrorCode.Status4105TempUserMobileExist });
                 }
 
-             
+
                 //bool IsSignEmail = _tempUserRegisterService.GetEmail(model.Email);
                 //if (IsSignEmail)
                 //{
@@ -229,8 +232,28 @@ namespace CleanArchitecture.Web.API
 
                     SendEmailRequest request = new SendEmailRequest();
                     request.Recepient = model.Email;
-                    request.Subject = EnResponseMessage.SendMailSubject;
-                    request.Body = confirmationLink;
+                    //  request.Subject = EnResponseMessage.SendMailSubject;
+                    //request.Body = confirmationLink;
+
+                    IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.Registration), 0);
+                    foreach (TemplateMasterData Provider in Result)
+                    {
+
+                        //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                        //foreach (string s in splitedarray)
+                        //{
+                        Provider.Content = Provider.Content.Replace("###Link###", ctokenlink);
+                        if (!string.IsNullOrEmpty(tempcurrentUser.UserName))
+                            Provider.Content = Provider.Content.Replace("###USERNAME###", tempcurrentUser.UserName);
+                        else
+                            Provider.Content = Provider.Content.Replace("###USERNAME###", string.Empty);
+                        //}
+                        request.Body = Provider.Content;
+                        request.Subject = Provider.AdditionalInfo;
+                    }
+
+
+
 
                     await _mediator.Send(request);
                     _logger.LogInformation(3, "User created a new account with password.");
@@ -261,7 +284,7 @@ namespace CleanArchitecture.Web.API
                 if (!string.IsNullOrEmpty(emailConfirmCode))
                 {
                     byte[] DecpasswordBytes = _encdecAEC.GetPasswordBytes(_configuration["AESSalt"].ToString());
-                    
+
                     var bytes = Convert.FromBase64String(emailConfirmCode);
                     var encodedString = Encoding.UTF8.GetString(bytes);
                     string DecryptToken = EncyptedDecrypted.Decrypt(encodedString, DecpasswordBytes);
@@ -409,13 +432,31 @@ namespace CleanArchitecture.Web.API
                             byte[] plainTextBytes = Encoding.UTF8.GetBytes(SubScriptionKey);
                             string ctokenlink = _configuration["ConfirmMailURL"].ToString() + Convert.ToBase64String(plainTextBytes);
 
-                           
+
                             var confirmationLink = "<a class='btn-primary' href=\"" + ctokenlink + "\">Confirm email address</a>";
 
                             SendEmailRequest request = new SendEmailRequest();
                             request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.ReSendMailSubject;
-                            request.Body = confirmationLink;
+                            //request.Subject = EnResponseMessage.ReSendMailSubject;
+                            //request.Body = confirmationLink;
+                            IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.Registration), 0);
+                            foreach (TemplateMasterData Provider in Result)
+                            {
+
+                                //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                                //foreach (string s in splitedarray)
+                                //{
+                                Provider.Content = Provider.Content.Replace("###Link###", ctokenlink);
+                                if (!string.IsNullOrEmpty(tempdata.UserName))
+                                    Provider.Content = Provider.Content.Replace("###USERNAME###", tempdata.UserName);
+                                else
+                                    Provider.Content = Provider.Content.Replace("###USERNAME###", string.Empty);
+                                //}
+                                request.Body = Provider.Content;
+                                request.Subject = Provider.AdditionalInfo;
+                            }
+
+
 
                             await _mediator.Send(request);
                             _logger.LogInformation(3, "Email sent successfully with your account");
@@ -487,7 +528,7 @@ namespace CleanArchitecture.Web.API
 
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpEmailValidation, ErrorCode = enErrorCode.Status4062UseralreadRegister });
                 }
-             
+
                 var tempcurrentUser = new TempUserRegisterViewModel
                 {
                     UserName = model.Email,
@@ -501,9 +542,27 @@ namespace CleanArchitecture.Web.API
                     var resultotp = await _tempOtpService.GetTempData(Convert.ToInt32(resultdata.Id));
                     SendEmailRequest request = new SendEmailRequest();
                     request.Recepient = model.Email;
-                    request.Subject = EnResponseMessage.SendMailSubject;
+                    // request.Subject = EnResponseMessage.SendMailSubject;
                     //request.Body = "use this code:" + resultotp.OTP + "";
-                    request.Body = EnResponseMessage.SendMailBody + resultotp.OTP;
+                    // request.Body = EnResponseMessage.SendMailBody + resultotp.OTP;
+
+                    IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.LoginWithOTP), 0);
+                    foreach (TemplateMasterData Provider in Result)
+                    {
+
+                        //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                        //foreach (string s in splitedarray)
+                        //{
+
+                        Provider.Content = Provider.Content.Replace("###USERNAME###", string.Empty);
+                        Provider.Content = Provider.Content.Replace("###Password###", resultotp.OTP);
+                        //}
+                        request.Body = Provider.Content;
+                        request.Subject = Provider.AdditionalInfo;
+                    }
+
+
+
 
                     await _mediator.Send(request);
 
@@ -514,7 +573,7 @@ namespace CleanArchitecture.Web.API
                 else
                 {
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUserRegisterError, ErrorCode = enErrorCode.Status4102SignUpUserRegisterError });
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -639,7 +698,7 @@ namespace CleanArchitecture.Web.API
                 }
             }
             catch (Exception ex)
-            {                
+            {
                 return BadRequest(new SignUpWithEmailResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
@@ -677,8 +736,29 @@ namespace CleanArchitecture.Web.API
 
                             SendEmailRequest request = new SendEmailRequest();
                             request.Recepient = model.Email;
-                            request.Subject = EnResponseMessage.ReSendMailSubject;
-                            request.Body = EnResponseMessage.SendMailBody + resultdata.OTP;
+                            // request.Subject = EnResponseMessage.ReSendMailSubject;
+                            // request.Body = EnResponseMessage.SendMailBody + resultdata.OTP;
+
+
+                            IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.LoginWithOTP), 0);
+                            foreach (TemplateMasterData Provider in Result)
+                            {
+
+                                //string[] splitedarray = Provider.AdditionaInfo.Split(",");
+                                //foreach (string s in splitedarray)
+                                //{
+
+                                if (!string.IsNullOrEmpty(tempdata.FirstName))
+                                    Provider.Content = Provider.Content.Replace("###USERNAME###", tempdata.FirstName);
+                                else
+                                    Provider.Content = Provider.Content.Replace("###USERNAME###", string.Empty);
+                                Provider.Content = Provider.Content.Replace("###Password###", resultdata.OTP);
+                                //}
+                                request.Body = Provider.Content;
+                                request.Subject = Provider.AdditionalInfo;
+                            }
+
+
 
                             await _mediator.Send(request);
                             _logger.LogInformation(3, "Email sent successfully with your account");
@@ -779,8 +859,8 @@ namespace CleanArchitecture.Web.API
                     UserName = model.Mobile,
                     Mobile = model.Mobile,
                     RegTypeId = await _registerTypeService.GetRegisterId(enRegisterType.Mobile),
-                };              
-                
+                };
+
                 var result = await _tempUserRegisterService.AddTempRegister(tempcurrentUser);
                 if (result != null)
                 {
@@ -793,10 +873,10 @@ namespace CleanArchitecture.Web.API
                     return Ok(new SignUpWithMobileResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SignUpWithMobile });
                 }
                 else
-                {                    
+                {
                     return BadRequest(new RegisterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUserRegisterError, ErrorCode = enErrorCode.Status4102SignUpUserRegisterError });
                 }
-                
+
             }
             catch (Exception ex)
             {
