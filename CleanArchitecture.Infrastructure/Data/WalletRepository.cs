@@ -412,7 +412,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                              Amount = u.Amount,
                                              Date = u.CreatedDate,
                                              Address = u.TransactionAccount==null? "Not" : u.TransactionAccount,
-                                             Confirmations = w==null?0:w.Confirmations
+                                             Confirmations = w==null?0:w.Confirmations,
                                                  StatusStr = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 2) ? "OperatorFail" : (u.Status == 3) ? "SystemFail" : (u.Status == 4) ? "Hold" : (u.Status == 5) ? "Refunded" : "Pending"
 
                                          }
