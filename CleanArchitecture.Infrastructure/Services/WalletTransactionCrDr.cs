@@ -214,6 +214,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 WalletDrCrResponse resp = new WalletDrCrResponse();
                 long owalletID, orgID;
                 WalletTransactionOrder woObj;
+                HelperForLog.WriteLogIntoFile("DepositionWalletOperation", "WalletService", "timestamp:" + timestamp + "," + "coinName:" + coinName + ",TrnRefNo=" + TrnRefNo.ToString() + ",address=" + address + ",amount=" + amount.ToString() + ",Token=" + Token);
 
 
                 // moved inside InsertWalletTQDebit
