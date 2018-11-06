@@ -289,6 +289,12 @@ namespace CleanArchitecture.Core.Enums
         public static string PersonalIdentityNotInserted = "Personal identity KYC request success full not inserted.";
         public static string GetPersonalIdentity = "Success full get user personal identity data.";
         public static string PersonalIdentityNotavailable = "Personal Identity not available.";
+
+        public static string DeviceIdNotFound = "DeviceID Not Found.";
+        public static string ModeNotFound = "Mode Not Found.";
+        public static string HostNameNotFound = "HostName Not Found.";
+
+
         // ================================ SignalR ========================= //
         public static string SignalRTrnSuccessfullyCreated = "Your Transacton Successfully created Price=#Price# ,Qty=#Qty#.";
         public static string SignalRTrnSuccessfullySettled = "Your Transacton settled. Price=#Price# ,Qty=#Qty# ,Total=#Total#";

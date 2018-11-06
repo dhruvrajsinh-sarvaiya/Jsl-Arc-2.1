@@ -376,7 +376,7 @@ namespace CleanArchitecture.Core.SignalR
         #region "Global Updates For Time , News , Announce"
 
         //public void getTime(string countryZone)
-        public Task GetTime()
+        public Task GetServerTime()
         {
             try
             {
@@ -389,6 +389,21 @@ namespace CleanArchitecture.Core.SignalR
                 return Task.FromResult(0);
             }            
         }
+
+        public Task GetTime(string Data)
+        {
+            try
+            {
+                _chatHubContext.Clients.All.SendAsync("SetTime", Data);
+                return Task.FromResult(0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occured,\nMethodName:" + System.Reflection.MethodBase.GetCurrentMethod().Name + "\nClassname=" + this.GetType().Name, LogLevel.Error);
+                return Task.FromResult(0);
+            }
+        }
+
 
         public Task BroadCastData(string Data)
         {
