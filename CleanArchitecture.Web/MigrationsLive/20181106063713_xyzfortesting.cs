@@ -2,22 +2,24 @@
 
 namespace CleanArchitecture.Web.Migrations
 {
-    public partial class InitialCreate22092018_1 : Migration
+    public partial class xyzfortesting : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<long>(
-                name: "OTP",
-                table: "BizUser",
+                name: "Wallet",
+                table: "WithdrawHistory",
                 nullable: false,
-                oldClrType: typeof(int));
+                oldClrType: typeof(string),
+                oldMaxLength: 50);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
-                name: "OTP",
-                table: "BizUser",
+            migrationBuilder.AlterColumn<string>(
+                name: "Wallet",
+                table: "WithdrawHistory",
+                maxLength: 50,
                 nullable: false,
                 oldClrType: typeof(long));
         }
