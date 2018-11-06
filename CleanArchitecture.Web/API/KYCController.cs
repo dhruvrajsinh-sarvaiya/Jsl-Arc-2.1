@@ -31,12 +31,13 @@ namespace CleanArchitecture.Web.API
         #region Ctore
         public KYCController(//IHostingEnvironment hostingEnvironment,
             Microsoft.Extensions.Configuration.IConfiguration configuration,
-            IPersonalVerificationService personalVerificationService, UserManager<ApplicationUser> userManager)
+            IPersonalVerificationService personalVerificationService, UserManager<ApplicationUser> userManager, IUserService userService)
         {
             //_hostingEnvironment = hostingEnvironment;
             _configuration = configuration;
             _personalVerificationService = personalVerificationService;
             _userManager = userManager;
+            _userService = userService;
         }
         #endregion
 
@@ -72,12 +73,21 @@ namespace CleanArchitecture.Web.API
 
                 if (String.IsNullOrEmpty(httpRequest["IPAddress"].ToString()))
                     return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                ////// Ip Address Validate or not
-                //string CountryCode = await _userService.GetCountryByIP(httpRequest["IPAddress"].ToString());
-                //if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
-                //{
-                //    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
-                //}
+                //// Ip Address Validate or not
+                string CountryCode = await _userService.GetCountryByIP(httpRequest["IPAddress"].ToString());
+                if (!string.IsNullOrEmpty(CountryCode) && CountryCode == "fail")
+                {
+                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.IpAddressInvalid, ErrorCode = enErrorCode.Status4020IpInvalid });
+                }
+                if (String.IsNullOrEmpty(httpRequest["DeviceId"].ToString()))
+                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.DeviceIdNotFound, ErrorCode = enErrorCode.Status4015DeviceIdNotFound });
+
+                if (String.IsNullOrEmpty(httpRequest["Mode"].ToString()))
+                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ModeNotFound, ErrorCode = enErrorCode.Status4017ModeNotFound });
+
+                if (String.IsNullOrEmpty(httpRequest["HostName"].ToString()))
+                    return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.HostNameNotFound, ErrorCode = enErrorCode.Status4021HostNameNotFound });
+
 
 
                 if (httpRequest.Files.Count == 0)

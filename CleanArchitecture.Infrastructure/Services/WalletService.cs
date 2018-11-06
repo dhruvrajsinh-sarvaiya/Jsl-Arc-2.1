@@ -893,9 +893,16 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 if (accessToken != null)
                 {
-                    var msg = EnResponseMessage.NewCreateWalletSuccessMsg;
-                    msg = msg.Replace("#WalletName#", walletMaster.Walletname);
-                    _signalRService.SendActivityNotification(msg, accessToken);
+                    try
+                    {
+                        var msg = EnResponseMessage.NewCreateWalletSuccessMsg;
+                        msg = msg.Replace("#WalletName#", walletMaster.Walletname);
+                        _signalRService.SendActivityNotification(msg, accessToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                    }
                 }
                 return createWalletResponse;
             }
@@ -2957,7 +2964,7 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             try
             {
-                if(req !=null)
+                if (req != null)
                 {
                     _WithdrawHistoryRepository.Add(req);
                     return true;
