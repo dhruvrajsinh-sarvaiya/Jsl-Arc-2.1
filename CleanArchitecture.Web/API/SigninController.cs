@@ -1418,7 +1418,7 @@ namespace CleanArchitecture.Web.API
 
 
 
-                IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.Registration), 0);
+                IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.ForgotPassword), 0);
                 foreach (TemplateMasterData Provider in Result)
                 {
 
