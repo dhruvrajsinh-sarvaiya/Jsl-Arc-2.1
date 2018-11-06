@@ -40,16 +40,16 @@ namespace CleanArchitecture.Web.API
             try
             {
                 var user = await GetCurrentUserAsync();
-                if (user != null)
-                {
+                //if (user != null)
+                //{
                     var ProfileList = _IprofileMaster.GetProfileData(user.Id);
                     if (ProfileList != null)
                         return Ok(new ProfileMasterResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessGetProfilePlan, ProfileList = ProfileList });
                     else
                         return BadRequest(new ProfileMasterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.ProfilePlan, ErrorCode = enErrorCode.Status4112ProfilePlan });
-                }
-                else
-                    return BadRequest(new ProfileMasterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4063UserNotRegister });
+                //}
+                //else
+                //    return BadRequest(new ProfileMasterResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4063UserNotRegister });
             }
             catch (Exception ex)
             {
@@ -63,8 +63,8 @@ namespace CleanArchitecture.Web.API
             try
             {
                 var user = await GetCurrentUserAsync();
-                if (user != null)
-                {
+                //if (user != null)
+                //{
                     if (model.ProfileId > 0)
                     {
                         bool Status = _IsubscriptionMaster.GetSubscriptionData(user.Id, model.ProfileId);
@@ -78,9 +78,9 @@ namespace CleanArchitecture.Web.API
                     }
                     else
                         return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.InvalidProfileId, ErrorCode = enErrorCode.Status4129InvalidProfileId });
-                }
-                else
-                    return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4063UserNotRegister });
+                //}
+                //else
+                //    return BadRequest(new SubscriptionResponse { ReturnCode = enResponseCode.Fail, ReturnMsg = EnResponseMessage.SignUpUser, ErrorCode = enErrorCode.Status4063UserNotRegister });
             }
             catch (Exception ex)
             {

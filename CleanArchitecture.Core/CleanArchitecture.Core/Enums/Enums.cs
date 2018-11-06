@@ -302,6 +302,10 @@ namespace CleanArchitecture.Core.Enums
         Status4128ValidIdentityCard = 4128,
         Status4129PersonalIdentityNotInserted = 4129,
         Status4130PersonalIdentityNotavailable =4130,
+
+        Status4015DeviceIdNotFound=4015,
+        Status4017ModeNotFound=4017,
+        Status4021HostNameNotFound=4021,
         ///// wallet ///////////
         DeductWalletNullWalletIDorCoinType = 424,
         DefaultWalletNotFound = 425,
