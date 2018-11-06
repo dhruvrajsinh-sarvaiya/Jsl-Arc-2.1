@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
@@ -762,6 +763,41 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 throw ex;
             }
         }
+        public void InsertIntoWithdrawHistory(long SerProID,string RouteTag,string TrnID)
+        {
+            try
+            {
+                WithdrawHistory WH = new WithdrawHistory();
+                WH.SMSCode = Req.SMSCode;
+                WH.TrnID = TrnID;
+                WH.Wallet = Req.DebitWalletID;
+                WH.Address = "";
+                WH.ToAddress = Req.TransactionAccount;
+                WH.Confirmations = 0;
+                WH.Value = 0;
+                WH.Amount = Req.Amount;
+                WH.Charge = 0;
+                WH.State = 0;
+                WH.confirmedTime = "";
+                WH.unconfirmedTime = "";
+                WH.CreatedDate = Helpers.UTC_To_IST();
+                WH.State = 0;
+                WH.IsProcessing = 0;
+                WH.TrnNo = Req.TrnNo;
+                WH.RouteTag = RouteTag;
+                WH.UserId = Req.MemberID;
+                WH.SerProID = SerProID;
+                WH.TrnDate = Helpers.UTC_To_IST();
+                WH.APITopUpRefNo = "";
+                WH.createdTime = Helpers.UTC_To_IST().ToString();
+                WH.SystemRemarks = "Transaction Process Done";
+                _WalletService.InsertIntoWithdrawHistory(WH);
+            }
+            catch(Exception ex)
+            {
+                HelperForLog.WriteErrorLog("InsertIntoWithdrawHistory Error-Fail:##TrnNo " + Req.TrnNo, ControllerName, ex);
+            }
+        }
         public Task<BizResponse> CallWebAPI(BizResponse _Resp)
         {
             //TransactionRequest TransactionRequestObj=new TransactionRequest(); 
@@ -776,6 +812,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 {
 
                     Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
+                    _TransactionRepository.Update(Newtransaction);
 
                     WebApiConfigurationResponseObj =_IWebApiData.GetAPIConfiguration(Provider.ThirPartyAPIID);
                     if(WebApiConfigurationResponseObj==null)
@@ -789,7 +826,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     ThirdPartyAPIRequestOnj =_IGetWebRequest.MakeWebRequest(Provider.RouteID,Provider.ThirPartyAPIID,Provider.SerProDetailID, Newtransaction);
                     
                     //Insert API request Data
-                    _TransactionObj.TransactionRequestID = InsertTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody);
+                    _TransactionObj.TransactionRequestID = InsertTransactionRequest(Provider, ThirdPartyAPIRequestOnj.RequestURL + "::" + ThirdPartyAPIRequestOnj.RequestBody);                   
+
                     switch (Provider.AppTypeID)
                     {
                         case (long)enAppType.WebSocket:
@@ -830,10 +868,14 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     NewtransactionReq.SetOprTrnID(WebAPIParseResponseClsObj.OperatorRefNo);
                     _TransactionRequest.Update(NewtransactionReq);
 
+                    if ((WebAPIParseResponseClsObj.Status == enTransactionStatus.Success) || (WebAPIParseResponseClsObj.Status == enTransactionStatus.Hold))
+                        if (Req.TrnType == enTrnType.Withdraw)
+                            InsertIntoWithdrawHistory(Provider.ServiceProID, Provider.RouteName, WebAPIParseResponseClsObj.TrnRefNo);
+
                     if (WebAPIParseResponseClsObj.Status == enTransactionStatus.Success)
                     {
                         Newtransaction.MakeTransactionSuccess();
-                        Newtransaction.SetTransactionStatusMsg(WebAPIParseResponseClsObj.StatusMsg);                        
+                        Newtransaction.SetTransactionStatusMsg("Success" + WebAPIParseResponseClsObj.StatusMsg);                        
                         _TransactionRepository.Update(Newtransaction);
                         IsTxnProceed = 1;//no further call next API
                         try
@@ -854,6 +896,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     {
                         Newtransaction.SetTransactionStatusMsg(WebAPIParseResponseClsObj.StatusMsg);
                         _TransactionRepository.Update(Newtransaction);
+
+                        _Resp.ReturnMsg = "Hold";
+                        _Resp.ReturnCode = enResponseCodeService.Success;
+                        _Resp.ErrorCode = enErrorCode.ProcessTrn_Hold;
                         IsTxnProceed = 1;//no further call next API
                         break;
                     }
@@ -861,14 +907,27 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 if(IsTxnProceed==0)
                 {
                     _Resp.ErrorCode = enErrorCode.ProcessTrn_OprFail;
-                    MarkTransactionOperatorFail(WebAPIParseResponseClsObj.StatusMsg, _Resp.ErrorCode);
+                    MarkTransactionOperatorFail("Fail" +WebAPIParseResponseClsObj.StatusMsg, _Resp.ErrorCode);
                 }
+              
 
             }
             catch (Exception ex)
             {
                 HelperForLog.WriteErrorLog("CallWebAPI:##TrnNo " + Req.TrnNo, ControllerName, ex);
-
+                if (IsTxnProceed == 0)
+                {
+                    _Resp.ReturnMsg = "Error occured";
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ErrorCode = enErrorCode.ProcessTrn_APICallInternalError;
+                }
+                else
+                {
+                    _Resp.ReturnMsg = "Hold";
+                    _Resp.ReturnCode = enResponseCodeService.Success;
+                    _Resp.ErrorCode = enErrorCode.ProcessTrn_Hold;
+                }
+              
             }
             return Task.FromResult(_Resp);
         }
