@@ -31,6 +31,7 @@ using Newtonsoft.Json.Serialization;
 using CleanArchitecture.Web.Filters;
 using Hangfire;
 using CleanArchitecture.Infrastructure.DTOClasses;
+using CleanArchitecture.Web.BackgroundTask;
 
 namespace CleanArchitecture.Web
 {
@@ -143,7 +144,7 @@ namespace CleanArchitecture.Web
 
             });
 
-
+            services.AddHostedService<TimedHostedService>();
             services.AddAuthentication();
             ////End Swagger
             ////services.AddMvcCore();
