@@ -2,16 +2,20 @@
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Entities.Configuration;
 using CleanArchitecture.Core.Entities.Transaction;
+using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Entities.Wallet;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repository;
+using CleanArchitecture.Core.ViewModels;
 using CleanArchitecture.Core.ViewModels.Transaction;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.Data.Transaction;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Infrastructure.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -46,6 +50,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         private readonly IWebApiData _IWebApiData; 
         private readonly ISettlementRepository<BizResponse> _SettlementRepository;
         private readonly ISignalRService _ISignalRService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMediator _mediator;
+        private readonly IMessageConfiguration _messageConfiguration;
 
         WebApiParseResponse _WebApiParseResponseObj;
 
@@ -85,7 +92,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             ICommonRepository<PoolOrder> PoolOrder, ICommonRepository<TradePoolMaster> TradePoolMaster,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeSellerList> TradeSellerList,
             ICommonRepository<TradeBuyerList> TradeBuyerList, ISettlementRepository<BizResponse> SettlementRepository, 
-            ISignalRService ISignalRService, ICommonRepository<TradePairStastics> tradePairStastics)
+            ISignalRService ISignalRService, ICommonRepository<TradePairStastics> tradePairStastics,UserManager<ApplicationUser> userManager,
+            IMediator mediator, IMessageConfiguration messageConfiguration)
         {
             _log = log;
             _TradePairMaster = TradePairMaster;
@@ -110,6 +118,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             _SettlementRepository = SettlementRepository;
             _ISignalRService = ISignalRService;
             _tradePairStastics = tradePairStastics;
+            _userManager = userManager;
+            _mediator = mediator;
+            _messageConfiguration = messageConfiguration;
         }
         public async Task<BizResponse> ProcessNewTransactionAsync(NewTransactionRequestCls Req1)
         {
@@ -221,7 +232,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             BizResponse _Resp1 = new BizResponse();
                             foreach (long HoldTrnNo in HoldTrnNos)
                             {                               
-                                var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == HoldTrnNo && item.IsProcessing == 0 &&
+                                var NewBuyRequestObj = _TradeBuyRequest.GetSingle(item => item.TrnNo == HoldTrnNo && item.IsProcessing == 0 && item.IsCancel==0 &&
                                                                                 (item.Status == Convert.ToInt16(enTransactionStatus.Hold) ||
                                                                                 item.Status == Convert.ToInt16(enTransactionStatus.Pending)));
                                 if (NewBuyRequestObj != null)
@@ -881,6 +892,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         try
                         {
                             _ISignalRService.SendActivityNotification("Transaction Success TrnNo:"+ Req.TrnNo, Req.accessToken);
+                            EmailSendAsync(TradeBuyRequestObj.UserID.ToString(), Convert.ToInt16(enTransactionStatus.Success), Req.SMSCode,Req.SMSCode, Newtransaction.TrnDate.ToString(),0, Req.Amount, 0);
                         }
                         catch (Exception ex)
                         {
@@ -1254,6 +1266,47 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         }
         #endregion
 
+        public async Task EmailSendAsync(string UserID, int Status, string PairName, string BaseMarket
+           , string TrnDate, decimal ReqAmount = 0, decimal Amount = 0, decimal Fees = 0)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(UserID) && !string.IsNullOrEmpty(PairName) && !string.IsNullOrEmpty(BaseMarket) &&
+                    ReqAmount != 0 && !string.IsNullOrEmpty(TrnDate) && Amount != 0 && Status == 1)
+                {
+                    SendEmailRequest Request = new SendEmailRequest();
+                    ApplicationUser User = new ApplicationUser();
+                    User = await _userManager.FindByIdAsync(UserID);
+                    if (!string.IsNullOrEmpty(User.Email))
+                    {
+                        IQueryable Result = await _messageConfiguration.GetTemplateConfigurationAsync(Convert.ToInt16(enCommunicationServiceType.Email), Convert.ToInt16(EnTemplateType.TransactionSuccess), 0);
+                        foreach (TemplateMasterData Provider in Result)
+                        {
+                            Provider.Content = Provider.Content.Replace("###USERNAME###", User.Name);
+                            Provider.Content = Provider.Content.Replace("###TYPE###", PairName);
+                            Provider.Content = Provider.Content.Replace("###REQAMOUNT###", ReqAmount.ToString());
+                            Provider.Content = Provider.Content.Replace("###STATUS###", "Success");
+                            Provider.Content = Provider.Content.Replace("###USER###", User.Name);
+                            Provider.Content = Provider.Content.Replace("###CURRENCY###", BaseMarket);
+                            Provider.Content = Provider.Content.Replace("###DATETIME###", TrnDate);
+                            Provider.Content = Provider.Content.Replace("###AMOUNT###", Amount.ToString());
+                            Provider.Content = Provider.Content.Replace("###FEES###", Fees.ToString());
+                            Provider.Content = Provider.Content.Replace("###FINAL###", (Amount + Fees).ToString());
+                            Request.Body = Provider.Content;
+                            Request.Subject = Provider.AdditionalInfo;
+                        }
+                        Request.Recepient = User.Email;
+                        Request.EmailType = 0;
+                        await _mediator.Send(Request);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog("Settlement - EmailSendAsync Error ", ControllerName, ex);
+            }
+        }
+
 
         //#region ==============================PROCESS SETLLEMENT========================
         //public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp)
@@ -1335,7 +1388,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         //                _TradePoolMaster.Update(PoolMst);
         //                break;//record settled
         //            }
-                   
+
         //        }
 
         //    }

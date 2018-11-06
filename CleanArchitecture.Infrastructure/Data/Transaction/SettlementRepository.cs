@@ -47,7 +47,12 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         TransactionQueue TransactionQueueObj;
         TradeTransactionQueue TradeTransactionQueueObj;
         TradeStopLoss _TradeStopLossObj;
+        TradeCancelQueue tradeCancelQueue;
         private readonly IMessageConfiguration _messageConfiguration;
+        string DebitAccountID;
+        string CreditAccountID;
+        long DebitWalletID;
+        long CreditWalletID;
 
         public SettlementRepository(CleanArchitectureContext dbContext, ICommonRepository<TradePoolQueue> TradePoolQueue,
             ICommonRepository<TradeBuyRequest> TradeBuyRequest, ICommonRepository<TradeBuyerList> TradeBuyerList,
@@ -143,12 +148,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
         }
 
-        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj, ref List<long> HoldTrnNos,string accessToken = "")
-        {
-            string DebitAccountID;
-            string CreditAccountID;
-            long DebitWalletID;
-            long CreditWalletID;
+        public Task<BizResponse> PROCESSSETLLEMENT(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj, ref List<long> HoldTrnNos,string accessToken = "",short IsCancel=0)
+        {           
             short TrackBit=0;
             try
             {
@@ -162,10 +163,10 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 CreditWalletID = TradeTransactionQueueObj.DeliveryWalletID;
                 CreditAccountID = _WalletService.GetAccWalletID(CreditWalletID);
 
-                if (TradeTransactionQueueObj.IsCancelled == 1)
+                if (TradeTransactionQueueObj.IsCancelled == 1 || IsCancel==1)
                 {
-
                     //Code for settlement
+                  CancellationProcess(_Resp, TradeBuyRequestObj, TransactionQueueObj, TradeTransactionQueueObj);
                     return Task.FromResult(_Resp);
                 }
                 if (TradeBuyRequestObj.PendingQty == 0)
@@ -382,8 +383,12 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                             }
                         }
 
-                        HoldTrnNos.Add(SellerList.TrnNo);                        
-                        
+                        HoldTrnNos.Add(SellerList.TrnNo);
+
+                        _dbContext.Entry(SellerList).Reload();
+
+                        SellerList.IsProcessing = 0;//Release Seller List                    
+                        _TradeSellerList.Update(SellerList);
                         break;//record settled
                     }
                     //====================take always latest object from DB 
@@ -420,7 +425,35 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
             return Task.FromResult(_Resp);
         }
         #region Cancellation Process
-        public async Task<BizResponse> CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj,TransactionQueue TransactionQueueObj)
+        public void CancellQueueEntry(TradeCancelQueue tradeCancelQueue, long TrnNo,long DeliverServiceID, decimal PendingBuyQty,decimal DeliverQty,short OrderType,
+            decimal DeliverBidPrice,long UserID)
+        {
+            try
+            {
+                tradeCancelQueue = new TradeCancelQueue()
+                {
+                    TrnNo = TrnNo,
+                    DeliverServiceID = DeliverServiceID,
+                    TrnDate = Helpers.UTC_To_IST(),
+                    PendingBuyQty = PendingBuyQty,
+                    DeliverQty = DeliverQty,
+                    OrderType = OrderType,
+                    DeliverBidPrice = DeliverBidPrice,
+                    Status = 0,
+                    OrderID = 0,
+                    SettledDate = Helpers.UTC_To_IST(),
+                    StatusMsg = "Cancel Order",
+                    CreatedBy = UserID,
+                    CreatedDate = Helpers.UTC_To_IST()
+                };              
+            }
+            catch(Exception ex)
+            {
+                HelperForLog.WriteErrorLog("CancellQueueEntry:##TrnNo " + TrnNo, ControllerName, ex);
+            }
+        }
+
+        public BizResponse CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj,TransactionQueue TransactionQueueObj,TradeTransactionQueue TradeTransactionQueueObj)
         {
             decimal DeliverQty = 0;
             try
@@ -429,22 +462,44 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                //ALSO DIND THE SELL BID PRICE
                DeliverQty = Helpers.DoRoundForTrading(TransactionQueueObj.Amount * TradeBuyRequestObj.PendingQty / TradeBuyRequestObj.Qty, 8);//@TotalSellQty
 
-                if(DeliverQty==0 || DeliverQty < 0)
+                if(DeliverQty==0 || DeliverQty < 0 || DeliverQty > TransactionQueueObj.Amount)
                 {
-
+                    _Resp.ErrorCode = enErrorCode.CancelOrder_InvalidDeliveryamount;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ReturnMsg = "Invalid Delivery amount";                 
+                    return _Resp;
                 }
-                if (DeliverQty > TransactionQueueObj.Amount)
-                {
 
-                }
+                CancellQueueEntry(tradeCancelQueue, TradeBuyRequestObj.TrnNo, TransactionQueueObj.ServiceID, TradeBuyRequestObj.PendingQty, DeliverQty,0,0, TradeBuyRequestObj.UserID);
+                PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, TradeBuyRequestObj.SellStockID, TradeBuyRequestObj.UserID, TradeBuyRequestObj.SellStockID, TradeBuyRequestObj.TrnNo, DeliverQty, CreditWalletID, CreditAccountID);
+                tradeCancelQueue.OrderID = PoolOrderObj.Id;
+                tradeCancelQueue.Status = 1;              
 
+                TradeBuyRequestObj.IsCancel = 1;
+                TradeTransactionQueueObj.SetTransactionStatusMsg("Cancellation Initiated");
                 TradeTransactionQueueObj.IsCancelled = 1;
                 _TradeTransactionRepository.Update(TradeTransactionQueueObj);
+
+                _dbContext.Database.BeginTransaction();
+
+                _dbContext.Set<TradeCancelQueue>().Add(tradeCancelQueue);
+                _dbContext.Set<PoolOrder>().Add(PoolOrderObj);
+                _dbContext.Entry(PoolOrderObj).State = EntityState.Modified;
+                _dbContext.Entry(TradeBuyRequestObj).State = EntityState.Modified;                
+                _dbContext.Entry(TradeTransactionQueueObj).State = EntityState.Modified;
+                _dbContext.SaveChanges();
+                _dbContext.Database.CommitTransaction();
+
+                _Resp.ErrorCode = enErrorCode.CancelOrder_InsertSuccess;
+                _Resp.ReturnCode = enResponseCodeService.Success;
+                _Resp.ReturnMsg = "Cancel Order Insert Success";
+                return _Resp;
 
             }
             catch(Exception ex)
             {
-
+                HelperForLog.WriteErrorLog("CancellationProcess:##TrnNo " + TradeBuyRequestObj.TrnNo, ControllerName, ex);
+                _dbContext.Database.RollbackTransaction();
             }
             return _Resp;
         }
@@ -469,7 +524,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                             Provider.Content = Provider.Content.Replace("###USERNAME###", User.Name);
                             Provider.Content = Provider.Content.Replace("###TYPE###", PairName);
                             Provider.Content = Provider.Content.Replace("###REQAMOUNT###", ReqAmount.ToString());
-                            Provider.Content = Provider.Content.Replace("###STATUS###", Status.ToString());
+                            Provider.Content = Provider.Content.Replace("###STATUS###", "Success");
                             Provider.Content = Provider.Content.Replace("###USER###", User.Name);
                             Provider.Content = Provider.Content.Replace("###CURRENCY###", BaseMarket);
                             Provider.Content = Provider.Content.Replace("###DATETIME###", TrnDate);
