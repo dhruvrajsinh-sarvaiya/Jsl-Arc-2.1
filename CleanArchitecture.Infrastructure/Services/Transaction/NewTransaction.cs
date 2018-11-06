@@ -782,13 +782,13 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 WH.SMSCode = Req.SMSCode;
                 WH.TrnID = TrnID;
                 WH.Wallet = Req.DebitWalletID;
-                WH.Address = "";
-                WH.ToAddress = Req.TransactionAccount;
+                WH.Address = Req.TransactionAccount;
+                WH.ToAddress = "";
                 WH.Confirmations = 0;
                 WH.Value = 0;
                 WH.Amount = Req.Amount;
                 WH.Charge = 0;
-                WH.State = 0;
+                WH.Status = 6; // ntrivedi status=6 to pick from deposition tps
                 WH.confirmedTime = "";
                 WH.unconfirmedTime = "";
                 WH.CreatedDate = Helpers.UTC_To_IST();
@@ -801,7 +801,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 WH.TrnDate = Helpers.UTC_To_IST();
                 WH.APITopUpRefNo = "";
                 WH.createdTime = Helpers.UTC_To_IST().ToString();
-                WH.SystemRemarks = "Transaction Process Done";
+                WH.SystemRemarks = "Initial entry";
                 _WalletService.InsertIntoWithdrawHistory(WH);
             }
             catch(Exception ex)
@@ -873,8 +873,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         IsTxnProceed = 1;//no further call next API
                         break;
                     }
-
-                    WebAPIParseResponseClsObj= _WebApiParseResponseObj.TransactionParseResponse(_TransactionObj.APIResponse, Provider.ThirPartyAPIID);
+                    //_TransactionObj.APIResponse = "{\"txid\":\"dc0f4454e77cb3bdaa0c707b37eca250dc6ac84a40994cc99c9c063583f50bbc\",\"tx\":\"01000000000101bbdb21bfc18efc9357c2abcbed6e6a6bc47bab2dd78952aa3b1b0aaa48af972c0100000023220020a3dd471b5765c0ac7e7173c00cb8f6d8ede04809442441a78ae71e555f0e3e25ffffffff02ce2a81000000000017a914ed1f54cf86f6b69e860bd118d29b63f6dbb2e17c87988d07000000000017a9141f6b16323e351422509d8f70f2ebe8f77aabc62d87040047304402205871d8dea5a91b9d40b6b8489dfd94184b2cb6338745b95cf71f45c6e23bc12a02202c4d99a057b85a6c0e8fed053278c9e4a1d0faf95931dc7925a52723e57e0f3d01483045022100f52edab9924eb8cc9785f1f27ebf8d53a86c81232ef8bafe7c66615e593283ac02206052b2e7c76f1390a57def1dbca28480ba70b506d20b4245204c8803b2bb85260169522103ca80fd2ca4c7097f386853f52f9224128b15409340524d04bddafc5afdb6b47321026563949e58c2b622d9ad84c53dbd5d1bdc09858ec37d96fbd95af4b49f06a8342102b5208a7ce843e28e2460eff28cd6d770c948a516074f1f0627f3cfb020512c0153aebc310800\",\"status\":\"signed\"}";
+                    WebAPIParseResponseClsObj = _WebApiParseResponseObj.TransactionParseResponse(_TransactionObj.APIResponse, Provider.ThirPartyAPIID);
                     NewtransactionReq.SetTrnID(WebAPIParseResponseClsObj.TrnRefNo);
                     NewtransactionReq.SetOprTrnID(WebAPIParseResponseClsObj.OperatorRefNo);
                     _TransactionRequest.Update(NewtransactionReq);
