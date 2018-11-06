@@ -96,7 +96,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     TakerLoss = TakerLoss,
                     Status = Convert.ToInt16(enTransactionStatus.Success),//always etry after settlement done
                 };
-                TradePoolQueueObj = _TradePoolQueue.Add(TradePoolQueueObj);
+                //TradePoolQueueObj = _TradePoolQueue.Add(TradePoolQueueObj);
                 //return (new BizResponse { ReturnMsg = EnResponseMessage.CommSuccessMsgInternal, ReturnCode = enResponseCodeService.Success });
             }
             catch (Exception ex)
@@ -250,6 +250,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                         _dbContext.Database.BeginTransaction();
 
+                        _dbContext.Set<TradePoolQueue>().Add(TradePoolQueueObj);
                         _dbContext.Entry(PoolOrderObj).State = EntityState.Modified;
                         _dbContext.Entry(TradeBuyRequestObj).State = EntityState.Modified;
                         _dbContext.Entry(SellerList).State = EntityState.Modified;
@@ -261,7 +262,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                                         enWalletTrnType.Cr_Buy_Trade, SettlementQty, TradeBuyRequestObj.UserID,
                                                         CreditAccountID, CreditWalletDrArryTrnIDList.ToArray(), TradeBuyRequestObj.TrnNo, 0, 
                                                         enWalletTranxOrderType.Credit, enServiceType.Trading, (enTrnType)TransactionQueueObj.TrnType);
-                        if(CreditWalletResult.ReturnCode==enResponseCode.Fail)
+                        if(CreditWalletResult.ReturnCode!=enResponseCode.Success)
                         {
                             HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
                             _dbContext.Database.RollbackTransaction();
@@ -338,6 +339,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                         _dbContext.Database.BeginTransaction();
 
+                        _dbContext.Set<TradePoolQueue>().Add(TradePoolQueueObj);
                         _dbContext.Entry(PoolOrderObj).State = EntityState.Modified;
                         _dbContext.Entry(TradeBuyRequestObj).State = EntityState.Modified;
                         _dbContext.Entry(SellerList).State = EntityState.Modified;
@@ -349,10 +351,11 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                                          enWalletTrnType.Cr_Buy_Trade, SettlementQty, TradeBuyRequestObj.UserID,
                                                          CreditAccountID, CreditWalletDrArryTrnIDList.ToArray(), TradeBuyRequestObj.TrnNo, 1,
                                                          enWalletTranxOrderType.Credit, enServiceType.Trading, (enTrnType)TransactionQueueObj.TrnType);
-                        if (CreditWalletResult.ReturnCode == enResponseCode.Fail)
+                        if (CreditWalletResult.ReturnCode != enResponseCode.Success)
                         {
                             HelperForLog.WriteLogIntoFile("PROCESSSETLLEMENT RollbackTransaction", ControllerName, "Balance credit fail" + CreditWalletResult.ReturnMsg + "##TrnNo:" + TradeBuyRequestObj.TrnNo);
                             _dbContext.Database.RollbackTransaction();
+
                             _Resp.ErrorCode = enErrorCode.Settlement_FullSettlementRollback;
                             _Resp.ReturnCode = enResponseCodeService.Success;
                             _Resp.ReturnMsg = "Full Settlement Rollback TrnNo:" + TradeBuyRequestObj.TrnNo + " With: TrnNo " + SellerList.TrnNo + "  Reason:" + CreditWalletResult.ReturnMsg;
