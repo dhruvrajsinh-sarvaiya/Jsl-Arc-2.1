@@ -517,7 +517,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                 //Query = Query.Replace("#IntervalData#", IntervalData).Replace("#IntervalTime#", IntervalTime.ToString());
                 //string MinuteData = Minute.ToString("yyyy-MM-dd HH:mm:00:000");
-                Interval = "2018-10-11 23:06:00";
+                //Interval = "2018-10-11 23:06:00";
                 Result = _dbContext.GetGraphResponseByPair.FromSql(Query, Interval);
                 return Result.ToList();
             }
