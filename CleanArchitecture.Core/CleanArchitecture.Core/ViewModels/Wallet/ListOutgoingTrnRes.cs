@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,5 +26,7 @@ namespace CleanArchitecture.Core.ViewModels.Wallet
         public decimal Amount { get; set; }
 
         public short? ConfirmationCount { get; set; }
+
+        public List<ExplorerData> ExplorerLink { get; set; } 
     }
 }

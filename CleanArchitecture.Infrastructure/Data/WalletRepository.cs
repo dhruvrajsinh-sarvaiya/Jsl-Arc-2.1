@@ -9,6 +9,7 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
+using CleanArchitecture.Core.ViewModels.Configuration;
 using CleanArchitecture.Core.ViewModels.Wallet;
 using CleanArchitecture.Core.ViewModels.WalletOperations;
 using CleanArchitecture.Core.ViewModels.WalletOpnAdvanced;
@@ -17,7 +18,7 @@ using CleanArchitecture.Infrastructure.DTOClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
-
+using Newtonsoft.Json;
 
 namespace CleanArchitecture.Infrastructure.Data
 {
@@ -1294,6 +1295,8 @@ namespace CleanArchitecture.Infrastructure.Data
             var trns = (from trn in _dbContext.DepositHistory
                         join wt in _dbContext.WalletTypeMasters
                        on trn.SMSCode equals wt.WalletTypeName
+                        join s in _dbContext.ServiceMaster on trn.SMSCode.ToLower() equals s.SMSCode.ToLower()
+                        join sd in _dbContext.ServiceDetail on s.Id equals sd.ServiceId
                         where trn.Status == Convert.ToInt16(ServiceStatus.InActive) && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new IncomingTrnRes
                         {
@@ -1303,7 +1306,8 @@ namespace CleanArchitecture.Infrastructure.Data
                             Confirmations = trn.Confirmations,
                             Amount = trn.Amount,
                             Address = trn.Address,
-                            ConfirmationCount = wt.ConfirmationCount
+                            ConfirmationCount = wt.ConfirmationCount,
+                            ExplorerLink = JsonConvert.DeserializeObject<ServiceDetailJsonData>(sd.ServiceDetailJson).Explorer
                         }).ToList();
             var test = trns.Select((r, i) => new IncomingTrnRes
             {
@@ -1313,7 +1317,8 @@ namespace CleanArchitecture.Infrastructure.Data
                 Confirmations = r.Confirmations,
                 Amount = r.Amount,
                 Address = r.Address,
-                ConfirmationCount = r.ConfirmationCount
+                ConfirmationCount = r.ConfirmationCount,
+                ExplorerLink = r.ExplorerLink
             }).ToList();
             return test;
         }
@@ -1433,6 +1438,8 @@ namespace CleanArchitecture.Infrastructure.Data
             var trns = (from trn in _dbContext.WithdrawHistory
                         join wt in _dbContext.WalletTypeMasters
                         on trn.SMSCode equals wt.WalletTypeName
+                        join s in _dbContext.ServiceMaster on trn.SMSCode.ToLower() equals s.SMSCode.ToLower()
+                        join sd in _dbContext.ServiceDetail on s.Id equals sd.ServiceId
                         where trn.Status == Convert.ToInt16(ServiceStatus.InActive) && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new OutgoingTrnRes
                         {
@@ -1442,8 +1449,9 @@ namespace CleanArchitecture.Infrastructure.Data
                             Confirmations = trn.Confirmations,
                             Amount = trn.Amount,
                             Address = trn.Address,
-                            ConfirmationCount = wt.ConfirmationCount
-                        }).ToList();
+                            ConfirmationCount = wt.ConfirmationCount,
+                            ExplorerLink = JsonConvert.DeserializeObject<ServiceDetailJsonData>(sd.ServiceDetailJson).Explorer
+        }).ToList();
             var test = trns.Select((r, i) => new OutgoingTrnRes
             {
                 AutoNo = i + 1,
@@ -1452,7 +1460,8 @@ namespace CleanArchitecture.Infrastructure.Data
                 Confirmations = r.Confirmations,
                 Amount = r.Amount,
                 Address = r.Address,
-                ConfirmationCount = r.ConfirmationCount
+                ConfirmationCount = r.ConfirmationCount,
+                ExplorerLink = r.ExplorerLink
             }).ToList();
             return test;
         }
