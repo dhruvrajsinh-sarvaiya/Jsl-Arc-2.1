@@ -21,8 +21,8 @@ namespace CleanArchitecture.Core.Entities.Wallet
         public string SMSCode { get; set; }
 
         [Required]
-        [StringLength(50)]
-        public string Wallet { get; set; }
+       // [StringLength(50)]
+        public long Wallet { get; set; }
 
         [Key]
         [StringLength(100)]
