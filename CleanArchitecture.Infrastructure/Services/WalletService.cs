@@ -1347,6 +1347,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 WalletTypeMaster walletTypeMaster;
                 //long walletTypeID;
                 WalletDrCrResponse resp = new WalletDrCrResponse();
+                HelperForLog.WriteLogIntoFile("GetWalletCreditNew", "WalletService", "timestamp:" + timestamp + "," + "coinName:" + coinName + ",TrnRefNo=" + TrnRefNo.ToString() + ",userID=" + userID + ",amount=" + TotalAmount.ToString());
 
                 if (string.IsNullOrEmpty(crAccWalletID) || coinName == string.Empty || userID == 0)
                 {
@@ -1443,12 +1444,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 msg = msg.Replace("#TrnNo#", TrnRefNo.ToString());
                 if (!string.IsNullOrEmpty(Token))
                 {
+                    HelperForLog.WriteLogIntoFile("GetWalletCreditNew Activity:With Token", "WalletService", "msg=" + msg + ",Token=" + Token + "WalletID" + walletMasterObj.AccWalletID + ",Balance" + walletMasterObj.Balance.ToString());
                     _signalRService.SendActivityNotification(msg, Token);
                     HelperForLog.WriteLogIntoFile("GetWalletCreditNew:With Token", "WalletService", "msg=" + msg + ",Token=" + Token + "WalletID" + walletMasterObj.AccWalletID + ",Balance" + walletMasterObj.Balance.ToString());
                     _signalRService.OnWalletBalChange(walletMasterObj, coinName, Token);
                 }
                 else
                 {
+                    HelperForLog.WriteLogIntoFile("GetWalletCreditNew Activity:Without Token", "WalletService", "msg=" + msg + ",Token=" + Token + "WalletID" + walletMasterObj.AccWalletID + ",Balance" + walletMasterObj.Balance.ToString());
                     _signalRService.SendActivityNotification(msg, cWalletobj.UserID.ToString(), 2);
                     HelperForLog.WriteLogIntoFile("GetWalletCreditNew:Without Token", "WalletService", "msg=" + msg + ",UserID =" + cWalletobj.UserID.ToString() + "WalletID" + walletMasterObj.AccWalletID + ",Balance" + walletMasterObj.Balance.ToString());
                     _signalRService.OnWalletBalChange(walletMasterObj, coinName, cWalletobj.UserID.ToString(), 2);
@@ -1456,7 +1459,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
                 //-------------------------------
 
-                return GetCrDRResponse(new WalletDrCrResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessCredit, ErrorCode = enErrorCode.Success, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg }, "Credit");
+                return GetCrDRResponse(new WalletDrCrResponse { ReturnCode = enResponseCode.Success, ReturnMsg = EnResponseMessage.SuccessCredit, ErrorCode = enErrorCode.Success, TrnNo = tqObj.TrnNo, Status = tqObj.Status, StatusMsg = tqObj.StatusMsg }, "GetWalletCreditNew");
 
                 //tqObj = _walletRepository1.AddIntoWalletTransactionQueue(tqObj, 2);
 
