@@ -2,7 +2,7 @@
 
 namespace CleanArchitecture.Web.Migrations
 {
-    public partial class WalletTransactionV1 : Migration
+    public partial class changeonWithdrawHistory : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
