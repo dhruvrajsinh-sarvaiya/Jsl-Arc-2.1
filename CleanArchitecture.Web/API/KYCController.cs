@@ -47,13 +47,6 @@ namespace CleanArchitecture.Web.API
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-
-
-        /// <summary>
-        /// Thid method are used KYC 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
         [HttpPost("PersonalVerification")]
         //[AllowAnonymous]
         //[ApiExplorerSettings(IgnoreApi = true)]
@@ -64,8 +57,6 @@ namespace CleanArchitecture.Web.API
                 var httpRequest = Request.Form;
                 var user = await GetCurrentUserAsync();
                 int userid = user.Id;
-
-
 
                 PersonalVerificationViewModel model = new PersonalVerificationViewModel();
                 //model.Id = ;
@@ -186,7 +177,6 @@ namespace CleanArchitecture.Web.API
             catch (Exception ex)
             {
                 return BadRequest(new PersonalVerificationResponse { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
-
             }
         }
 
