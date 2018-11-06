@@ -363,7 +363,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 SendData.Parameter = Token;
                 SendData.DataObj = JsonConvert.SerializeObject(CommonData);
                 //SendData.WalletName = Wallet;
-
+                HelperForLog.WriteLogIntoFile("ActivityNotification", ControllerName, " MSG :" + Msg);
                 _mediator.Send(SendData);
             }
             catch (Exception ex)
@@ -428,9 +428,6 @@ namespace CleanArchitecture.Infrastructure.Services
             }
         }
         #endregion
-
-        
-
         public void OnVolumeChange(VolumeDataRespose volumeData, MarketCapData capData)
         {
             try
