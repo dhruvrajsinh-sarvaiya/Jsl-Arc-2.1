@@ -1297,7 +1297,7 @@ namespace CleanArchitecture.Infrastructure.Data
                        on trn.SMSCode equals wt.WalletTypeName
                         join s in _dbContext.ServiceMaster on trn.SMSCode.ToLower() equals s.SMSCode.ToLower()
                         join sd in _dbContext.ServiceDetail on s.Id equals sd.ServiceId
-                        where trn.Status == Convert.ToInt16(ServiceStatus.InActive) && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                        where trn.Status == Convert.ToInt16(enTransactionStatus.Pending) /*&& trn.Confirmations < 3 */ && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new IncomingTrnRes
                         {
                             AutoNo = trn.Id,
@@ -1440,7 +1440,7 @@ namespace CleanArchitecture.Infrastructure.Data
                         on trn.SMSCode equals wt.WalletTypeName
                         join s in _dbContext.ServiceMaster on trn.SMSCode.ToLower() equals s.SMSCode.ToLower()
                         join sd in _dbContext.ServiceDetail on s.Id equals sd.ServiceId
-                        where trn.Status == Convert.ToInt16(ServiceStatus.InActive) && trn.Confirmations < 3 && trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                        where trn.Status == Convert.ToInt16(enTransactionStatus.Pending) /*&& trn.Confirmations < 3 */&& trn.UserId == Userid && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new OutgoingTrnRes
                         {
                             AutoNo = trn.Id,
@@ -1478,7 +1478,7 @@ namespace CleanArchitecture.Infrastructure.Data
                        on trn.SMSCode equals wt.WalletTypeName
                         join u in _dbContext.Users
                         on trn.UserId equals u.Id
-                        where trn.Status == Status && trn.Confirmations < 3 && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                        where trn.Status == Status && /*trn.Confirmations < 3 &&*/ (Coin == null || (trn.SMSCode == Coin && Coin != null))
                          && (trn.CreatedDate == null || (trn.CreatedDate >= FromDate && trn.CreatedDate != null)) && (trn.CreatedDate == null || (trn.CreatedDate <= ToDate && trn.CreatedDate != null))
                         select new TransfersRes
                         {
@@ -1500,7 +1500,7 @@ namespace CleanArchitecture.Infrastructure.Data
                        on trn.SMSCode equals wt.WalletTypeName
                         join u in _dbContext.Users
                         on trn.UserId equals u.Id
-                        where trn.Status == Status && trn.Confirmations < 3 && (Coin == null || (trn.SMSCode == Coin && Coin != null))
+                        where trn.Status == Status /*&& trn.Confirmations < 3*/ && (Coin == null || (trn.SMSCode == Coin && Coin != null))
                         select new TransfersRes
                         {
                             AutoNo = trn.Id,
