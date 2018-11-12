@@ -80,9 +80,9 @@ namespace CleanArchitecture.Core.Enums
         public static string ItemOrThirdprtyNotFound = "Unable to Process your request please contact admin.";
         public static string FindRecored = "Record Found Successfully!";
         public static string NotFound = "Record Not Found";
-        public static string RecordAdded = "Recored Added Successfully!";
-        public static string RecordUpdated = "Recored Updated Successfully!";
-        public static string RecordDisable = "Recored Disable Successfully!";
+        public static string RecordAdded = "Record Added Successfully!";
+        public static string RecordUpdated = "Record Updated Successfully!";
+        public static string RecordDisable = "Record Disable Successfully!";
         public static string InvalidLimit = "Invalid Limit.";
         public static string NotFoundLimit = "Not Found Limit.";
 
