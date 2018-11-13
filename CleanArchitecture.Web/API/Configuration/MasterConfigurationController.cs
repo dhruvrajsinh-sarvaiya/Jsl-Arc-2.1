@@ -15,6 +15,7 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.Configuration;
 
 namespace CleanArchitecture.Web.API.Configuration
 {
@@ -22,16 +23,117 @@ namespace CleanArchitecture.Web.API.Configuration
     [ApiController]
     public class MasterConfigurationController : Controller
     {
-        #region Ctor
+        #region "Ctor"
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMasterConfiguration _masterConfiguration;
+        private readonly ICommunicationService _communicationService;
 
-        public MasterConfigurationController(UserManager<ApplicationUser> userManager, IBasePage basePage,IMasterConfiguration masterConfiguration)
+        public MasterConfigurationController(UserManager<ApplicationUser> userManager, IBasePage basePage,IMasterConfiguration masterConfiguration, ICommunicationService communicationService)
         {
             _userManager = userManager;
             _masterConfiguration = masterConfiguration;
+            _communicationService = communicationService;
         }
         #endregion
+
+        #region "CommServiceTypeMaster"
+
+        //vsoalnki 13-11-2018
+        [HttpGet]
+        public async Task<IActionResult> GetAllCommServiceType()
+        {
+            CommServiceTypeRes Response = new CommServiceTypeRes();
+            try
+            {
+                 ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetAllCommServiceTypeMaster();                   
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
+        #region "TemplateMaster"
+
+        //vsoalnki 13-11-2018
+        [HttpGet]
+        public async Task<IActionResult> GetAllTemplate()
+        {
+            ListTemplateMasterRes Response = new ListTemplateMasterRes();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetAllTemplateMaster();
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        //vsoalnki 13-11-2018
+        [HttpPost]
+        public async Task<IActionResult> AddTemplate([FromBody]TemplateMasterReq Request)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.AddTemplateMaster(Request,user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
         [HttpPost]
         public async Task<IActionResult> AddCountry(string CountryName, string CountryCode)
         {

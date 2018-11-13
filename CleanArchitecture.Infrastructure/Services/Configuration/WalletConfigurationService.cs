@@ -190,7 +190,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 var _walletTypeMaster = _WalletTypeMasterRepository.GetSingle(item => item.Id == WalletTypeId && item.Status != Convert.ToInt16(ServiceStatus.Disable));
                 if (_walletTypeMaster == null)
                 {
-                    walletTypeMasterResponse.ReturnCode = enResponseCode.Success;
+                    walletTypeMasterResponse.ReturnCode = enResponseCode.Fail;
                     walletTypeMasterResponse.ReturnMsg = EnResponseMessage.NotFound;
                     return walletTypeMasterResponse;
                 }
