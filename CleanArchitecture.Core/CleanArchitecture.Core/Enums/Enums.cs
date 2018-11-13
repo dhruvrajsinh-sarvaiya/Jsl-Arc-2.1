@@ -350,6 +350,8 @@ namespace CleanArchitecture.Core.Enums
         PushNotificationUnsubscriptionFail = 5004,
         InvalidInput=5005,
         InvalidMasterID = 4916
+        InvalidInput=5005,
+        MoreDays=5006
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
     public enum enResponseCodeService

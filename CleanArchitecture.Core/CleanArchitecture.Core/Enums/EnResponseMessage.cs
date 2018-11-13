@@ -308,6 +308,7 @@ namespace CleanArchitecture.Core.Enums
         public static string PushNotificationUnsubscriptionFail = "Notification Unsubscription Failed.";
 
         public static string InvalidInput = "Invalid input";
+        public static string MoreDays = "You can not view more than #X# days report";
 
     }
 

@@ -31,11 +31,22 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
 
     public class TemplateMasterRes: BizResponseClass
     {
-        public  TemplateMaster TemplateMasterObj{ get;set;}
+        public TemplateResponse TemplateMasterObj { get;set;}
     }
 
     public class ListTemplateMasterRes : BizResponseClass
     {
-        public List<TemplateMaster> TemplateMasterObj { get; set; }
+        public List<TemplateResponse> TemplateMasterObj { get; set; }
+    }
+    public class TemplateResponse
+    {
+        public long TemplateID { get; set; }
+        public string TemplateType { get; set; }
+        public long CommServiceTypeID { get; set; }
+        public string CommServiceType { get; set; }
+        public string TemplateName { get; set; }
+        public string Content { get; set; }
+        public string AdditionalInfo { get; set; }
+        public short Status { get; set; }
     }
 }

@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace CleanArchitecture.Infrastructure.Services.Configuration
 {
@@ -20,16 +22,20 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         private readonly ICommonRepository<CommServiceTypeMaster> _CommServiceTypeMaster;
         private readonly ICommonRepository<TemplateMaster> _TemplateMaster;
         private readonly ILogger<CommunicationService> _log;
+        private readonly CleanArchitectureContext _dbContext;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
         #endregion
 
         #region "cotr"
 
-        public CommunicationService(ILogger<CommunicationService> log, ILogger<BasePage> logger, ICommonRepository<CommServiceTypeMaster> CommServiceTypeMaster, ICommonRepository<TemplateMaster> TemplateMaster) : base(logger)
+        public CommunicationService(ILogger<CommunicationService> log, ILogger<BasePage> logger, ICommonRepository<CommServiceTypeMaster> CommServiceTypeMaster, ICommonRepository<TemplateMaster> TemplateMaster, CleanArchitectureContext dbContext, Microsoft.Extensions.Configuration.IConfiguration configuration) : base(logger)
         {
             _CommServiceTypeMaster = CommServiceTypeMaster;
             _TemplateMaster = TemplateMaster;
             _log = log;
+            _dbContext = dbContext;
+            _configuration = configuration;
         }
 
         #endregion
@@ -44,7 +50,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             {
                 // var items = _CommServiceTypeMaster.FindBy(i => i.Status == Convert.ToInt16(ServiceStatus.Active));
                 var items = _CommServiceTypeMaster.List();
-                if (items.Count==0)
+                if (items.Count == 0)
                 {
                     res.ReturnCode = enResponseCode.Fail;
                     res.ErrorCode = enErrorCode.RecordNotFound;
@@ -74,7 +80,30 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             ListTemplateMasterRes res = new ListTemplateMasterRes();
             try
             {
-                var items = _TemplateMaster.List();
+                List<int> AllowTrnType = Helpers.GetEnumValue<EnTemplateType>();
+
+                var val = Enum.GetNames(typeof(EnTemplateType))
+                  .Cast<string>()
+                  .Select(x => x.ToString())
+                  .ToArray();
+
+                var items = (from tm in _dbContext.TemplateMaster
+                             join cm in _dbContext.CommServiceTypeMaster
+                             on tm.CommServiceTypeID equals cm.CommServiceTypeID
+                             join q in AllowTrnType on tm.TemplateID equals q
+                             select new TemplateResponse
+                             {
+                                 Status = tm.Status,
+                                 TemplateID = tm.TemplateID,
+                                 TemplateType = val[q - 1],
+                                 CommServiceTypeID = tm.CommServiceTypeID,
+                                 CommServiceType = cm.CommServiceTypeName,
+                                 TemplateName = tm.TemplateName,
+                                 Content = tm.Content,
+                                 AdditionalInfo = tm.AdditionalInfo
+                             }
+                             ).ToList();
+                //var items = _TemplateMaster.List();
                 // var items = _TemplateMaster.FindBy(i => i.Status == Convert.ToInt16(ServiceStatus.Active));
                 if (items.Count == 0)
                 {
@@ -187,12 +216,36 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         }
 
         //vsoalnki 13-11-2018
-        public TemplateMasterRes GetAllTemplateMaster(long TemplateMasterId)
+        public TemplateMasterRes GetTemplateMasterById(long TemplateMasterId)
         {
             TemplateMasterRes res = new TemplateMasterRes();
             try
             {
-                var template = _TemplateMaster.GetById(TemplateMasterId);
+                List<int> AllowTrnType = Helpers.GetEnumValue<EnTemplateType>();
+
+                var val = Enum.GetNames(typeof(EnTemplateType))
+                  .Cast<string>()
+                  .Select(x => x.ToString())
+                  .ToArray();
+
+                var template = (from tm in _dbContext.TemplateMaster
+                                join cm in _dbContext.CommServiceTypeMaster
+                                on tm.CommServiceTypeID equals cm.CommServiceTypeID
+                                join q in AllowTrnType on tm.TemplateID equals q
+                                where tm.Id == TemplateMasterId
+                                select new TemplateResponse
+                                {
+                                    Status = tm.Status,
+                                    TemplateID = tm.TemplateID,
+                                    TemplateType = val[q - 1],
+                                    CommServiceTypeID = tm.CommServiceTypeID,
+                                    CommServiceType = cm.CommServiceTypeName,
+                                    TemplateName = tm.TemplateName,
+                                    Content = tm.Content,
+                                    AdditionalInfo = tm.AdditionalInfo
+                                }
+                             ).First();
+                // var template = _TemplateMaster.GetById(TemplateMasterId);
                 if (template != null)
                 {
                     res.ReturnCode = enResponseCode.Success;
@@ -212,6 +265,67 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
+        #endregion
+
+        #region "MessagingQueue"
+
+        //vsolanki 13-11-2018
+        public ListMessagingQueueRes GetMessagingQueue(DateTime FromDate, DateTime ToDate, short? Status, long? MobileNo, int Page)
+        {
+            ListMessagingQueueRes res = new ListMessagingQueueRes();
+            int Customday = Convert.ToInt32(_configuration["ReportValidDays"]);//2;
+            double days = (ToDate - FromDate).TotalDays;
+            if(Customday < days)
+            {
+                var msg = EnResponseMessage.MoreDays;
+                msg = msg.Replace("#X#", Customday.ToString());
+
+                res.ReturnCode = enResponseCode.Fail;
+                res.ErrorCode = enErrorCode.MoreDays;
+                res.ReturnMsg = msg;
+                return res;
+            }
+
+            //MessageStatusType
+            var val = Enum.GetNames(typeof(MessageStatusType))
+                .Cast<string>()
+                .Select(x => x.ToString())
+                .ToArray();
+            List<int> msgInt = Helpers.GetEnumValue<MessageStatusType>();
+
+            var items = (from u in _dbContext.MessagingQueue
+                         join q in msgInt
+                         on u.Status equals q
+                         where u.CreatedDate >= FromDate && u.CreatedDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (MobileNo == null || (u.MobileNo == MobileNo && MobileNo != null))
+                         select new MessagingQueueRes
+                         {
+                             Status = u.Status,
+                             MobileNo = u.MobileNo,
+                             SMSDate = u.CreatedDate,
+                             SMSText = u.SMSText,
+                             StrStatus=val[q-1]
+                         }
+                         ).ToList();
+
+            if (items.Count != 0)
+            {
+                if (Page > 0)
+                {
+                    int skip = Helpers.PageSize * (Page - 1);
+                    items = items.Skip(skip).Take(Helpers.PageSize).ToList();
+                }
+                res.ReturnCode = enResponseCode.Success;
+                res.ErrorCode = enErrorCode.Success;
+                res.ReturnMsg = EnResponseMessage.FindRecored;
+                res.MessagingQueueObj = items;
+                return res;
+            }
+            res.ReturnCode = enResponseCode.Fail;
+            res.ErrorCode = enErrorCode.RecordNotFound;
+            res.ReturnMsg = EnResponseMessage.NotFound;
+            return res;
+        }
+
         #endregion
     }
 }

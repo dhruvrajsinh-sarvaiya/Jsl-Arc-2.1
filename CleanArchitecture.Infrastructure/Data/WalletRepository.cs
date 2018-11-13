@@ -404,7 +404,7 @@ namespace CleanArchitecture.Infrastructure.Data
                                          join w in _dbContext.WithdrawHistory
                                          on u.Id equals w.TrnNo into ps
                                          from w in ps.DefaultIfEmpty()
-                                         where u.MemberID == Userid && u.TrnDate >= FromDate && u.TrnDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))
+                                         where u.TrnType==6 && u.MemberID == Userid && u.TrnDate >= FromDate && u.TrnDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Coin == null || (u.SMSCode == Coin && Coin != null)) && (Amount == null || (u.Amount == Amount && Amount != null))
                                          select new HistoryObject
                                          {
                                              CoinName = u.SMSCode,
