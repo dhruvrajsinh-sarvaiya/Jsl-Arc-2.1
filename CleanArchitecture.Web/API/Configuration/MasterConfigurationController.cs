@@ -133,8 +133,8 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         //vsoalnki 13-11-2018
-        [HttpPost("{TemplateId}")]
-        public async Task<IActionResult> UpdateTemplate([FromBody]TemplateMasterReq Request,long TemplateId)
+        [HttpPost("{TemplateMasterId}")]
+        public async Task<IActionResult> UpdateTemplate([FromBody]TemplateMasterReq Request,long TemplateMasterId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -150,7 +150,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _communicationService.UpdateTemplateMaster(TemplateId,Request, user.Id);
+                    Response = _communicationService.UpdateTemplateMaster(TemplateMasterId, Request, user.Id);
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -163,8 +163,8 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         //vsoalnki 13-11-2018
-        [HttpPost("{TemplateId}")]
-        public async Task<IActionResult> DisableTemplate(long TemplateId)
+        [HttpPost("{TemplateMasterId}")]
+        public async Task<IActionResult> DisableTemplate(long TemplateMasterId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -180,7 +180,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _communicationService.DisableTemplateMaster(TemplateId);
+                    Response = _communicationService.DisableTemplateMaster(TemplateMasterId);
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -193,8 +193,8 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         //vsoalnki 13-11-2018
-        [HttpGet("{TemplateId}")]
-        public async Task<IActionResult> GetTemplateById(long TemplateId)
+        [HttpGet("{TemplateMasterId}")]
+        public async Task<IActionResult> GetTemplateById(long TemplateMasterId)
         {
             TemplateMasterRes Response = new TemplateMasterRes();
             try
@@ -210,7 +210,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _communicationService.GetTemplateMasterById(TemplateId);
+                    Response = _communicationService.GetTemplateMasterById(TemplateMasterId);
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
