@@ -199,6 +199,8 @@ namespace CleanArchitecture.Web
                 config.For(typeof(ISettlementRepository<BizResponse>)).Add(typeof(SettlementRepository));//Rita 2-11-2018 for settlement
                 config.For(typeof(IWebApiData)).Add(typeof(TransactionWebAPIConfiguration));
 
+                config.For(typeof(ICommunicationService)).Add(typeof(CommunicationService));
+                config.For(typeof(IMasterConfiguration)).Add(typeof(MasterConfigServices));
 
                 //Populate the container using the service collection
                 config.Populate(services);

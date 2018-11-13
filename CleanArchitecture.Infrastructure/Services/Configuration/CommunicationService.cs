@@ -37,12 +37,25 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         #region "CommServiceTypeMaster"
 
         //vsoalnki 13-11-2018
-        public IEnumerable<CommServiceTypeMaster> GetAllCommServiceTypeMaster()
+        public CommServiceTypeRes GetAllCommServiceTypeMaster()
         {
+            CommServiceTypeRes res = new CommServiceTypeRes();
             try
             {
-                var items = _CommServiceTypeMaster.FindBy(i => i.Status == Convert.ToInt16(ServiceStatus.Active));
-                return items;
+                // var items = _CommServiceTypeMaster.FindBy(i => i.Status == Convert.ToInt16(ServiceStatus.Active));
+                var items = _CommServiceTypeMaster.List();
+                if (items.Count==0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.RecordNotFound;
+                    res.ReturnMsg = EnResponseMessage.NotFound;
+                    return res;
+                }
+                res.ReturnCode = enResponseCode.Success;
+                res.ErrorCode = enErrorCode.Success;
+                res.ReturnMsg = EnResponseMessage.FindRecored;
+                res.Response = items;
+                return res;
             }
             catch (Exception ex)
             {
@@ -56,13 +69,25 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         #region "TemplateMaster"
 
         //vsoalnki 13-11-2018
-        public IEnumerable<TemplateMaster> GetAllTemplateMaster()
+        public ListTemplateMasterRes GetAllTemplateMaster()
         {
+            ListTemplateMasterRes res = new ListTemplateMasterRes();
             try
             {
-                //var items = _TemplateMaster.List();
-                var items = _TemplateMaster.FindBy(i => i.Status == Convert.ToInt16(ServiceStatus.Active));
-                return items;
+                var items = _TemplateMaster.List();
+                // var items = _TemplateMaster.FindBy(i => i.Status == Convert.ToInt16(ServiceStatus.Active));
+                if (items.Count == 0)
+                {
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.RecordNotFound;
+                    res.ReturnMsg = EnResponseMessage.NotFound;
+                    return res;
+                }
+                res.ReturnCode = enResponseCode.Success;
+                res.ErrorCode = enErrorCode.Success;
+                res.ReturnMsg = EnResponseMessage.FindRecored;
+                res.TemplateMasterObj = items;
+                return res;
             }
             catch (Exception ex)
             {

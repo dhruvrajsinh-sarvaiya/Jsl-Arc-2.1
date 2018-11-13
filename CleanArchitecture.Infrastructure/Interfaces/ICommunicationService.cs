@@ -12,14 +12,14 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         #region "CommServiceTypeMaster"
 
         //vsoalnki 13-11-2018
-        IEnumerable<CommServiceTypeMaster> GetAllCommServiceTypeMaster();
+        CommServiceTypeRes GetAllCommServiceTypeMaster();
 
         #endregion
 
         #region "TemplateMaster"
 
         //vsoalnki 13-11-2018
-        IEnumerable<TemplateMaster> GetAllTemplateMaster();
+        ListTemplateMasterRes GetAllTemplateMaster();
         BizResponseClass AddTemplateMaster(TemplateMasterReq Request, long userid);
         BizResponseClass UpdateTemplateMaster(long TemplateMasterId, TemplateMasterReq Request, long userid);
         BizResponseClass DisableTemplateMaster(long TemplateMasterId);
