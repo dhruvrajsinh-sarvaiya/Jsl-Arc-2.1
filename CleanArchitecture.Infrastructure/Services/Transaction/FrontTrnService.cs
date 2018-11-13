@@ -360,7 +360,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 //Calucalte ChangePer
                 decimal Volume24 = 0, ChangePer = 0, High24Hr = 0, Low24Hr = 0, WeekHigh = 0,WeekLow =0,Week52High=0,Week52Low=0;
-                short UpDownBit = 0;
+                short UpDownBit = 1; //komal 13-11-2018 set defau
                 decimal tradeprice = 0, todayopen, todayclose;
                 var tradedtatstatus = _tradeTransactionQueueRepository.GetSingle(x => x.TrnNo == TrnNo);
                 if( tradedtatstatus != null)
@@ -546,18 +546,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
 
 
                     var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
-                    pairData.ChangePer24 = ChangePer;
-                    pairData.ChangeVol24 = Volume24;
-                    pairData.High24Hr = High24Hr;
-                    pairData.Low24Hr = Low24Hr;
-                    pairData.LTP = CurrentRate;
-                    pairData.CurrentRate = CurrentRate;
-                    pairData.HighWeek = WeekHigh;
-                    pairData.LowWeek = WeekLow;
-                    pairData.High52Week = Week52High;
-                    pairData.Low52Week = Week52Low;
-
-                    if (CurrentRate > pairData.High24Hr)
+                    if (CurrentRate > pairData.High24Hr) //komal 13-11-2018 Change code sequence cos got 0 every time
                     {
                         UpDownBit = 1;
                     }
@@ -575,7 +564,21 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         {
                             UpDownBit = 1;
                         }
+                        else if(CurrentRate == pairData.LTP)//komal 13-11-2018 if no change then set as it is
+                        {
+                            UpDownBit = pairData.UpDownBit;
+                        }
                     }
+                    pairData.ChangePer24 = ChangePer;
+                    pairData.ChangeVol24 = Volume24;
+                    pairData.High24Hr = High24Hr;
+                    pairData.Low24Hr = Low24Hr;
+                    pairData.LTP = CurrentRate;
+                    pairData.CurrentRate = CurrentRate;
+                    pairData.HighWeek = WeekHigh;
+                    pairData.LowWeek = WeekLow;
+                    pairData.High52Week = Week52High;
+                    pairData.Low52Week = Week52Low;
                     _tradePairStastics.Update(pairData);
 
                     var VolumeData = GetVolumeDataByPair(PairId);
@@ -633,7 +636,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         {
                             Amount = model.Amount,
                             ChargeRs = model.ChargeRs,
-                            DateTime = model.DateTime.Date,
+                            DateTime = model.DateTime,
                             PairName = model.PairName,
                             Price = model.Price,
                             Status = model.Status,
@@ -677,7 +680,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         responce.Add(new RecentOrderInfo
                         {
                             Qty = model.Qty,
-                            DateTime = model.DateTime.Date,
+                            DateTime = model.DateTime,
                             Price = model.Price,
                             TrnNo = model.TrnNo,
                             Type = model.Type,
@@ -719,7 +722,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                             IsCancelled = model.IsCancelled,
                             Order_Currency = model.Order_Currency,
                             Price = model.Price,
-                            TrnDate = model.TrnDate.Date,
+                            TrnDate = model.TrnDate,
                             Type = model.Type,
                             PairName =model.PairName,
                             PairId=model.PairId,
