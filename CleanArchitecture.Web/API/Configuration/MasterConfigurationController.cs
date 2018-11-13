@@ -28,7 +28,7 @@ namespace CleanArchitecture.Web.API.Configuration
         private readonly IMasterConfiguration _masterConfiguration;
         private readonly ICommunicationService _communicationService;
 
-        public MasterConfigurationController(UserManager<ApplicationUser> userManager, IBasePage basePage,IMasterConfiguration masterConfiguration, ICommunicationService communicationService)
+        public MasterConfigurationController(UserManager<ApplicationUser> userManager, IBasePage basePage, IMasterConfiguration masterConfiguration, ICommunicationService communicationService)
         {
             _userManager = userManager;
             _masterConfiguration = masterConfiguration;
@@ -45,7 +45,7 @@ namespace CleanArchitecture.Web.API.Configuration
             CommServiceTypeRes Response = new CommServiceTypeRes();
             try
             {
-                 ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
                 //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
                 {
@@ -56,7 +56,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _communicationService.GetAllCommServiceTypeMaster();                   
+                    Response = _communicationService.GetAllCommServiceTypeMaster();
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -120,7 +120,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _communicationService.AddTemplateMaster(Request,user.Id);
+                    Response = _communicationService.AddTemplateMaster(Request, user.Id);
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -134,7 +134,7 @@ namespace CleanArchitecture.Web.API.Configuration
 
         //vsoalnki 13-11-2018
         [HttpPost("{TemplateMasterId}")]
-        public async Task<IActionResult> UpdateTemplate([FromBody]TemplateMasterReq Request,long TemplateMasterId)
+        public async Task<IActionResult> UpdateTemplate([FromBody]TemplateMasterReq Request, long TemplateMasterId)
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -211,6 +211,40 @@ namespace CleanArchitecture.Web.API.Configuration
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
                     Response = _communicationService.GetTemplateMasterById(TemplateMasterId);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
+        #region "MessagingQueue"
+
+        //vsolanki 13-11-2018
+        [HttpGet("{FromDate}/{ToDate}/{Page}")]
+        public async Task<IActionResult> GetMessagingQueue(DateTime FromDate, DateTime ToDate, short? Status, long? MobileNo, int Page)
+        {
+            ListMessagingQueueRes Response = new ListMessagingQueueRes();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetMessagingQueue(FromDate,ToDate,Status,MobileNo,Page);
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);

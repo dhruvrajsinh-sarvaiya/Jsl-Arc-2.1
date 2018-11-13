@@ -26,5 +26,12 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         TemplateMasterRes GetTemplateMasterById(long TemplateMasterId);
 
         #endregion
+
+        #region "MessagingQueue"
+
+        //vsolanki 13-11-2018
+        ListMessagingQueueRes GetMessagingQueue(DateTime FromDate, DateTime ToDate, short? Status, long? MobileNo, int Page );
+
+        #endregion
     }
 }
