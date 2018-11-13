@@ -15,12 +15,15 @@ using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using CleanArchitecture.Core.ApiModels;
+using CleanArchitecture.Core.ViewModels.MasterConfiguration;
+using System.ComponentModel.DataAnnotations;
 using CleanArchitecture.Core.ViewModels.Configuration;
 
 namespace CleanArchitecture.Web.API.Configuration
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    //[Authorize]
     public class MasterConfigurationController : Controller
     {
         #region "Ctor"
@@ -134,8 +137,11 @@ namespace CleanArchitecture.Web.API.Configuration
 
         #endregion
 
+        #region MasterConfiguration
+
+        #region Insert Method
         [HttpPost]
-        public async Task<IActionResult> AddCountry(string CountryName, string CountryCode)
+        public async Task<IActionResult> AddCountry(AddCountryReq Request)//[Required]string CountryName, [Required]string CountryCode
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -150,7 +156,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _masterConfiguration.AddCountry(CountryName, CountryCode,user.Id);
+                    Response = _masterConfiguration.AddCountry(Request,user.Id);//Request.CountryName,Request.CountryCode,user.Id,Request.Status
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -163,7 +169,7 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddState(string StateName, string StateCode, long CountryID)
+        public async Task<IActionResult> AddState(AddStateReq Request)//string StateName, string StateCode, long CountryID
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -178,7 +184,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _masterConfiguration.AddState(StateName, StateCode, CountryID, user.Id);
+                    Response = _masterConfiguration.AddState(Request, user.Id);//Request.StateName, Request.StateCode, Request.CountryID
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -192,7 +198,7 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCity(string CityName, long StateID)
+        public async Task<IActionResult> AddCity(AddCityReq Request)//string CityName, long StateID
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -207,7 +213,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _masterConfiguration.AddCity(CityName, StateID, user.Id);
+                    Response = _masterConfiguration.AddCity(Request, user.Id);//user.Id--71   Request.CityName, Request.StateID
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -220,7 +226,7 @@ namespace CleanArchitecture.Web.API.Configuration
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddZipCode(long ZipCode, string AreaName, long CityID)
+        public async Task<IActionResult> AddZipCode(AddZipCodeReq Request)//long ZipCode, string AreaName, long CityID
         {
             BizResponseClass Response = new BizResponseClass();
             try
@@ -235,7 +241,7 @@ namespace CleanArchitecture.Web.API.Configuration
                 else
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    Response = _masterConfiguration.AddZipCode(ZipCode, AreaName, CityID, user.Id);
+                    Response = _masterConfiguration.AddZipCode(Request, user.Id);//Request.ZipCode, Request.AreaName, Request.CityID
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);
@@ -246,5 +252,149 @@ namespace CleanArchitecture.Web.API.Configuration
                 return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
             }
         }
+
+        #endregion
+
+        #region Update Methods
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCountryDetail(AddCountryReq Request)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else if(Request.CountryID == null || Request.CountryID == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.MasterConfig;
+                    Response.ErrorCode = enErrorCode.InvalidMasterID;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _masterConfiguration.UpdateCountry(Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStateDetail(AddStateReq Request)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else if (Request.StateID == null || Request.StateID == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.MasterConfig;
+                    Response.ErrorCode = enErrorCode.InvalidMasterID;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _masterConfiguration.UpdateState(Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCityDetail(AddCityReq Request)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else if (Request.CityID == null || Request.CityID == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.MasterConfig;
+                    Response.ErrorCode = enErrorCode.InvalidMasterID;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _masterConfiguration.UpdateCity(Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateZipCodeDetail(AddZipCodeReq Request)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else if (Request.ZipCodeID == null || Request.ZipCodeID == 0)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.MasterConfig;
+                    Response.ErrorCode = enErrorCode.InvalidMasterID;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _masterConfiguration.UpdateZipCode(Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
+        #endregion
     }
 }
