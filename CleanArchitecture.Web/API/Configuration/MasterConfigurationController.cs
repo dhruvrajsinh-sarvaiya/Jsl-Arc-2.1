@@ -132,6 +132,96 @@ namespace CleanArchitecture.Web.API.Configuration
             }
         }
 
+        //vsoalnki 13-11-2018
+        [HttpPost("{TemplateId}")]
+        public async Task<IActionResult> UpdateTemplate([FromBody]TemplateMasterReq Request,long TemplateId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.UpdateTemplateMaster(TemplateId,Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        //vsoalnki 13-11-2018
+        [HttpPost("{TemplateId}")]
+        public async Task<IActionResult> DisableTemplate(long TemplateId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.DisableTemplateMaster(TemplateId);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        //vsoalnki 13-11-2018
+        [HttpGet("{TemplateId}")]
+        public async Task<IActionResult> GetTemplateById(long TemplateId)
+        {
+            TemplateMasterRes Response = new TemplateMasterRes();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetTemplateMasterById(TemplateId);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
         #endregion
 
         [HttpPost]

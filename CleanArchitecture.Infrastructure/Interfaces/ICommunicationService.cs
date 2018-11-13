@@ -23,7 +23,7 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         BizResponseClass AddTemplateMaster(TemplateMasterReq Request, long userid);
         BizResponseClass UpdateTemplateMaster(long TemplateMasterId, TemplateMasterReq Request, long userid);
         BizResponseClass DisableTemplateMaster(long TemplateMasterId);
-        TemplateMasterRes GetAllTemplateMaster(long TemplateMasterId);
+        TemplateMasterRes GetTemplateMasterById(long TemplateMasterId);
 
         #endregion
     }

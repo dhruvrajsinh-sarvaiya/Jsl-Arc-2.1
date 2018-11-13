@@ -187,7 +187,7 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         }
 
         //vsoalnki 13-11-2018
-        public TemplateMasterRes GetAllTemplateMaster(long TemplateMasterId)
+        public TemplateMasterRes GetTemplateMasterById(long TemplateMasterId)
         {
             TemplateMasterRes res = new TemplateMasterRes();
             try
