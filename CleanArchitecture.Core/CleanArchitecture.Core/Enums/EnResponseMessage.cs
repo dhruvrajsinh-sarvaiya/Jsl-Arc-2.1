@@ -306,7 +306,7 @@ namespace CleanArchitecture.Core.Enums
         public static string PushNotificationSubscriptionFail = "Notification Subscription Failed.";
         public static string PushNotificationUnsubscriptionFail = "Notification Unsubscription Failed.";
 
-
+        public static string InvalidInput = "Invalid input";
 
     }
 
