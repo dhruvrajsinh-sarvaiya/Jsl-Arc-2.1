@@ -1205,7 +1205,10 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     Newtransaction.SetServiceProviderData(Provider.ServiceID, Provider.ServiceProID, Provider.ProductID, Provider.RouteID);
 
                     //===========POOL==================
-                    TradePoolMasterObj = _TradePoolMaster.GetSingle(item => item.BidPrice == _TransactionObj.BidPrice_TQ && item.SellServiceID == _TransactionObj.Order_ServiceID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                    TradePoolMasterObj = _TradePoolMaster.GetSingle(item => item.BidPrice == _TransactionObj.BidPrice_TQ && 
+                                                        item.SellServiceID == _TransactionObj.Order_ServiceID && 
+                                                        item.BuyServiceID == _TransactionObj.Delivery_ServiceID &&
+                                                        item.Status == Convert.ToInt16(ServiceStatus.Active));
                     if (TradePoolMasterObj != null)//Update
                     {
                         TradePoolMasterObj.TotalQty += Req.Amount;
