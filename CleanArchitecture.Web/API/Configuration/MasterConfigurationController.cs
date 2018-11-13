@@ -18,25 +18,21 @@ using CleanArchitecture.Core.ApiModels;
 
 namespace CleanArchitecture.Web.API.Configuration
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/[controller]/[action]")]
+    //[ApiController]
     public class MasterConfigurationController : Controller
     {
         #region Ctor
-        private readonly IBasePage _basePage;
-        private readonly ILogger<MasterConfigurationController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMasterConfiguration _masterConfiguration;
 
-        public MasterConfigurationController(ILogger<MasterConfigurationController> logger, UserManager<ApplicationUser> userManager, IBasePage basePage,IMasterConfiguration masterConfiguration)
+        public MasterConfigurationController(UserManager<ApplicationUser> userManager, IBasePage basePage,IMasterConfiguration masterConfiguration)
         {
-            _logger = logger;
             _userManager = userManager;
             _masterConfiguration = masterConfiguration;
-            _basePage = basePage;
         }
         #endregion
-
+        [HttpPost]
         public async Task<IActionResult> AddCountry(string CountryName, string CountryCode)
         {
             BizResponseClass Response = new BizResponseClass();
