@@ -207,6 +207,7 @@ namespace CleanArchitecture.Core.Enums
         CancelOrder_InvalidDeliveryamount = 4640,
         CancelOrder_InsertSuccess = 4643,
         ProcessTrn_APICallInternalError = 4641,
+        CancelOrder_StockNotAvilable = 4642,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
