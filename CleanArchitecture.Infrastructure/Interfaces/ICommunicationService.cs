@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.ViewModels.Configuration;
+using CleanArchitecture.Core.ViewModels.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,6 +39,32 @@ namespace CleanArchitecture.Infrastructure.Interfaces
 
         //vsolanki 14-11-2018
         ListEmailQueueRes GetEmailQueue(DateTime FromDate, DateTime ToDate, short? Status, string Email, int Page);
+
+        #endregion
+
+        #region "WalletLedger"
+
+        //vsolanki 14-11-2018
+        ListWalletLedgerResponse GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page, int? PageSize);
+
+        #endregion
+
+        #region "LimitRuleMaster"
+
+        //vsoalnki 13-11-2018
+        ListLimitRuleMasterRes GetAllLimitRule();
+
+        //vsoalnki 13-11-2018
+        BizResponseClass AddLimitRule(LimitRuleMasterReq Request, long userid);
+
+        //vsoalnki 13-11-2018
+        BizResponseClass UpdateLimitRule(long LimitRuleMasterId, LimitRuleMasterReq Request, long userid);
+
+        //vsoalnki 13-11-2018
+        BizResponseClass DisableLimitRule(long LimitRuleMasterId);
+
+        //vsoalnki 13-11-2018
+        ListLimitRuleMasterRes GetLimitRuleById(long LimitRuleMasterId);
 
         #endregion
     }

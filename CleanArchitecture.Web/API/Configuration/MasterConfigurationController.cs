@@ -18,6 +18,7 @@ using CleanArchitecture.Core.ApiModels;
 using CleanArchitecture.Core.ViewModels.MasterConfiguration;
 using System.ComponentModel.DataAnnotations;
 using CleanArchitecture.Core.ViewModels.Configuration;
+using CleanArchitecture.Core.ViewModels.Wallet;
 
 namespace CleanArchitecture.Web.API.Configuration
 {
@@ -282,6 +283,195 @@ namespace CleanArchitecture.Web.API.Configuration
                 {
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
                     Response = _communicationService.GetEmailQueue(FromDate, ToDate, Status, Email, Page);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
+        #region "WalletLedger"
+
+        //vsolanki 14-11-2018
+        [HttpGet("{FromDate}/{ToDate}/{WalletId}/{Page}")]
+        public async Task<IActionResult> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int Page,int? PageSize)
+        {
+            ListWalletLedgerResponse Response = new ListWalletLedgerResponse();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetWalletLedger(FromDate, ToDate, WalletId, Page, PageSize);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+
+        #endregion
+
+        #region "LimitRuleMaster"
+
+        //vsoalnki 14-11-2018
+        [HttpGet]
+        public async Task<IActionResult> GetAllLimitRule()
+        {
+            ListLimitRuleMasterRes Response = new ListLimitRuleMasterRes();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetAllLimitRule();
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        //vsoalnki 14-11-2018
+        [HttpPost]
+        public async Task<IActionResult> AddLimitRule([FromBody]LimitRuleMasterReq Request)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.AddLimitRule(Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        //vsoalnki 14-11-2018
+        [HttpPost("{LimitRuleMasterId}")]
+        public async Task<IActionResult> UpdateLimitRule([FromBody]LimitRuleMasterReq Request, long LimitRuleMasterId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.UpdateLimitRule(LimitRuleMasterId, Request, user.Id);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        //vsoalnki 14-11-2018
+        [HttpPost("{LimitRuleMasterId}")]
+        public async Task<IActionResult> DisableLimitRule(long LimitRuleMasterId)
+        {
+            BizResponseClass Response = new BizResponseClass();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.DisableLimitRule(LimitRuleMasterId);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        //vsoalnki 14-11-2018
+        [HttpGet("{LimitRuleMasterId}")]
+        public async Task<IActionResult> GetLimitRuleById(long LimitRuleMasterId)
+        {
+            ListLimitRuleMasterRes Response = new ListLimitRuleMasterRes();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetLimitRuleById(LimitRuleMasterId);
                 }
                 var respObj = JsonConvert.SerializeObject(Response);
                 dynamic respObjJson = JObject.Parse(respObj);

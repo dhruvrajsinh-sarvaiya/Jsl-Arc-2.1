@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Helpers;
 using CleanArchitecture.Core.Interfaces.Configuration;
 using CleanArchitecture.Core.ViewModels.Configuration;
+using CleanArchitecture.Core.ViewModels.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace CleanArchitecture.Infrastructure.Data.Configuration
 {
-    public class MasterConfigurationRepository: IMasterConfigurationRepository
+    public class MasterConfigurationRepository : IMasterConfigurationRepository
     {
         #region "DI"
         private readonly CleanArchitectureContext _dbContext;
@@ -104,7 +105,7 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
         public List<MessagingQueueRes> GetMessagingQueue(DateTime FromDate, DateTime ToDate, short? Status, long? MobileNo, int Page)
         {
             try
-            {                            
+            {
                 //MessageStatusType
                 //var val = Enum.GetNames(typeof(MessageStatusType))
                 //    .Cast<string>()
@@ -125,7 +126,7 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
                                  StrStatus = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 6) ? "Pending" : "Fail"
                              }
                              ).ToList();
-               
+
                 return items;
             }
             catch (Exception ex)
@@ -158,15 +159,139 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
                                  EmailDate = u.CreatedDate.ToString("dd-MM-yyyy h:mm:ss tt"),
                                  Body = u.Body,
                                  CC = u.CC,
-                                 BCC=u.BCC,
-                                 Subject=u.Subject,
-                                 Attachment=u.Attachment,
-                                 EmailType=u.EmailType.ToString(),
+                                 BCC = u.BCC,
+                                 Subject = u.Subject,
+                                 Attachment = u.Attachment,
+                                 EmailType = u.EmailType.ToString(),
                                  StrStatus = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 6) ? "Pending" : "Fail"
                              }
                              ).ToList();
 
                 return items;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        //vsolanki 14-11-2018
+        public List<WalletLedgerResponse> GetWalletLedger(DateTime FromDate, DateTime ToDate, long WalletId, int page, int? PageSize)
+        {
+            List<WalletLedgerResponse> wl = (from w in _dbContext.WalletLedgers
+                                        where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                        orderby w.TrnDate ascending
+                                        select new WalletLedgerResponse
+                                        {
+                                            LedgerId = w.Id,
+                                            PreBal = w.PreBal,
+                                            PostBal = w.PreBal,
+                                            Remarks = "Opening Balance",
+                                            Amount = 0,
+                                            CrAmount = 0,
+                                            DrAmount = 0,
+                                            TrnDate = w.TrnDate.ToString("dd-MM-yyyy h:mm:ss tt")
+                                        }).Take(1).Union((from w in _dbContext.WalletLedgers
+                                                          where w.WalletId == WalletId && w.TrnDate >= FromDate && w.TrnDate <= ToDate
+                                                          select new WalletLedgerResponse
+                                                          {
+                                                              LedgerId = w.Id,
+                                                              PreBal = w.PreBal,
+                                                              PostBal = w.PostBal,
+                                                              Remarks = w.Remarks,
+                                                              Amount = w.CrAmt > 0 ? w.CrAmt : w.DrAmt,
+                                                              CrAmount = w.CrAmt,
+                                                              DrAmount = w.DrAmt,
+                                                              TrnDate = w.TrnDate.ToString("dd-MM-yyyy h:mm:ss tt")
+                                                          })).ToList();
+
+            if (page > 0)
+            {
+                if (PageSize == null)
+                {
+                    int skip = Helpers.PageSize * (page - 1);
+                    wl = wl.Skip(skip).Take(Helpers.PageSize).ToList();
+                }
+                else
+                {
+                    int skip = Convert.ToInt32(PageSize) * (page - 1);
+                    wl = wl.Skip(skip).Take(Helpers.PageSize).ToList();
+                }
+            }
+            return wl;
+        }
+
+        //vsoalnki 14-11-2018
+        public List<LimitRuleMasterRes> GetAllLimitRule()
+        {
+            try
+            {
+                List<int> AllowTrnType = Helpers.GetEnumValue<enTrnType>();
+
+                var trntype = Enum.GetNames(typeof(enTrnType))
+                .Cast<string>()
+                .Select(x => x.ToString())
+                .ToArray();
+
+                var items = (from tm in _dbContext.LimitRuleMaster
+                             join cm in _dbContext.WalletTypeMasters
+                             on tm.WalletType equals cm.Id
+                             select new LimitRuleMasterRes
+                             {
+                                 Status = tm.Status,
+                                 Id = tm.Id,
+                                 Name = tm.Name,
+                                 TrnType = tm.TrnType,
+                                 StrTrnType = trntype[(Convert.ToInt32(tm.TrnType) - 1)],
+                                 MinAmount = tm.MinAmount,
+                                 MaxAmount = tm.MaxAmount,
+                                 WalletTypeName = cm.WalletTypeName,
+                                 WalletType = tm.WalletType,
+                                 StatusStr = (tm.Status == 9) ? "Disable" : (tm.Status == 1) ? "Active" : "InActive"
+                             }
+                             ).ToList();
+                return items;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        //vsoalnki 14-11-2018
+        public List<LimitRuleMasterRes> GetLimitRuleById(long LimitRuleMasterId)
+        {
+            try
+            {
+                List<int> AllowTrnType = Helpers.GetEnumValue<enTrnType>();
+
+                var trntype = Enum.GetNames(typeof(enTrnType))
+                .Cast<string>()
+                .Select(x => x.ToString())
+                .ToArray();
+
+                
+                var template = (from tm in _dbContext.LimitRuleMaster
+                                join cm in _dbContext.WalletTypeMasters
+                                on tm.WalletType equals cm.Id
+                                where tm.Id == LimitRuleMasterId
+                                select new LimitRuleMasterRes
+                                {
+                                    Status = tm.Status,
+                                    Id=tm.Id,
+                                    Name=tm.Name,
+                                    TrnType=tm.TrnType,
+                                    StrTrnType= trntype[Convert.ToInt32(tm.TrnType)-1],
+                                    MinAmount=tm.MinAmount,
+                                    MaxAmount=tm.MaxAmount,
+                                    WalletTypeName=cm.WalletTypeName,
+                                    WalletType=tm.WalletType,
+                                    StatusStr  = (tm.Status == 9) ? "Disable" : (tm.Status == 1) ? "Active" : "InActive"
+                                }
+                             ).ToList();
+                return template;
             }
             catch (Exception ex)
             {
