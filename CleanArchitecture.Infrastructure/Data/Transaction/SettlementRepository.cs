@@ -48,6 +48,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
         TradeTransactionQueue TradeTransactionQueueObj;
         TradeStopLoss _TradeStopLossObj;
         TradeCancelQueue tradeCancelQueue;
+        TradeTransactionStatus TradeTransactionStatusObj;
         private readonly IMessageConfiguration _messageConfiguration;
         string DebitAccountID;
         string CreditAccountID;
@@ -464,7 +465,17 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 HelperForLog.WriteErrorLog("CancellQueueEntry:##TrnNo " + TrnNo, ControllerName, ex);
             }
         }
+        public void TradeTransactionStatusEntry(decimal DeliverQty)
+        {
+            TradeTransactionStatus TradeTransactionStatusObj = new TradeTransactionStatus();
+            TradeTransactionStatusObj.TrnNo = TradeTransactionQueueObj.TrnNo;
+            TradeTransactionStatusObj.SettledQty = TradeTransactionStatusObj.TotalQty = TradeTransactionStatusObj.DeliveredQty = DeliverQty;
+            TradeTransactionStatusObj.PendingQty = 0;
+            //TradeTransactionStatusObj.SoldPrice;
+            //TradeTransactionStatusObj.BidPrice
 
+
+        }
         public BizResponse CancellationProcess(BizResponse _Resp, TradeBuyRequest TradeBuyRequestObj,TransactionQueue TransactionQueueObj,TradeTransactionQueue TradeTransactionQueueObj)
         {
             decimal DeliverQty = 0;
@@ -481,17 +492,24 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     _Resp.ReturnMsg = "Invalid Delivery amount";                 
                     return _Resp;
                 }
+                var PoolMst = _TradePoolMaster.GetSingle(e => e.Status == 1 && e.OnProcessing > 0 && e.TotalQty > DeliverQty && e.Id== TradeBuyRequestObj.SellStockID);
+                if (PoolMst == null)
+                {
+                    _Resp.ErrorCode = enErrorCode.CancelOrder_StockNotAvilable;
+                    _Resp.ReturnCode = enResponseCodeService.Fail;
+                    _Resp.ReturnMsg = "Stock Not Avilable";
+                    return _Resp;
+                }
 
                 CancellQueueEntry(tradeCancelQueue, TradeBuyRequestObj.TrnNo, TransactionQueueObj.ServiceID, TradeBuyRequestObj.PendingQty, DeliverQty,0,0, TradeBuyRequestObj.UserID);
                 PoolOrderObj = CreatePoolOrderForSettlement(TradeBuyRequestObj.UserID, TradeBuyRequestObj.SellStockID, TradeBuyRequestObj.UserID, TradeBuyRequestObj.SellStockID, TradeBuyRequestObj.TrnNo, DeliverQty, CreditWalletID, CreditAccountID);
                 tradeCancelQueue.OrderID = PoolOrderObj.Id;
-                tradeCancelQueue.Status = 1;              
-
+                tradeCancelQueue.Status = 1; 
                 TradeBuyRequestObj.IsCancel = 1;
                 TradeTransactionQueueObj.SetTransactionStatusMsg("Cancellation Initiated");
                 TradeTransactionQueueObj.IsCancelled = 1;
                 _TradeTransactionRepository.Update(TradeTransactionQueueObj);
-
+                
                 _dbContext.Database.BeginTransaction();
 
                 _dbContext.Set<TradeCancelQueue>().Add(tradeCancelQueue);
@@ -501,6 +519,62 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 _dbContext.Entry(TradeTransactionQueueObj).State = EntityState.Modified;
                 _dbContext.SaveChanges();
                 _dbContext.Database.CommitTransaction();
+
+                if(PoolMst.TotalQty >= DeliverQty)
+                {
+                    PoolOrderObj.DeliveryAmt = DeliverQty;
+                    PoolOrderObj.Status = 1;
+                    PoolOrderObj.DRemarks = "Cancel order Delivery Success";
+                    //PoolOrderObj.DMemberID = TradeBuyRequestObj.UserID; DeliveryGivenBy=@MemberID
+                    _PoolOrder.Update(PoolOrderObj);
+
+                    PoolMst.TotalQty = PoolMst.TotalQty - DeliverQty;
+                    PoolMst.UpdatedDate = DateTime.UtcNow;
+                    PoolMst.UpdatedBy= TradeBuyRequestObj.UserID;
+                    _TradePoolMaster.Update(PoolMst);
+
+                    TradeBuyRequestObj.Status = 1;
+                    _TradeBuyRequest.Update(TradeBuyRequestObj);
+                    if(TradeBuyRequestObj.DeliveredQty > 0)
+                    {
+                        TradeTransactionQueueObj.Status = 1;
+                        TradeTransactionQueueObj.StatusMsg = "Success with partial cancellation";
+                        TradeTransactionQueueObj.SettledDate = DateTime.UtcNow;
+                        _TradeTransactionRepository.Update(TradeTransactionQueueObj);
+
+                        TransactionQueueObj.Status = 1;
+                        TransactionQueueObj.StatusMsg = "Success with partial cancellation";
+                        _TransactionRepository.Update(TransactionQueueObj);
+
+                        TradeBuyRequestObj.Status = 1;
+                        TradeBuyRequestObj.UpdatedDate = DateTime.UtcNow;
+                        _TradeBuyRequest.Update(TradeBuyRequestObj);
+                    }
+                    else
+                    {
+                        TradeTransactionQueueObj.Status = 2;
+                        TradeTransactionQueueObj.StatusMsg = "Full Order Cancellation";
+                        TradeTransactionQueueObj.SettledDate = DateTime.UtcNow;
+                        _TradeTransactionRepository.Update(TradeTransactionQueueObj);
+
+                        TransactionQueueObj.Status = 2;
+                        _TransactionRepository.Update(TransactionQueueObj);
+
+                        TradeBuyRequestObj.Status = 2;
+                        TradeBuyRequestObj.UpdatedDate = DateTime.UtcNow;
+                        _TradeBuyRequest.Update(TradeBuyRequestObj);
+                    }
+
+                    tradeCancelQueue.Status = 1;
+                    tradeCancelQueue.SettledDate = DateTime.UtcNow;
+                    tradeCancelQueue.UpdatedDate = DateTime.UtcNow;
+                    tradeCancelQueue.StatusMsg = "Cancellation Successful.";
+                    //TCQ object update pending
+                    //Update Wallet 
+                    //EXEC sp_InsertTransactionAccount 
+                    //EXEC sp_InsertLedger
+                    
+                }
 
                 _Resp.ErrorCode = enErrorCode.CancelOrder_InsertSuccess;
                 _Resp.ReturnCode = enResponseCodeService.Success;
