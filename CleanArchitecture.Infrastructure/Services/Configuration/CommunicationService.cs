@@ -271,5 +271,54 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         }
 
         #endregion
+
+        #region "EmailQueue"
+
+        //vsolanki 14-11-2018
+        public ListEmailQueueRes GetEmailQueue(DateTime FromDate, DateTime ToDate, short? Status, string Email, int Page)
+        {
+            try
+            {
+                ListEmailQueueRes res = new ListEmailQueueRes();
+                int Customday = Convert.ToInt32(_configuration["ReportValidDays"]);//2;
+                double days = (ToDate - FromDate).TotalDays;
+                if (Customday < days)
+                {
+                    var msg = EnResponseMessage.MoreDays;
+                    msg = msg.Replace("#X#", Customday.ToString());
+
+                    res.ReturnCode = enResponseCode.Fail;
+                    res.ErrorCode = enErrorCode.MoreDays;
+                    res.ReturnMsg = msg;
+                    return res;
+                }
+
+                var items = _masterConfigurationRepository.GetEmailQueue(FromDate, ToDate, Status, Email, Page);
+                if (items.Count != 0)
+                {
+                    if (Page > 0)
+                    {
+                        int skip = Helpers.PageSize * (Page - 1);
+                        items = items.Skip(skip).Take(Helpers.PageSize).ToList();
+                    }
+                    res.ReturnCode = enResponseCode.Success;
+                    res.ErrorCode = enErrorCode.Success;
+                    res.ReturnMsg = EnResponseMessage.FindRecored;
+                    res.EmailQueueObj = items;
+                    return res;
+                }
+                res.ReturnCode = enResponseCode.Fail;
+                res.ErrorCode = enErrorCode.RecordNotFound;
+                res.ReturnMsg = EnResponseMessage.NotFound;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
+        #endregion
     }
 }

@@ -135,6 +135,46 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
             }
         }
 
+        //vsoalnki 14-11-2018
+        public List<EmailQueueRes> GetEmailQueue(DateTime FromDate, DateTime ToDate, short? Status, string Email, int Page)
+        {
+            try
+            {
+                //MessageStatusType
+                //var val = Enum.GetNames(typeof(MessageStatusType))
+                //    .Cast<string>()
+                //    .Select(x => x.ToString())
+                //    .ToArray();
+                //List<int> msgInt = Helpers.GetEnumValue<MessageStatusType>();
+
+                var items = (from u in _dbContext.EmailQueue
+                                 //join q in msgInt
+                                 //on u.Status equals q
+                             where u.CreatedDate >= FromDate && u.CreatedDate <= ToDate && (Status == null || (u.Status == Status && Status != null)) && (Email == null || (u.Recepient == Email && Email != null))
+                             select new EmailQueueRes
+                             {
+                                 Status = u.Status,
+                                 RecepientEmail = u.Recepient,
+                                 EmailDate = u.CreatedDate,
+                                 Body = u.Body,
+                                 CC = u.CC,
+                                 BCC=u.BCC,
+                                 Subject=u.Subject,
+                                 Attachment=u.Attachment,
+                                 EmailType=u.EmailType.ToString(),
+                                 StrStatus = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 6) ? "Pending" : "Fail"
+                             }
+                             ).ToList();
+
+                return items;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw ex;
+            }
+        }
+
         #endregion
     }
 }

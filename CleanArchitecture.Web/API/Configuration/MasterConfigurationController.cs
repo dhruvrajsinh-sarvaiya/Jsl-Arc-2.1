@@ -261,6 +261,40 @@ namespace CleanArchitecture.Web.API.Configuration
 
         #endregion
 
+        #region "EmailQueue"
+
+        //vsolanki 14-11-2018
+        [HttpGet("{FromDate}/{ToDate}/{Page}")]
+        public async Task<IActionResult> GetEmailQueue(DateTime FromDate, DateTime ToDate, short? Status, string Email, int Page)
+        {
+            ListEmailQueueRes Response = new ListEmailQueueRes();
+            try
+            {
+                ApplicationUser user = new ApplicationUser(); user.Id = 1;
+                //ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    Response.ReturnCode = enResponseCode.Fail;
+                    Response.ReturnMsg = EnResponseMessage.StandardLoginfailed;
+                    Response.ErrorCode = enErrorCode.StandardLoginfailed;
+                }
+                else
+                {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    Response = _communicationService.GetEmailQueue(FromDate, ToDate, Status, Email, Page);
+                }
+                var respObj = JsonConvert.SerializeObject(Response);
+                dynamic respObjJson = JObject.Parse(respObj);
+                return Ok(respObjJson);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BizResponseClass { ReturnCode = enResponseCode.InternalError, ReturnMsg = ex.ToString(), ErrorCode = enErrorCode.Status500InternalServerError });
+            }
+        }
+
+        #endregion
+
         #region MasterConfiguration
 
         #region Insert Method
