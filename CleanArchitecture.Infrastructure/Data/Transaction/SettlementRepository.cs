@@ -190,24 +190,30 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                 IEnumerable<TradeSellerList> MatchSellerListBase;
                 //SortedList<TradeSellerList, TradeSellerList>
-                if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))//Take price as Highest and find lower
-                {
-                   MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
-                                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
-                                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
-                                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
-                                                       && item.RemainQty > 0);//Pending after partial Qty remain
-                }
-                else //Take price as Highest and find larger
-                {
-                    MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price >= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
-                                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
-                                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
-                                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
-                                                       && item.RemainQty > 0);//Pending after partial Qty remain
-                }
-                   
+                //if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))//Take price as Highest and find lower
+                //{
+                //   MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
+                //                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
+                //                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
+                //                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                //                                       && item.RemainQty > 0);//Pending after partial Qty remain
+                //}
+                //else //Take price as Highest and find larger
+                //{
+                //    MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price >= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
+                //                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
+                //                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
+                //                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                //                                       && item.RemainQty > 0);//Pending after partial Qty remain
+                //}
+                MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price >= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
+                                                     && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
+                                                     item.SellServiceID == TradeBuyRequestObj.ServiceID
+                                                     && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                                                     && item.RemainQty > 0);//Pending after partial Qty remain
 
+
+                //var MatchSellerList = MatchSellerListBase.OrderBy(x => x.Price).OrderBy(x => x.TrnNo);
                 var MatchSellerList = MatchSellerListBase.OrderBy(x => x.Price).OrderBy(x => x.TrnNo);
 
                 foreach (TradeSellerList SellerList in MatchSellerList)
