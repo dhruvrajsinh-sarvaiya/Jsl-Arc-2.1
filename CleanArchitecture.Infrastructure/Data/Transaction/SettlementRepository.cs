@@ -382,9 +382,9 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                 _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal
                                                                                                                                                                                                         //==============Volume update only after success
                                 if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
-                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.BidPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.BuyQty);
+                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.BidPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.BuyQty, TradeTransactionQueueObj.TrnDate);
                                 else
-                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty);
+                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty, TradeTransactionQueueObj.TrnDate);
 
                                 EmailSendAsync(TradeBuyRequestObj.UserID.ToString(), Convert.ToInt16(enTransactionStatus.Success), TradeTransactionQueueObj.PairName,
                                        TradeTransactionQueueObj.PairName.Split("_")[1], TradeTransactionQueueObj.TrnDate.ToString(),
