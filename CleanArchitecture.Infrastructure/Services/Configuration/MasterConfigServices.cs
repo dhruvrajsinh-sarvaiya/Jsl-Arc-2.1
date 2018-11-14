@@ -287,9 +287,108 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         #endregion
 
         #region GetByIDMethods
+
+        public Countries GetCountry(long CountryID)
+        {
+            try
+            {
+                Countries country = new Countries();
+                BizResponseClass Resp = new BizResponseClass();
+                var IsExist = _commonRepoCountry.GetSingle(item => item.Id == CountryID);
+                if (IsExist != null)
+                {
+                    country.CountryName = IsExist.CountryName;
+                    country.CountryCode = IsExist.CountryCode;
+                    country.Status = IsExist.Status;
+                    Resp.ErrorCode = enErrorCode.Success;
+                    Resp.ReturnCode = enResponseCode.Success;
+                    Resp.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                else
+                {
+                    Resp.ErrorCode = enErrorCode.NotFound;
+                    Resp.ReturnCode = enResponseCode.Fail;
+                    Resp.ReturnMsg = EnResponseMessage.NotFound;
+                }
+                country.BizResponseObj = Resp;
+                return country;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw;
+            }
+        }
+
+        public States GetState(long StateID)
+        {
+            try
+            {
+                States states = new States();
+                BizResponseClass Resp = new BizResponseClass();
+                var IsExist = _commonRepoState.GetSingle(item => item.Id == StateID);
+                if (IsExist != null)
+                {
+                    states.StateName = IsExist.StateName;
+                    states.StateCode = IsExist.StateCode;
+                    states.Status = IsExist.Status;
+                    Resp.ErrorCode = enErrorCode.Success;
+                    Resp.ReturnCode = enResponseCode.Success;
+                    Resp.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                else
+                {
+                    Resp.ErrorCode = enErrorCode.NotFound;
+                    Resp.ReturnCode = enResponseCode.Fail;
+                    Resp.ReturnMsg = EnResponseMessage.NotFound;
+                }
+                states.BizResponseObj = Resp;
+                return states;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw;
+            }
+        }
+
+        public Cities GetCity(long CityID)
+        {
+            try
+            {
+                Cities cities = new Cities();
+                BizResponseClass Resp = new BizResponseClass();
+                var IsExist = _commonRepoCity.GetSingle(item => item.Id == CityID);
+                if (IsExist != null)
+                {
+                    cities.CityName = IsExist.CityName;
+                    cities.Status = IsExist.Status;
+                    Resp.ErrorCode = enErrorCode.Success;
+                    Resp.ReturnCode = enResponseCode.Success;
+                    Resp.ReturnMsg = EnResponseMessage.FindRecored;
+                }
+                else
+                {
+                    Resp.ErrorCode = enErrorCode.NotFound;
+                    Resp.ReturnCode = enResponseCode.Fail;
+                    Resp.ReturnMsg = EnResponseMessage.NotFound;
+                }
+                cities.BizResponseObj = Resp;
+                return cities;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw;
+            }
+        }
+
         #endregion
 
         #region GetListMethods
+
+
+
         #endregion
     }
 }

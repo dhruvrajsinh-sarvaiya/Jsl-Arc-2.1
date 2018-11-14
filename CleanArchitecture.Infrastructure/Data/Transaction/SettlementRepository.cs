@@ -190,25 +190,31 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
                 IEnumerable<TradeSellerList> MatchSellerListBase;
                 //SortedList<TradeSellerList, TradeSellerList>
-                if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))//Take price as Highest and find lower
-                {
-                   MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
-                                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
-                                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
-                                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
-                                                       && item.RemainQty > 0);//Pending after partial Qty remain
-                }
-                else //Take price as Highest and find larger
-                {
-                    MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price >= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
-                                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
-                                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
-                                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
-                                                       && item.RemainQty > 0);//Pending after partial Qty remain
-                }
-                   
+                //if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))//Take price as Highest and find lower
+                //{
+                //   MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price <= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
+                //                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
+                //                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
+                //                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                //                                       && item.RemainQty > 0);//Pending after partial Qty remain
+                //}
+                //else //Take price as Highest and find larger
+                //{
+                //    MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price >= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
+                //                                       && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
+                //                                       item.SellServiceID == TradeBuyRequestObj.ServiceID
+                //                                       && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                //                                       && item.RemainQty > 0);//Pending after partial Qty remain
+                //}
+                MatchSellerListBase = _TradeSellerList.FindBy(item => item.Price >= TradeBuyRequestObj.BidPrice && item.IsProcessing == 0
+                                                     && item.BuyServiceID == TradeBuyRequestObj.PaidServiceID &&
+                                                     item.SellServiceID == TradeBuyRequestObj.ServiceID
+                                                     && (item.Status == Convert.ToInt16(enTransactionStatus.Initialize) || item.Status == Convert.ToInt16(enTransactionStatus.Hold))
+                                                     && item.RemainQty > 0);//Pending after partial Qty remain
 
-                var MatchSellerList = MatchSellerListBase.OrderBy(x => x.Price).OrderBy(x => x.TrnNo);
+
+                //var MatchSellerList = MatchSellerListBase.OrderBy(x => x.Price).OrderBy(x => x.TrnNo);
+                var MatchSellerList = MatchSellerListBase.OrderByDescending(x => x.Price).OrderBy(x => x.TrnNo);
 
                 foreach (TradeSellerList SellerList in MatchSellerList)
                 {
@@ -382,9 +388,9 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                                 _ISignalRService.OnStatusSuccess(Convert.ToInt16(enTransactionStatus.Success), TransactionQueueObj, TradeTransactionQueueObj, accessToken, _TradeStopLossObj.ordertype);//komal
                                                                                                                                                                                                         //==============Volume update only after success
                                 if (TradeTransactionQueueObj.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
-                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.BidPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.BuyQty);
+                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.BidPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.BuyQty, TradeTransactionQueueObj.TrnDate);
                                 else
-                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty);
+                                    _IFrontTrnService.GetPairAdditionalVal(TradeTransactionQueueObj.PairID, TradeTransactionQueueObj.AskPrice, TradeTransactionQueueObj.TrnNo, TradeTransactionQueueObj.SellQty, TradeTransactionQueueObj.TrnDate);
 
                                 EmailSendAsync(TradeBuyRequestObj.UserID.ToString(), Convert.ToInt16(enTransactionStatus.Success), TradeTransactionQueueObj.PairName,
                                        TradeTransactionQueueObj.PairName.Split("_")[1], TradeTransactionQueueObj.TrnDate.ToString(),

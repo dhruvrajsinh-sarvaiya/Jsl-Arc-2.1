@@ -354,7 +354,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         //        throw ex;
         //    }
         //}
-        public void GetPairAdditionalVal(long PairId, decimal CurrentRate, long TrnNo,decimal Quantity)
+        public void GetPairAdditionalVal(long PairId, decimal CurrentRate, long TrnNo,decimal Quantity,DateTime TranDate)
         {
             try
             {
@@ -362,13 +362,26 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 decimal Volume24 = 0, ChangePer = 0, High24Hr = 0, Low24Hr = 0, WeekHigh = 0,WeekLow =0,Week52High=0,Week52Low=0;
                 short UpDownBit = 1; //komal 13-11-2018 set defau
                 decimal tradeprice = 0, todayopen, todayclose;
-                var tradedtatstatus = _tradeTransactionQueueRepository.GetSingle(x => x.TrnNo == TrnNo);
-                if( tradedtatstatus != null)
+                decimal LastRate = 0;
+
+                var tradeRateData = _tradeTransactionQueueRepository.FindBy(x => x.TrnDate > _basePage.UTC_To_IST().AddDays(-1) && x.PairID == PairId && x.Status == 1 && ( x.TrnType == Convert.ToInt16(enTrnType.Sell_Trade) || x.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))).OrderByDescending(x => x.TrnNo).FirstOrDefault();
+                if(tradeRateData != null)
                 {
-                    HelperForLog.WriteLogIntoFile("#GetPairAdditionalVal# #TradeStatus# " + " #TrnNo# :" + TrnNo + " #BidPrice# : " + tradedtatstatus.BidPrice + " #AskPrice# : " + tradedtatstatus.AskPrice + " #Status# : " + tradedtatstatus.Status, "FrontService", "Object Data : ");
+                    if(tradeRateData.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
+                    {
+                        LastRate = tradeRateData.BidPrice;
+                    }
+                    else if (tradeRateData.TrnType == Convert.ToInt16(enTrnType.Sell_Trade))
+                    {
+                        LastRate = tradeRateData.AskPrice;
+                    }
                 }
+                else
+                {
+                    LastRate = 0;
+                }
+
                 var tradedata = _tradeTransactionQueueRepository.GetSingle(x => x.TrnDate > _basePage.UTC_To_IST().AddDays(-1) && x.PairID == PairId && x.Status == 1);
-              
                 if (tradedata != null)
                 {
                     HelperForLog.WriteLogIntoFile("#GetPairAdditionalVal# #CHANGEPER# #Count# : 1 " + " #TrnNo# :" + TrnNo + " #BidPrice# : " + tradedata.BidPrice + " #AskPrice# : " + tradedata.AskPrice, "FrontService", "Object Data : ");
@@ -380,9 +393,9 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     {
                         tradeprice = tradedata.AskPrice;
                     }
-                    if (CurrentRate > 0 && tradeprice > 0)
-                        ChangePer = ((CurrentRate * 100) / tradeprice) - 100;
-                    else if (CurrentRate > 0 && tradeprice == 0)
+                    if (LastRate > 0 && tradeprice > 0)
+                        ChangePer = ((LastRate * 100) / tradeprice) - 100;
+                    else if (LastRate > 0 && tradeprice == 0)
                     {
                         ChangePer = 100;
                     }
@@ -431,7 +444,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 HelperForLog.WriteLogIntoFile("#GetPairAdditionalVal# " + " #VolumeData :" + Volume24 + " #ChangePer# : " + ChangePer, "FrontService", "Object Data : ");
 
                 //Insert In GraphDetail Only BidPrice
-                var DataDate = _basePage.UTC_To_IST();
+                var DataDate = TranDate;
                 var tradegraph = new TradeGraphDetail()
                 {
                     PairId = PairId,
@@ -457,20 +470,30 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                 finally
                 {
                     //Calculate High Low Data For 24Hr
-                    var tradegraphdetail = _graphDetailRepository.FindBy(x => x.PairId == PairId && x.DataDate >= _basePage.UTC_To_IST().AddDays(-1) && x.DataDate <= _basePage.UTC_To_IST()).OrderBy(x => x.Id).ToList();
-                    High24Hr = CurrentRate;
-                    Low24Hr = CurrentRate;
-                    if (tradegraphdetail.Count > 0)
+                    var tardeTrabDetail = _tradeTransactionQueueRepository.FindBy(x => x.PairID == PairId && x.TrnDate >= _basePage.UTC_To_IST().AddDays(-1) && x.TrnDate <= _basePage.UTC_To_IST()).OrderBy(x => x.Id).ToList();
+                    High24Hr = LastRate;
+                    Low24Hr = LastRate;
+                    if (tardeTrabDetail.Count > 0)
                     {
-                        foreach (TradeGraphDetail type in tradegraphdetail)
+                        foreach (TradeTransactionQueue type in tardeTrabDetail)
                         {
-                            if (type.BidPrice > High24Hr)
+                            decimal price = 0;
+                            if(type.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
                             {
-                                High24Hr = type.BidPrice;
+                                price = type.BidPrice;
                             }
-                            if (type.BidPrice < Low24Hr)
+                            else if (type.TrnType == Convert.ToInt16(enTrnType.Sell_Trade))
                             {
-                                Low24Hr = type.BidPrice;
+                                price = type.AskPrice;
+                            }
+
+                            if (price > High24Hr)
+                            {
+                                High24Hr = price;
+                            }
+                            if (price < Low24Hr)
+                            {
+                                Low24Hr = price;
                             }
                         }
                     }
@@ -544,8 +567,20 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     //tradegraph.TodayClose = todayclose;                   
                     //_graphDetailRepository.Update(tradegraph);
 
+                    //Uday 14-11-2018 CurrentRate Calculation Changes based on TrnDate
 
                     var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
+                    if(TranDate > pairData.TranDate)
+                    {
+                        pairData.LTP = CurrentRate;
+                        pairData.CurrentRate = CurrentRate;
+                    }
+                    else
+                    {
+                        CurrentRate = pairData.CurrentRate;
+                    }
+                    _tradePairStastics.Update(pairData);
+
                     if (CurrentRate > pairData.High24Hr) //komal 13-11-2018 Change code sequence cos got 0 every time
                     {
                         UpDownBit = 1;
