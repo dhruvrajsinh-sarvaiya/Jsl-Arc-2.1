@@ -20,5 +20,9 @@ namespace CleanArchitecture.Infrastructure.Interfaces
         BizResponseClass UpdateState(AddStateReq Request, long UserID);
         BizResponseClass UpdateCity(AddCityReq Request, long UserID);
         BizResponseClass UpdateZipCode(AddZipCodeReq Request, long UserID);
+
+        Countries GetCountry(long CountryID);
+        States GetState(long StateID);
+        Cities GetCity(long CityID);
     }
 }
