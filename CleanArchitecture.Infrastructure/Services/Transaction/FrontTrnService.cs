@@ -639,8 +639,8 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         _signalRService.ChartData(GraphData, VolumeData.PairName);
                     }
 
-                    HelperForLog.WriteLogIntoFile("#VolumeDataToSocket# #PairId# : " + PairId, "FrontService", "Object Data : ");
-                    HelperForLog.WriteLogIntoFile("#MarketDataToSocket# #PairId# : " + PairId, "FrontService", "Object Data : ");
+                    HelperForLog.WriteLogIntoFile("#VolumeDataToSocket# #PairId# : " + PairId + " #TrnNo# : " + TrnNo, "FrontService", "Object Data : ");
+                    HelperForLog.WriteLogIntoFile("#MarketDataToSocket# #PairId# : " + PairId + " #TrnNo# : " + TrnNo, "FrontService", "Object Data : ");
                     _signalRService.OnVolumeChange(VolumeData, MarketData);
                 }
             }
