@@ -24,6 +24,7 @@ using CleanArchitecture.Core.Helpers;
 using Microsoft.AspNetCore.Identity;
 using CleanArchitecture.Core.Entities.User;
 using CleanArchitecture.Core.Entities.Configuration;
+using CleanArchitecture.Core.ViewModels.MasterConfiguration;
 
 namespace CleanArchitecture.Infrastructure.Services.Configuration
 {
@@ -46,15 +47,15 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
         }
 
         #region AddMethods
-        public BizResponseClass AddCity(string CityName, long StateID, long UserID)
+        public BizResponseClass AddCity(AddCityReq Request, long UserID)//string CityName, long StateID, short Status
         {
             BizResponseClass Resp = new BizResponseClass();
             try
             {
                 CityMaster obj = new CityMaster();
-                obj.CityName = CityName;
-                obj.StateID = StateID;
-                obj.Status = Convert.ToInt16(ServiceStatus.Active);
+                obj.CityName = Request.CityName;
+                obj.StateID = Request.StateID;
+                obj.Status = Request.Status;
                 obj.CreatedBy = UserID;
                 obj.CreatedDate = UTC_To_IST();
                 _commonRepoCity.Add(obj);
@@ -70,15 +71,15 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public BizResponseClass AddCountry(string CountryName, string CountryCode, long UserID)
+        public BizResponseClass AddCountry(AddCountryReq Request, long UserID)//string CountryName, string CountryCode, long UserID, short Status
         {
             BizResponseClass Resp = new BizResponseClass();
             try
             {
                 CountryMaster obj = new CountryMaster();
-                obj.CountryName = CountryName;
-                obj.CountryCode = CountryCode;
-                obj.Status = Convert.ToInt16(ServiceStatus.Active);
+                obj.CountryName = Request.CountryName;
+                obj.CountryCode = Request.CountryCode;
+                obj.Status = Request.Status;
                 obj.CreatedBy = UserID;
                 obj.CreatedDate = UTC_To_IST();
                 _commonRepoCountry.Add(obj);
@@ -94,15 +95,16 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public BizResponseClass AddState(string StateName, string StateCode, long CountryID, long UserID)
+        public BizResponseClass AddState(AddStateReq Request, long UserID)//string StateName, string StateCode, long CountryID, short Status
         {
             BizResponseClass Resp = new BizResponseClass();
             try
             {
                 StateMaster obj = new StateMaster();
-                obj.StateName = StateName;
-                obj.StateCode = StateCode;
-                obj.Status = Convert.ToInt16(ServiceStatus.Active);
+                obj.StateName = Request.StateName;
+                obj.StateCode = Request.StateCode;
+                obj.Status = Request.Status;
+                obj.CountryID = Request.CountryID;
                 obj.CreatedBy = UserID;
                 obj.CreatedDate = UTC_To_IST();
                 _commonRepoState.Add(obj);
@@ -118,16 +120,16 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
             }
         }
 
-        public BizResponseClass AddZipCode(long ZipCode, string AreaName, long CityID, long UserID)
+        public BizResponseClass AddZipCode(AddZipCodeReq Request, long UserID)//long ZipCode, string AreaName, long CityID, short Status
         {
             BizResponseClass Resp = new BizResponseClass();
             try
             {
                 ZipCodeMaster obj = new ZipCodeMaster();
-                obj.ZipCode = ZipCode;
-                obj.ZipAreaName = AreaName;
-                obj.CityID = CityID;
-                obj.Status = Convert.ToInt16(ServiceStatus.Active);
+                obj.ZipCode = Request.ZipCode;
+                obj.ZipAreaName = Request.AreaName;
+                obj.CityID = Request.CityID;
+                obj.Status = Request.Status;
                 obj.CreatedBy = UserID;
                 obj.CreatedDate = UTC_To_IST();
                 _commonRepoZipCode.Add(obj);
@@ -142,9 +144,146 @@ namespace CleanArchitecture.Infrastructure.Services.Configuration
                 throw ex;
             }
         }
+
+
         #endregion
 
         #region UpdateMethods
+
+        public BizResponseClass UpdateCountry(AddCountryReq Request, long UserID)
+        {
+            try
+            {
+                BizResponseClass Resp = new BizResponseClass();
+                var IsExist = _commonRepoCountry.GetSingle(item => item.Id == Request.CountryID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                if (IsExist != null)
+                {
+                    IsExist.CountryCode = Request.CountryCode;
+                    IsExist.CountryName = Request.CountryName;
+                    IsExist.Status = Request.Status;
+                    IsExist.UpdatedBy = UserID;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _commonRepoCountry.Update(IsExist);
+                    Resp.ErrorCode = enErrorCode.Success;
+                    Resp.ReturnCode = enResponseCode.Success;
+                    Resp.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Resp.ErrorCode = enErrorCode.NotFound;
+                    Resp.ReturnCode = enResponseCode.Fail;
+                    Resp.ReturnMsg = EnResponseMessage.NotFound;
+                }
+                return Resp;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw;
+            }
+        }
+
+        public BizResponseClass UpdateState(AddStateReq Request, long UserID)
+        {
+            try
+            {
+                BizResponseClass Resp = new BizResponseClass();
+                var IsExist = _commonRepoState.GetSingle(item => item.Id == Request.StateID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                if (IsExist != null)
+                {
+                    IsExist.StateName = Request.StateName;
+                    IsExist.StateCode = Request.StateCode;
+                    IsExist.CountryID = Request.CountryID;
+                    IsExist.Status = Request.Status;
+                    IsExist.UpdatedBy = UserID;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _commonRepoState.Update(IsExist);
+                    Resp.ErrorCode = enErrorCode.Success;
+                    Resp.ReturnCode = enResponseCode.Success;
+                    Resp.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Resp.ErrorCode = enErrorCode.NotFound;
+                    Resp.ReturnCode = enResponseCode.Fail;
+                    Resp.ReturnMsg = EnResponseMessage.NotFound;
+                }
+                return Resp;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw;
+            }
+        }
+
+        public BizResponseClass UpdateCity(AddCityReq Request, long UserID)
+        {
+            try
+            {
+                BizResponseClass Resp = new BizResponseClass();
+                var IsExist = _commonRepoCity.GetSingle(item => item.Id == Request.CityID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                if (IsExist != null)
+                {
+                    IsExist.CityName = Request.CityName;
+                    IsExist.StateID = Request.StateID;
+                    IsExist.Status = Request.Status;
+                    IsExist.UpdatedBy = UserID;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _commonRepoCity.Update(IsExist);
+                    Resp.ErrorCode = enErrorCode.Success;
+                    Resp.ReturnCode = enResponseCode.Success;
+                    Resp.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Resp.ErrorCode = enErrorCode.NotFound;
+                    Resp.ReturnCode = enResponseCode.Fail;
+                    Resp.ReturnMsg = EnResponseMessage.NotFound;
+                }
+                return Resp;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw;
+            }
+        }
+
+        public BizResponseClass UpdateZipCode(AddZipCodeReq Request, long UserID)
+        {
+            try
+            {
+                BizResponseClass Resp = new BizResponseClass();
+                var IsExist = _commonRepoZipCode.GetSingle(item => item.Id == Request.ZipCodeID && item.Status == Convert.ToInt16(ServiceStatus.Active));
+                if (IsExist != null)
+                {
+                    IsExist.ZipCode = Request.ZipCode;
+                    IsExist.ZipAreaName = Request.AreaName;
+                    IsExist.CityID = Request.CityID;
+                    IsExist.Status = Request.Status;
+                    IsExist.UpdatedBy = UserID;
+                    IsExist.UpdatedDate = UTC_To_IST();
+                    _commonRepoZipCode.Update(IsExist);
+                    Resp.ErrorCode = enErrorCode.Success;
+                    Resp.ReturnCode = enResponseCode.Success;
+                    Resp.ReturnMsg = EnResponseMessage.RecordUpdated;
+                }
+                else
+                {
+                    Resp.ErrorCode = enErrorCode.NotFound;
+                    Resp.ReturnCode = enResponseCode.Fail;
+                    Resp.ReturnMsg = EnResponseMessage.NotFound;
+                }
+                return Resp;
+            }
+            catch (Exception ex)
+            {
+                HelperForLog.WriteErrorLog(System.Reflection.MethodBase.GetCurrentMethod().Name, this.GetType().Name, ex);
+                throw;
+            }
+        }
+
         #endregion
 
         #region GetByIDMethods

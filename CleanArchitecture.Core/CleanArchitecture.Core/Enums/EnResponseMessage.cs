@@ -113,6 +113,7 @@ namespace CleanArchitecture.Core.Enums
         public static string AddBeneNotification = "New Beneficiary Added Successfully For Wallet Type:#WalletName#";
         public static string UpBeneNotification = "Beneficiary Details Updated Successfully For Wallet Type:#WalletName#";
         public static string UserPreferencesNotification = "Your Whitelisting Is Switched #ONOFF# Successfully";
+        public static string MasterConfig = "Invalid Parameter";
         //public static string AddBeneNotification = "New Beneficiary Added Successfully For Wallet Type:#WalletName#";
 
         //========================My Account===============================//

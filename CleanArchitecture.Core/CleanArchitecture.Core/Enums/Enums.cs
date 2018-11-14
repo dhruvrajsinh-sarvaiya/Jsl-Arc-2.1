@@ -207,6 +207,7 @@ namespace CleanArchitecture.Core.Enums
         CancelOrder_InvalidDeliveryamount = 4640,
         CancelOrder_InsertSuccess = 4643,
         ProcessTrn_APICallInternalError = 4641,
+        CancelOrder_StockNotAvilable = 4642,
         //=======================
         //=====================MyAccount
         Status500InternalServerError = 500,
@@ -349,6 +350,7 @@ namespace CleanArchitecture.Core.Enums
         PushNotificationSubscriptionFail = 5003,
         PushNotificationUnsubscriptionFail = 5004,
         InvalidInput=5005,
+        InvalidMasterID = 4916,
         MoreDays=5006
     }
     //Rushabh 05-10-2018 as per instruction by nupoora mam change Enum 0 for Success and 1 for Fail
