@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.SharedKernel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -54,6 +55,9 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Column(TypeName = "decimal(18, 8)")]
         public decimal CurrencyPrice { get; set; }
         public short UpDownBit { get; set; }
+        [Required]
+        [DataType(DataType.DateTime)]
+        [DefaultValue("dbo.GetISTdate()")]
         public DateTime TranDate { get; set; }
     }
 }

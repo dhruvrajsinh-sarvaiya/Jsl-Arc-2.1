@@ -354,20 +354,20 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
         //        throw ex;
         //    }
         //}
-        public void GetPairAdditionalVal(long PairId, decimal CurrentRate, long TrnNo,decimal Quantity,DateTime TranDate)
+        public async void GetPairAdditionalVal(long PairId, decimal CurrentRate, long TrnNo, decimal Quantity, DateTime TranDate)
         {
             try
             {
                 //Calucalte ChangePer
-                decimal Volume24 = 0, ChangePer = 0, High24Hr = 0, Low24Hr = 0, WeekHigh = 0,WeekLow =0,Week52High=0,Week52Low=0;
+                decimal Volume24 = 0, ChangePer = 0, High24Hr = 0, Low24Hr = 0, WeekHigh = 0, WeekLow = 0, Week52High = 0, Week52Low = 0;
                 short UpDownBit = 1; //komal 13-11-2018 set defau
                 decimal tradeprice = 0, todayopen, todayclose;
                 decimal LastRate = 0;
 
-                var tradeRateData = _tradeTransactionQueueRepository.FindBy(x => x.TrnDate > _basePage.UTC_To_IST().AddDays(-1) && x.PairID == PairId && x.Status == 1 && ( x.TrnType == Convert.ToInt16(enTrnType.Sell_Trade) || x.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))).OrderByDescending(x => x.TrnNo).FirstOrDefault();
-                if(tradeRateData != null)
+                var tradeRateData = _tradeTransactionQueueRepository.FindBy(x => x.TrnDate > _basePage.UTC_To_IST().AddDays(-1) && x.PairID == PairId && x.Status == 1 && (x.TrnType == Convert.ToInt16(enTrnType.Sell_Trade) || x.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))).OrderByDescending(x => x.TrnNo).FirstOrDefault();
+                if (tradeRateData != null)
                 {
-                    if(tradeRateData.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
+                    if (tradeRateData.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
                     {
                         LastRate = tradeRateData.BidPrice;
                     }
@@ -478,7 +478,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         foreach (TradeTransactionQueue type in tardeTrabDetail)
                         {
                             decimal price = 0;
-                            if(type.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
+                            if (type.TrnType == Convert.ToInt16(enTrnType.Buy_Trade))
                             {
                                 price = type.BidPrice;
                             }
@@ -570,7 +570,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     //Uday 14-11-2018 CurrentRate Calculation Changes based on TrnDate
 
                     var pairData = _tradePairStastics.GetSingle(x => x.PairId == PairId);
-                    if(TranDate > pairData.TranDate)
+                    if (TranDate > pairData.TranDate)
                     {
                         pairData.LTP = CurrentRate;
                         pairData.CurrentRate = CurrentRate;
@@ -599,7 +599,7 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                         {
                             UpDownBit = 1;
                         }
-                        else if(CurrentRate == pairData.LTP)//komal 13-11-2018 if no change then set as it is
+                        else if (CurrentRate == pairData.LTP)//komal 13-11-2018 if no change then set as it is
                         {
                             UpDownBit = pairData.UpDownBit;
                         }
@@ -619,28 +619,28 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
                     var VolumeData = GetVolumeDataByPair(PairId);
                     var MarketData = GetMarketCap(PairId);
                     var GraphDataList = _frontTrnRepository.GetGraphData(PairId, 1, "MINUTE", DataDate, 1);
-                    if(GraphDataList.Count() > 0)
+                    if (GraphDataList.Count() > 0)
                     {
                         DateTime dt2 = new DateTime(1970, 1, 1);
                         List<GetGraphDetailInfo> responseData = new List<GetGraphDetailInfo>();
 
-                        responseData = GraphDataList.Select(a => new GetGraphDetailInfo()
-                        {
-                            DataDate = Convert.ToInt64(a.DataDate.Subtract(dt2).TotalMilliseconds),
-                            High = a.High,
-                            Low = a.Low,
-                            Open = a.OpenVal,
-                            Close = a.OpenVal,
-                            Volume = a.Volume,
-                        }).ToList();
+                        //responseData = GraphDataList.Select(a => new GetGraphDetailInfo()
+                        //{
+                        //    DataDate = Convert.ToInt64(a.DataDate.Subtract(dt2).TotalMilliseconds),
+                        //    High = a.High,
+                        //    Low = a.Low,
+                        //    Open = a.OpenVal,
+                        //    Close = a.OpenVal,
+                        //    Volume = a.Volume,
+                        //}).ToList();
 
                         var GraphData = responseData.FirstOrDefault();
                         HelperForLog.WriteLogIntoFile("#GraphDataToSocket# #TrnNo# : " + TrnNo, "FrontService", "Object Data : ");
                         _signalRService.ChartData(GraphData, VolumeData.PairName);
                     }
 
-                    HelperForLog.WriteLogIntoFile("#VolumeDataToSocket# #PairId# : " + PairId, "FrontService", "Object Data : " );
-                    HelperForLog.WriteLogIntoFile("#MarketDataToSocket# #PairId# : " + PairId, "FrontService", "Object Data : " );
+                    HelperForLog.WriteLogIntoFile("#VolumeDataToSocket# #PairId# : " + PairId + " #TrnNo# : " + TrnNo, "FrontService", "Object Data : ");
+                    HelperForLog.WriteLogIntoFile("#MarketDataToSocket# #PairId# : " + PairId + " #TrnNo# : " + TrnNo, "FrontService", "Object Data : ");
                     _signalRService.OnVolumeChange(VolumeData, MarketData);
                 }
             }
@@ -904,19 +904,22 @@ namespace CleanArchitecture.Infrastructure.Services.Transaction
             {
                 List<GetGraphDetailInfo> responseData = new List<GetGraphDetailInfo>();
                 var list = _frontTrnRepository.GetGraphData(PairId,IntervalTime,IntervalData,_basePage.UTC_To_IST()).OrderBy(x => x.DataDate);
-                DateTime dt2 = new DateTime(1970, 1, 1);
 
-                responseData = list.Select(a => new GetGraphDetailInfo()
-                {
-                    DataDate = Convert.ToInt64(a.DataDate.Subtract(dt2).TotalMilliseconds),
-                    High = a.High,
-                    Low = a.Low,
-                    Open = a.OpenVal,
-                    Close = a.OpenVal,
-                    Volume = a.Volume,
-                }).ToList();
+                //Uday 14-11-2018 Direct Query On Absolute View So No conversion required
+                //DateTime dt2 = new DateTime(1970, 1, 1);
+                //responseData = list.Select(a => new GetGraphDetailInfo()
+                //{
+                //    DataDate = Convert.ToInt64(a.DataDate.Subtract(dt2).TotalMilliseconds),
+                //    High = a.High,
+                //    Low = a.Low,
+                //    Open = a.OpenVal,
+                //    Close = a.OpenVal,
+                //    Volume = a.Volume,
+                //}).ToList();
 
-                return responseData;
+                //return responseData;
+
+                return list.ToList();
             }
             catch (Exception ex)
             {
