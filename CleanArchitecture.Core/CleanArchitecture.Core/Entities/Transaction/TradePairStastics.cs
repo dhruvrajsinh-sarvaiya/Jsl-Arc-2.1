@@ -54,5 +54,6 @@ namespace CleanArchitecture.Core.Entities.Transaction
         [Column(TypeName = "decimal(18, 8)")]
         public decimal CurrencyPrice { get; set; }
         public short UpDownBit { get; set; }
+        public DateTime TranDate { get; set; }
     }
 }

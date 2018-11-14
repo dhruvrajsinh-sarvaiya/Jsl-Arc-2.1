@@ -32,7 +32,7 @@ namespace CleanArchitecture.Core.Interfaces
         int AddToFavouritePair(long PairId, long UserId);
         int RemoveFromFavouritePair(long PairId, long UserId);
         List<FavouritePairInfo> GetFavouritePair(long UserId);
-        void GetPairAdditionalVal(long PairId, decimal CurrentRate,long TrnNo, decimal Quantity);
+        void GetPairAdditionalVal(long PairId, decimal CurrentRate,long TrnNo, decimal Quantity, DateTime TranDate);
         void GetIntervalTimeValue(string Interval, ref int IntervalTime, ref string IntervalData);
     }
 }
