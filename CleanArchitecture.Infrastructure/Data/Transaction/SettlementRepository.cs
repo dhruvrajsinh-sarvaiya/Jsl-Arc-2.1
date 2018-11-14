@@ -214,7 +214,7 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
 
 
                 //var MatchSellerList = MatchSellerListBase.OrderBy(x => x.Price).OrderBy(x => x.TrnNo);
-                var MatchSellerList = MatchSellerListBase.OrderBy(x => x.Price).OrderBy(x => x.TrnNo);
+                var MatchSellerList = MatchSellerListBase.OrderByDescending(x => x.Price).OrderBy(x => x.TrnNo);
 
                 foreach (TradeSellerList SellerList in MatchSellerList)
                 {
