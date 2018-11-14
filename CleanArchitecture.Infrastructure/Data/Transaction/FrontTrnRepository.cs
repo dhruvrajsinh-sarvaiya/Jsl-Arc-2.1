@@ -41,7 +41,9 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                 if (!string.IsNullOrEmpty(FromDate) && !string.IsNullOrEmpty(ToDate))
                 {
                     fDate = DateTime.ParseExact(FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                    tDate = DateTime.ParseExact(ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    ToDate = ToDate + " 23:59:59";
+                    tDate = DateTime.ParseExact(ToDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    //tDate = tDate.Add(DateTime.Now.TimeOfDay);
                     Result = _dbContext.ActiveOrderDataResponse.FromSql(Qry
                    , MemberID, Convert.ToInt16(enTransactionStatus.Hold),fDate ,tDate);
                 }
@@ -206,7 +208,8 @@ namespace CleanArchitecture.Infrastructure.Data.Transaction
                     if (!string.IsNullOrEmpty(FromDate) && !string.IsNullOrEmpty(ToDate))
                     {
                         fDate = DateTime.ParseExact(FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                        tDate = DateTime.ParseExact(ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        ToDate = ToDate + " 23:59:59";
+                        tDate = DateTime.ParseExact(ToDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         Result = _dbContext.TradeHistoryInfo.FromSql(qry, FromDate, ToDate);
                     }
 

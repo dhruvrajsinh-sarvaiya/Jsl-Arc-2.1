@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using CleanArchitecture.Core.Enums;
+using Microsoft.AspNetCore.Mvc;
+using CleanArchitecture.Core.Helpers;
 
 namespace CleanArchitecture.Core.SignalR
 {
@@ -548,6 +550,7 @@ namespace CleanArchitecture.Core.SignalR
                     if (Pair.Split("_")[1].ToString() == WalletName)
                     {
                         _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveBuyerSideWalletBal), Data);
+                        HelperForLog.WriteLogIntoFile("BuyerSideWalletBal", "SocketHub", " Send Data :"+ Data);
                     }
                     else
                     {
@@ -583,6 +586,7 @@ namespace CleanArchitecture.Core.SignalR
                     if (Pair.Split("_")[0].ToString() == WalletName)
                     {
                         _chatHubContext.Clients.Client(Key).SendAsync(Enum.GetName(typeof(enReturnMethod), enReturnMethod.RecieveSellerSideWalletBal), Data);
+                        HelperForLog.WriteLogIntoFile("SellerSideWalletBal", "SocketHub", " Send Data :" + Data);
                     }
                     else
                     {
