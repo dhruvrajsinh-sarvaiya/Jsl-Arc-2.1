@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     {
         public short Status { get; set; }
         public long MobileNo { get; set; }
-        public DateTime SMSDate { get; set; }
+        public string SMSDate { get; set; }
         public string SMSText { get; set; }
         public string StrStatus { get; set; }
     }

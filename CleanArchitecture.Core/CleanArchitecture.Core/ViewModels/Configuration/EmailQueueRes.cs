@@ -9,7 +9,7 @@ namespace CleanArchitecture.Core.ViewModels.Configuration
     {
         public short Status { get; set; }
         public string RecepientEmail { get; set; }
-        public DateTime EmailDate { get; set; }
+        public string  EmailDate { get; set; }
         public string Body { get; set; }
         public string StrStatus { get; set; }
         public string Subject { get; set; }
