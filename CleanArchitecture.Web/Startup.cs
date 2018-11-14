@@ -32,6 +32,7 @@ using CleanArchitecture.Web.Filters;
 using Hangfire;
 using CleanArchitecture.Infrastructure.DTOClasses;
 using CleanArchitecture.Web.BackgroundTask;
+using CleanArchitecture.Infrastructure.Data.Configuration;
 
 namespace CleanArchitecture.Web
 {
@@ -201,6 +202,7 @@ namespace CleanArchitecture.Web
 
                 config.For(typeof(ICommunicationService)).Add(typeof(CommunicationService));
                 config.For(typeof(IMasterConfiguration)).Add(typeof(MasterConfigServices));
+                config.For(typeof(IMasterConfigurationRepository)).Add(typeof(MasterConfigurationRepository));
 
                 //Populate the container using the service collection
                 config.Populate(services);
