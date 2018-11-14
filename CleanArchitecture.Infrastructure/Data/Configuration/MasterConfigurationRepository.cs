@@ -120,7 +120,7 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
                              {
                                  Status = u.Status,
                                  MobileNo = u.MobileNo,
-                                 SMSDate = u.CreatedDate.ToString(),
+                                 SMSDate = u.CreatedDate.ToString("dd-MM-yyyy h:mm:ss tt"),
                                  SMSText = u.SMSText,
                                  StrStatus = (u.Status == 0) ? "Initialize" : (u.Status == 1) ? "Success" : (u.Status == 6) ? "Pending" : "Fail"
                              }
@@ -155,7 +155,7 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
                              {
                                  Status = u.Status,
                                  RecepientEmail = u.Recepient,
-                                 EmailDate = u.CreatedDate.ToString(),
+                                 EmailDate = u.CreatedDate.ToString("dd-MM-yyyy h:mm:ss tt"),
                                  Body = u.Body,
                                  CC = u.CC,
                                  BCC=u.BCC,
